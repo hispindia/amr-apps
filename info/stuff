@@ -1,0 +1,42 @@
+http://ugle.asuscomm.com:8888/api/trackedEntityAttributes/RkCL8PAxV22.json?fields=*
+
+
+
+POST
+http://ugle.asuscomm.com:8888/api/29/trackedEntityInstances
+{
+    "trackedEntityType":"G5cty8Gzan7",
+    "orgUnit":"ANGhR1pa8I5",
+    "attributes":
+    [
+        {
+            "attribute":"BY9hgWTrq8V",
+            "value":"Transgender"
+        },
+        {
+            "attribute":"DOxUystmutC",
+            "value":"Oslo"
+        },
+        {
+            "attribute":"Lv4xbLkG39P",
+            "value":"2019-01-01"},
+        {
+            "attribute":"OkKucSXfbQ2",
+            "value":"Warangal"},
+        {
+            "attribute":"RkCL8PAxV22",
+            "value":"11223344"
+        },
+        {
+            "attribute":"ZVHlQMTW21F",
+            "value":"Urban"
+        },
+        {
+            "attribute":"jfydZttH7ls",
+            "value":"Telangana"
+        }
+    ]
+}
+
+GET
+http://ugle.asuscomm.com:8888/api/trackedEntityInstances.json?ouMode=ALL&fields=attributes[code,displayName,valueType,attribute,value]&filter=RkCL8PAxV22:eq:11223344
