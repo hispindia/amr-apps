@@ -39,3 +39,13 @@ export async function getPatient(patientRegNr) {
         return null;
     }
 }
+
+export async function getStates() {
+    return (await get('organisationUnits.json?paging=false&filter=level:eq:2'))
+        .organisationUnits;
+}
+
+export async function getDistricts() {
+    return (await get('organisationUnits.json?paging=false&filter=level:eq:3'))
+        .organisationUnits;
+}

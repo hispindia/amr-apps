@@ -62,7 +62,7 @@ export class InputField extends React.Component {
           value={this.state.value}
           onChange={this.setValue}
           variant={'outlined'}
-          style={{padding: 8}}
+          style={{margin: 8}}
           fullWidth
         />
     );

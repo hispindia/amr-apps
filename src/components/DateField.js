@@ -21,6 +21,12 @@ export class DateField extends React.Component {
     if (this.props.basicValue) this.setState({ value: this.props.basicValue });
   };
 
+  componentWillReceiveProps = props => {
+    console.log(props.value)
+    if(this.state.value !== props.value)
+      this.setState({ value: props.value });
+  };
+
   /**
    * passes the changed value to parent
    * @param newValue
@@ -62,10 +68,7 @@ export class DateField extends React.Component {
           labelFunc={this.renderLabel}
           variant={'outlined'}
           fullWidth
-          style={{
-            marginTop: 16,
-            marginBottom: 8
-          }}
+          style={{margin: 8}}
           showTodayButton
           animateYearScrolling
         />

@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { Paper, Typography } from '@material-ui/core';
-import { getPatient } from '../../api/api';
+import { getPatient, getStates, getDistricts } from '../../api/api';
 import { InputField } from '../../components/InputField';
 import { DateField } from '../../components/DateField';
+import { RadioSelector } from '../../components/RadioSelector';
+import { ObjectSelect } from '../../components/ObjectSelect';
 //import MomentUtils from "@date-io/moment";
 //import { InputField } from '@dhis2/ui/core/InputField'
 
@@ -15,7 +17,16 @@ export class PatientInformation extends Component {
         gender: '',
         locationType: '',
         patientRegistrationNumber: '',
-        state: ''
+        state: '',
+        loading: true
+    }
+
+    componentDidMount = async () => {
+        this.setState({
+            states: await getStates(),
+            districts: await getDistricts(),
+            loading: false
+        });
     }
 
     searchPatient = async value => {
@@ -51,13 +62,18 @@ export class PatientInformation extends Component {
             state,
             district,
             city,
-            locationType
+            locationType,
+            states,
+            loading
         } = this.state;
 
         console.log(this.state)
+
+        if(loading) return null;
+
         return (
             <Paper style={{ padding: 16 }}>
-                <Typography variant="h6" component="h6" style={{ padding: "30px 30px 10px 30px" }}>
+                <Typography variant="h6" component="h6" style={{ padding: 10 }}>
                     Patient information
                 </Typography>
                 <InputField
@@ -74,26 +90,26 @@ export class PatientInformation extends Component {
                     value = { dateOfBirth }
                     onChange = { this.onChange }
                 />
-                <InputField
+                <RadioSelector
                     required = { true }
                     name = { 'gender' }
                     label = { 'Gender' }
                     value = { gender }
                     onChange = { this.onChange }
                 />
-                <InputField
+                <ObjectSelect
                     required = { true }
-                    name = { 'state' }
+                    ous = { this.state.states }
                     label = { 'State' }
-                    value = { state }
-                    onChange = { this.onChange }
+                    value = { this.state.state }
+                    labelWidth = { 47 }
                 />
-                <InputField
+                <ObjectSelect
                     required = { true }
-                    name = { 'district' }
+                    ous = { this.state.districts }
                     label = { 'District' }
-                    value = { district }
-                    onChange = { this.onChange }
+                    value = { this.state.district }
+                    labelWidth = { 60 }
                 />
                 <InputField
                     required = { false }
@@ -109,6 +125,7 @@ export class PatientInformation extends Component {
                     value = { locationType }
                     onChange = { this.onChange }
                 />
+
             </Paper>
         );
     }
