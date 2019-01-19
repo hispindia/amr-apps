@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-import { DataEntry } from "./modules/dataentry/DataEntry";
+import { PatientInformation } from "./modules/dataentry/PatientInformation";
 import { Analytics } from "./modules/analytics/Analytics";
 
 
@@ -8,8 +8,8 @@ const Main = () => {
   return (
     <main>
       <Switch>
-        <Route exact path="/" component={DataEntry} />
-        <Route path="/dataentry" component={DataEntry} />
+        <Route exact path="/" component={PatientInformation} />
+        <Route path="/dataentry" component={PatientInformation} />
         <Route path="/analytics" component={Analytics} />
       </Switch>
     </main>

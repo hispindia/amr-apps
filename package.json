@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@date-io/moment": "^1.0.1",
     "@dhis2/d2-ui-core": "^1.4.0",
     "@dhis2/d2-ui-header-bar": "^5.0.3",
     "@dhis2/ui": "^1.0.0-beta.7",

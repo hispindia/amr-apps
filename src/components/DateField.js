@@ -5,7 +5,7 @@ import { TextField } from "@material-ui/core";
 import _ from "lodash";
 
 
-class InputField extends React.Component {
+export class DateField extends React.Component {
   state = {
     value: "",
     errorText: ""
@@ -30,14 +30,17 @@ class InputField extends React.Component {
   };
 
   /**
-   * handles value change
-   * @param newValue
+   * handles date change
+   * @param date
    */
-  setValue = newValue => {
-    this.setState({
-      value: newValue.target.value
-    });
-    this.passValue(newValue.target.value);
+  setDate = date => {
+    this.setState({ value: date });
+    this.passValue(date.format("YYYY-MM-DD"));
+  };
+
+  renderLabel = date => {
+    if (date.isValid()) return date.format("LL");
+    return "";
   };
 
 
@@ -49,13 +52,15 @@ class InputField extends React.Component {
    */
   render() {
     return (
+      <MuiPickersUtilsProvider utils={MomentUtils}>
         <DatePicker
-          required={ou.required}
+          required={this.props.required}
           error={this.state.value === null}
-          label={ou.displayName}
+          label={this.props.label}
           value={this.state.value}
           onChange={this.setDate}
           labelFunc={this.renderLabel}
+          variant={'outlined'}
           fullWidth
           style={{
             marginTop: 16,
@@ -64,8 +69,7 @@ class InputField extends React.Component {
           showTodayButton
           animateYearScrolling
         />
+      </MuiPickersUtilsProvider>
     );
   }
 }
-
-export default InputField;

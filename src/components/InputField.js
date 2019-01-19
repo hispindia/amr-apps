@@ -5,7 +5,7 @@ import { TextField } from "@material-ui/core";
 import _ from "lodash";
 
 
-class InputField extends React.Component {
+export class InputField extends React.Component {
   state = {
     value: "",
     errorText: ""
@@ -18,8 +18,14 @@ class InputField extends React.Component {
   }
 
   componentDidMount = () => {
-    if (this.props.basicValue) this.setState({ value: this.props.basicValue });
+    if (this.props.value) this.setState({ value: this.props.value });
   };
+
+  componentWillReceiveProps = props => {
+    console.log(props.value)
+    if(this.state.value !== props.value)
+      this.setState({ value: props.value });
+  }
 
   /**
    * passes the changed value to parent
@@ -56,9 +62,9 @@ class InputField extends React.Component {
           value={this.state.value}
           onChange={this.setValue}
           variant={'outlined'}
+          style={{padding: 8}}
+          fullWidth
         />
     );
   }
 }
-
-export default InputField;
