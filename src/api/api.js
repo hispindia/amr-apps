@@ -40,6 +40,19 @@ export async function getPatient(patientRegNr) {
     }
 }
 
+export async function getAllPatients() {
+    let data = await get('trackedEntityInstances/query.json?ouMode=ALL&order=created:desc&program=ecIoUziI2Gb&paging=false');
+    for (let i = 0; i < data.headers.length; i++)
+        data.headers[i].name = data.headers[i].column;
+    data.headers[0].options = { display: false };
+    data.headers[1].options = { display: false };
+    data.headers[2].options = { display: false };
+    data.headers[3].options = { display: false };
+    data.headers[5].options = { display: false };
+    data.headers[6].options = { display: false };
+    return data;
+}
+
 export async function getStates() {
     return (await get('organisationUnits.json?paging=false&filter=level:eq:2'))
         .organisationUnits;

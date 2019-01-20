@@ -18,7 +18,7 @@ export class DateField extends React.Component {
   }
 
   componentDidMount = () => {
-    if (this.props.basicValue) this.setState({ value: this.props.basicValue });
+    if (this.props.value) this.setState({ value: this.props.value });
   };
 
   componentWillReceiveProps = props => {

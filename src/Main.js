@@ -1,16 +1,15 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import { PatientInformation } from "./modules/dataentry/PatientInformation";
-import { Analytics } from "./modules/analytics/Analytics";
+import { Home } from "./modules/home/Home";
 
 
 const Main = () => {
   return (
     <main>
       <Switch>
-        <Route exact path="/" component={PatientInformation} />
-        <Route path="/dataentry" component={PatientInformation} />
-        <Route path="/analytics" component={Analytics} />
+        <Route exact path="/" component={Home} />
+        <Route path="/patient/:id" component={PatientInformation} />
       </Switch>
     </main>
   );

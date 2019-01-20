@@ -54,9 +54,9 @@ group = {
                 onChange={this.onChange}
                 style={this.group}
             >
-                <FormControlLabel value="Male" control={<Radio />} label="Male" />
-                <FormControlLabel value="Female" control={<Radio />} label="Female" />
-                <FormControlLabel value="Transgender" control={<Radio />} label="Transgender" />
+              {this.props.objects.map(object => (
+                <FormControlLabel key={object} value={object} control={<Radio />} label={object} />
+              ))}
             </RadioGroup>
         </FormControl>
     );

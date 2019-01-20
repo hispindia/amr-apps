@@ -32,7 +32,7 @@ export class ObjectSelect extends React.Component {
   };
 
   render() {
-    const ous = this.props.ous;
+    const objects = this.props.objects;
 
     return (
       <FormControl variant={'outlined'} fullWidth style={{margin: 8}}>
@@ -42,12 +42,12 @@ export class ObjectSelect extends React.Component {
             onChange={this.onChange}
             input={<OutlinedInput labelWidth={this.props.labelWidth} name={this.props.label} id={this.props.label}/>}
         >
-            {ous.map(ou => (
+            {objects.map(object => (
                 <MenuItem
-                    key={ou.id}
-                    value={ou.displayName}
+                    key={object.id}
+                    value={object.displayName}
                 >
-                    {ou.displayName}
+                    {object.displayName}
                 </MenuItem>
             ))}
         </Select>

@@ -25,8 +25,12 @@ export class PatientInformation extends Component {
         this.setState({
             states: await getStates(),
             districts: await getDistricts(),
-            loading: false
         });
+
+        if(this.props.match.params.id)
+            await this.searchPatient(this.props.match.params.id);
+
+        this.setState({ loading: false });
     }
 
     searchPatient = async value => {
@@ -92,6 +96,7 @@ export class PatientInformation extends Component {
                 />
                 <RadioSelector
                     required = { true }
+                    objects = { ['Male', 'Female', 'Transgender'] }
                     name = { 'gender' }
                     label = { 'Gender' }
                     value = { gender }
@@ -99,14 +104,14 @@ export class PatientInformation extends Component {
                 />
                 <ObjectSelect
                     required = { true }
-                    ous = { this.state.states }
+                    objects = { this.state.states }
                     label = { 'State' }
                     value = { this.state.state }
                     labelWidth = { 47 }
                 />
                 <ObjectSelect
                     required = { true }
-                    ous = { this.state.districts }
+                    objects = { this.state.districts }
                     label = { 'District' }
                     value = { this.state.district }
                     labelWidth = { 60 }
@@ -118,10 +123,11 @@ export class PatientInformation extends Component {
                     value = { city }
                     onChange = { this.onChange }
                 />
-                <InputField
+                <RadioSelector
                     required = { false }
+                    objects = { ['Urban', 'Rural'] }
                     name = { 'locationType' }
-                    label = { 'Location Type' }
+                    label = { 'Location type' }
                     value = { locationType }
                     onChange = { this.onChange }
                 />
