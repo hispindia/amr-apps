@@ -1,8 +1,6 @@
 import React from "react";
 import { DatePicker, MuiPickersUtilsProvider } from "material-ui-pickers";
 import MomentUtils from "@date-io/moment";
-import { TextField } from "@material-ui/core";
-import _ from "lodash";
 
 
 export class DateField extends React.Component {
@@ -10,12 +8,6 @@ export class DateField extends React.Component {
     value: "",
     errorText: ""
   };
-
-  constructor(props) {
-    super(props);
-    // Will start searching after user has stopped typing for 1 second.
-    this.passValue = _.debounce(this.passValue, 1000);
-  }
 
   componentDidMount = () => {
     if (this.props.value) this.setState({ value: this.props.value });
@@ -28,20 +20,12 @@ export class DateField extends React.Component {
   };
 
   /**
-   * passes the changed value to parent
-   * @param newValue
-   */
-  passValue = async newValue => {
-    this.props.onChange(newValue);
-  };
-
-  /**
    * handles date change
    * @param date
    */
   setDate = date => {
     this.setState({ value: date });
-    this.passValue(date.format("YYYY-MM-DD"));
+    this.props.onChange(date.format("YYYY-MM-DD"));
   };
 
   renderLabel = date => {

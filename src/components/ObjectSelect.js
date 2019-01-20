@@ -1,6 +1,5 @@
 import React from "react";
-import ReactDOM from 'react-dom';
-import { InputLabel, FormControl, OutlinedInput, MenuItem, Select, FilledInput } from "@material-ui/core";
+import { InputLabel, FormControl, OutlinedInput, MenuItem, Select } from "@material-ui/core";
 
 export class ObjectSelect extends React.Component {
   state = {

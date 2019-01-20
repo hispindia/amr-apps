@@ -1,5 +1,10 @@
-import { get, post, postData, put, patch, del } from "./crud";
+import { get } from "./crud";
 
+
+export async function patientRegNrIsUnique(patientRegNr) {
+    return (await get('trackedEntityInstances.json?ouMode=ALL&fields=attributes[code,displayName,valueType,attribute,value]&filter=RkCL8PAxV22:eq:'
+            + patientRegNr)).trackedEntityInstances.length === 0;
+}
 
 export async function getPatient(patientRegNr) {
     try {
