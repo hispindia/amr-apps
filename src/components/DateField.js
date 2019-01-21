@@ -14,7 +14,7 @@ export class DateField extends React.Component {
   };
 
   componentWillReceiveProps = props => {
-    console.log(props.value)
+    //console.log(props.value)
     if(this.state.value !== props.value)
       this.setState({ value: props.value });
   };

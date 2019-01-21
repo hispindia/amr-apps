@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Paper, Typography, Grid, Button } from '@material-ui/core';
 import DoneIcon from '@material-ui/icons/Done';
-import { getPatient, getStates, getDistricts, getProgramAttributes } from '../../api/api';
+import { /*getPatient,*/ getProgramAttributes, getDistricts } from '../../api/api';
 import { InputField } from '../../components/InputField';
 import { DateField } from '../../components/DateField';
 import { RadioSelector } from '../../components/RadioSelector';
@@ -10,87 +10,62 @@ import { ObjectSelect } from '../../components/ObjectSelect';
 
 export class PatientInformation extends Component {
     state = {
-        city: '',
-        dateOfBirth: '',
-        district: '',
-        gender: '',
-        locationType: '',
-        patientRegistrationNumber: '',
-        state: '',
         loading: true,
-        values: {}
+        values: {},
+        stateId: '',
+        districts: []
     }
 
     componentDidMount = async () => {
-        //console.log(await getStates())
         const programAttributes = await getProgramAttributes();
-        console.log(programAttributes)
         let values = {};
-        for(let i = 0; i < programAttributes.length; i++)
+        let stateId = '';
+        for(let i = 0; i < programAttributes.length; i++) {
             values[programAttributes[i].trackedEntityAttribute.id] = '';
+            if(programAttributes[i].trackedEntityAttribute.code === 'state')
+                stateId = programAttributes[i].trackedEntityAttribute.id;
+        }
 
 
         this.setState({
-            states: await getStates(),
-            districts: [],
             attributes: programAttributes,
-            values: values
+            values: values,
+            stateId: stateId
         });
 
-        if(this.props.match.params.id)
-            await this.searchPatient(this.props.match.params.id);
+        //if(this.props.match.params.id)
+        //    await this.searchPatient(this.props.match.params.id);
 
         this.setState({ loading: false });
     }
 
-    searchPatient = async value => {
+    /*searchPatient = async value => {
         const patientData = await getPatient(value);
         console.log(patientData);
         if(patientData) {
             this.setState(patientData);
             //this.setState({ dateOfBirth: patientData.dateOfBirth })
         }
-    }
+    }*/
 
-    onChange = (name, value) => {
+    onChange = async (name, value) => {
         let values = {...this.state.values};
         values[name] = value;
-        this.setState({ values: values })
+        if(name === this.state.stateId)
+            this.setState({
+                values: values,
+                districts: await getDistricts(value)
+            })
+        else
+            this.setState({ values: values })
     }
-    
-    onStateSelected = async value => {
-        this.console.log(value)
-        this.setState({
-            state: value,
-            //districts: await getDistricts(value)
-        });
-    }
-
-    /*
-    <TextField
-                required={this.props.required}
-                id="standard-required"
-                name={this.props.name}
-                label={this.props.displayName}
-                onChange={this.props.onChange}
-                value={this.state.value}
-            />
-    */
 
     render() {
         const {
-            patientRegistrationNumber,
-            dateOfBirth,
-            gender,
-            state,
-            district,
-            city,
-            locationType,
-            states,
-            districts,
             loading,
             attributes,
-            values
+            values,
+            districts
         } = this.state;
 
         console.log(this.state)
@@ -126,11 +101,17 @@ export class PatientInformation extends Component {
                                     ) : (
                                         <ObjectSelect
                                             required = { true }
-                                            objects = { attribute.trackedEntityAttribute.optionSet.options }
+                                            objects = { attribute.trackedEntityAttribute.code !== 'district' ? (
+                                                attribute.trackedEntityAttribute.optionSet.options
+                                                ) : districts }
+                                            name = { attribute.trackedEntityAttribute.id }
                                             label = { attribute.trackedEntityAttribute.displayName }
                                             value = { values[attribute.trackedEntityAttribute.id] }
                                             labelWidth = { 60 }
-                                            onChange = { this.onStateSelected }
+                                            onChange = { this.onChange }
+                                            disabled = { attribute.trackedEntityAttribute.code === 'district'
+                                                && districts.length === 0 }
+                                            helperText = 'Select state first'
                                         />)
                             ) : <InputField
                                     required = { true }

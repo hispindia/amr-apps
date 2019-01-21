@@ -16,7 +16,7 @@ export class ObjectSelect extends React.Component {
   };
 
   componentWillReceiveProps = props => {
-    console.log(props.value)
+    //console.log(props.value)
     if(this.state.value !== props.value)
       this.setState({ value: props.value });
   };
@@ -27,8 +27,7 @@ export class ObjectSelect extends React.Component {
    */
   onChange = event => {
     this.setState({ value: event.target.value });
-    console.log(event.target.value)
-    this.props.onChange(event.target.value);
+    this.props.onChange(event.target.name, event.target.value);
   };
 
   render() {
@@ -40,7 +39,7 @@ export class ObjectSelect extends React.Component {
         <Select
             value={this.state.value}
             onChange={this.onChange}
-            input={<OutlinedInput labelWidth={this.props.labelWidth} name={this.props.label} id={this.props.label}/>}
+            input={<OutlinedInput labelWidth={this.props.labelWidth} name={this.props.name} id={this.props.label}/>}
         >
             {objects.map(object => (
                 <MenuItem

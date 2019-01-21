@@ -20,7 +20,7 @@ group = {
   };
 
   componentWillReceiveProps = props => {
-    console.log(props.value)
+    //console.log(props.value)
     if(this.state.value !== props.value)
       this.setState({ value: props.value });
   }
@@ -30,7 +30,7 @@ group = {
    * @param newValue
    */
   onChange = event => {
-    console.log()
+    //console.log()
     this.setState({ value: event.target.value });
     this.props.onChange(this.props.name, event.target.value);
   };
