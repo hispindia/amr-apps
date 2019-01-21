@@ -20,7 +20,7 @@ export class SideButton extends React.Component {
 
     return (
         <Fab variant="extended" color="primary" onClick = { this.onClick }>
-            <AddIcon/>
+            <AddIcon style={{paddingRight: 8}}/>
             { this.props.label }
         </Fab>
     );

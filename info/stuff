@@ -40,3 +40,5 @@ http://ugle.asuscomm.com:8888/api/29/trackedEntityInstances
 
 GET
 http://ugle.asuscomm.com:8888/api/trackedEntityInstances.json?ouMode=ALL&fields=attributes[code,displayName,valueType,attribute,value]&filter=RkCL8PAxV22:eq:11223344
+
+http://ugle.asuscomm.com:8888/api/optionSets.json?paging=false&fields=options[*]&filter=code:eq:State

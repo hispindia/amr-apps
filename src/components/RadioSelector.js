@@ -30,8 +30,9 @@ group = {
    * @param newValue
    */
   onChange = event => {
+    console.log()
     this.setState({ value: event.target.value });
-    this.props.onChange(event.target.value);
+    this.props.onChange(this.props.name, event.target.value);
   };
 
 
@@ -55,7 +56,7 @@ group = {
                 style={this.group}
             >
               {this.props.objects.map(object => (
-                <FormControlLabel key={object} value={object} control={<Radio />} label={object} />
+                <FormControlLabel key={object.id} value={object.name} control={<Radio />} label={object.displayName} />
               ))}
             </RadioGroup>
         </FormControl>

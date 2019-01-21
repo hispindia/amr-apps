@@ -25,7 +25,7 @@ export class DateField extends React.Component {
    */
   setDate = date => {
     this.setState({ value: date });
-    this.props.onChange(date.format("YYYY-MM-DD"));
+    this.props.onChange(this.props.name, date.format("YYYY-MM-DD"));
   };
 
   renderLabel = date => {

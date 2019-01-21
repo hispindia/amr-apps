@@ -1,5 +1,5 @@
 import React from "react";
-import { InputLabel, FormControl, OutlinedInput, MenuItem, Select } from "@material-ui/core";
+import { InputLabel, FormControl, OutlinedInput, MenuItem, Select, FormHelperText } from "@material-ui/core";
 
 export class ObjectSelect extends React.Component {
   state = {
@@ -27,14 +27,15 @@ export class ObjectSelect extends React.Component {
    */
   onChange = event => {
     this.setState({ value: event.target.value });
-    //this.props.onChange({ id: selected.value, name: selected.label });
+    console.log(event.target.value)
+    this.props.onChange(event.target.value);
   };
 
   render() {
     const objects = this.props.objects;
 
     return (
-      <FormControl variant={'outlined'} fullWidth style={{margin: 8}}>
+      <FormControl variant={'outlined'} fullWidth style={{margin: 8}} disabled={this.props.disabled}>
         <InputLabel htmlFor={this.props.label} required={this.props.required}>{this.props.label}</InputLabel>
         <Select
             value={this.state.value}
@@ -50,6 +51,9 @@ export class ObjectSelect extends React.Component {
                 </MenuItem>
             ))}
         </Select>
+        {this.props.disabled ? (
+          <FormHelperText>{this.props.helperText}</FormHelperText>
+        ) : null}
       </FormControl>
     );
   }

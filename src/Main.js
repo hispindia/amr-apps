@@ -6,7 +6,7 @@ import Home from "./modules/home/Home";
 
 const Main = () => {
   return (
-    <main>
+    <main style = {{ marginLeft: 20, marginRight: 20 }}>
       <Switch>
         <Route exact path="/" component={Home} />
         <Route exact path="/patient" component={PatientInformation} />

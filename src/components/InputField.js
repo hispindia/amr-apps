@@ -31,21 +31,20 @@ export class InputField extends React.Component {
    * passes the changed value to parent
    * @param newValue
    */
-  passValue = async newValue => {
-    this.props.onChange(newValue);
+  passValue = async (name, value) => {
+    this.props.onChange(name, value);
   };
 
   /**
    * handles value change
    * @param newValue
    */
-  setValue = newValue => {
+  setValue = event => {
     this.setState({
-      value: newValue.target.value
+      value: event.target.value
     });
-    this.passValue(newValue.target.value);
+    this.passValue(event.target.name, event.target.value);
   };
-
 
   /**
    * renders a DatePicker for all attributes of type 'date',

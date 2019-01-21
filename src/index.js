@@ -5,6 +5,7 @@ import { App } from './App';
 import * as serviceWorker from './serviceWorker';
 import { config, init } from 'd2'
 import { setBaseUrl } from './api/crud';
+import { setAmrProgram } from './api/api';
 
 
 const apiVersion = 29;
@@ -25,6 +26,7 @@ config.i18n.strings.add('no_results_found');
 const withBaseUrl = baseUrl => {
     baseUrl = `${baseUrl}/api/${apiVersion}`;
     setBaseUrl(baseUrl);
+    setAmrProgram();
 
     init({baseUrl: baseUrl})
     .then(d2 => {
@@ -38,6 +40,7 @@ const withBaseUrl = baseUrl => {
     })
     .catch(err => console.error(err));
 };
+
 
 if (process.env.NODE_ENV === 'production') {
     fetch('./manifest.webapp')

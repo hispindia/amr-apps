@@ -1,7 +1,19 @@
 import { get } from "./crud";
 
+let amr = '';
 
-export async function patientRegNrIsUnique(patientRegNr) {
+export async function setAmrProgram() {
+    amr = (await get('programs.json?filter=shortName:eq:AMR&paging=false&fields=id'))
+        .programs[0].id;
+}
+
+export async function getProgramAttributes() {
+    return (await get('programs/' + amr
+        + '.json?fields=programTrackedEntityAttributes[trackedEntityAttribute[code,displayName,valueType,id,unique,name,optionSetValue,optionSet[options[code,name,id,displayName]]]]'))
+        .programTrackedEntityAttributes;
+}
+
+export async function isUnique(property, patientRegNr) {
     return (await get('trackedEntityInstances.json?ouMode=ALL&fields=attributes[code,displayName,valueType,attribute,value]&filter=RkCL8PAxV22:eq:'
             + patientRegNr)).trackedEntityInstances.length === 0;
 }
@@ -46,7 +58,7 @@ export async function getPatient(patientRegNr) {
 }
 
 export async function getAllPatients() {
-    let data = await get('trackedEntityInstances/query.json?ouMode=ALL&order=created:desc&program=ecIoUziI2Gb&paging=false');
+    let data = await get('trackedEntityInstances/query.json?ouMode=ALL&order=created:desc&paging=false&program=' + amr);
     for (let i = 0; i < data.headers.length; i++)
         data.headers[i].name = data.headers[i].column;
     data.headers[0].options = { display: false };
@@ -59,11 +71,11 @@ export async function getAllPatients() {
 }
 
 export async function getStates() {
-    return (await get('organisationUnits.json?paging=false&filter=level:eq:2'))
-        .organisationUnits;
+    return (await get('optionSets.json?paging=false&fields=options[name,displayName,id]&filter=code:eq:State'))
+        .optionSets[0].options;
 }
 
-export async function getDistricts() {
-    return (await get('organisationUnits.json?paging=false&filter=level:eq:3'))
-        .organisationUnits;
+export async function getDistricts(state) {
+    return (await get('optionSets.json?paging=false&fields=options[name,displayName,id]&filter=code:eq:'
+        + state)).optionSets[0].options;
 }

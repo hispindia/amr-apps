@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import { Paper, Typography } from '@material-ui/core';
-import { getPatient, getStates, getDistricts } from '../../api/api';
+import { Paper, Typography, Grid, Button } from '@material-ui/core';
+import DoneIcon from '@material-ui/icons/Done';
+import { getPatient, getStates, getDistricts, getProgramAttributes } from '../../api/api';
 import { InputField } from '../../components/InputField';
 import { DateField } from '../../components/DateField';
 import { RadioSelector } from '../../components/RadioSelector';
 import { ObjectSelect } from '../../components/ObjectSelect';
-//import MomentUtils from "@date-io/moment";
-//import { InputField } from '@dhis2/ui/core/InputField'
 
 
 export class PatientInformation extends Component {
@@ -18,13 +17,24 @@ export class PatientInformation extends Component {
         locationType: '',
         patientRegistrationNumber: '',
         state: '',
-        loading: true
+        loading: true,
+        values: {}
     }
 
     componentDidMount = async () => {
+        //console.log(await getStates())
+        const programAttributes = await getProgramAttributes();
+        console.log(programAttributes)
+        let values = {};
+        for(let i = 0; i < programAttributes.length; i++)
+            values[programAttributes[i].trackedEntityAttribute.id] = '';
+
+
         this.setState({
             states: await getStates(),
-            districts: await getDistricts(),
+            districts: [],
+            attributes: programAttributes,
+            values: values
         });
 
         if(this.props.match.params.id)
@@ -43,8 +53,17 @@ export class PatientInformation extends Component {
     }
 
     onChange = (name, value) => {
-        //console.log(event)
-        //this.setState({ name: value })
+        let values = {...this.state.values};
+        values[name] = value;
+        this.setState({ values: values })
+    }
+    
+    onStateSelected = async value => {
+        this.console.log(value)
+        this.setState({
+            state: value,
+            //districts: await getDistricts(value)
+        });
     }
 
     /*
@@ -69,7 +88,9 @@ export class PatientInformation extends Component {
             locationType,
             states,
             districts,
-            loading
+            loading,
+            attributes,
+            values
         } = this.state;
 
         console.log(this.state)
@@ -77,62 +98,55 @@ export class PatientInformation extends Component {
         if(loading) return null;
 
         return (
-            <Paper style={{ padding: 16 }}>
-                <Typography variant="h6" component="h6" style={{ padding: 6 }}>
+            <Paper style={{ padding: "20px 34px 20px 20px" }}>
+                <Typography variant="h6" component="h6" style={{ padding: "8px 8px 20px 8px" }}>
                     Patient information
                 </Typography>
-                <InputField
-                    required = { true }
-                    name = { 'patientRegistrationNumber' }
-                    label = { 'Patient registration number' }
-                    value = { patientRegistrationNumber }
-                    onChange = { this.searchPatient }
-                />
-                <DateField
-                    required = { true }
-                    name = { 'dateOfBirth' }
-                    label = { 'Date of birth' }
-                    value = { dateOfBirth }
-                    onChange = { this.onChange }
-                />
-                <RadioSelector
-                    required = { true }
-                    objects = { ['Male', 'Female', 'Transgender'] }
-                    name = { 'gender' }
-                    label = { 'Gender' }
-                    value = { gender }
-                    onChange = { this.onChange }
-                />
-                <ObjectSelect
-                    required = { true }
-                    objects = { states }
-                    label = { 'State' }
-                    value = { state }
-                    labelWidth = { 47 }
-                />
-                <ObjectSelect
-                    required = { true }
-                    objects = { districts }
-                    label = { 'District' }
-                    value = { district }
-                    labelWidth = { 60 }
-                />
-                <InputField
-                    required = { false }
-                    name = { 'city' }
-                    label = { 'City/Town/Village' }
-                    value = { city }
-                    onChange = { this.onChange }
-                />
-                <RadioSelector
-                    required = { false }
-                    objects = { ['Urban', 'Rural'] }
-                    name = { 'locationType' }
-                    label = { 'Location type' }
-                    value = { locationType }
-                    onChange = { this.onChange }
-                />
-
+                <Grid container spacing={16} direction='column'>
+                    {attributes.map(attribute => (
+                        <Grid item md key={attribute.trackedEntityAttribute.id}>
+                            {attribute.trackedEntityAttribute.valueType === 'AGE' ? (
+                                <DateField
+                                    required = { true }
+                                    name = { attribute.trackedEntityAttribute.id }
+                                    label = { attribute.trackedEntityAttribute.displayName }
+                                    value = { values[attribute.trackedEntityAttribute.id] }
+                                    onChange = { this.onChange }
+                            />
+                            ) : attribute.trackedEntityAttribute.optionSetValue ? (
+                                    attribute.trackedEntityAttribute.optionSet.options.length < 5 ? (
+                                        <RadioSelector
+                                            required = { true }
+                                            objects = { attribute.trackedEntityAttribute.optionSet.options }
+                                            name = { attribute.trackedEntityAttribute.id }
+                                            label = { attribute.trackedEntityAttribute.displayName }
+                                            value = { values[attribute.trackedEntityAttribute.id] }
+                                            onChange = { this.onChange }
+                                        />
+                                    ) : (
+                                        <ObjectSelect
+                                            required = { true }
+                                            objects = { attribute.trackedEntityAttribute.optionSet.options }
+                                            label = { attribute.trackedEntityAttribute.displayName }
+                                            value = { values[attribute.trackedEntityAttribute.id] }
+                                            labelWidth = { 60 }
+                                            onChange = { this.onStateSelected }
+                                        />)
+                            ) : <InputField
+                                    required = { true }
+                                    name = { attribute.trackedEntityAttribute.id }
+                                    label = { attribute.trackedEntityAttribute.displayName }
+                                    value = { values[attribute.trackedEntityAttribute.id] }
+                                    onChange = { this.onChange }
+                                />
+                            }
+                        </Grid>
+                    ))}
+                </Grid>
+                <Button variant="contained" color="primary" style={{ margin: 8 }}>
+                    <DoneIcon style={{paddingRight: 8}}/>
+                    Submit
+                </Button>
             </Paper>
         );
     }
