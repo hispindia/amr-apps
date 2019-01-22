@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
+import { BrowserRouter } from "react-router-dom";
 //import logo from './logo.svg';
 import { HashRouter } from "react-router-dom";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core";
-import HeaderBar from "@dhis2/d2-ui-header-bar";
 import Main from './Main';
+import { Header } from './modules/Header';
 
 
 const theme = createMuiTheme({
@@ -21,14 +22,16 @@ export class App extends Component {
 
   render() {
     return (
+      <BrowserRouter>
       <HashRouter>
         <MuiThemeProvider theme={theme}>
-          <HeaderBar d2={ this.props.d2 }/>
-          <div style={{ marginTop: 60 }}>
+          <Header/>
+          <div style={{ marginTop: 16 }}>
             <Main/>
           </div>
         </MuiThemeProvider>
       </HashRouter>
+      </BrowserRouter>
     );
   }
 }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Paper, Typography, Grid, Button } from '@material-ui/core';
 import DoneIcon from '@material-ui/icons/Done';
-import { /*getPatient,*/ getProgramAttributes, getDistricts } from '../../api/api';
+import { /*getPatient,*/ getProgramAttributes, getDistricts, addPatient } from '../../api/api';
 import { InputField } from '../../components/InputField';
 import { DateField } from '../../components/DateField';
 import { RadioSelector } from '../../components/RadioSelector';
@@ -13,17 +13,21 @@ export class PatientInformation extends Component {
         loading: true,
         values: {},
         stateId: '',
-        districts: []
+        districts: [],
+        uniques: []
     }
 
     componentDidMount = async () => {
         const programAttributes = await getProgramAttributes();
         let values = {};
+        let uniques = {};
         let stateId = '';
         for(let i = 0; i < programAttributes.length; i++) {
             values[programAttributes[i].trackedEntityAttribute.id] = '';
             if(programAttributes[i].trackedEntityAttribute.code === 'state')
                 stateId = programAttributes[i].trackedEntityAttribute.id;
+            if(programAttributes[i].trackedEntityAttribute.unique)
+                uniques[programAttributes[i].trackedEntityAttribute.id] = true;
         }
 
 
@@ -60,12 +64,34 @@ export class PatientInformation extends Component {
             this.setState({ values: values })
     }
 
+    onClick = async () => {
+        await addPatient(this.state.values);
+    }
+
+    validate = () => {
+        const { attributes, values, uniques } = this.state;
+        for(let i = 0; i < attributes.length; i++)
+            if(attributes[i].mandatory)
+                if(values[attributes[i].trackedEntityAttribute.id] === '')
+                    return false;
+        for(let key in uniques)
+            if(!uniques[key])
+                return false;
+        return true;
+    }
+
+    setUniqueValid = (name, valid) => {
+        let uniques = {...this.state.uniques};
+        uniques[name] = valid;
+        this.setState({ uniques: uniques });
+    }
+
     render() {
         const {
             loading,
             attributes,
             values,
-            districts
+            districts,
         } = this.state;
 
         console.log(this.state)
@@ -82,7 +108,8 @@ export class PatientInformation extends Component {
                         <Grid item md key={attribute.trackedEntityAttribute.id}>
                             {attribute.trackedEntityAttribute.valueType === 'AGE' ? (
                                 <DateField
-                                    required = { true }
+                                    required = { attribute.mandatory }
+                                    unique = { attribute.trackedEntityAttribute.unique }
                                     name = { attribute.trackedEntityAttribute.id }
                                     label = { attribute.trackedEntityAttribute.displayName }
                                     value = { values[attribute.trackedEntityAttribute.id] }
@@ -91,7 +118,7 @@ export class PatientInformation extends Component {
                             ) : attribute.trackedEntityAttribute.optionSetValue ? (
                                     attribute.trackedEntityAttribute.optionSet.options.length < 5 ? (
                                         <RadioSelector
-                                            required = { true }
+                                            required = { attribute.mandatory }
                                             objects = { attribute.trackedEntityAttribute.optionSet.options }
                                             name = { attribute.trackedEntityAttribute.id }
                                             label = { attribute.trackedEntityAttribute.displayName }
@@ -100,7 +127,7 @@ export class PatientInformation extends Component {
                                         />
                                     ) : (
                                         <ObjectSelect
-                                            required = { true }
+                                            required = { attribute.mandatory }
                                             objects = { attribute.trackedEntityAttribute.code !== 'district' ? (
                                                 attribute.trackedEntityAttribute.optionSet.options
                                                 ) : districts }
@@ -114,7 +141,8 @@ export class PatientInformation extends Component {
                                             helperText = 'Select state first'
                                         />)
                             ) : <InputField
-                                    required = { true }
+                                    required = { attribute.mandatory }
+                                    onUnique = { this.setUniqueValid }
                                     name = { attribute.trackedEntityAttribute.id }
                                     label = { attribute.trackedEntityAttribute.displayName }
                                     value = { values[attribute.trackedEntityAttribute.id] }
@@ -124,7 +152,7 @@ export class PatientInformation extends Component {
                         </Grid>
                     ))}
                 </Grid>
-                <Button variant="contained" color="primary" style={{ margin: 8 }}>
+                <Button variant="contained" color="primary" style={{ margin: 8 }} onClick={this.onClick} disabled={!this.validate()}>
                     <DoneIcon style={{paddingRight: 8}}/>
                     Submit
                 </Button>

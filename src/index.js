@@ -1,48 +1,32 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter } from "react-router-dom";
 import { App } from './App';
 import * as serviceWorker from './serviceWorker';
-import { config, init } from 'd2'
 import { setBaseUrl } from './api/crud';
 import { setAmrProgram } from './api/api';
 
 
-const apiVersion = 29;
 const developmentServer = 'http://ugle.asuscomm.com:8888';
 const rootElement = document.getElementById('root');
 
-config.i18n.strings.add('app_search_placeholder');
-config.i18n.strings.add('manage_my_apps');
-config.i18n.strings.add('log_out');
-config.i18n.strings.add('account');
-config.i18n.strings.add('profile');
-config.i18n.strings.add('settings');
-config.i18n.strings.add('about_dhis2');
-config.i18n.strings.add('help');
-config.i18n.strings.add('no_results_found');
+const withBaseUrl = async baseUrl => {
+    baseUrl = `${baseUrl}/api`;
+    setBaseUrl(baseUrl)
+    await setAmrProgram()
+    var DHIS_CONFIG = {
+        baseUrl: baseUrl
+    }
+    console.log(DHIS_CONFIG.baseUrl)
 
+    ReactDOM.render(<App/>, rootElement);
+    serviceWorker.unregister();
 
-const withBaseUrl = baseUrl => {
-    baseUrl = `${baseUrl}/api/${apiVersion}`;
-    setBaseUrl(baseUrl);
-    setAmrProgram();
-
-    init({baseUrl: baseUrl})
-    .then(d2 => {
-        ReactDOM.render(
-            <BrowserRouter>
-                <App d2={d2} />
-            </BrowserRouter>,
-            rootElement
-        );
-        serviceWorker.unregister();
-    })
-    .catch(err => console.error(err));
+    
 };
 
 
 if (process.env.NODE_ENV === 'production') {
+    console.log('prod')
     fetch('./manifest.webapp')
         .then(response => response.json())
         .then(manifest => {
@@ -53,6 +37,7 @@ if (process.env.NODE_ENV === 'production') {
             ReactDOM.render(<code>No manifest found</code>, rootElement);
         });
 } else {
+    console.log('dev')
     withBaseUrl(developmentServer);
 }
 

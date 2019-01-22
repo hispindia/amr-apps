@@ -42,3 +42,24 @@ GET
 http://ugle.asuscomm.com:8888/api/trackedEntityInstances.json?ouMode=ALL&fields=attributes[code,displayName,valueType,attribute,value]&filter=RkCL8PAxV22:eq:11223344
 
 http://ugle.asuscomm.com:8888/api/optionSets.json?paging=false&fields=options[*]&filter=code:eq:State
+
+
+{
+    "trackedEntity": "tracked-entity-id",
+    "orgUnit": "org-unit-id",
+    "attributes": [ {
+        "attribute": "attribute-id",
+        "value": "attribute-value"
+    } ],
+    "enrollments": [ {
+        "orgUnit": "org-unit-id",
+        "program": "program-id",
+        "enrollmentDate": "2013-09-17",
+        "incidentDate": "2013-09-17"
+     }, {
+        "orgUnit": "org-unit-id",
+        "program": "program-id",
+        "enrollmentDate": "2013-09-17",
+        "incidentDate": "2013-09-17"
+     } ]
+}

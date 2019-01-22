@@ -1,7 +1,7 @@
 let baseUrl = "";
 
-export function updateState(text, open) {
-  this.setState({ open: open, text: text });
+export function getBaseUrl() {
+  return {...baseUrl};
 }
 
 /**
@@ -18,6 +18,17 @@ export function setBaseUrl(url) {
  */
 export async function get(endpoint) {
   const response = await fetch(baseUrl + endpoint, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      Accept: "application/json"
+    }
+  });
+  return await response.json();
+}
+
+export async function getNonApi(endpoint) {
+  const response = await fetch(baseUrl.substring(0, baseUrl.length - 4) + endpoint, {
     method: "GET",
     credentials: "include",
     headers: {
