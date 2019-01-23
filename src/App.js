@@ -15,9 +15,7 @@ export class App extends Component {
         <HashRouter>
           <div>
             <Header/>
-            <div style={{ marginTop: 16 }}>
-              <Main/>
-            </div>
+            <Main/>
           </div>
         </HashRouter>
       </BrowserRouter>

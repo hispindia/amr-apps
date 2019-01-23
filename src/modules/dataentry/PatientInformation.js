@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
-import { Button, Card } from '@dhis2/ui/core';
+import { Redirect } from 'react-router-dom'
+import { Button, Card, LinearProgress } from '@dhis2/ui/core';
 import { Row, Heading } from '../../helpers/helpers';
-import { getProgramAttributes, getDistricts, addPatient, getPatient } from '../../api/api';
+import { getProgramAttributes, getDistricts, addPatient, getPatient, deletePatient } from '../../api/api';
 import { TextInput } from '../../components/TextInput';
 import { DateField } from '../../components/DateField';
 import { RadioSelector } from '../../components/RadioSelector';
 import { ObjectSelect } from '../../components/ObjectSelect';
+import { PatientButtons } from './PatientButtons';
 
 
 export class PatientInformation extends Component {
@@ -14,7 +16,9 @@ export class PatientInformation extends Component {
         values: {},
         stateId: '',
         districts: [],
-        uniques: []
+        uniques: [],
+        querying: false,
+        goToHome: false
     }
 
     componentDidMount = async () => {
@@ -61,7 +65,6 @@ export class PatientInformation extends Component {
             isNewPatient: isNewPatient,
             loading: false
         });
-        console.log(id)
     }
 
     searchPatient = async value => {
@@ -98,8 +101,18 @@ export class PatientInformation extends Component {
             this.setState({ values: values })
     }
 
-    onClick = async () => {
+    onSubmitClick = async () => {
         await addPatient(this.state.values);
+        this.setState({ goToHome: true });
+    }
+
+    onEditClick = () => {
+        this.setState({ isNewPatient: true });
+    }
+
+    onDeleteClick = async () => {
+        await deletePatient(this.state.id);
+        this.setState({ goToHome: true });
     }
 
     validate = () => {
@@ -120,108 +133,107 @@ export class PatientInformation extends Component {
         this.setState({ uniques: uniques });
     }
 
+    getButtonProps = () => {
+        return this.state.isNewPatient ? [{
+            label: 'Submit',
+            onClick: this.onSubmitClick,
+            disabled: !this.validate(),
+            icon: 'done'
+        }] : [{
+            label: 'Edit',
+            onClick: this.onEditClick,
+            disabled: this.state.querying,
+            icon: 'edit'
+        },
+        {
+            label: 'Delete',
+            onClick: this.onDeleteClick,
+            disabled: this.state.querying,
+            icon: 'delete'
+        }];
+    }
+
     render() {
         const {
             loading,
             attributes,
             values,
             districts,
-            isNewPatient
+            isNewPatient,
+            querying,
+            goToHome
         } = this.state;
 
-        console.log(this.state)
+        if(goToHome)
+            return <Redirect push to={"/"}/>;
 
         if(loading) return null;
 
         return (
-            <Card>
-                <div style={{ margin: 20 }}>
-                    <Heading>
-                        Patient information
-                    </Heading>
-                        {attributes.map(attribute => (
-                            <div key={attribute.trackedEntityAttribute.id} style={{ marginBottom: 24 }}>
-                                {attribute.trackedEntityAttribute.valueType === 'AGE' ? (
-                                    <DateField
-                                        required = { attribute.mandatory }
-                                        unique = { attribute.trackedEntityAttribute.unique }
-                                        name = { attribute.trackedEntityAttribute.id }
-                                        label = { attribute.trackedEntityAttribute.displayName }
-                                        value = { values[attribute.trackedEntityAttribute.id] }
-                                        onChange = { this.onChange }
-                                        disabled = { !isNewPatient }
-                                />
-                                ) : attribute.trackedEntityAttribute.optionSetValue ? (
-                                        attribute.trackedEntityAttribute.optionSet.options.length < 5 ? (
-                                            <RadioSelector
+            <div>
+                {querying ? <LinearProgress/> : null}
+                <div style={{margin: 20}}>
+                    <Card>
+                        <div style={{ margin: 20 }}>
+                            <Heading>
+                                Patient information
+                            </Heading>
+                                {attributes.map(attribute => (
+                                    <div key={attribute.trackedEntityAttribute.id} style={{ marginBottom: 24 }}>
+                                        {attribute.trackedEntityAttribute.valueType === 'AGE' ? (
+                                            <DateField
                                                 required = { attribute.mandatory }
-                                                objects = { attribute.trackedEntityAttribute.optionSet.options }
+                                                unique = { attribute.trackedEntityAttribute.unique }
+                                                name = { attribute.trackedEntityAttribute.id }
+                                                label = { attribute.trackedEntityAttribute.displayName }
+                                                value = { values[attribute.trackedEntityAttribute.id] }
+                                                onChange = { this.onChange }
+                                                disabled = { !isNewPatient }
+                                        />
+                                        ) : attribute.trackedEntityAttribute.optionSetValue ? (
+                                                attribute.trackedEntityAttribute.optionSet.options.length < 5 ? (
+                                                    <RadioSelector
+                                                        required = { attribute.mandatory }
+                                                        objects = { attribute.trackedEntityAttribute.optionSet.options }
+                                                        name = { attribute.trackedEntityAttribute.id }
+                                                        label = { attribute.trackedEntityAttribute.displayName }
+                                                        value = { values[attribute.trackedEntityAttribute.id] }
+                                                        onChange = { this.onChange }
+                                                        disabled = { !isNewPatient }
+                                                    />
+                                                ) : (
+                                                    <ObjectSelect
+                                                        required = { attribute.mandatory }
+                                                        objects = { attribute.trackedEntityAttribute.code !== 'district' ? (
+                                                            attribute.trackedEntityAttribute.optionSet.options
+                                                            ) : districts }
+                                                        name = { attribute.trackedEntityAttribute.id }
+                                                        label = { attribute.trackedEntityAttribute.displayName }
+                                                        value = { values[attribute.trackedEntityAttribute.id] }
+                                                        labelWidth = { 60 }
+                                                        onChange = { this.onChange }
+                                                        disabled = { !isNewPatient || (attribute.trackedEntityAttribute.code === 'district'
+                                                            && districts.length === 0) }
+                                                        helperText = { !isNewPatient ? '' : 'Select state first' }
+                                                    />)
+                                        ) : <TextInput
+                                                required = { attribute.mandatory }
+                                                unique = { attribute.trackedEntityAttribute.unique }
+                                                onUnique = { this.setUniqueValid }
                                                 name = { attribute.trackedEntityAttribute.id }
                                                 label = { attribute.trackedEntityAttribute.displayName }
                                                 value = { values[attribute.trackedEntityAttribute.id] }
                                                 onChange = { this.onChange }
                                                 disabled = { !isNewPatient }
                                             />
-                                        ) : (
-                                            <ObjectSelect
-                                                required = { attribute.mandatory }
-                                                objects = { attribute.trackedEntityAttribute.code !== 'district' ? (
-                                                    attribute.trackedEntityAttribute.optionSet.options
-                                                    ) : districts }
-                                                name = { attribute.trackedEntityAttribute.id }
-                                                label = { attribute.trackedEntityAttribute.displayName }
-                                                value = { values[attribute.trackedEntityAttribute.id] }
-                                                labelWidth = { 60 }
-                                                onChange = { this.onChange }
-                                                disabled = { !isNewPatient || (attribute.trackedEntityAttribute.code === 'district'
-                                                    && districts.length === 0) }
-                                                helperText = { !isNewPatient ? '' : 'Select state first' }
-                                            />)
-                                ) : <TextInput
-                                        required = { attribute.mandatory }
-                                        unique = { attribute.trackedEntityAttribute.unique }
-                                        onUnique = { this.setUniqueValid }
-                                        name = { attribute.trackedEntityAttribute.id }
-                                        label = { attribute.trackedEntityAttribute.displayName }
-                                        value = { values[attribute.trackedEntityAttribute.id] }
-                                        onChange = { this.onChange }
-                                        disabled = { !isNewPatient }
-                                    />
-                                }
-                            </div>
-                        ))}
-                    <div style={{ marginTop: 32 }}>
-                        {isNewPatient ? <Button
-                            variant="contained"
-                            kind="primary"
-                            onClick={this.onClick}
-                            disabled={!this.validate()}
-                            icon='done'>
-                            Submit
-                        </Button>
-                        : <Row>
-                            <div style={{paddingRight: 12}}>
-                                <Button
-                                    variant="contained"
-                                    kind="primary"
-                                    onClick={this.onClick}
-                                    disabled={!this.validate()}
-                                    icon='edit'>
-                                    Edit
-                                </Button>
-                            </div>
-                            <Button
-                                variant="contained"
-                                kind="primary"
-                                onClick={this.onClick}
-                                disabled={!this.validate()}
-                                icon='delete'>
-                                Delete
-                            </Button>
-                        </Row> }
-                    </div>
+                                        }
+                                    </div>
+                                ))}
+                            <PatientButtons buttons = { this.getButtonProps() }/>
+                        </div>
+                    </Card>
                 </div>
-            </Card>
+            </div>
         );
     }
 }

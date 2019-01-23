@@ -6,7 +6,7 @@ import { Home } from "./modules/home/Home";
 
 export const Main = () => {
   return (
-    <main style = {{ marginLeft: 20, marginRight: 20, minWidth: 500 }}>
+    <main style = {{ minWidth: 500 }}>
       <Switch>
         <Route exact path="/" component={Home} />
         <Route exact path="/patient" component={PatientInformation} />

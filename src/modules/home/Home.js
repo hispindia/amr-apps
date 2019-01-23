@@ -20,11 +20,13 @@ export class Home extends React.Component {
         if(!this.state.data) return null;
 
         return(
+            <div style={{margin: 20}}>
             <Row>
                 <PatientTable data = { this.state.data }/>
                 <div style={{ width: 16 }}/>
                 <SideButton label='New' icon='create'/>
             </Row>
+            </div>
         );
     }
 }
