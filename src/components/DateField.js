@@ -1,6 +1,8 @@
 import React from "react";
 import { DatePicker, MuiPickersUtilsProvider } from "material-ui-pickers";
 import MomentUtils from "@date-io/moment";
+import * as moment from 'moment';
+import InputField from '@dhis2/ui/core/InputField'
 
 
 export class DateField extends React.Component {
@@ -28,35 +30,46 @@ export class DateField extends React.Component {
     this.props.onChange(this.props.name, date.format("YYYY-MM-DD"));
   };
 
-  renderLabel = date => {
-    if (date.isValid()) return date.format("LL");
-    return "";
+  openPicker = e => {
+    this.picker.open(e);
   };
 
+  onKeyPress = e => {
+    if(e.key === 'Enter')
+      this.picker.open(e);
+  }
 
-  /**
-   * renders a DatePicker for all attributes of type 'date',
-   * a ParentSelect object for the parent attribute,
-   * a textfield for everything else, marks required attributes as required and shows an error when those are empty
-   * @returns {*}
-   */
+  getField = () => {
+    return (
+      <div onClick={this.props.disabled ? null : this.openPicker} onKeyPress={this.props.disabled ? null : this.onKeyPress}>
+        <InputField
+          required={this.props.required}
+          name={this.props.name}
+          label={this.props.label}
+          value={this.state.value !== '' ? moment(this.state.value).format("LL") : this.state.value}
+          onChange={() => {}}
+          kind={'outlined'}
+          status={this.state.errorText === "" ? 'default' : 'error'}
+          help={this.state.errorText}
+          disabled = { this.props.disabled }
+        />
+      </div>
+    );
+  }
+
   render() {
     return (
+      <div className="picker">
       <MuiPickersUtilsProvider utils={MomentUtils}>
         <DatePicker
-          required={this.props.required}
-          error={this.state.value === null}
-          label={this.props.label}
-          value={this.state.value}
           onChange={this.setDate}
-          labelFunc={this.renderLabel}
-          variant={'outlined'}
-          fullWidth
-          style={{margin: 8}}
           showTodayButton
           animateYearScrolling
+          TextFieldComponent={this.getField}
+          ref={node => { this.picker = node; }}
         />
       </MuiPickersUtilsProvider>
+      </div>
     );
   }
 }

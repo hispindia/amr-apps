@@ -7,7 +7,7 @@ export class Header extends React.Component {
 
     render() {
         return (
-                <HeaderBar appName='AMR'/>
+                <HeaderBar appName='AMR Surveilance'/>
         )
     }
 }

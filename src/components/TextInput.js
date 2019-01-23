@@ -1,12 +1,10 @@
 import React from "react";
-//import { DatePicker, MuiPickersUtilsProvider } from "material-ui-pickers";
-//import MomentUtils from "@date-io/moment";
-import { TextField, CircularProgress } from "@material-ui/core";
+import InputField from '@dhis2/ui/core/InputField'
 import _ from "lodash";
 import { isUnique } from "../api/api";
 
 
-export class InputField extends React.Component {
+export class TextInput extends React.Component {
   state = {
     value: "",
     errorText: "",
@@ -31,15 +29,10 @@ export class InputField extends React.Component {
   };
 
   componentWillReceiveProps = props => {
-    //console.log(props.value)
     if(this.state.value !== props.value)
       this.setState({ value: props.value });
   }
 
-  /**
-   * passes the changed value to parent
-   * @param newValue
-   */
   passValue = async (name, value) => {
     const didValidate = await this.validate(value);
     this.setState({ errorText: didValidate });
@@ -50,11 +43,9 @@ export class InputField extends React.Component {
    * handles value change
    * @param newValue
    */
-  setValue = event => {
-    this.setState({
-      value: event.target.value
-    });
-    this.passValue(event.target.name, event.target.value);
+  setValue = (name, value) => {
+    this.setState({ value: value });
+    this.passValue(name, value);
   };
 
   /**
@@ -84,31 +75,19 @@ export class InputField extends React.Component {
     return errorText;
   };
 
-  /**
-   * renders a DatePicker for all attributes of type 'date',
-   * a ParentSelect object for the parent attribute,
-   * a textfield for everything else, marks required attributes as required and shows an error when those are empty
-   * @returns {*}
-   */
   render() {
     return (
-      <div style={{ position: "relative" }}>
-        <TextField
+        <InputField
           required={this.props.required}
           name={this.props.name}
           label={this.props.label}
           value={this.state.value}
           onChange={this.setValue}
-          variant={'outlined'}
-          style={{margin: 8}}
-          fullWidth
-          error={this.state.errorText !== ""}
-          helperText={this.state.errorText}
+          kind={'outlined'}
+          status={this.state.errorText === "" ? 'default' : 'error'}
+          help={this.state.errorText}
+          disabled={this.props.disabled}
         />
-        {this.state.validating ? (
-          <CircularProgress style={this.style} size={30}/>
-        ) : null}
-      </div>
     );
   }
 }

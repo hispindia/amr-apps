@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { App } from './App';
 import * as serviceWorker from './serviceWorker';
+import { App } from './App';
 import { setBaseUrl } from './api/crud';
 import { setAmrProgram } from './api/api';
 
@@ -13,20 +13,13 @@ const withBaseUrl = async baseUrl => {
     baseUrl = `${baseUrl}/api`;
     setBaseUrl(baseUrl)
     await setAmrProgram()
-    var DHIS_CONFIG = {
-        baseUrl: baseUrl
-    }
-    console.log(DHIS_CONFIG.baseUrl)
 
     ReactDOM.render(<App/>, rootElement);
     serviceWorker.unregister();
-
-    
 };
 
 
-if (process.env.NODE_ENV === 'production') {
-    console.log('prod')
+if(process.env.NODE_ENV === 'production') {
     fetch('./manifest.webapp')
         .then(response => response.json())
         .then(manifest => {
@@ -36,10 +29,9 @@ if (process.env.NODE_ENV === 'production') {
             console.error('Could not read manifest:', e);
             ReactDOM.render(<code>No manifest found</code>, rootElement);
         });
-} else {
-    console.log('dev')
-    withBaseUrl(developmentServer);
 }
+else
+    withBaseUrl(developmentServer);
 
 
 

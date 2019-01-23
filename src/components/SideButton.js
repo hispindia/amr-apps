@@ -1,7 +1,6 @@
 import React from "react";
 import { Redirect } from 'react-router-dom'
-import { Fab } from "@material-ui/core";
-import AddIcon from '@material-ui/icons/Add';
+import { Button } from '@dhis2/ui/core'
 
 
 export class SideButton extends React.Component {
@@ -13,16 +12,14 @@ export class SideButton extends React.Component {
       this.setState({ clicked: true });
   }
 
-
   render() {
     if(this.state.clicked)
       return <Redirect push to={"/patient/"}/>;
 
     return (
-        <Fab variant="extended" color="primary" onClick = { this.onClick }>
-            <AddIcon style={{paddingRight: 8}}/>
-            { this.props.label }
-        </Fab>
+      <Button variant="contained" kind="primary" onClick={this.onClick} icon={this.props.icon} size='large'>
+        {this.props.label}
+      </Button>
     );
   }
 }

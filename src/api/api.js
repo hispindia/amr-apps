@@ -1,4 +1,4 @@
-import { get, postData, getNonApi } from "./crud";
+import { get, postData, del } from "./crud";
 import * as moment from 'moment';
 
 let amrId = '';
@@ -9,8 +9,6 @@ export async function setAmrProgram() {
         .programs[0];
     amrId = program.id;
     personId = program.trackedEntityType.id;
-    console.log(amrId)
-    console.log(personId)
 }
 
 export async function getProgramAttributes() {
@@ -26,37 +24,8 @@ export async function isUnique(property, value) {
 
 export async function getPatient(patientRegNr) {
     try {
-        const attributes = (await get('trackedEntityInstances.json?ouMode=ALL&fields=attributes[code,displayName,valueType,attribute,value]&filter=RkCL8PAxV22:eq:'
-            + patientRegNr)).trackedEntityInstances[0].attributes;
-        let patientData = {};
-        for (let i = 0; i < attributes.length; i++) {
-            switch(attributes[i].attribute) {
-                case 'DOxUystmutC':
-                    patientData.city = attributes[i].value;
-                    break;
-                case 'Lv4xbLkG39P':
-                    patientData.dateOfBirth = attributes[i].value;
-                    break;
-                case 'OkKucSXfbQ2':
-                    patientData.district = attributes[i].value;
-                    break;
-                case 'BY9hgWTrq8V':
-                    patientData.gender = attributes[i].value;
-                    break;
-                case 'ZVHlQMTW21F':
-                    patientData.locationType = attributes[i].value;
-                    break;
-                case 'RkCL8PAxV22':
-                    patientData.patientRegistrationNumber = attributes[i].value;
-                    break;
-                case 'jfydZttH7ls':
-                    patientData.state = attributes[i].value;
-                    break;
-                default:
-                    break;
-            }
-        }
-        return patientData;
+        return (await get('trackedEntityInstances.json?ouMode=ALL&fields=trackedEntityInstance,attributes[code,displayName,valueType,attribute,value]&filter=RkCL8PAxV22:eq:'
+            + patientRegNr)).trackedEntityInstances[0];
     }
     catch {
         return null;
@@ -79,12 +48,14 @@ export async function addPatient(values) {
     };
     for(let key in values)
         data.attributes.push({ attribute: key, value: values[key] });
-    console.log(await postData('trackedEntityInstances/', data));
+    await postData('trackedEntityInstances/', data);
+}
+
+export async function deletePatient(id) {
+    await del('trackedEntityInstances/' + id);
 }
 
 export async function getAllPatients() {
-    console.log('hello')
-    console.log(amrId)
     let data = await get('trackedEntityInstances/query.json?ouMode=ALL&order=created:desc&paging=false&program=' + amrId);
     for (let i = 0; i < data.headers.length; i++)
         data.headers[i].name = data.headers[i].column;
@@ -97,13 +68,9 @@ export async function getAllPatients() {
     return data;
 }
 
-export async function getStates() {
-    return (await get('optionSets.json?paging=false&fields=options[name,displayName,id]&filter=code:eq:State'))
-        .optionSets[0].options;
-}
-
 export async function getDistricts(state) {
-    return (await get('optionSets.json?paging=false&fields=options[name,displayName,id]&filter=code:eq:'
+    return (await get('optionSets.json?paging=false&fields=options[name,displayName,id,code]&filter=code:eq:'
         + state)).optionSets[0].options;
 }
 
+    

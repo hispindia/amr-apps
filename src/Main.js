@@ -1,12 +1,12 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import { PatientInformation } from "./modules/dataentry/PatientInformation";
-import Home from "./modules/home/Home";
+import { Home } from "./modules/home/Home";
 
 
-const Main = () => {
+export const Main = () => {
   return (
-    <main style = {{ marginLeft: 20, marginRight: 20 }}>
+    <main style = {{ marginLeft: 20, marginRight: 20, minWidth: 500 }}>
       <Switch>
         <Route exact path="/" component={Home} />
         <Route exact path="/patient" component={PatientInformation} />
@@ -15,5 +15,3 @@ const Main = () => {
     </main>
   );
 };
-
-export default Main;
