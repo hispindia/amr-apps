@@ -1,13 +1,12 @@
-import React from 'react';
+import React from 'react'
 import { Redirect } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
-import MUIDataTable from "mui-datatables";
-
+import MUIDataTable from 'mui-datatables'
 
 export class EventTable extends React.Component {
     state = {
-        patientClicked: null
-    };
+        patientClicked: null,
+    }
 
     onClick = row => {
         console.log('hello')
@@ -21,17 +20,17 @@ export class EventTable extends React.Component {
             <div style={{ marginTop: 16 }}>
                 <Card>
                     <MUIDataTable
-                        title={"Some title"}
+                        title={'Some title'}
                         data={this.props.data.rows}
                         columns={this.props.data.headers}
                         options={{
                             selectableRows: false,
                             onRowClick: this.onClick,
-                            elevation: 0
+                            elevation: 0,
                         }}
                     />
                 </Card>
             </div>
-        );
+        )
     }
 }

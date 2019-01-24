@@ -1,7 +1,7 @@
-let baseUrl = "";
+let baseUrl = ''
 
 export function getBaseUrl() {
-  return {...baseUrl};
+    return { ...baseUrl }
 }
 
 /**
@@ -9,7 +9,7 @@ export function getBaseUrl() {
  * @param {String} url
  */
 export function setBaseUrl(url) {
-  baseUrl = url + "/";
+    baseUrl = url + '/'
 }
 
 /**
@@ -17,25 +17,28 @@ export function setBaseUrl(url) {
  * @returns Server response.
  */
 export async function get(endpoint) {
-  const response = await fetch(baseUrl + endpoint, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      Accept: "application/json"
-    }
-  });
-  return await response.json();
+    const response = await fetch(baseUrl + endpoint, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+            Accept: 'application/json',
+        },
+    })
+    return await response.json()
 }
 
 export async function getNonApi(endpoint) {
-  const response = await fetch(baseUrl.substring(0, baseUrl.length - 4) + endpoint, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      Accept: "application/json"
-    }
-  });
-  return await response.json();
+    const response = await fetch(
+        baseUrl.substring(0, baseUrl.length - 4) + endpoint,
+        {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                Accept: 'application/json',
+            },
+        }
+    )
+    return await response.json()
 }
 
 /**
@@ -45,16 +48,16 @@ export async function getNonApi(endpoint) {
  * @returns Server response.
  */
 export async function put(endpoint, data) {
-  const response = await fetch(baseUrl + endpoint, {
-    method: "PUT",
-    credentials: "include",
-    body: JSON.stringify(data),
-    headers: {
-      Accept: "application/json",
-      "Content-type": "application/json"
-    }
-  });
-  return await response.json();
+    const response = await fetch(baseUrl + endpoint, {
+        method: 'PUT',
+        credentials: 'include',
+        body: JSON.stringify(data),
+        headers: {
+            Accept: 'application/json',
+            'Content-type': 'application/json',
+        },
+    })
+    return await response.json()
 }
 
 /**
@@ -64,16 +67,16 @@ export async function put(endpoint, data) {
  * @returns Server response.
  */
 export async function patch(endpoint, data) {
-  const response = await fetch(baseUrl + endpoint, {
-    method: "PATCH",
-    credentials: "include",
-    body: JSON.stringify(data),
-    headers: {
-      Accept: "application/json",
-      "Content-type": "application/json"
-    }
-  });
-  return await response;
+    const response = await fetch(baseUrl + endpoint, {
+        method: 'PATCH',
+        credentials: 'include',
+        body: JSON.stringify(data),
+        headers: {
+            Accept: 'application/json',
+            'Content-type': 'application/json',
+        },
+    })
+    return await response
 }
 
 /**
@@ -82,14 +85,14 @@ export async function patch(endpoint, data) {
  * @returns Server response.
  */
 export async function post(endpoint) {
-  const response = await fetch(baseUrl + endpoint, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      Accept: "application/json"
-    }
-  });
-  return await response;
+    const response = await fetch(baseUrl + endpoint, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            Accept: 'application/json',
+        },
+    })
+    return await response
 }
 
 /**
@@ -99,16 +102,16 @@ export async function post(endpoint) {
  * @returns Server response.
  */
 export async function postData(endpoint, data) {
-  const response = await fetch(baseUrl + endpoint, {
-    method: "POST",
-    credentials: "include",
-    body: JSON.stringify(data),
-    headers: {
-      Accept: "application/json",
-      "Content-type": "application/json"
-    }
-  });
-  return await response;
+    const response = await fetch(baseUrl + endpoint, {
+        method: 'POST',
+        credentials: 'include',
+        body: JSON.stringify(data),
+        headers: {
+            Accept: 'application/json',
+            'Content-type': 'application/json',
+        },
+    })
+    return await response
 }
 
 /**
@@ -117,12 +120,12 @@ export async function postData(endpoint, data) {
  * @returns Server response.
  */
 export async function del(endpoint) {
-  const response = await fetch(baseUrl + endpoint, {
-    method: "DELETE",
-    credentials: "include",
-    headers: {
-      Accept: "application/json"
-    }
-  });
-  return await response;
+    const response = await fetch(baseUrl + endpoint, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+            Accept: 'application/json',
+        },
+    })
+    return await response
 }
