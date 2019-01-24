@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
 import MUIDataTable from 'mui-datatables'
 
-export class PatientTable extends React.Component {
+export class EntityTable extends React.Component {
     state = {
         patientClicked: null,
     }

@@ -1,6 +1,6 @@
 import React from 'react'
 import { getAllPatients } from '../../api/api'
-import { PatientTable } from './PatientTable'
+import { EntityTable } from './EntityTable'
 import { SideButton } from '../../components/SideButton'
 import { Row } from '../../helpers/helpers'
 
@@ -21,7 +21,7 @@ export class Home extends React.Component {
         return (
             <div style={{ margin: 20 }}>
                 <Row>
-                    <PatientTable data={this.state.data} />
+                    <EntityTable data={this.state.data} />
                     <div style={{ width: 16 }} />
                     <SideButton label="New" icon="create" />
                 </Row>
