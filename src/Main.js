@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-import { PatientInformation } from "./modules/dataentry/PatientInformation";
+import { Entity } from "./modules/entity/Entity";
 import { Home } from "./modules/home/Home";
 
 
@@ -9,8 +9,8 @@ export const Main = () => {
     <main style = {{ minWidth: 500 }}>
       <Switch>
         <Route exact path="/" component={Home} />
-        <Route exact path="/patient" component={PatientInformation} />
-        <Route path="/patient/:id" component={PatientInformation} />
+        <Route exact path="/patient" component={Entity} />
+        <Route path="/patient/:id" component={Entity} />
       </Switch>
     </main>
   );

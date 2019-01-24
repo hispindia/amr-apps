@@ -1,4 +1,4 @@
-import { get, postData, del } from "./crud";
+import { get, postData, del, put } from "./crud";
 import * as moment from 'moment';
 
 let amrId = '';
@@ -13,7 +13,7 @@ export async function setAmrProgram() {
 
 export async function getProgramAttributes() {
     return (await get('programs/' + amrId
-        + '/programTrackedEntityAttributes.json?fields=mandatory,trackedEntityAttribute[code,displayName,valueType,id,unique,name,optionSetValue,optionSet[options[code,name,id,displayName]]]'))
+        + '/programTrackedEntityAttributes.json?fields=mandatory,sortOrder,trackedEntityAttribute[code,displayName,valueType,id,unique,name,optionSetValue,optionSet[options[code,name,id,displayName]]]'))
         .programTrackedEntityAttributes;
 }
 
@@ -33,8 +33,8 @@ export async function getPatient(patientRegNr) {
 }
 
 export async function addPatient(values) {
-    const orgUnit = "ANGhR1pa8I5";
-    const now = moment().format("YYYY-MM-DD");
+    const orgUnit = 'ANGhR1pa8I5';
+    const now = moment().format('YYYY-MM-DD');
     let data = {
         trackedEntityType: personId,
         orgUnit: orgUnit,
@@ -49,6 +49,13 @@ export async function addPatient(values) {
     for(let key in values)
         data.attributes.push({ attribute: key, value: values[key] });
     await postData('trackedEntityInstances/', data);
+}
+
+export async function updatePatient(id, values) {
+    let data = await get('trackedEntityInstances/' + id + '.json?ouMode=ALL&fields=*');
+    for(let key in values)
+        data.attributes.push({ attribute: key, value: values[key] });
+    await put('trackedEntityInstances/' + id, data);
 }
 
 export async function deletePatient(id) {
@@ -66,6 +73,11 @@ export async function getAllPatients() {
     data.headers[5].options = { display: false };
     data.headers[6].options = { display: false };
     return data;
+}
+
+export async function getEvents() {
+    return await get('events.json?order=created:desc&paging=false&program=' + amrId);
+    
 }
 
 export async function getDistricts(state) {

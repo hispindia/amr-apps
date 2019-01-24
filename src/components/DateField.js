@@ -3,21 +3,40 @@ import { DatePicker, MuiPickersUtilsProvider } from "material-ui-pickers";
 import MomentUtils from "@date-io/moment";
 import * as moment from 'moment';
 import InputField from '@dhis2/ui/core/InputField'
+import { Text, Row, Col } from "../helpers/helpers";
 
 
 export class DateField extends React.Component {
   state = {
     value: "",
+    years: '0',
+    months: '0',
+    days: '0',
     errorText: ""
   };
 
   componentDidMount = () => {
-    if (this.props.value) this.setState({ value: this.props.value });
+    if (this.props.value) {
+      const age = moment.duration(moment().diff(this.props.value));
+      this.setState({
+        value: this.props.value,
+        years: age.years().toString(),
+        months: age.months().toString(),
+        days: age.days().toString()
+      });
+    }
   };
 
   componentWillReceiveProps = props => {
-    if(this.state.value !== props.value)
-      this.setState({ value: props.value });
+    if(this.state.value !== props.value) {
+      const age = moment.duration(moment().diff(props.value));
+      this.setState({
+        value: props.value,
+        years: age.years().toString(),
+        months: age.months().toString(),
+        days: age.days().toString()
+      });
+    }
   };
 
   /**
@@ -25,7 +44,13 @@ export class DateField extends React.Component {
    * @param date
    */
   setDate = date => {
-    this.setState({ value: date });
+    const age = moment.duration(moment().diff(date));
+    this.setState({
+      value: date,
+      years: age.years().toString(),
+      months: age.months().toString(),
+      days: age.days().toString()
+    });
     this.props.onChange(this.props.name, date.format("YYYY-MM-DD"));
   };
 
@@ -38,19 +63,53 @@ export class DateField extends React.Component {
       this.picker.open(e);
   }
 
+  onAge = async (name, v) => {
+    let { value, years, months, days } = this.state;
+    if(!v) v = '0';
+    v = parseInt(v)
+    switch(name) {
+      case 'years':
+        if(v < 0 || v > 118) return;
+        years = v;
+        break;
+      case 'months':
+        if(v < 0 || v > 13) return;
+        months = v;
+        break;
+      case 'days':
+        if(v < 0 || v > 32) return;
+        days = v;
+        break;
+      default:
+        break;
+    }
+
+    value = moment().add(-years, 'years').add(-months, 'months').add(-days, 'days');
+    await this.setState({
+      value: value.format("YYYY-MM-DD"),
+      years: years.toString(),
+      months: months.toString(),
+      days: days.toString()
+    })
+    this.props.onChange(this.props.name, value.format("YYYY-MM-DD"));
+  }
+
   getField = () => {
     return (
-      <div onClick={this.props.disabled ? null : this.openPicker} onKeyPress={this.props.disabled ? null : this.onKeyPress}>
+      <div
+        onClick={this.props.disabled ? null : this.openPicker}
+        onKeyPress={this.props.disabled ? null : this.onKeyPress}
+        style={{ marginTop: 16 }}>
         <InputField
-          required={this.props.required}
           name={this.props.name}
-          label={this.props.label}
+          label={'Date of Birth'}
           value={this.state.value !== '' ? moment(this.state.value).format("LL") : this.state.value}
           onChange={() => {}}
           kind={'outlined'}
           status={this.state.errorText === "" ? 'default' : 'error'}
           help={this.state.errorText}
           disabled = { this.props.disabled }
+          size='dense'
         />
       </div>
     );
@@ -58,16 +117,52 @@ export class DateField extends React.Component {
 
   render() {
     return (
-      <div className="picker">
-      <MuiPickersUtilsProvider utils={MomentUtils}>
-        <DatePicker
-          onChange={this.setDate}
-          showTodayButton
-          animateYearScrolling
-          TextFieldComponent={this.getField}
-          ref={node => { this.picker = node; }}
-        />
-      </MuiPickersUtilsProvider>
+      <div>
+        <Text>{this.props.label}{this.props.required ? ' *' : null}</Text>
+        <Row>
+          <div style={{ marginRight: 16, width: 100 }}>
+            <InputField
+              name={'years'}
+              label={'Years'}
+              value={this.state.years}
+              onChange={this.onAge}
+              kind={'outlined'}
+              disabled = { this.props.disabled }
+              size='dense'
+            />
+          </div>
+          <div style={{ marginRight: 16, width: 100 }}>
+            <InputField
+              name={'months'}
+              label={'Months'}
+              value={this.state.months}
+              onChange={this.onAge}
+              kind={'outlined'}
+              disabled = { this.props.disabled }
+              size='dense'
+            />
+          </div>
+          <div style={{ width: 100 }}>
+            <InputField
+              name={'days'}
+              label={'Days'}
+              value={this.state.days}
+              onChange={this.onAge}
+              kind={'outlined'}
+              disabled = { this.props.disabled }
+              size='dense'
+            />
+          </div>
+        </Row>
+        <MuiPickersUtilsProvider utils={MomentUtils}>
+          <DatePicker
+            value={this.state.value}
+            onChange={this.setDate}
+            showTodayButton
+            TextFieldComponent={this.getField}
+            ref={node => { this.picker = node; }}
+          />
+        </MuiPickersUtilsProvider>
       </div>
     );
   }

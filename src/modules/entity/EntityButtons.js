@@ -3,7 +3,7 @@ import { Button } from '@dhis2/ui/core';
 import { Row } from '../../helpers/helpers';
 
 
-export class PatientButtons extends Component {
+export class EntityButtons extends Component {
     render() {
         return (
             <div style={{ marginTop: 32 }}>

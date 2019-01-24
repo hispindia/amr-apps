@@ -36,6 +36,7 @@ export class ObjectSelect extends React.Component {
         help={this.props.disabled ? this.props.helperText : null}
         onChange={this.onChange}
         disabled={this.props.disabled}
+        size='dense'
       />
     );
   }
