@@ -1,12 +1,14 @@
 import React from 'react'
-import { getAllPatients, getEvents } from '../../api/api'
+import { Redirect } from 'react-router-dom'
+import { Button } from '@dhis2/ui/core'
+import { getEvents } from '../../api/api'
 import { EntityInformation } from './EntityInformation'
 import { EventTable } from './EventTable'
-import { Row } from '../../helpers/helpers'
 
 export class Entity extends React.Component {
     state = {
         data: null,
+        newClicked: false,
     }
 
     componentDidMount = async () => {
@@ -17,7 +19,13 @@ export class Entity extends React.Component {
         })
     }
 
+    newClick = () => {
+        this.setState({ newClicked: true })
+    }
+
     render() {
+        if (this.state.newClicked) return <Redirect push to={'/event'} />
+
         if (!this.state.data) return null
 
         return (
@@ -30,7 +38,27 @@ export class Entity extends React.Component {
                     }
                 />
                 {this.props.match.params.id ? (
-                    <EventTable data={this.state.data} />
+                    <div style={{ position: 'relative' }}>
+                        <EventTable data={this.state.data} />
+                        <div
+                            style={{
+                                position: 'absolute',
+                                left: '11px',
+                                bottom: '11px',
+                                zIndex: 1,
+                            }}
+                        >
+                            <Button
+                                variant="contained"
+                                kind="primary"
+                                onClick={this.newClick}
+                                icon="create"
+                                size="medium"
+                            >
+                                New
+                            </Button>
+                        </div>
+                    </div>
                 ) : null}
             </div>
         )

@@ -3,6 +3,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: Roboto;
+    letter-spacing: 0.0075em;
 }
 
 .text {
@@ -10,23 +11,30 @@ body {
     line-height: 24px;
 }
 
+.heading {
+    margin: 40px 0 30px 0;
+    color: #0d0d0e;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    font-weight: 500;
+}
+
 .row {
     display: flex;
     flex-direction: row;
 }
+
 .col {
     display: flex;
     flex-direction: column;
 }
+
+/* Max height for select dropdown */
 html[dir='ltr'] .ui_selectfield_menu_udicv .ui_card_base_l2vmf {
     max-height: 300px;
 }
+
+/* Scrollbar for select dropdown */
 html[dir] .ui_selectfield_menu_udicv > .ui_card_base_l2vmf {
     overflow: auto;
-}
-.heading {
-    margin: 40px 0 30px 0;
-    color: #0d0d0e;
-    font-size: 24px;
-    line-height: 28px;
 }

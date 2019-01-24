@@ -2,6 +2,7 @@ import React from 'react'
 import { Route, Switch } from 'react-router-dom'
 import { Entity } from './modules/entity/Entity'
 import { Home } from './modules/home/Home'
+import { Event } from './modules/event/Event'
 
 export const Main = () => {
     return (
@@ -10,6 +11,7 @@ export const Main = () => {
                 <Route exact path="/" component={Home} />
                 <Route exact path="/patient" component={Entity} />
                 <Route path="/patient/:id" component={Entity} />
+                <Route exact path="/event" component={Event} />
             </Switch>
         </main>
     )

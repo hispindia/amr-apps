@@ -3,13 +3,15 @@ import * as moment from 'moment'
 
 let amrId = ''
 let personId = ''
+let programStageId = ''
 
 export async function setAmrProgram() {
     const program = (await get(
-        'programs.json?filter=shortName:eq:AMR&paging=false&fields=id,trackedEntityType'
+        'programs.json?filter=shortName:eq:AMR&paging=false&fields=id,trackedEntityType,programStages'
     )).programs[0]
     amrId = program.id
     personId = program.trackedEntityType.id
+    programStageId = program.programStages[0].id
 }
 
 export async function getProgramAttributes() {
@@ -103,4 +105,14 @@ export async function getDistricts(state) {
         'optionSets.json?paging=false&fields=options[name,displayName,id,code]&filter=code:eq:' +
             state
     )).optionSets[0].options
+}
+
+export async function getProgramStage() {
+    let programStage = await get(
+        'programStages/' +
+            programStageId +
+            '.json?fields=displayName,programStageDataElements[id,compulsory],programStageSections[id,displayName,sortOrder,dataElements[id,displayFormName,valueType,optionSetValue,optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
+    )
+    console.log(programStage)
+    return programStage
 }

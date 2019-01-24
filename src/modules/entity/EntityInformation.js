@@ -17,11 +17,6 @@ import { RadioSelector } from '../../components/RadioSelector'
 import { ObjectSelect } from '../../components/ObjectSelect'
 import { EntityButtons } from './EntityButtons'
 
-const directions = {
-    xs: 'column-reverse',
-    sm: 'column-reverse',
-}
-
 export class EntityInformation extends Component {
     state = {
         loading: true,
@@ -52,10 +47,13 @@ export class EntityInformation extends Component {
                 uniques[programAttributes[i].trackedEntityAttribute.id] = true
             if (programAttributes[i].trackedEntityAttribute.optionSetValue) {
                 let options = []
-                let length =
+                for (
+                    let j = 0;
+                    j <
                     programAttributes[i].trackedEntityAttribute.optionSet
-                        .options.length
-                for (let j = 0; j < length; j++) {
+                        .options.length;
+                    j++
+                ) {
                     options.push({
                         value:
                             programAttributes[i].trackedEntityAttribute
@@ -271,7 +269,7 @@ export class EntityInformation extends Component {
 
         if (goToHome) return <Redirect push to={'/'} />
 
-        if (loading) return null
+        if (loading) return <LinearProgress />
 
         return (
             <div>
