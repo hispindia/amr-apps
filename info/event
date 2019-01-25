@@ -3,3 +3,8 @@ http://ugle.asuscomm.com:8888/api/programStages/dDxm1Z4oOUO.json?fields=displayN
 displayName
 programStageDataElements[id,compulsory]
 programStageSections[id,displayName,sortOrder,dataElements[id,displayFormName,valueType,optionSetValue,optionSet[name,displayName,id,code]]]
+
+
+TABLE
+
+http://ugle.asuscomm.com:8888/api/events.json?order=created:desc&paging=false&program=ecIoUziI2Gb&fields=orgUnitName,lastUpdated,created,dataValues[*]

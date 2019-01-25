@@ -11,6 +11,16 @@ body {
     line-height: 24px;
 }
 
+.title {
+    display: block;
+    font-size: 2em;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: 500;
+}
+
 .heading {
     margin: 40px 0 30px 0;
     color: #0d0d0e;
@@ -37,4 +47,25 @@ html[dir='ltr'] .ui_selectfield_menu_udicv .ui_card_base_l2vmf {
 /* Scrollbar for select dropdown */
 html[dir] .ui_selectfield_menu_udicv > .ui_card_base_l2vmf {
     overflow: auto;
+}
+
+.table_button {
+    position: absolute;
+    left: 20px;
+    bottom: 11px;
+    z-index: 1;
+}
+
+.table {
+    position: relative;
+}
+
+.icon_button .ui_icon_base_1s8vb {
+    font-size: 2rem;
+    line-height: 2.4;
+    cursor: pointer;
+}
+
+.icon_button {
+    margin-right: 16px;
 }

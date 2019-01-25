@@ -3,9 +3,9 @@ import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
 import MomentUtils from '@date-io/moment'
 import * as moment from 'moment'
 import InputField from '@dhis2/ui/core/InputField'
-import { Text, Row, Col } from '../helpers/helpers'
+import { Text, Row } from '../../helpers/helpers'
 
-export class DateField extends React.Component {
+export class AgeInput extends React.Component {
     state = {
         value: '',
         years: '0',

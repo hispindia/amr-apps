@@ -1,8 +1,8 @@
 import React from 'react'
 import { Radio } from '@dhis2/ui/core'
-import { Text, Row } from '../helpers/helpers'
+import { Text, Row } from '../../helpers/helpers'
 
-export class RadioSelector extends React.Component {
+export class RadioInput extends React.Component {
     state = {
         value: '',
     }

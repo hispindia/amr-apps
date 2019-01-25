@@ -11,11 +11,8 @@ import {
     deletePatient,
     updatePatient,
 } from '../../api/api'
-import { TextInput } from '../../components/TextInput'
-import { DateField } from '../../components/DateField'
-import { RadioSelector } from '../../components/RadioSelector'
-import { ObjectSelect } from '../../components/ObjectSelect'
-import { EntityButtons } from './EntityButtons'
+import { EntityButtons } from '../'
+import { TextInput, AgeInput, RadioInput, SelectInput } from '../../inputs'
 
 export class EntityInformation extends Component {
     state = {
@@ -198,7 +195,7 @@ export class EntityInformation extends Component {
                 style={{ marginBottom: 24 }}
             >
                 {attribute.trackedEntityAttribute.valueType === 'AGE' ? (
-                    <DateField
+                    <AgeInput
                         required={attribute.mandatory}
                         unique={attribute.trackedEntityAttribute.unique}
                         name={attribute.trackedEntityAttribute.id}
@@ -210,7 +207,7 @@ export class EntityInformation extends Component {
                 ) : attribute.trackedEntityAttribute.optionSetValue ? (
                     attribute.trackedEntityAttribute.optionSet.options.length <
                     5 ? (
-                        <RadioSelector
+                        <RadioInput
                             required={attribute.mandatory}
                             objects={
                                 attribute.trackedEntityAttribute.optionSet
@@ -223,7 +220,7 @@ export class EntityInformation extends Component {
                             disabled={!isNewPatient}
                         />
                     ) : (
-                        <ObjectSelect
+                        <SelectInput
                             required={attribute.mandatory}
                             objects={
                                 attribute.trackedEntityAttribute.code !==
@@ -276,7 +273,7 @@ export class EntityInformation extends Component {
                 {querying ? <LinearProgress /> : null}
                 <Card>
                     <div style={{ margin: 20 }}>
-                        <Heading>Patient information</Heading>
+                        <Heading>Information</Heading>
                         <Grid container spacing={16}>
                             <Grid item sm>
                                 {attributes

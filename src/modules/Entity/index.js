@@ -2,8 +2,9 @@ import React from 'react'
 import { Redirect } from 'react-router-dom'
 import { Button } from '@dhis2/ui/core'
 import { getEvents } from '../../api/api'
-import { EntityInformation } from './EntityInformation'
-import { EventTable } from './EventTable'
+import { Title, Row } from '../../helpers/helpers'
+import { EventTable, EntityInformation } from '../'
+import { IconButton } from '../../inputs'
 
 export class Entity extends React.Component {
     state = {
@@ -13,7 +14,6 @@ export class Entity extends React.Component {
 
     componentDidMount = async () => {
         const data = await getEvents()
-        console.log(data)
         this.setState({
             data: data,
         })
@@ -30,6 +30,14 @@ export class Entity extends React.Component {
 
         return (
             <div style={{ margin: 20 }}>
+                <Row>
+                    <IconButton
+                        name="arrow_back"
+                        icon="arrow_back"
+                        redirect="/"
+                    />
+                    <Title>Patient</Title>
+                </Row>
                 <EntityInformation
                     id={
                         this.props.match.params.id
@@ -38,16 +46,9 @@ export class Entity extends React.Component {
                     }
                 />
                 {this.props.match.params.id ? (
-                    <div style={{ position: 'relative' }}>
+                    <div className="table">
                         <EventTable data={this.state.data} />
-                        <div
-                            style={{
-                                position: 'absolute',
-                                left: '11px',
-                                bottom: '11px',
-                                zIndex: 1,
-                            }}
-                        >
+                        <div className="table_button">
                             <Button
                                 variant="contained"
                                 kind="primary"

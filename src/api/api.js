@@ -1,5 +1,6 @@
 import { get, postData, del, put } from './crud'
 import * as moment from 'moment'
+import { removeTime } from '../helpers/date'
 
 let amrId = ''
 let personId = ''
@@ -91,13 +92,47 @@ export async function getAllPatients() {
     data.headers[3].options = { display: false }
     data.headers[5].options = { display: false }
     data.headers[6].options = { display: false }
+    console.log(data)
     return data
 }
 
 export async function getEvents() {
-    return await get(
-        'events.json?order=created:desc&paging=false&program=' + amrId
-    )
+    const events = (await get(
+        'events.json?order=created:desc&paging=false&program=' +
+            amrId +
+            '&fields=orgUnitName,lastUpdated,created,storedBy,dataValues[*]'
+    )).events
+    let data = {
+        headers: [
+            {
+                name: 'Organisation unit',
+                column: 'Organisation unit',
+            },
+            {
+                name: 'Stored by',
+                column: 'Stored by',
+            },
+            {
+                name: 'Created',
+                column: 'Created',
+            },
+            {
+                name: 'Updated',
+                column: 'Updated',
+            },
+        ],
+        rows: [],
+    }
+    //console.log(events)
+    for (let i = 0; i < events.length; i++)
+        //console.log(events[i])
+        data.rows.push([
+            events[i].orgUnitName,
+            events[i].storedBy,
+            removeTime(events[i].created),
+            removeTime(events[i].lastUpdated),
+        ])
+    return data
 }
 
 export async function getDistricts(state) {

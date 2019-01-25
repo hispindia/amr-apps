@@ -1,7 +1,7 @@
 import React from 'react'
 import SelectField from '@dhis2/ui/core/SelectField'
 
-export class ObjectSelect extends React.Component {
+export class SelectInput extends React.Component {
     state = {
         value: '',
         labelWidth: 0,

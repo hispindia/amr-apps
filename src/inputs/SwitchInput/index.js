@@ -10,7 +10,6 @@ export class SwitchInput extends React.Component {
     }
 
     render() {
-        console.log('render')
         return (
             <Switch
                 name={this.props.name}

@@ -1,13 +1,15 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
-import { Grid, withWidth } from '@material-ui/core'
 import { Card, LinearProgress } from '@dhis2/ui/core'
 import { Heading } from '../../helpers/helpers'
 import { getProgramStage } from '../../api/api'
-import { TextInput } from '../../components/TextInput'
-import { RadioSelector } from '../../components/RadioSelector'
-import { ObjectSelect } from '../../components/ObjectSelect'
-import { SwitchInput } from '../../components/SwitchInput'
+import {
+    TextInput,
+    AgeInput,
+    RadioInput,
+    SelectInput,
+    SwitchInput,
+} from '../../inputs'
 
 export class Event extends Component {
     state = {
@@ -92,7 +94,7 @@ export class Event extends Component {
                                         {dataElement.optionSetValue ? (
                                             dataElement.optionSet.options
                                                 .length < 5 ? (
-                                                <RadioSelector
+                                                <RadioInput
                                                     objects={
                                                         dataElement.optionSet
                                                             .options
@@ -107,7 +109,7 @@ export class Event extends Component {
                                                     onChange={this.onChange}
                                                 />
                                             ) : (
-                                                <ObjectSelect
+                                                <SelectInput
                                                     objects={
                                                         dataElement.optionSet
                                                             .options

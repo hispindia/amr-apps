@@ -1,7 +1,7 @@
 import React from 'react'
 import InputField from '@dhis2/ui/core/InputField'
 import _ from 'lodash'
-import { isUnique } from '../api/api'
+import { isUnique } from '../../api/api'
 
 export class TextInput extends React.Component {
     state = {
