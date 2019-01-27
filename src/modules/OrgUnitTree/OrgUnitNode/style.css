@@ -1,0 +1,53 @@
+/* Style the caret/arrow */
+.caret {
+    cursor: pointer;
+    user-select: none; /* Prevent text selection */
+}
+.ou-text {
+    cursor: pointer;
+    user-select: none; /* Prevent text selection */
+}
+
+.ou-selected {
+    color: var(--primary);
+}
+
+/* Create the caret/arrow with a unicode, and style it */
+.caret::before {
+    content: '\2023';
+    color: black;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.no-caret {
+    cursor: pointer;
+    user-select: none; /* Prevent text selection */
+}
+
+.no-caret::before {
+    content: '';
+    display: inline-block;
+    margin-right: 14.6px;
+}
+
+/* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+.caret-down::before {
+    transform: rotate(90deg);
+}
+
+/* Hide the nested list */
+.nested {
+    display: none;
+}
+
+/* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+.active {
+    display: block;
+}
+
+/* Remove default bullets */
+ul,
+#myUL {
+    list-style-type: none;
+}

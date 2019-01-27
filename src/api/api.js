@@ -4,17 +4,34 @@ import { removeTime } from '../helpers/date'
 
 let amrId = ''
 let personId = ''
+let entityLabel = ''
 let programStageId = ''
 
+/**
+ * Gets entity label.
+ * @returns {string} Entity Label.
+ */
+export function getEntityLabel() {
+    return entityLabel
+}
+
+/**
+ * Sets the id of the AMR program, AMR program, and person for later use.
+ */
 export async function setAmrProgram() {
     const program = (await get(
-        'programs.json?filter=shortName:eq:AMR&paging=false&fields=id,trackedEntityType,programStages'
+        'programs.json?filter=shortName:eq:AMR&paging=false&fields=id,trackedEntityType[id,displayName],programStages'
     )).programs[0]
     amrId = program.id
     personId = program.trackedEntityType.id
+    entityLabel = program.trackedEntityType.displayName
     programStageId = program.programStages[0].id
 }
 
+/**
+ * Gets the attributes of the AMR program.
+ * @returns {Object[]} Attributes
+ */
 export async function getProgramAttributes() {
     return (await get(
         'programs/' +
@@ -23,6 +40,12 @@ export async function getProgramAttributes() {
     )).programTrackedEntityAttributes
 }
 
+/**
+ * Checks if any tracked entity instance has property with value.
+ * @param {string} property - Property.
+ * @param {string} value - Value.
+ * @returns {boolean} - True if unique.
+ */
 export async function isUnique(property, value) {
     return (
         (await get(
@@ -34,6 +57,11 @@ export async function isUnique(property, value) {
     )
 }
 
+/**
+ * Gets tracked entity instance of type person by patient registration number.
+ * @param {string} patientRegNr - Patient registration number.
+ * @returns {Object} Tracked entity instance.
+ */
 export async function getPatient(patientRegNr) {
     try {
         return (await get(
@@ -45,6 +73,10 @@ export async function getPatient(patientRegNr) {
     }
 }
 
+/**
+ * Adds a new person tracked entity instance and enrolls to AMR program.
+ * @param {Object} values - Values
+ */
 export async function addPatient(values) {
     const orgUnit = 'ANGhR1pa8I5'
     const now = moment().format('YYYY-MM-DD')
@@ -66,6 +98,11 @@ export async function addPatient(values) {
     await postData('trackedEntityInstances/', data)
 }
 
+/**
+ * Updates a tracked entity instance.
+ * @param {string} id - Tracked entity instance id.
+ * @param {*} values - Values.
+ */
 export async function updatePatient(id, values) {
     let data = await get(
         'trackedEntityInstances/' + id + '.json?ouMode=ALL&fields=*'
@@ -75,11 +112,19 @@ export async function updatePatient(id, values) {
     await put('trackedEntityInstances/' + id, data)
 }
 
+/**
+ * Deletes a tracked entity instance.
+ * @param {string} id - Tracked entity instance.
+ */
 export async function deletePatient(id) {
     await del('trackedEntityInstances/' + id)
 }
 
-export async function getAllPatients() {
+/**   ************** REPLACED BY FUNCTION getEntities() ************
+ * Gets all person tracked entity instances.
+ * @returns {Object[]} All person tracked entity instances.
+ */
+/*export async function getAllPatients() {
     let data = await get(
         'trackedEntityInstances/query.json?ouMode=ALL&order=created:desc&paging=false&program=' +
             amrId
@@ -94,8 +139,67 @@ export async function getAllPatients() {
     data.headers[6].options = { display: false }
     console.log(data)
     return data
+}*/
+
+/**
+ * Gets all person tracked entity instances.
+ * @returns {Object} Headers with medadata and rows with data.
+ */
+export async function getEntities() {
+    const values = (await get(
+        'trackedEntityInstances.json?ouMode=ALL&order=created:desc&paging=false&fields=created,lastUpdated,attributes[displayName,valueType,attribute,value]&program=' +
+            amrId
+    )).trackedEntityInstances
+    const metaData = (await get(
+        'programs/' +
+            amrId +
+            '.json?fields=programTrackedEntityAttributes[trackedEntityAttribute[displayName,valueType,id]]'
+    )).programTrackedEntityAttributes
+    let data = {
+        headers: [
+            {
+                name: 'Created',
+                options: { display: false },
+            },
+            {
+                name: 'Updated',
+                options: { display: false },
+            },
+        ],
+        rows: [],
+        title: entityLabel + 's',
+    }
+
+    let getAttributeValue = (index, id) => {
+        for (let i = 0; i < values[index].attributes.length; i++) {
+            if (values[index].attributes[i].attribute === id)
+                return values[index].attributes[i].value
+        }
+        return ''
+    }
+
+    for (let i = 0; i < metaData.length; i++)
+        data.headers.push({
+            name: metaData[i].trackedEntityAttribute.displayName,
+            id: metaData[i].trackedEntityAttribute.id,
+            options: { display: i < 5 },
+        })
+    for (let i = 0; i < values.length; i++) {
+        let entityValues = [
+            removeTime(values[i].created),
+            removeTime(values[i].lastUpdated),
+        ]
+        for (let j = 2; j < data.headers.length; j++)
+            entityValues.push(getAttributeValue(i, data.headers[j].id))
+        data.rows.push(entityValues)
+    }
+    return data
 }
 
+/**
+ * Gets all events from the AMR program.
+ * @returns {Object[]} All AMR events.
+ */
 export async function getEvents() {
     const events = (await get(
         'events.json?order=created:desc&paging=false&program=' +
@@ -135,19 +239,108 @@ export async function getEvents() {
     return data
 }
 
+/**
+ * Gets option set by code.
+ * @param {string} state - Option set code.
+ * @returns {Object[]} Option sets.
+ */
 export async function getDistricts(state) {
-    return (await get(
-        'optionSets.json?paging=false&fields=options[name,displayName,id,code]&filter=code:eq:' +
-            state
-    )).optionSets[0].options
+    try {
+        return (await get(
+            'optionSets.json?paging=false&fields=options[name,displayName,id,code]&filter=code:eq:' +
+                state
+        )).optionSets[0].options
+    } catch {
+        return []
+    }
 }
 
+/**
+ * Gets AMR program stage.
+ * @returns {Object} AMR program stage.
+ */
 export async function getProgramStage() {
     let programStage = await get(
         'programStages/' +
             programStageId +
             '.json?fields=displayName,programStageDataElements[id,compulsory],programStageSections[id,displayName,sortOrder,dataElements[id,displayFormName,valueType,optionSetValue,optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
     )
-    console.log(programStage)
+
+    for (let i = 0; i < programStage.programStageDataElements.length; i++)
+        if (programStage.programStageDataElements[i].compulsory)
+            for (let j = 0; j < programStage.programStageSections.length; j++)
+                for (
+                    let k = 0;
+                    k <
+                    programStage.programStageSections[j].dataElements.length;
+                    k++
+                )
+                    programStage.programStageSections[j].dataElements[
+                        k
+                    ].required = true
+
     return programStage
+}
+
+/**
+ * Gets all organisation units.
+ * @returns {Object[]} All organisation units.
+ */
+export async function getOrgUnits() {
+    const data = (await get(
+        'organisationUnits.json?paging=false&order=level:asc&fields=id,name,children,leaf,level'
+    )).organisationUnits
+    return [
+        {
+            id: 123,
+            displayName: 'India',
+            leaf: false,
+            level: 1,
+            children: [
+                {
+                    id: 234,
+                    displayName: 'UP',
+                    leaf: false,
+                    level: 2,
+                    children: [
+                        {
+                            id: 987,
+                            displayName: 'Noida',
+                            leaf: true,
+                            level: 3,
+                            children: [],
+                        },
+                        {
+                            id: 876,
+                            displayName: 'Luchnow',
+                            leaf: true,
+                            level: 3,
+                            children: [],
+                        },
+                    ],
+                },
+                {
+                    id: 345,
+                    displayName: 'Dehli',
+                    leaf: true,
+                    level: 2,
+                    children: [],
+                },
+                {
+                    id: 456,
+                    displayName: 'Goa',
+                    leaf: true,
+                    level: 2,
+                    children: [],
+                },
+            ],
+        },
+        {
+            id: 1233543,
+            displayName: 'India',
+            leaf: false,
+            level: 1,
+            children: [],
+        },
+    ]
 }

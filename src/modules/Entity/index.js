@@ -1,7 +1,7 @@
 import React from 'react'
 import { Redirect } from 'react-router-dom'
 import { Button } from '@dhis2/ui/core'
-import { getEvents } from '../../api/api'
+import { getEvents, getEntityLabel } from '../../api/api'
 import { Title, Row } from '../../helpers/helpers'
 import { EventTable, EntityInformation } from '../'
 import { IconButton } from '../../inputs'
@@ -10,6 +10,8 @@ export class Entity extends React.Component {
     state = {
         data: null,
         newClicked: false,
+        backClicked: false,
+        forceTable: false,
     }
 
     componentDidMount = async () => {
@@ -23,8 +25,18 @@ export class Entity extends React.Component {
         this.setState({ newClicked: true })
     }
 
+    backClicked = () => {
+        this.setState({ backClicked: true })
+    }
+
+    onNewEnityAdded = () => {
+        this.setState({ forceTable: true })
+    }
+
     render() {
         if (this.state.newClicked) return <Redirect push to={'/event'} />
+
+        if (this.state.backClicked) return <Redirect push to={'/'} />
 
         if (!this.state.data) return null
 
@@ -34,9 +46,9 @@ export class Entity extends React.Component {
                     <IconButton
                         name="arrow_back"
                         icon="arrow_back"
-                        redirect="/"
+                        onClick={this.backClicked}
                     />
-                    <Title>Patient</Title>
+                    <Title>{getEntityLabel()}</Title>
                 </Row>
                 <EntityInformation
                     id={
@@ -44,6 +56,7 @@ export class Entity extends React.Component {
                             ? this.props.match.params.id
                             : null
                     }
+                    onEntityAdded={this.onNewEnityAdded}
                 />
                 {this.props.match.params.id ? (
                     <div className="table">

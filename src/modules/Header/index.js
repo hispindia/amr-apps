@@ -5,6 +5,6 @@ export class Header extends React.Component {
     static id = 'headerbar'
 
     render() {
-        return <HeaderBar appName="AMR Surveilance" />
+        return <HeaderBar appName="Record Capture" />
     }
 }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
-import { Grid, withWidth } from '@material-ui/core'
+import { Grid } from '@material-ui/core'
 import { Card, LinearProgress } from '@dhis2/ui/core'
 import { Heading } from '../../helpers/helpers'
 import {
@@ -125,6 +125,7 @@ export class EntityInformation extends Component {
         if (!this.state.editing) {
             await addPatient(this.state.values)
             this.setState({ isNewPatient: false, querying: false })
+            this.props.onEntityAdded()
         } else {
             await updatePatient(this.state.id, this.state.values)
             this.setState({
@@ -297,5 +298,3 @@ export class EntityInformation extends Component {
         )
     }
 }
-
-export default withWidth()(EntityInformation)

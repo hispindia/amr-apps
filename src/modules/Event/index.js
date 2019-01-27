@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Card, LinearProgress } from '@dhis2/ui/core'
+import { Grid } from '@material-ui/core'
 import { Heading } from '../../helpers/helpers'
 import { getProgramStage } from '../../api/api'
 import {
@@ -107,6 +108,9 @@ export class Event extends Component {
                                                         values[dataElement.id]
                                                     }
                                                     onChange={this.onChange}
+                                                    required={
+                                                        dataElement.required
+                                                    }
                                                 />
                                             ) : (
                                                 <SelectInput
@@ -122,6 +126,9 @@ export class Event extends Component {
                                                         values[dataElement.id]
                                                     }
                                                     onChange={this.onChange}
+                                                    required={
+                                                        dataElement.required
+                                                    }
                                                 />
                                             )
                                         ) : dataElement.valueType ===
@@ -134,6 +141,7 @@ export class Event extends Component {
                                                 checked={values[dataElement.id]}
                                                 disabled={false}
                                                 onChange={this.onChange}
+                                                required={dataElement.required}
                                             />
                                         ) : (
                                             <TextInput
@@ -142,6 +150,7 @@ export class Event extends Component {
                                                     dataElement.displayFormName
                                                 }
                                                 value={values[dataElement.id]}
+                                                required={dataElement.required}
                                             />
                                         )}
                                     </div>

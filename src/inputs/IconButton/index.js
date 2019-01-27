@@ -19,7 +19,7 @@ export class IconButton extends Component {
                 <Icon
                     name={this.props.name}
                     className={this.props.icon}
-                    onClick={this.onClick}
+                    onClick={this.props.onClick}
                 />
             </div>
         )

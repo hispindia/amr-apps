@@ -26,7 +26,7 @@ export class RadioInput extends React.Component {
             <div style={{ marginLeft: 8, marginRight: 8, marginTop: -8 }}>
                 <Text>
                     {this.props.label}
-                    {this.props.required ? ' *' : null}
+                    {this.props.required ? '*' : null}
                 </Text>
                 <Row>
                     {this.props.objects.map(object => (

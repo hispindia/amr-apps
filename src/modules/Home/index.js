@@ -1,7 +1,7 @@
 import React from 'react'
 import { Redirect } from 'react-router-dom'
 import { Button } from '@dhis2/ui/core'
-import { getAllPatients } from '../../api/api'
+import { getEntities } from '../../api/api'
 import { EntityTable } from '../'
 
 export class Home extends React.Component {
@@ -12,7 +12,7 @@ export class Home extends React.Component {
 
     componentDidMount = async () => {
         this.setState({
-            data: await getAllPatients(),
+            data: await getEntities(),
         })
     }
 
@@ -21,7 +21,7 @@ export class Home extends React.Component {
     }
 
     render() {
-        if (this.state.newClicked) return <Redirect push to={'/patient'} />
+        if (this.state.newClicked) return <Redirect push to={'/entity'} />
 
         if (!this.state.data) return null
 

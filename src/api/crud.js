@@ -1,5 +1,9 @@
 let baseUrl = ''
 
+/**
+ * Gets base URL.
+ * @returns {string} Base URL.
+ */
 export function getBaseUrl() {
     return { ...baseUrl }
 }
@@ -24,20 +28,6 @@ export async function get(endpoint) {
             Accept: 'application/json',
         },
     })
-    return await response.json()
-}
-
-export async function getNonApi(endpoint) {
-    const response = await fetch(
-        baseUrl.substring(0, baseUrl.length - 4) + endpoint,
-        {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                Accept: 'application/json',
-            },
-        }
-    )
     return await response.json()
 }
 

@@ -9,19 +9,17 @@ export class EntityTable extends React.Component {
     }
 
     onClick = row => {
-        this.setState({ patientClicked: row[7] })
+        this.setState({ patientClicked: row[2] })
     }
 
     render() {
         if (this.state.patientClicked)
-            return (
-                <Redirect push to={'/patient/' + this.state.patientClicked} />
-            )
+            return <Redirect push to={'/entity/' + this.state.patientClicked} />
 
         return (
             <Card>
                 <MUIDataTable
-                    title={'Patients'}
+                    title={this.props.data.title}
                     data={this.props.data.rows}
                     columns={this.props.data.headers}
                     options={{

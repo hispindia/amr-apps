@@ -5,6 +5,9 @@ import * as moment from 'moment'
 import InputField from '@dhis2/ui/core/InputField'
 import { Text, Row } from '../../helpers/helpers'
 
+/**
+ * Age input consisting of date picker and year/month/date input fields.
+ */
 export class AgeInput extends React.Component {
     state = {
         value: '',
@@ -39,8 +42,8 @@ export class AgeInput extends React.Component {
     }
 
     /**
-     * handles date change
-     * @param date
+     * Called on date picker input.
+     * @param {string} - New date.
      */
     setDate = date => {
         const age = moment.duration(moment().diff(date))
@@ -53,14 +56,27 @@ export class AgeInput extends React.Component {
         this.props.onChange(this.props.name, date.format('YYYY-MM-DD'))
     }
 
+    /**
+     * Opens date picker.
+     * @param {Object} e - Event.
+     */
     openPicker = e => {
         this.picker.open(e)
     }
 
+    /**
+     * Opens date picker.
+     * @param {Object} e - Event.
+     */
     onKeyPress = e => {
         if (e.key === 'Enter') this.picker.open(e)
     }
 
+    /**
+     * Called on input from age fields.
+     * @param {string} name - Field name.
+     * @param {string} v - Value.
+     */
     onAge = async (name, v) => {
         let { value, years, months, days } = this.state
         if (!v) v = '0'
@@ -95,6 +111,10 @@ export class AgeInput extends React.Component {
         this.props.onChange(this.props.name, value.format('YYYY-MM-DD'))
     }
 
+    /**
+     * Gets input field used for date picker.
+     * @returns {Component} Input field.
+     */
     getField = () => {
         return (
             <div
@@ -126,7 +146,7 @@ export class AgeInput extends React.Component {
             <div>
                 <Text>
                     {this.props.label}
-                    {this.props.required ? ' *' : null}
+                    {this.props.required ? '*' : null}
                 </Text>
                 <Row>
                     <div style={{ marginRight: 16, width: 100 }}>
