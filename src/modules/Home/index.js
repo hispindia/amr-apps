@@ -8,12 +8,23 @@ export class Home extends React.Component {
     state = {
         data: null,
         newClicked: false,
+        selected: null
+    }
+
+    getData = async selected => {
+        this.setState({
+            data: await getEntities(selected),
+            selected: selected
+        })
     }
 
     componentDidMount = async () => {
-        this.setState({
-            data: await getEntities(this.props.selected),
-        })
+        await getData(this.props.selected)
+    }
+
+    componentWillReceiveProps = async props => {
+        if(this.state.selected && props.selected != this.state.selected)
+            await getData(props.selected)
     }
 
     newClick = () => {

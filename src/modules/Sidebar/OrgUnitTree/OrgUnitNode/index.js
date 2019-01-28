@@ -1,6 +1,6 @@
 import React from 'react'
 import './style.css'
-import { Col, Row } from '../../../../helpers/helpers'
+import { Row } from '../../../../helpers/helpers'
 
 export class OrgUnitNode extends React.Component {
     state = {
@@ -9,7 +9,6 @@ export class OrgUnitNode extends React.Component {
 
     onCarretClick = () => {
         this.setState({ opened: !this.state.opened })
-        //this.props.onSelect(this.props.orgUnit.id)
     }
 
     render() {

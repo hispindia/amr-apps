@@ -1,5 +1,4 @@
 import React from 'react'
-import { getOrgUnits } from '../../../api/api'
 import { OrgUnitNode } from './OrgUnitNode'
 import './style.css'
 

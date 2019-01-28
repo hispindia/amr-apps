@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Card, LinearProgress } from '@dhis2/ui/core'
-import { Grid } from '@material-ui/core'
 import { Heading } from '../../helpers/helpers'
 import { getProgramStage } from '../../api/api'
 import {
     TextInput,
-    AgeInput,
     RadioInput,
     SelectInput,
     SwitchInput,
