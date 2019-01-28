@@ -12,7 +12,7 @@ export class Home extends React.Component {
 
     componentDidMount = async () => {
         this.setState({
-            data: await getEntities(),
+            data: await getEntities(this.props.selected),
         })
     }
 

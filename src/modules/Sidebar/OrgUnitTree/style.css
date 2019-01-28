@@ -1,5 +1,5 @@
 /* Remove default bullets */
-#myUL {
+#org_unit_tree {
     list-style-type: none;
     margin: 0;
     padding: 0;

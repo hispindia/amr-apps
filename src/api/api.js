@@ -107,9 +107,10 @@ export async function updatePatient(id, values) {
     let data = await get(
         'trackedEntityInstances/' + id + '.json?ouMode=ALL&fields=*'
     )
+    data.attributes = []
     for (let key in values)
         data.attributes.push({ attribute: key, value: values[key] })
-    await put('trackedEntityInstances/' + id, data)
+    console.log(await put('trackedEntityInstances/' + id, data))
 }
 
 /**
@@ -145,9 +146,11 @@ export async function deletePatient(id) {
  * Gets all person tracked entity instances.
  * @returns {Object} Headers with medadata and rows with data.
  */
-export async function getEntities() {
+export async function getEntities(orgUnit) {
     const values = (await get(
-        'trackedEntityInstances.json?ouMode=ALL&order=created:desc&paging=false&fields=created,lastUpdated,attributes[displayName,valueType,attribute,value]&program=' +
+        'trackedEntityInstances.json?ou=' +
+            orgUnit +
+            '&ouMode=DESCENDANTS&order=created:desc&paging=false&fields=created,lastUpdated,attributes[displayName,valueType,attribute,value],enrollments[orgUnitName]&program=' +
             amrId
     )).trackedEntityInstances
     const metaData = (await get(
@@ -164,6 +167,9 @@ export async function getEntities() {
             {
                 name: 'Updated',
                 options: { display: false },
+            },
+            {
+                name: 'Organisation Unit',
             },
         ],
         rows: [],
@@ -182,14 +188,15 @@ export async function getEntities() {
         data.headers.push({
             name: metaData[i].trackedEntityAttribute.displayName,
             id: metaData[i].trackedEntityAttribute.id,
-            options: { display: i < 5 },
+            options: { display: i < 4 },
         })
     for (let i = 0; i < values.length; i++) {
         let entityValues = [
             removeTime(values[i].created),
             removeTime(values[i].lastUpdated),
+            values[i].enrollments[0].orgUnitName,
         ]
-        for (let j = 2; j < data.headers.length; j++)
+        for (let j = 3; j < data.headers.length; j++)
             entityValues.push(getAttributeValue(i, data.headers[j].id))
         data.rows.push(entityValues)
     }
@@ -287,60 +294,35 @@ export async function getProgramStage() {
  * @returns {Object[]} All organisation units.
  */
 export async function getOrgUnits() {
-    const data = (await get(
-        'organisationUnits.json?paging=false&order=level:asc&fields=id,name,children,leaf,level'
+    const userOrgUnits = (await get('me.json?fields=organisationUnits'))
+        .organisationUnits
+    let orgUnitsString = '[' + userOrgUnits[0].id
+    for (let i = 1; i < userOrgUnits.length; i++)
+        orgUnitsString += ',' + userOrgUnits[i].id
+    orgUnitsString += ']'
+
+    let data = (await get(
+        'organisationUnits.json?filter=id:in:' +
+            orgUnitsString +
+            '&paging=false&order=level:asc&fields=id,displayName,children[id,displayName,children[id,displayName,children[id,displayName,children[id,displayName]]]]'
     )).organisationUnits
-    return [
-        {
-            id: 123,
-            displayName: 'India',
-            leaf: false,
-            level: 1,
-            children: [
-                {
-                    id: 234,
-                    displayName: 'UP',
-                    leaf: false,
-                    level: 2,
-                    children: [
-                        {
-                            id: 987,
-                            displayName: 'Noida',
-                            leaf: true,
-                            level: 3,
-                            children: [],
-                        },
-                        {
-                            id: 876,
-                            displayName: 'Luchnow',
-                            leaf: true,
-                            level: 3,
-                            children: [],
-                        },
-                    ],
-                },
-                {
-                    id: 345,
-                    displayName: 'Dehli',
-                    leaf: true,
-                    level: 2,
-                    children: [],
-                },
-                {
-                    id: 456,
-                    displayName: 'Goa',
-                    leaf: true,
-                    level: 2,
-                    children: [],
-                },
-            ],
-        },
-        {
-            id: 1233543,
-            displayName: 'India',
-            leaf: false,
-            level: 1,
-            children: [],
-        },
-    ]
+
+    const sortChildren = orgUnit => {
+        if (orgUnit.children)
+            if (orgUnit.children.length) {
+                for (let i = 0; i < orgUnit.children.length; i++)
+                    sortChildren(orgUnit.children[i])
+                orgUnit.children.sort((a, b) =>
+                    a.displayName > b.displayName
+                        ? 1
+                        : b.displayName > a.displayName
+                        ? -1
+                        : 0
+                )
+            }
+    }
+
+    for (let i = 0; i < data.length; i++) sortChildren(data[i])
+
+    return data
 }

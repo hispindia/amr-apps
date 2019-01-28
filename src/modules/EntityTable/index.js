@@ -9,7 +9,7 @@ export class EntityTable extends React.Component {
     }
 
     onClick = row => {
-        this.setState({ patientClicked: row[2] })
+        this.setState({ patientClicked: row[3] })
     }
 
     render() {

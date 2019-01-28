@@ -5,28 +5,50 @@ import './App.css'
 import { HashRouter } from 'react-router-dom'
 import { Main } from './Main'
 import { Header } from './modules/Header'
-import { Drawer } from '@material-ui/core'
-import { OrgUnitTree } from './modules'
+import { Sidebar } from './modules'
+import { Col, Row } from './helpers/helpers'
+import { getOrgUnits } from './api/api'
 
 export class App extends Component {
-    state = { drawer: true }
+    state = {
+        orgUnits: null,
+        selected: null,
+    }
 
-    onClick = () => {
-        this.setState({ drawer: !this.state.drawer })
+    onSelect = selected => {
+        console.log(selected)
+        this.setState({ selected: selected })
+    }
+
+    componentDidMount = async () => {
+        const orgUnits = await getOrgUnits()
+        this.setState({
+            orgUnits: orgUnits,
+            selected: {
+                id: orgUnits[0].id,
+                name: orgUnits[0].displayName,
+            },
+        })
     }
 
     render() {
+        if (!this.state.selected) return null
+
         return (
             <BrowserRouter>
                 <HashRouter>
                     <div>
                         <Header />
-                        <Drawer variant="persistent" open={this.state.drawer}>
-                            <div style={{ padding: 16 }}>
-                                <OrgUnitTree onClick={this.onClick} />
-                            </div>
-                        </Drawer>
-                        <Main />
+                        <Row>
+                            <Col>
+                                <Sidebar
+                                    onSelect={this.onSelect}
+                                    selected={this.state.selected}
+                                    orgUnits={this.state.orgUnits}
+                                />
+                            </Col>
+                            <Main selected={this.state.selected.id} />
+                        </Row>
                     </div>
                 </HashRouter>
             </BrowserRouter>

@@ -1,17 +1,24 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { Route, Switch } from 'react-router-dom'
-import { Entity, Home, Event, OrgUnitTree } from './modules'
+import { Entity, Home, Event } from './modules'
 
-export const Main = () => {
-    return (
-        <main style={{ minWidth: 500 }}>
-            <Switch>
-                <Route exact path="/" component={Home} />
-                <Route exact path="/entity" component={Entity} />
-                <Route path="/entity/:id" component={Entity} />
-                <Route exact path="/event" component={Event} />
-                <Route exact path="/tree" component={OrgUnitTree} />
-            </Switch>
-        </main>
-    )
+export class Main extends Component {
+    render() {
+        return (
+            <main style={{ minWidth: 500, width: '-webkit-fill-available' }}>
+                <Switch>
+                    <Route
+                        exact
+                        path="/"
+                        render={props => (
+                            <Home {...props} selected={this.props.selected} />
+                        )}
+                    />
+                    <Route exact path="/entity" component={Entity} />
+                    <Route path="/entity/:id" component={Entity} />
+                    <Route exact path="/event" component={Event} />
+                </Switch>
+            </main>
+        )
+    }
 }
