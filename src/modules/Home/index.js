@@ -8,13 +8,13 @@ export class Home extends React.Component {
     state = {
         data: null,
         newClicked: false,
-        selected: null
+        selected: null,
     }
 
     getData = async selected => {
         this.setState({
             data: await getEntities(selected),
-            selected: selected
+            selected: selected,
         })
     }
 
@@ -23,7 +23,7 @@ export class Home extends React.Component {
     }
 
     componentWillReceiveProps = async props => {
-        if(this.state.selected && props.selected != this.state.selected)
+        if (this.state.selected && props.selected != this.state.selected)
             await getData(props.selected)
     }
 

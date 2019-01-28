@@ -29,11 +29,10 @@ export class App extends Component {
                 name: orgUnits[0].displayName,
             },
         })
-    }   
+    }
 
     render() {
         if (!this.state.selected) return null
-
 
         return (
             <BrowserRouter>
@@ -41,13 +40,13 @@ export class App extends Component {
                     <div>
                         <Header />
                         <Row>
-                                <Col>
-                                    <Sidebar
-                                        onSelect={this.onSelect}
-                                        selected={this.state.selected}
-                                        orgUnits={this.state.orgUnits}
-                                    />
-                                </Col>
+                            <Col>
+                                <Sidebar
+                                    onSelect={this.onSelect}
+                                    selected={this.state.selected}
+                                    orgUnits={this.state.orgUnits}
+                                />
+                            </Col>
                             <Main selected={this.state.selected.id} />
                         </Row>
                     </div>

@@ -3,12 +3,7 @@ import { Redirect } from 'react-router-dom'
 import { Card, LinearProgress } from '@dhis2/ui/core'
 import { Heading } from '../../helpers/helpers'
 import { getProgramStage } from '../../api/api'
-import {
-    TextInput,
-    RadioInput,
-    SelectInput,
-    SwitchInput,
-} from '../../inputs'
+import { TextInput, RadioInput, SelectInput, SwitchInput } from '../../inputs'
 
 export class Event extends Component {
     state = {
