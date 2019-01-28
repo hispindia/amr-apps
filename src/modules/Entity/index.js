@@ -9,7 +9,7 @@ import { IconButton } from '../../inputs'
 export class Entity extends React.Component {
     state = {
         data: null,
-        newClicked: false,
+        addClicked: false,
         backClicked: false,
         forceTable: false,
     }
@@ -21,20 +21,16 @@ export class Entity extends React.Component {
         })
     }
 
-    newClick = () => {
-        this.setState({ newClicked: true })
+    onAddClick = () => {
+        this.setState({ addClicked: true })
     }
 
     backClicked = () => {
         this.setState({ backClicked: true })
     }
 
-    onNewEnityAdded = () => {
-        this.setState({ forceTable: true })
-    }
-
     render() {
-        if (this.state.newClicked) return <Redirect push to={'/event'} />
+        if (this.state.addClicked) return <Redirect push to={'/event'} />
 
         if (this.state.backClicked) return <Redirect push to={'/'} />
 
@@ -60,18 +56,10 @@ export class Entity extends React.Component {
                 />
                 {this.props.match.params.id ? (
                     <div className="table">
-                        <EventTable data={this.state.data} />
-                        <div className="table_button">
-                            <Button
-                                variant="contained"
-                                kind="primary"
-                                onClick={this.newClick}
-                                icon="create"
-                                size="medium"
-                            >
-                                New
-                            </Button>
-                        </div>
+                        <EventTable
+                            data={this.state.data}
+                            onAddClick={this.onAddClick}
+                        />
                     </div>
                 ) : null}
             </div>

@@ -51,13 +51,14 @@ html[dir] .ui_selectfield_menu_udicv > .ui_card_base_l2vmf {
 
 .table_button {
     position: absolute;
-    left: 20px;
-    bottom: 11px;
+    top: 14px;
+    right: 272px;
     z-index: 1;
 }
 
 .table {
     position: relative;
+    min-width: 700px;
 }
 
 .icon_button .ui_icon_base_1s8vb {

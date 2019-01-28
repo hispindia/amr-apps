@@ -11,6 +11,15 @@ export class Home extends React.Component {
         selected: null,
     }
 
+    componentDidMount = async () => {
+        await this.getData(this.props.selected)
+    }
+
+    componentWillReceiveProps = async props => {
+        if (this.state.selected && props.selected != this.state.selected)
+            await this.getData(props.selected)
+    }
+
     getData = async selected => {
         this.setState({
             data: await getEntities(selected),
@@ -18,16 +27,7 @@ export class Home extends React.Component {
         })
     }
 
-    componentDidMount = async () => {
-        await getData(this.props.selected)
-    }
-
-    componentWillReceiveProps = async props => {
-        if (this.state.selected && props.selected != this.state.selected)
-            await getData(props.selected)
-    }
-
-    newClick = () => {
+    onAddClick = () => {
         this.setState({ newClicked: true })
     }
 
@@ -37,18 +37,12 @@ export class Home extends React.Component {
         if (!this.state.data) return null
 
         return (
-            <div className="table" style={{ margin: 20 }}>
-                <EntityTable data={this.state.data} />
-                <div className="table_button">
-                    <Button
-                        variant="contained"
-                        kind="primary"
-                        onClick={this.newClick}
-                        icon="create"
-                        size="medium"
-                    >
-                        New
-                    </Button>
+            <div style={{ margin: 20 }}>
+                <div className="table">
+                    <EntityTable
+                        data={this.state.data}
+                        onAddClick={this.onAddClick}
+                    />
                 </div>
             </div>
         )

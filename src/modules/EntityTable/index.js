@@ -2,6 +2,7 @@ import React from 'react'
 import { Redirect } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
 import MUIDataTable from 'mui-datatables'
+import TableToolbar from '../../inputs/TableToolbar'
 
 export class EntityTable extends React.Component {
     state = {
@@ -9,6 +10,7 @@ export class EntityTable extends React.Component {
     }
 
     onClick = row => {
+        console.log(row)
         this.setState({ patientClicked: row[3] })
     }
 
@@ -26,6 +28,13 @@ export class EntityTable extends React.Component {
                         selectableRows: false,
                         onRowClick: this.onClick,
                         elevation: 0,
+                        customToolbar: () => {
+                            return (
+                                <TableToolbar
+                                    onAddClick={this.props.onAddClick}
+                                />
+                            )
+                        },
                     }}
                 />
             </Card>
