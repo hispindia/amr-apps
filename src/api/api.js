@@ -6,6 +6,10 @@ let amrId = ''
 let personId = ''
 let entityLabel = ''
 let programStageId = ''
+let organismProgramId = ''
+let organismEntityId = ''
+let organismElementId = ''
+//let organismEntityLabel = ''
 
 /**
  * Gets entity label.
@@ -26,6 +30,17 @@ export async function setAmrProgram() {
     personId = program.trackedEntityType.id
     entityLabel = program.trackedEntityType.displayName
     programStageId = program.programStages[0].id
+
+    const organismProgram = (await get(
+        'programs.json?filter=code:eq:organism&paging=false&fields=id,trackedEntityType[id,displayName]'
+    )).programs[0]
+    organismProgramId = organismProgram.id
+    organismEntityId = organismProgram.trackedEntityType.id
+
+    organismElementId = (await get(
+        'trackedEntityAttributes.json?filter=code:eq:organism&paging=false'
+    )).trackedEntityAttributes[0].id
+    console.log(organismElementId)
 }
 
 /**
@@ -203,6 +218,33 @@ export async function getEntities(orgUnit) {
     return data
 }
 
+export async function getOrganisms() {
+    const data = (await get(
+        'trackedEntityInstances.json?ouMode=ALL&order=created:desc&paging=false&fields=attributes[displayName,attribute,value]&program=' +
+            organismProgramId
+    )).trackedEntityInstances
+
+    let label = index => {
+        for (let i = 0; i < data[index].attributes.length; i++) {
+            if (data[index].attributes[i].attribute === organismElementId)
+                return data[index].attributes[i].value
+        }
+        return ''
+    }
+
+    let organisms = []
+    for (let i = 0; i < data.length; i++)
+        organisms.push({
+            value: data[i].attributes,
+            label: label(i),
+        })
+
+    organisms.sort((a, b) =>
+        a.label > b.label ? 1 : b.label > a.label ? -1 : 0
+    )
+    return organisms
+}
+
 /**
  * Gets all events from the AMR program.
  * @returns {Object[]} All AMR events.
@@ -270,7 +312,7 @@ export async function getProgramStage() {
     let programStage = await get(
         'programStages/' +
             programStageId +
-            '.json?fields=displayName,programStageDataElements[id,compulsory],programStageSections[id,displayName,sortOrder,dataElements[id,displayFormName,valueType,optionSetValue,optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
+            '.json?fields=displayName,programStageDataElements[id,compulsory],programStageSections[id,displayName,sortOrder,dataElements[id,displayFormName,code,valueType,optionSetValue,optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
     )
 
     for (let i = 0; i < programStage.programStageDataElements.length; i++)

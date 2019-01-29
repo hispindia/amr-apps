@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
 import { Heading, Row, Title } from '../../helpers/helpers'
-import { getProgramStage } from '../../api/api'
+import { getProgramStage, getOrganisms } from '../../api/api'
 import {
     TextInput,
     RadioInput,
@@ -10,6 +10,8 @@ import {
     SwitchInput,
     IconButton,
 } from '../../inputs'
+
+const specialRendering = ['organism']
 
 export class Event extends Component {
     state = {
@@ -60,6 +62,7 @@ export class Event extends Component {
 
         this.setState({
             programStage: programStage,
+            organisms: await getOrganisms(),
         })
     }
 
@@ -71,6 +74,29 @@ export class Event extends Component {
 
     onBackClicked = () => {
         this.setState({ backClicked: true })
+    }
+
+    renderSpecial = dataElement => {
+        switch (dataElement.code) {
+            case 'organism':
+                return (
+                    <SelectInput
+                        objects={this.state.organisms}
+                        name={dataElement.id}
+                        label={dataElement.displayFormName}
+                        value={this.state.values[dataElement.id]}
+                        onChange={this.onOrganism}
+                        required={dataElement.required}
+                    />
+                )
+            default:
+                return null
+        }
+    }
+
+    onOrganism = (name, value) => {
+        console.log(name)
+        console.log(value)
     }
 
     render() {
@@ -100,37 +126,79 @@ export class Event extends Component {
                                 <div style={{ marginLeft: 8, marginRight: 8 }}>
                                     <Heading>{section.displayName}</Heading>
                                 </div>
-                                {section.dataElements.map(dataElement => (
-                                    <div
-                                        key={dataElement.id}
-                                        style={{ margin: 8 }}
-                                    >
-                                        {dataElement.optionSetValue ? (
-                                            dataElement.optionSet.options
-                                                .length < 5 ? (
-                                                <RadioInput
-                                                    objects={
-                                                        dataElement.optionSet
-                                                            .options
-                                                    }
+                                {section.dataElements.map(dataElement =>
+                                    specialRendering.includes(
+                                        dataElement.code
+                                    ) ? (
+                                        this.renderSpecial(dataElement)
+                                    ) : (
+                                        <div
+                                            key={dataElement.id}
+                                            style={{ margin: 8 }}
+                                        >
+                                            {dataElement.optionSetValue ? (
+                                                dataElement.optionSet.options
+                                                    .length < 5 ? (
+                                                    <RadioInput
+                                                        objects={
+                                                            dataElement
+                                                                .optionSet
+                                                                .options
+                                                        }
+                                                        name={dataElement.id}
+                                                        label={
+                                                            dataElement.displayFormName
+                                                        }
+                                                        value={
+                                                            values[
+                                                                dataElement.id
+                                                            ]
+                                                        }
+                                                        onChange={this.onChange}
+                                                        required={
+                                                            dataElement.required
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <SelectInput
+                                                        objects={
+                                                            dataElement
+                                                                .optionSet
+                                                                .options
+                                                        }
+                                                        name={dataElement.id}
+                                                        label={
+                                                            dataElement.displayFormName
+                                                        }
+                                                        value={
+                                                            values[
+                                                                dataElement.id
+                                                            ]
+                                                        }
+                                                        onChange={this.onChange}
+                                                        required={
+                                                            dataElement.required
+                                                        }
+                                                    />
+                                                )
+                                            ) : dataElement.valueType ===
+                                              'TRUE_ONLY' ? (
+                                                <SwitchInput
                                                     name={dataElement.id}
                                                     label={
                                                         dataElement.displayFormName
                                                     }
-                                                    value={
+                                                    checked={
                                                         values[dataElement.id]
                                                     }
+                                                    disabled={false}
                                                     onChange={this.onChange}
                                                     required={
                                                         dataElement.required
                                                     }
                                                 />
                                             ) : (
-                                                <SelectInput
-                                                    objects={
-                                                        dataElement.optionSet
-                                                            .options
-                                                    }
+                                                <TextInput
                                                     name={dataElement.id}
                                                     label={
                                                         dataElement.displayFormName
@@ -138,36 +206,14 @@ export class Event extends Component {
                                                     value={
                                                         values[dataElement.id]
                                                     }
-                                                    onChange={this.onChange}
                                                     required={
                                                         dataElement.required
                                                     }
                                                 />
-                                            )
-                                        ) : dataElement.valueType ===
-                                          'TRUE_ONLY' ? (
-                                            <SwitchInput
-                                                name={dataElement.id}
-                                                label={
-                                                    dataElement.displayFormName
-                                                }
-                                                checked={values[dataElement.id]}
-                                                disabled={false}
-                                                onChange={this.onChange}
-                                                required={dataElement.required}
-                                            />
-                                        ) : (
-                                            <TextInput
-                                                name={dataElement.id}
-                                                label={
-                                                    dataElement.displayFormName
-                                                }
-                                                value={values[dataElement.id]}
-                                                required={dataElement.required}
-                                            />
-                                        )}
-                                    </div>
-                                ))}
+                                            )}
+                                        </div>
+                                    )
+                                )}
                             </div>
                         </Card>
                     </div>
