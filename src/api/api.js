@@ -294,6 +294,13 @@ export async function getProgramStage() {
  * @returns {Object[]} All organisation units.
  */
 export async function getOrgUnits() {
+    const maxLevel = (await get(
+        'organisationUnits.json?fields=level&pageSize=1&order=level:desc'
+    )).organisationUnits[0].level
+    let childrenString = ''
+    for (let i = 0; i < maxLevel; i++)
+        childrenString += ',children[id,displayName'
+    for (let i = 0; i < maxLevel; i++) childrenString += ']'
     const userOrgUnits = (await get('me.json?fields=organisationUnits'))
         .organisationUnits
     let orgUnitsString = '[' + userOrgUnits[0].id
@@ -304,7 +311,8 @@ export async function getOrgUnits() {
     let data = (await get(
         'organisationUnits.json?filter=id:in:' +
             orgUnitsString +
-            '&paging=false&order=level:asc&fields=id,displayName,children[id,displayName,children[id,displayName,children[id,displayName,children[id,displayName]]]]'
+            '&paging=false&order=level:asc&fields=id,displayName' +
+            childrenString
     )).organisationUnits
 
     const sortChildren = orgUnit => {

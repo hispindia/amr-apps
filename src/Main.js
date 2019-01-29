@@ -16,7 +16,7 @@ export class Main extends Component {
                     />
                     <Route exact path="/entity" component={Entity} />
                     <Route path="/entity/:id" component={Entity} />
-                    <Route exact path="/event" component={Event} />
+                    <Route exact path="/event/:id" component={Event} />
                 </Switch>
             </main>
         )

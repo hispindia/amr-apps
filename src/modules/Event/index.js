@@ -1,14 +1,20 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
-import { Card, LinearProgress } from '@dhis2/ui/core'
-import { Heading } from '../../helpers/helpers'
+import { Card } from '@dhis2/ui/core'
+import { Heading, Row, Title } from '../../helpers/helpers'
 import { getProgramStage } from '../../api/api'
-import { TextInput, RadioInput, SelectInput, SwitchInput } from '../../inputs'
+import {
+    TextInput,
+    RadioInput,
+    SelectInput,
+    SwitchInput,
+    IconButton,
+} from '../../inputs'
 
 export class Event extends Component {
     state = {
-        loading: true,
-        goToHome: false,
+        programStage: null,
+        backClicked: false,
         values: {},
     }
 
@@ -54,7 +60,6 @@ export class Event extends Component {
 
         this.setState({
             programStage: programStage,
-            loading: false,
         })
     }
 
@@ -64,19 +69,32 @@ export class Event extends Component {
         this.setState({ values: values })
     }
 
+    onBackClicked = () => {
+        this.setState({ backClicked: true })
+    }
+
     render() {
-        const { loading, programStage, goToHome, values } = this.state
+        const { programStage, backClicked, values } = this.state
 
-        if (goToHome) return <Redirect push to={'/'} />
+        if (!programStage) return null
 
-        if (loading) return <LinearProgress />
+        if (backClicked)
+            return <Redirect push to={'/entity/' + this.props.match.id} />
 
         return (
-            <div style={{ margin: 20 }}>
+            <div style={{ margin: 16 }}>
+                <Row>
+                    <IconButton
+                        name="arrow_back"
+                        icon="arrow_back"
+                        onClick={this.backClicked}
+                    />
+                    <Title>{'Record'}</Title>
+                </Row>
                 {programStage.programStageSections.map(section => (
                     <div key={section.id} style={{ marginBottom: 16 }}>
                         <Card>
-                            <div style={{ margin: 20 }}>
+                            <div style={{ margin: 16 }}>
                                 <div style={{ marginLeft: 8, marginRight: 8 }}>
                                     <Heading>{section.displayName}</Heading>
                                 </div>

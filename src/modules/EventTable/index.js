@@ -13,8 +13,6 @@ export class EventTable extends React.Component {
         //if(this.state.patientClicked)
         //    return <Redirect push to={"/patient/" + this.state.patientClicked}/>;
 
-        if (this.state.addClicked) return <Redirect push to="/event" />
-
         return (
             <div style={{ marginTop: 16 }}>
                 <Card>
