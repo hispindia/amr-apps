@@ -49,18 +49,6 @@ html[dir] .ui_selectfield_menu_udicv > .ui_card_base_l2vmf {
     overflow: auto;
 }
 
-.table_button {
-    position: absolute;
-    top: 14px;
-    right: 272px;
-    z-index: 1;
-}
-
-.table {
-    position: relative;
-    min-width: 700px;
-}
-
 .icon_button .ui_icon_base_1s8vb {
     font-size: 2rem;
     cursor: pointer;

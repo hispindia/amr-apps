@@ -6,22 +6,21 @@ import TableToolbar from '../../inputs/TableToolbar'
 
 export class EntityTable extends React.Component {
     state = {
-        patientClicked: null,
+        entityClicked: null,
     }
 
     onClick = row => {
-        console.log(row)
-        this.setState({ patientClicked: row[3] })
+        this.setState({ entityClicked: row[3] })
     }
 
     render() {
-        if (this.state.patientClicked)
-            return <Redirect push to={'/entity/' + this.state.patientClicked} />
+        if (this.state.entityClicked)
+            return <Redirect push to={'/entity/' + this.state.entityClicked} />
 
         return (
             <Card>
                 <MUIDataTable
-                    title={this.props.data.title}
+                    title={''}
                     data={this.props.data.rows}
                     columns={this.props.data.headers}
                     options={{

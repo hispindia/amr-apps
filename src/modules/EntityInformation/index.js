@@ -267,7 +267,7 @@ export class EntityInformation extends Component {
 
         if (goToHome) return <Redirect push to={'/'} />
 
-        if (loading) return <LinearProgress />
+        if (loading) return null
 
         return (
             <div>

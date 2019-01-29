@@ -16,7 +16,6 @@ export class App extends Component {
     }
 
     onSelect = selected => {
-        console.log(selected)
         this.setState({ selected: selected })
     }
 

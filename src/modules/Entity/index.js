@@ -1,6 +1,5 @@
 import React from 'react'
 import { Redirect } from 'react-router-dom'
-import { Button } from '@dhis2/ui/core'
 import { getEvents, getEntityLabel } from '../../api/api'
 import { Title, Row } from '../../helpers/helpers'
 import { EventTable, EntityInformation } from '../'

@@ -1,8 +1,8 @@
 import React from 'react'
 import { Redirect } from 'react-router-dom'
-import { Button } from '@dhis2/ui/core'
 import { getEntities } from '../../api/api'
 import { EntityTable } from '../'
+import { Row, Title } from '../../helpers/helpers'
 
 export class Home extends React.Component {
     state = {
@@ -16,7 +16,7 @@ export class Home extends React.Component {
     }
 
     componentWillReceiveProps = async props => {
-        if (this.state.selected && props.selected != this.state.selected)
+        if (this.state.selected && props.selected !== this.state.selected)
             await this.getData(props.selected)
     }
 
@@ -37,7 +37,10 @@ export class Home extends React.Component {
         if (!this.state.data) return null
 
         return (
-            <div style={{ margin: 20 }}>
+            <div style={{ margin: 16 }}>
+                <Row>
+                    <Title>{this.state.data.title}</Title>
+                </Row>
                 <div className="table">
                     <EntityTable
                         data={this.state.data}

@@ -4,3 +4,11 @@
     margin: 0;
     padding: 0;
 }
+
+#org_unit_tree_container {
+    margin: 8px;
+}
+
+#org_unit_tree_spacing {
+    margin-top: 8px;
+}
