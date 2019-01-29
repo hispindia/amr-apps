@@ -32,7 +32,13 @@ export class Home extends React.Component {
     }
 
     render() {
-        if (this.state.newClicked) return <Redirect push to={'/entity'} />
+        if (this.state.newClicked)
+            return (
+                <Redirect
+                    push
+                    to={'orgUnit/' + this.props.selected + '/entity'}
+                />
+            )
 
         if (!this.state.data) return null
 
@@ -45,6 +51,7 @@ export class Home extends React.Component {
                     <EntityTable
                         data={this.state.data}
                         onAddClick={this.onAddClick}
+                        orgUnit={this.props.selected}
                     />
                 </div>
             </div>

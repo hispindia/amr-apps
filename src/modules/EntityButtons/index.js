@@ -11,7 +11,7 @@ export class EntityButtons extends Component {
                         <div key={button.label} style={{ paddingRight: 12 }}>
                             <Button
                                 variant="contained"
-                                kind="primary"
+                                kind={button.kind}
                                 onClick={button.onClick}
                                 disabled={button.disabled}
                                 icon={button.icon}

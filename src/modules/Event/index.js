@@ -80,14 +80,16 @@ export class Event extends Component {
         switch (dataElement.code) {
             case 'organism':
                 return (
-                    <SelectInput
-                        objects={this.state.organisms}
-                        name={dataElement.id}
-                        label={dataElement.displayFormName}
-                        value={this.state.values[dataElement.id]}
-                        onChange={this.onOrganism}
-                        required={dataElement.required}
-                    />
+                    <div key={dataElement.id} style={{ margin: 8 }}>
+                        <SelectInput
+                            objects={this.state.organisms}
+                            name={dataElement.id}
+                            label={dataElement.displayFormName}
+                            value={this.state.values[dataElement.id]}
+                            onChange={this.onOrganism}
+                            required={dataElement.required}
+                        />
+                    </div>
                 )
             default:
                 return null

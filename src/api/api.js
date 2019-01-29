@@ -40,7 +40,6 @@ export async function setAmrProgram() {
     organismElementId = (await get(
         'trackedEntityAttributes.json?filter=code:eq:organism&paging=false'
     )).trackedEntityAttributes[0].id
-    console.log(organismElementId)
 }
 
 /**
@@ -92,8 +91,7 @@ export async function getPatient(patientRegNr) {
  * Adds a new person tracked entity instance and enrolls to AMR program.
  * @param {Object} values - Values
  */
-export async function addPatient(values) {
-    const orgUnit = 'ANGhR1pa8I5'
+export async function addPatient(values, orgUnit) {
     const now = moment().format('YYYY-MM-DD')
     let data = {
         trackedEntityType: personId,
@@ -224,7 +222,7 @@ export async function getOrganisms() {
             organismProgramId
     )).trackedEntityInstances
 
-    let label = index => {
+    let getValue = index => {
         for (let i = 0; i < data[index].attributes.length; i++) {
             if (data[index].attributes[i].attribute === organismElementId)
                 return data[index].attributes[i].value
@@ -233,11 +231,13 @@ export async function getOrganisms() {
     }
 
     let organisms = []
-    for (let i = 0; i < data.length; i++)
+    for (let i = 0; i < data.length; i++) {
+        let value = getValue(i)
         organisms.push({
-            value: data[i].attributes,
-            label: label(i),
+            value: value,
+            label: value,
         })
+    }
 
     organisms.sort((a, b) =>
         a.label > b.label ? 1 : b.label > a.label ? -1 : 0

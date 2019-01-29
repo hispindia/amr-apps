@@ -29,7 +29,6 @@ export class EntityInformation extends Component {
 
     componentDidMount = async () => {
         let programAttributes = await getProgramAttributes()
-
         let values = {}
         let uniques = {}
         let stateId = ''
@@ -123,7 +122,7 @@ export class EntityInformation extends Component {
     onSubmitClick = async () => {
         this.setState({ querying: true })
         if (!this.state.editing) {
-            await addPatient(this.state.values)
+            await addPatient(this.state.values, this.props.orgUnit)
             this.setState({ isNewPatient: false, querying: false })
             this.props.onEntityAdded()
         } else {
@@ -169,6 +168,7 @@ export class EntityInformation extends Component {
                       onClick: this.onSubmitClick,
                       disabled: !this.validate() || this.state.unchanged,
                       icon: 'done',
+                      kind: 'primary',
                   },
               ]
             : [
@@ -177,12 +177,14 @@ export class EntityInformation extends Component {
                       onClick: this.onEditClick,
                       disabled: this.state.querying,
                       icon: 'edit',
+                      kind: 'primary',
                   },
                   {
                       label: 'Delete',
                       onClick: this.onDeleteClick,
                       disabled: this.state.querying,
                       icon: 'delete',
+                      kind: 'destructive',
                   },
               ]
     }

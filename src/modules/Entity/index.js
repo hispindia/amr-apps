@@ -52,6 +52,7 @@ export class Entity extends React.Component {
                             ? this.props.match.params.id
                             : null
                     }
+                    orgUnit={this.props.match.params.orgUnit}
                     onEntityAdded={this.onNewEnityAdded}
                 />
                 {this.props.match.params.id ? (

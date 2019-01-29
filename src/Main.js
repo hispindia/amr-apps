@@ -14,8 +14,15 @@ export class Main extends Component {
                             <Home {...props} selected={this.props.selected} />
                         )}
                     />
-                    <Route exact path="/entity" component={Entity} />
-                    <Route path="/entity/:id" component={Entity} />
+                    <Route
+                        exact
+                        path="/orgUnit/:orgUnit/entity"
+                        component={Entity}
+                    />
+                    <Route
+                        path="/orgUnit/:orgUnit/entity/:id"
+                        component={Entity}
+                    />
                     <Route exact path="/event/:id" component={Event} />
                 </Switch>
             </main>

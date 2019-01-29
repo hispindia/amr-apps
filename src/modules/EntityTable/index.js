@@ -15,7 +15,17 @@ export class EntityTable extends React.Component {
 
     render() {
         if (this.state.entityClicked)
-            return <Redirect push to={'/entity/' + this.state.entityClicked} />
+            return (
+                <Redirect
+                    push
+                    to={
+                        'orgUnit/' +
+                        this.props.orgUnit +
+                        '/entity/' +
+                        this.state.entityClicked
+                    }
+                />
+            )
 
         return (
             <Card>
