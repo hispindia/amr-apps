@@ -7,9 +7,11 @@
     cursor: pointer;
     user-select: none; /* Prevent text selection */
 }
-
-.ou-selected {
+.ou-text:hover {
     color: var(--primary);
+}
+.ou-selected {
+    color: var(--primary-dark);
 }
 
 /* Create the caret/arrow with a unicode, and style it */
@@ -18,6 +20,9 @@
     color: black;
     display: inline-block;
     margin-right: 5px;
+}
+.caret:hover::before {
+    color: var(--primary);
 }
 
 .no-caret {

@@ -79,7 +79,9 @@ export class Event extends Component {
         if (!programStage) return null
 
         if (backClicked)
-            return <Redirect push to={'/entity/' + this.props.match.id} />
+            return (
+                <Redirect push to={'/entity/' + this.props.match.params.id} />
+            )
 
         return (
             <div style={{ margin: 16 }}>
@@ -87,7 +89,7 @@ export class Event extends Component {
                     <IconButton
                         name="arrow_back"
                         icon="arrow_back"
-                        onClick={this.backClicked}
+                        onClick={this.onBackClicked}
                     />
                     <Title>{'Record'}</Title>
                 </Row>
