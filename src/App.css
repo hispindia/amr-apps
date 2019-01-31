@@ -11,6 +11,10 @@ body {
     line-height: 24px;
 }
 
+.label {
+    font-weight: 500;
+}
+
 .title {
     display: block;
     font-size: 2em;
@@ -37,6 +41,10 @@ body {
 .col {
     display: flex;
     flex-direction: column;
+}
+
+.wrapped {
+    flex-wrap: wrap;
 }
 
 /* Max height for select dropdown */
@@ -68,4 +76,12 @@ html[dir] .ui_selectfield_menu_udicv > .ui_card_base_l2vmf {
 .icon_button:hover {
     background: var(--idle);
     border-radius: 50%;
+}
+
+.ui_card_base_l2vmf {
+    height: auto !important;
+}
+
+.input {
+    min-width: 300px;
 }

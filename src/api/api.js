@@ -2,12 +2,14 @@ import { get, postData, del, put } from './crud'
 import * as moment from 'moment'
 import { removeTime } from '../helpers/date'
 
+const config = require('../config/config.json')
+
 let amrId = ''
 let personId = ''
 let entityLabel = ''
 let programStageId = ''
 let organismProgramId = ''
-let organismEntityId = ''
+//let organismEntityId = ''
 let organismElementId = ''
 //let organismEntityLabel = ''
 
@@ -35,7 +37,7 @@ export async function setAmrProgram() {
         'programs.json?filter=code:eq:organism&paging=false&fields=id,trackedEntityType[id,displayName]'
     )).programs[0]
     organismProgramId = organismProgram.id
-    organismEntityId = organismProgram.trackedEntityType.id
+    //organismEntityId = organismProgram.trackedEntityType.id
 
     organismElementId = (await get(
         'trackedEntityAttributes.json?filter=code:eq:organism&paging=false'
@@ -312,30 +314,81 @@ export async function getProgramStage() {
     let programStage = await get(
         'programStages/' +
             programStageId +
-            '.json?fields=displayName,programStageDataElements[id,compulsory],programStageSections[id,displayName,sortOrder,dataElements[id,displayFormName,code,valueType,optionSetValue,optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
+            '.json?fields=displayName,programStageDataElements[dataElement[id],compulsory,sortOrder],programStageSections[id,name,displayName,dataElements[id,displayFormName,code,valueType,optionSetValue,optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
     )
 
-    for (let i = 0; i < programStage.programStageDataElements.length; i++)
-        if (programStage.programStageDataElements[i].compulsory)
-            for (let j = 0; j < programStage.programStageSections.length; j++)
-                for (
-                    let k = 0;
-                    k <
-                    programStage.programStageSections[j].dataElements.length;
-                    k++
+    let getIndex = dataElementId => {
+        for (let i = 0; i < programStage.programStageDataElements.length; i++)
+            if (
+                programStage.programStageDataElements[i].dataElement.id ===
+                dataElementId
+            )
+                return i
+        return -1
+    }
+
+    for (let i = 0; i < programStage.programStageSections.length; i++)
+        for (
+            let j = 0;
+            j < programStage.programStageSections[i].dataElements.length;
+            j++
+        ) {
+            let index = getIndex(
+                programStage.programStageSections[i].dataElements[j].id
+            )
+            programStage.programStageSections[i].dataElements[j].required =
+                programStage.programStageDataElements[index].compulsory
+            programStage.programStageSections[i].dataElements[j].sortOrder =
+                programStage.programStageDataElements[index].sortOrder
+        }
+
+    let getSectionIndex = sectionName => {
+        for (let i = 0; i < programStage.programStageSections.length; i++)
+            if (programStage.programStageSections[i].name === sectionName)
+                return i
+        return -1
+    }
+
+    for (let i = 0; i < programStage.programStageSections.length; i++) {
+        if (
+            config.eventForm.specialSections[
+                programStage.programStageSections[i].name
+            ]
+        ) {
+            let childSections = []
+            for (let j in config.eventForm.specialSections[
+                programStage.programStageSections[i].name
+            ]) {
+                let index = getSectionIndex(
+                    config.eventForm.specialSections[
+                        programStage.programStageSections[i].name
+                    ][j]
                 )
-                    programStage.programStageSections[j].dataElements[
-                        k
-                    ].required = true
+                if (index !== -1) {
+                    childSections.push(programStage.programStageSections[index])
+                    programStage.programStageSections.splice(index, 1)
+                }
+            }
+            programStage.programStageSections[i].childSections = childSections
+        } else if (
+            config.eventForm.ignoredSections.includes(
+                programStage.programStageSections[i].name
+            )
+        ) {
+            programStage.programStageSections.splice(i, 1)
+            i--
+        }
+    }
 
     return programStage
 }
 
 /**
- * Gets all organisation units.
- * @returns {Object[]} All organisation units.
+ * Gets the user's organisation units along with their descendants.
+ * @returns {Object[]} Organisation units.
  */
 export async function getOrgUnits() {
+    // Getting the id's of the users OU's.
     const maxLevel = (await get(
         'organisationUnits.json?fields=level&pageSize=1&order=level:desc'
     )).organisationUnits[0].level
@@ -350,6 +403,7 @@ export async function getOrgUnits() {
         orgUnitsString += ',' + userOrgUnits[i].id
     orgUnitsString += ']'
 
+    // Getting the OU's with descendants.
     let data = (await get(
         'organisationUnits.json?filter=id:in:' +
             orgUnitsString +
@@ -372,6 +426,7 @@ export async function getOrgUnits() {
             }
     }
 
+    // Sorting children by display name.
     for (let i = 0; i < data.length; i++) sortChildren(data[i])
 
     return data

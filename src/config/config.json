@@ -1,0 +1,18 @@
+{
+    "eventForm": {
+        "specialElements": ["organism"],
+        "specialSections": {
+            "Institute / Hospital Information": ["Comorbidity"]
+        },
+        "ignoredSections": [
+            "Antibiotics / Antifungals (Taken for 3 days in last 1 month)",
+            "Disk Diffusion",
+            "MIC",
+            "Results",
+            "Special tests - Phenotypic tests",
+            "Special tests - Genotypic tests",
+            "Level 1 Approval status",
+            "Level 2 Approval status"
+        ]
+    }
+}

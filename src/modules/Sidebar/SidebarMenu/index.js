@@ -12,17 +12,17 @@ export class SidebarMenu extends Component {
             icon: 'people',
         },
         {
-            label: 'Records for Revision [0]',
+            label: 'Records for Revision (0)',
             value: '/events/revision',
             icon: 'help_outline',
         },
         {
-            label: 'Rejected Records [0]',
+            label: 'Rejected Records (0)',
             value: '/events/rejected',
             icon: 'highlight_off',
         },
         {
-            label: 'Accepted Records [0]',
+            label: 'Accepted Records (0)',
             value: '/events/accepted',
             icon: 'check_circle_outline',
         },

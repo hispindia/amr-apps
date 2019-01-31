@@ -1,6 +1,6 @@
 import React from 'react'
 import { Radio } from '@dhis2/ui/core'
-import { Text, Row } from '../../helpers/helpers'
+import { RowW, Label } from '../../helpers/helpers'
 
 export class RadioInput extends React.Component {
     state = {
@@ -24,11 +24,11 @@ export class RadioInput extends React.Component {
     render() {
         return (
             <div style={{ marginLeft: 8, marginRight: 8, marginTop: -8 }}>
-                <Text>
+                <Label>
                     {this.props.label}
                     {this.props.required ? '*' : null}
-                </Text>
-                <Row>
+                </Label>
+                <RowW>
                     {this.props.objects.map(object => (
                         <div key={object.value} style={{ marginRight: 40 }}>
                             <Radio
@@ -42,7 +42,7 @@ export class RadioInput extends React.Component {
                             />
                         </div>
                     ))}
-                </Row>
+                </RowW>
             </div>
         )
     }

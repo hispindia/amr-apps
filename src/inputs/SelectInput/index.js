@@ -27,17 +27,19 @@ export class SelectInput extends React.Component {
 
     render() {
         return (
-            <SelectField
-                name={this.props.name}
-                kind="outlined"
-                list={this.props.objects}
-                value={this.state.value}
-                label={this.props.label}
-                help={this.props.disabled ? this.props.helperText : null}
-                onChange={this.onChange}
-                disabled={this.props.disabled}
-                size="dense"
-            />
+            <div className="input">
+                <SelectField
+                    name={this.props.name}
+                    kind="outlined"
+                    list={this.props.objects}
+                    value={this.state.value}
+                    label={this.props.label}
+                    help={this.props.disabled ? this.props.helperText : null}
+                    onChange={this.onChange}
+                    disabled={this.props.disabled}
+                    size="dense"
+                />
+            </div>
         )
     }
 }

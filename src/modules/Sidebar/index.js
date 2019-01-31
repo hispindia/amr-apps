@@ -6,7 +6,7 @@ import { SidebarMenu } from './SidebarMenu'
 export class Sidebar extends Component {
     render() {
         return (
-            <div style={{ margin: 16 }}>
+            <div id="sidebar" style={{ margin: 16 }}>
                 <SidebarMenu />
                 <Route
                     exact

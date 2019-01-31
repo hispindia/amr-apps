@@ -76,18 +76,20 @@ export class TextInput extends React.Component {
 
     render() {
         return (
-            <InputField
-                required={this.props.required}
-                name={this.props.name}
-                label={this.props.label}
-                value={this.state.value}
-                onChange={this.setValue}
-                kind={'outlined'}
-                status={this.state.errorText === '' ? 'default' : 'error'}
-                help={this.state.errorText}
-                disabled={this.props.disabled}
-                size="dense"
-            />
+            <div className="input">
+                <InputField
+                    required={this.props.required}
+                    name={this.props.name}
+                    label={this.props.label}
+                    value={this.state.value}
+                    onChange={this.setValue}
+                    kind={'outlined'}
+                    status={this.state.errorText === '' ? 'default' : 'error'}
+                    help={this.state.errorText}
+                    disabled={this.props.disabled}
+                    size="dense"
+                />
+            </div>
         )
     }
 }

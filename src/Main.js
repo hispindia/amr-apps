@@ -5,7 +5,7 @@ import { Entity, Home, Event } from './modules'
 export class Main extends Component {
     render() {
         return (
-            <main style={{ minWidth: 500, width: '-webkit-fill-available' }}>
+            <main style={{ width: '100%' }}>
                 <Switch>
                     <Route
                         exact
@@ -20,6 +20,7 @@ export class Main extends Component {
                         component={Entity}
                     />
                     <Route
+                        exact
                         path="/orgUnit/:orgUnit/entity/:id"
                         component={Entity}
                     />

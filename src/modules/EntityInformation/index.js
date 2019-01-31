@@ -272,31 +272,26 @@ export class EntityInformation extends Component {
         if (loading) return null
 
         return (
-            <div>
-                {querying ? <LinearProgress /> : null}
-                <Card>
-                    <div style={{ margin: 20 }}>
-                        <Heading>Information</Heading>
-                        <Grid container spacing={16}>
-                            <Grid item sm>
-                                {attributes
-                                    .filter(
-                                        attribute => attribute.sortOrder <= half
-                                    )
-                                    .map(attribute => this.getInput(attribute))}
-                            </Grid>
-                            <Grid item sm>
-                                {attributes
-                                    .filter(
-                                        attribute => attribute.sortOrder > half
-                                    )
-                                    .map(attribute => this.getInput(attribute))}
-                            </Grid>
+            <Card>
+                <div style={{ margin: 16 }}>
+                    <Heading>Information</Heading>
+                    <Grid container spacing={16}>
+                        <Grid item xs>
+                            {attributes
+                                .filter(
+                                    attribute => attribute.sortOrder <= half
+                                )
+                                .map(attribute => this.getInput(attribute))}
                         </Grid>
-                        <EntityButtons buttons={this.getButtonProps()} />
-                    </div>
-                </Card>
-            </div>
+                        <Grid item xs>
+                            {attributes
+                                .filter(attribute => attribute.sortOrder > half)
+                                .map(attribute => this.getInput(attribute))}
+                        </Grid>
+                    </Grid>
+                    <EntityButtons buttons={this.getButtonProps()} />
+                </div>
+            </Card>
         )
     }
 }

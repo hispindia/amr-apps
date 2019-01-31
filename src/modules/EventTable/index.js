@@ -1,5 +1,4 @@
 import React from 'react'
-import { Redirect } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
 import MUIDataTable from 'mui-datatables'
 import TableToolbar from '../../inputs/TableToolbar'

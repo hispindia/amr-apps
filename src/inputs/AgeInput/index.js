@@ -3,7 +3,7 @@ import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
 import MomentUtils from '@date-io/moment'
 import * as moment from 'moment'
 import InputField from '@dhis2/ui/core/InputField'
-import { Text, Row } from '../../helpers/helpers'
+import { RowW, Label } from '../../helpers/helpers'
 
 /**
  * Age input consisting of date picker and year/month/date input fields.
@@ -144,11 +144,11 @@ export class AgeInput extends React.Component {
     render() {
         return (
             <div>
-                <Text>
+                <Label>
                     {this.props.label}
                     {this.props.required ? '*' : null}
-                </Text>
-                <Row>
+                </Label>
+                <RowW>
                     <div style={{ marginRight: 16, width: 100 }}>
                         <InputField
                             name={'years'}
@@ -182,7 +182,7 @@ export class AgeInput extends React.Component {
                             size="dense"
                         />
                     </div>
-                </Row>
+                </RowW>
                 <MuiPickersUtilsProvider utils={MomentUtils}>
                     <DatePicker
                         value={this.state.value}

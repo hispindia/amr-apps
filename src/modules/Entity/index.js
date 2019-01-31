@@ -37,7 +37,7 @@ export class Entity extends React.Component {
         if (!this.state.data) return null
 
         return (
-            <div style={{ margin: 20 }}>
+            <div style={{ margin: 16 }}>
                 <Row>
                     <IconButton
                         name="arrow_back"
