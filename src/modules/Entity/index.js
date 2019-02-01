@@ -30,7 +30,18 @@ export class Entity extends React.Component {
 
     render() {
         if (this.state.addClicked)
-            return <Redirect push to={'/event/' + this.props.match.params.id} />
+            return (
+                <Redirect
+                    push
+                    to={
+                        '/orgUnit/' +
+                        this.props.match.params.orgUnit +
+                        '/entity/' +
+                        this.props.match.params.id +
+                        '/event/'
+                    }
+                />
+            )
 
         if (this.state.backClicked) return <Redirect push to={'/'} />
 

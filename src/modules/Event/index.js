@@ -200,7 +200,15 @@ export class Event extends Component {
 
         if (backClicked)
             return (
-                <Redirect push to={'/entity/' + this.props.match.params.id} />
+                <Redirect
+                    push
+                    to={
+                        '/orgUnit/' +
+                        this.props.match.orgUnit +
+                        '/entity/' +
+                        this.props.match.params.id
+                    }
+                />
             )
 
         return (
