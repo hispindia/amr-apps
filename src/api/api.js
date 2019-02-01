@@ -220,7 +220,7 @@ export async function getEntities(orgUnit) {
 
 export async function getOrganisms() {
     const data = (await get(
-        'trackedEntityInstances.json?ouMode=ALL&order=created:desc&paging=false&fields=attributes[displayName,attribute,value]&program=' +
+        'trackedEntityInstances.json?ouMode=ALL&order=created:desc&paging=false&fields=trackedEntityInstance,attributes[displayName,attribute,value]&program=' +
             organismProgramId
     )).trackedEntityInstances
 
@@ -236,7 +236,7 @@ export async function getOrganisms() {
     for (let i = 0; i < data.length; i++) {
         let value = getValue(i)
         organisms.push({
-            value: value,
+            value: data[i].trackedEntityInstance,
             label: value,
         })
     }
