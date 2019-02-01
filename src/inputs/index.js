@@ -1,5 +1,6 @@
 export * from './AgeInput'
 export * from './CheckboxInput'
+export * from './DateInput'
 export * from './IconButton'
 export * from './RadioInput'
 export * from './SelectInput'

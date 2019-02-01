@@ -10,6 +10,7 @@ import {
     SwitchInput,
     IconButton,
     CheckboxInput,
+    DateInput,
 } from '../../inputs'
 import { Grid } from '@material-ui/core'
 
@@ -104,11 +105,16 @@ export class Event extends Component {
                 let objects = {}
                 let values = {}
                 for (let i = 0; i < childSection.dataElements.length; i++) {
-                    objects[childSection.dataElements[i].id] =
-                        childSection.dataElements[i].displayFormName
-                    values[childSection.dataElements[i].id] =
-                        this.state.values[childSection.dataElements[i].id] ===
-                        true
+                    if (
+                        childSection.dataElements[i].valueType === 'TRUE_ONLY'
+                    ) {
+                        objects[childSection.dataElements[i].id] =
+                            childSection.dataElements[i].displayFormName
+                        values[childSection.dataElements[i].id] =
+                            this.state.values[
+                                childSection.dataElements[i].id
+                            ] === true
+                    }
                 }
                 return (
                     <div key={'Comorbidity'} style={{ margin: 16 }}>
@@ -120,6 +126,13 @@ export class Event extends Component {
                             onChange={this.onChange}
                             required={true}
                         />
+                        {childSection.dataElements
+                            .filter(
+                                dataElement => dataElement.valueType === 'TEXT'
+                            )
+                            .map(dataElement =>
+                                this.getDataElement(dataElement)
+                            )}
                     </div>
                 )
             default:
@@ -159,12 +172,21 @@ export class Event extends Component {
                         onChange={this.onChange}
                         required={dataElement.required}
                     />
+                ) : dataElement.valueType === 'DATE' ? (
+                    <DateInput
+                        name={dataElement.id}
+                        label={dataElement.displayFormName}
+                        value={this.state.values[dataElement.id]}
+                        required={dataElement.required}
+                        onChange={this.onChange}
+                    />
                 ) : (
                     <TextInput
                         name={dataElement.id}
                         label={dataElement.displayFormName}
                         value={this.state.values[dataElement.id]}
                         required={dataElement.required}
+                        onChange={this.onChange}
                     />
                 )}
             </div>
@@ -192,7 +214,13 @@ export class Event extends Component {
                     <Title>{'Record'}</Title>
                 </Row>
                 {programStage.programStageSections.map(section => {
-                    let half = Math.ceil(section.dataElements.length / 2)
+                    let half = Math.ceil(
+                        (section.dataElements.length +
+                            (section.childSections
+                                ? section.childSections.length
+                                : 0)) /
+                            2
+                    )
                     return (
                         <div key={section.id} style={{ marginBottom: 16 }}>
                             <Card>
@@ -235,16 +263,16 @@ export class Event extends Component {
                                                               dataElement
                                                           )
                                                 )}
+                                            {section.childSections
+                                                ? section.childSections.map(
+                                                      childSection =>
+                                                          this.getChildSection(
+                                                              childSection
+                                                          )
+                                                  )
+                                                : null}
                                         </Grid>
                                     </Grid>
-                                    {section.childSections
-                                        ? section.childSections.map(
-                                              childSection =>
-                                                  this.getChildSection(
-                                                      childSection
-                                                  )
-                                          )
-                                        : null}
                                 </div>
                             </Card>
                         </div>

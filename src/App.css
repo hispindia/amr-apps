@@ -69,12 +69,11 @@ html[dir] .ui_selectfield_menu_udicv > .ui_card_base_l2vmf {
 }
 
 .arrow_back:hover {
-    color: var(--primary);
-    background: #0d0d0e;
+    color: var(--primary-dark);
 }
 
 .icon_button:hover {
-    background: var(--idle);
+    background: rgba(0, 0, 0, 0.08);
     border-radius: 50%;
 }
 
