@@ -69,7 +69,7 @@ html[dir] .ui_selectfield_menu_udicv > .ui_card_base_l2vmf {
 }
 
 .arrow_back:hover {
-    color: var(--primary-dark);
+    color: var(--primary800);
 }
 
 .icon_button:hover {
@@ -83,4 +83,14 @@ html[dir] .ui_selectfield_menu_udicv > .ui_card_base_l2vmf {
 
 .input {
     min-width: 300px;
+}
+
+.add_button {
+    color: white !important;
+    background: linear-gradient(180deg, #1565c0, #0650a3);
+    border: 1px solid var(--primary800);
+}
+
+.add_button:hover {
+    background: linear-gradient(180deg, #054fa3, #034793);
 }

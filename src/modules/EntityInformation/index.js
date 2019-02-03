@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Grid } from '@material-ui/core'
-import { Card, LinearProgress } from '@dhis2/ui/core'
+import { Card } from '@dhis2/ui/core'
 import { Heading } from '../../helpers/helpers'
 import {
     getProgramAttributes,
@@ -265,7 +265,7 @@ export class EntityInformation extends Component {
     }
 
     render() {
-        const { loading, attributes, querying, goToHome, half } = this.state
+        const { loading, attributes, goToHome, half } = this.state
 
         if (goToHome) return <Redirect push to={'/'} />
 

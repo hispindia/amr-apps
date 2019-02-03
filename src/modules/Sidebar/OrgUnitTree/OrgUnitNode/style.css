@@ -8,10 +8,10 @@
     user-select: none; /* Prevent text selection */
 }
 .ou-text:hover {
-    color: var(--primary);
+    color: var(--primary800);
 }
 .ou-selected {
-    color: var(--primary-dark);
+    color: var(--primary800);
 }
 
 /* Create the caret/arrow with a unicode, and style it */
@@ -22,7 +22,7 @@
     margin-right: 5px;
 }
 .caret:hover::before {
-    color: var(--primary);
+    color: var(--primary800);
 }
 
 .no-caret {

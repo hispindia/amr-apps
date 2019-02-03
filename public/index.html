@@ -24,16 +24,34 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>AMR - Record Capture</title>
-    <style type="text/css">
-      body {
-        background-color: rgb(240, 240, 240);
-        margin: 0;
-      }
-    </style>
     <script>
       var DHIS_CONFIG = {
         baseUrl: 'http://ugle.asuscomm.com:8888'
       }
+      var manifest = {
+        "launch_path": "index.html",
+        "default_locale": "en",
+        "activities": {
+          "dhis": {
+            "href": "../../.."
+          }
+        },
+        "dhis2": {
+          "apiVersion": "30"
+        },
+        "appType": "APP",
+        "name": "AMR Record Capture",
+        "version": "0.1.0",
+        "description": "AMR record capture app for DHIS2",
+        "icons": {
+          "48": "icon.png"
+        },
+        "developer": {
+          "name": "Terje Uglebakken",
+          "company": "HISP India"
+        },
+        "manifest_generated_at": "Sun Feb 03 2019 14:51:28 GMT+0530 (India Standard Time)"
+          }
     </script>
   </head>
   <body>

@@ -16,9 +16,8 @@ class TableToolbar extends React.Component {
             <React.Fragment>
                 <Tooltip title={'Add'}>
                     <IconButton
-                        className="ui_button_kind-primary_anmz5"
                         onClick={this.props.onAddClick}
-                        style={{ color: 'white' }}
+                        className={'add_button'}
                     >
                         <AddIcon className={classes.deleteIcon} />
                     </IconButton>

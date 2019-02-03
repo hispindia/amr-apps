@@ -33,10 +33,17 @@ export class SidebarMenu extends Component {
     }
 
     render() {
-        if (this.state.path) return <Redirect push to={this.state.path} />
-
         return (
-            <Menu size="dense" list={this.menuItems} onClick={this.onClick} />
+            <div>
+                {this.state.path ? (
+                    <Redirect push to={this.state.path} />
+                ) : null}
+                <Menu
+                    size="dense"
+                    list={this.menuItems}
+                    onClick={this.onClick}
+                />
+            </div>
         )
     }
 }
