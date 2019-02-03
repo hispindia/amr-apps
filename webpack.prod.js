@@ -4,7 +4,7 @@ const path = require('path')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const manifest = require('build/manifest.webapp')
+//const manifest = require('build/manifest.webapp')
 //const fs = require('json-loader')
 
 //const manifest = JSON.parse(
