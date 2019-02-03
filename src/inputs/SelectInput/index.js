@@ -1,5 +1,6 @@
 import React from 'react'
 import SelectField from '@dhis2/ui/core/SelectField'
+import './style.css'
 
 export class SelectInput extends React.Component {
     state = {

@@ -9,9 +9,7 @@ let personId = ''
 let entityLabel = ''
 let programStageId = ''
 let organismProgramId = ''
-//let organismEntityId = ''
 let organismElementId = ''
-//let organismEntityLabel = ''
 
 /**
  * Gets entity label.
@@ -37,7 +35,6 @@ export async function setAmrProgram() {
         'programs.json?filter=code:eq:organism&paging=false&fields=id,trackedEntityType[id,displayName]'
     )).programs[0]
     organismProgramId = organismProgram.id
-    //organismEntityId = organismProgram.trackedEntityType.id
 
     organismElementId = (await get(
         'trackedEntityAttributes.json?filter=code:eq:organism&paging=false'
@@ -136,27 +133,6 @@ export async function deletePatient(id) {
     await del('trackedEntityInstances/' + id)
 }
 
-/**   ************** REPLACED BY FUNCTION getEntities() ************
- * Gets all person tracked entity instances.
- * @returns {Object[]} All person tracked entity instances.
- */
-/*export async function getAllPatients() {
-    let data = await get(
-        'trackedEntityInstances/query.json?ouMode=ALL&order=created:desc&paging=false&program=' +
-            amrId
-    )
-    for (let i = 0; i < data.headers.length; i++)
-        data.headers[i].name = data.headers[i].column
-    data.headers[0].options = { display: false }
-    data.headers[1].options = { display: false }
-    data.headers[2].options = { display: false }
-    data.headers[3].options = { display: false }
-    data.headers[5].options = { display: false }
-    data.headers[6].options = { display: false }
-    console.log(data)
-    return data
-}*/
-
 /**
  * Gets all person tracked entity instances.
  * @returns {Object} Headers with medadata and rows with data.
@@ -173,6 +149,8 @@ export async function getEntities(orgUnit) {
             amrId +
             '.json?fields=programTrackedEntityAttributes[trackedEntityAttribute[displayName,valueType,id]]'
     )).programTrackedEntityAttributes
+
+    // Created and Updated are not displayed by default.
     let data = {
         headers: [
             {
@@ -278,15 +256,15 @@ export async function getEvents() {
         ],
         rows: [],
     }
-    //console.log(events)
+
     for (let i = 0; i < events.length; i++)
-        //console.log(events[i])
         data.rows.push([
             events[i].orgUnitName,
             events[i].storedBy,
             removeTime(events[i].created),
             removeTime(events[i].lastUpdated),
         ])
+
     return data
 }
 
@@ -336,6 +314,7 @@ export async function getProgramStage() {
             let index = getIndex(
                 programStage.programStageSections[i].dataElements[j].id
             )
+            // Adding required and sort order properties.
             programStage.programStageSections[i].dataElements[j].required =
                 programStage.programStageDataElements[index].compulsory
             programStage.programStageSections[i].dataElements[j].sortOrder =

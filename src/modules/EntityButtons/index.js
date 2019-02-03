@@ -5,7 +5,7 @@ import { RowR } from '../../helpers/helpers'
 export class EntityButtons extends Component {
     render() {
         return (
-            <div style={{ marginTop: 32 }}>
+            <div style={{ marginTop: 16 }}>
                 <RowR>
                     {this.props.buttons.map(button => (
                         <div key={button.label} style={{ paddingLeft: 12 }}>

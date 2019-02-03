@@ -1,0 +1,9 @@
+.add_button {
+    color: white !important;
+    background: linear-gradient(180deg, #1565c0, #0650a3);
+    border: 1px solid var(--primary800);
+}
+
+.add_button:hover {
+    background: linear-gradient(180deg, #054fa3, #034793);
+}
