@@ -1,3 +1,10 @@
-# amr
+# AMR Record Capture
 
-DHIS2 AMR
+## Usage
+
+### Installation
+```npm install```
+### Running
+```npm start```
+### Building
+```npm run-script build```
