@@ -28,6 +28,11 @@ export const RowW = ({ style, children }) => (
         {children}
     </div>
 )
+export const RowR = ({ style, children }) => (
+    <div style={style} className="row_reverse">
+        {children}
+    </div>
+)
 export const ColW = ({ style, children }) => (
     <div style={style} className="col wrapped">
         {children}

@@ -68,6 +68,7 @@ export class DateInput extends React.Component {
             <div
                 onClick={this.props.disabled ? null : this.openPicker}
                 onKeyPress={this.props.disabled ? null : this.onKeyPress}
+                className="input"
             >
                 <InputField
                     name={this.props.name}

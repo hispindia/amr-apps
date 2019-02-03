@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 import { Button } from '@dhis2/ui/core'
-import { Row } from '../../helpers/helpers'
+import { RowR } from '../../helpers/helpers'
 
 export class EntityButtons extends Component {
     render() {
         return (
             <div style={{ marginTop: 32 }}>
-                <Row>
+                <RowR>
                     {this.props.buttons.map(button => (
-                        <div key={button.label} style={{ paddingRight: 12 }}>
+                        <div key={button.label} style={{ paddingLeft: 12 }}>
                             <Button
                                 variant="contained"
                                 kind={button.kind}
@@ -20,7 +20,7 @@ export class EntityButtons extends Component {
                             </Button>
                         </div>
                     ))}
-                </Row>
+                </RowR>
             </div>
         )
     }

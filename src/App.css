@@ -38,6 +38,11 @@ body {
     flex-direction: row;
 }
 
+.row_reverse {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
 .col {
     display: flex;
     flex-direction: column;
@@ -47,14 +52,14 @@ body {
     flex-wrap: wrap;
 }
 
-/* Max height for select dropdown */
-html[dir='ltr'] .ui_selectfield_menu_udicv .ui_card_base_l2vmf {
+/* Scrollbar for select dropdown */
+.ui_selectfield_menu_1a3v8 > .ui_card_base_l2vmf {
+    overflow: auto;
     max-height: 300px;
 }
 
-/* Scrollbar for select dropdown */
-html[dir] .ui_selectfield_menu_udicv > .ui_card_base_l2vmf {
-    overflow: auto;
+.ui_selectfield_menu_1a3v8 {
+    width: inherit !important;
 }
 
 .icon_button .ui_icon_base_1s8vb {
