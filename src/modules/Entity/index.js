@@ -5,6 +5,9 @@ import { Title, Row } from '../../helpers/helpers'
 import { EventTable, EntityInformation } from '../'
 import { IconButton } from '../../inputs'
 
+/**
+ * Consists of entity information and event table.
+ */
 export class Entity extends React.Component {
     state = {
         data: null,
@@ -20,10 +23,16 @@ export class Entity extends React.Component {
         })
     }
 
+    /**
+     * On table add click.
+     */
     onAddClick = () => {
         this.setState({ addClicked: true })
     }
 
+    /**
+     * On back arrow click.
+     */
     backClicked = () => {
         this.setState({ backClicked: true })
     }

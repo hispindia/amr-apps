@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, HashRouter } from 'react-router-dom'
 import './App.css'
 //import logo from './logo.svg';
-import { HashRouter } from 'react-router-dom'
+import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
 import { Main } from './Main'
-import { Header } from './modules/Header'
 import { Sidebar } from './modules'
 import { Col, Row } from './helpers/helpers'
 import { getOrgUnits } from './api/api'
@@ -37,7 +36,7 @@ export class App extends Component {
             <BrowserRouter>
                 <HashRouter>
                     <div>
-                        <Header />
+                        <HeaderBar appName="Record Capture" />
                         <Row>
                             <Col>
                                 <Sidebar

@@ -3,6 +3,9 @@ import InputField from '@dhis2/ui/core/InputField'
 import _ from 'lodash'
 import { isUnique } from '../../api/api'
 
+/**
+ * Textfield input.
+ */
 export class TextInput extends React.Component {
     state = {
         value: '',
@@ -32,16 +35,15 @@ export class TextInput extends React.Component {
             this.setState({ value: props.value })
     }
 
+    /**
+     * Passes the value to parent component after 1 sec.
+     */
     passValue = async (name, value) => {
         const didValidate = await this.validate(value)
         this.setState({ errorText: didValidate })
         this.props.onChange(name, value)
     }
 
-    /**
-     * handles value change
-     * @param newValue
-     */
     setValue = (name, value) => {
         this.setState({ value: value })
         this.passValue(name, value)

@@ -2,6 +2,9 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Icon } from '@dhis2/ui/core'
 
+/**
+ * Icon Button.
+ */
 export class IconButton extends Component {
     static id = 'icon_button'
     state = { clicked: false }

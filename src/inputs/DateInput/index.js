@@ -5,7 +5,7 @@ import * as moment from 'moment'
 import InputField from '@dhis2/ui/core/InputField'
 
 /**
- * Date picker
+ * Date picker.
  */
 export class DateInput extends React.Component {
     state = {

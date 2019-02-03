@@ -3,6 +3,9 @@ import { Route } from 'react-router-dom'
 import { OrgUnitTree } from './OrgUnitTree'
 import { SidebarMenu } from './SidebarMenu'
 
+/**
+ * Sidebar with menu and possibly OU tree.
+ */
 export class Sidebar extends Component {
     render() {
         return (

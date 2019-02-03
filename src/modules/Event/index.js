@@ -14,6 +14,7 @@ import {
 } from '../../inputs'
 import { Grid } from '@material-ui/core'
 
+// Used for inputs with special handling.
 const config = require('../../config/config.json')
 
 export class Event extends Component {

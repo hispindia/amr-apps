@@ -4,6 +4,9 @@ import { Card } from '@dhis2/ui/core'
 import MUIDataTable from 'mui-datatables'
 import TableToolbar from '../../inputs/TableToolbar'
 
+/**
+ * Table containing all persons belonging to the selected OU or it's descendants.
+ */
 export class EntityTable extends React.Component {
     state = {
         entityClicked: null,

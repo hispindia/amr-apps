@@ -2,6 +2,9 @@ import React from 'react'
 import { Radio } from '@dhis2/ui/core'
 import { RowW, Label } from '../../helpers/helpers'
 
+/**
+ * Input consisting of a group of radios.
+ */
 export class RadioInput extends React.Component {
     state = {
         value: '',

@@ -2,6 +2,9 @@ import React from 'react'
 import './style.css'
 import { Row } from '../../../../helpers/helpers'
 
+/**
+ * Organisation unit node.
+ */
 export class OrgUnitNode extends React.Component {
     state = {
         opened: false,

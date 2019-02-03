@@ -75,7 +75,7 @@ export async function isUnique(property, value) {
  * @param {string} patientRegNr - Patient registration number.
  * @returns {Object} Tracked entity instance.
  */
-export async function getPatient(patientRegNr) {
+export async function getPerson(patientRegNr) {
     try {
         return (await get(
             'trackedEntityInstances.json?ouMode=ALL&fields=trackedEntityInstance,attributes[code,displayName,valueType,attribute,value]&filter=RkCL8PAxV22:eq:' +
@@ -90,7 +90,7 @@ export async function getPatient(patientRegNr) {
  * Adds a new person tracked entity instance and enrolls to AMR program.
  * @param {Object} values - Values
  */
-export async function addPatient(values, orgUnit) {
+export async function addPerson(values, orgUnit) {
     const now = moment().format('YYYY-MM-DD')
     let data = {
         trackedEntityType: personId,
@@ -115,7 +115,7 @@ export async function addPatient(values, orgUnit) {
  * @param {string} id - Tracked entity instance id.
  * @param {*} values - Values.
  */
-export async function updatePatient(id, values) {
+export async function updatePerson(id, values) {
     let data = await get(
         'trackedEntityInstances/' + id + '.json?ouMode=ALL&fields=*'
     )
@@ -129,7 +129,7 @@ export async function updatePatient(id, values) {
  * Deletes a tracked entity instance.
  * @param {string} id - Tracked entity instance.
  */
-export async function deletePatient(id) {
+export async function deletePerson(id) {
     await del('trackedEntityInstances/' + id)
 }
 

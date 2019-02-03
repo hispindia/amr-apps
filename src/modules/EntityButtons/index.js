@@ -2,6 +2,9 @@ import React, { Component } from 'react'
 import { Button } from '@dhis2/ui/core'
 import { RowR } from '../../helpers/helpers'
 
+/**
+ * Entity information buttons (Submit/Edit/Delete).
+ */
 export class EntityButtons extends Component {
     render() {
         return (

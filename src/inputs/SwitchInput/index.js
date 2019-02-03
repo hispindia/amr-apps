@@ -1,6 +1,9 @@
 import React from 'react'
 import Switch from '@dhis2/ui/core/Switch'
 
+/**
+ * Switch input.
+ */
 export class SwitchInput extends React.Component {
     state = { value: false }
 

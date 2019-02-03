@@ -2,6 +2,9 @@ import React from 'react'
 import { Checkbox } from '@dhis2/ui/core'
 import { RowW, Label } from '../../helpers/helpers'
 
+/**
+ * Input consisting of a a group of checkboxes.
+ */
 export class CheckboxInput extends React.Component {
     state = {
         values: {},
@@ -12,11 +15,13 @@ export class CheckboxInput extends React.Component {
     }
 
     componentWillReceiveProps = props => {
-        'hello'
         if (this.state.values !== props.values)
             this.setState({ values: props.values })
     }
 
+    /**
+     * Called on checkbox click.
+     */
     onChange = (name, value) => {
         let values = { ...this.state.values }
         values[name] = value

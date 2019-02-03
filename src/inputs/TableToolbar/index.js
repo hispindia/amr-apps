@@ -9,6 +9,9 @@ const defaultToolbarStyles = {
     iconButton: {},
 }
 
+/**
+ * Adds an extra add button to the table toolbar.
+ */
 class TableToolbar extends React.Component {
     render() {
         const { classes } = this.props

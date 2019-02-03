@@ -6,25 +6,26 @@ import { Heading } from '../../helpers/helpers'
 import {
     getProgramAttributes,
     getDistricts,
-    addPatient,
-    getPatient,
-    deletePatient,
-    updatePatient,
+    addPerson,
+    getPerson,
+    deletePerson,
+    updatePerson,
 } from '../../api/api'
 import { EntityButtons } from '../'
 import { TextInput, AgeInput, RadioInput, SelectInput } from '../../inputs'
 
+/**
+ * Entity information section.
+ */
 export class EntityInformation extends Component {
     state = {
-        loading: true,
-        values: {},
-        stateId: '',
-        districts: [],
-        uniques: [],
-        querying: false,
-        goToHome: false,
-        editing: false,
-        unchanged: false,
+        values: {}, // Current or new values.
+        stateId: '', // Districts are populated when state is selected.
+        districts: [], // Populated after state is selected.
+        uniques: [], // Unique textfield values are validated.
+        goToHome: false, // Redirects to home after deleting entity.
+        editing: false, // Will be true after Edit button is clicked.
+        unchanged: false, // Submit button is disabled when editing and values are unchanged.
     }
 
     componentDidMount = async () => {
@@ -66,7 +67,7 @@ export class EntityInformation extends Component {
         }
 
         if (this.props.id) {
-            const patientData = await this.searchPatient(this.props.id)
+            const patientData = await this.searchEntity(this.props.id)
             values = patientData.values
             id = patientData.id
             districts = await this.addDistricts(values[stateId])
@@ -80,13 +81,15 @@ export class EntityInformation extends Component {
             stateId: stateId,
             districts: districts,
             isNewPatient: isNewPatient,
-            loading: false,
             half: Math.floor(programAttributes.length / 2),
         })
     }
 
-    searchPatient = async value => {
-        const data = await getPatient(value)
+    /**
+     * Searches for person by patient registration number and gets values.
+     */
+    searchEntity = async value => {
+        const data = await getPerson(value)
         let patientData = { values: [], id: data.trackedEntityInstance }
         if (data) {
             for (let i = 0; i < data.attributes.length; i++)
@@ -96,6 +99,9 @@ export class EntityInformation extends Component {
         return patientData
     }
 
+    /**
+     * Adds the selected state's districts.
+     */
     addDistricts = async value => {
         let options = await getDistricts(value)
         let districts = []
@@ -107,6 +113,9 @@ export class EntityInformation extends Component {
         return districts
     }
 
+    /**
+     * Called on every input field change.
+     */
     onChange = async (name, value) => {
         let values = { ...this.state.values }
         values[name] = value
@@ -119,31 +128,41 @@ export class EntityInformation extends Component {
         } else this.setState({ values: values, unchanged: false })
     }
 
+    /**
+     * On submit button click.
+     */
     onSubmitClick = async () => {
-        this.setState({ querying: true })
         if (!this.state.editing) {
-            await addPatient(this.state.values, this.props.orgUnit)
-            this.setState({ isNewPatient: false, querying: false })
+            await addPerson(this.state.values, this.props.orgUnit)
+            this.setState({ isNewPatient: false })
             this.props.onEntityAdded()
         } else {
-            await updatePatient(this.state.id, this.state.values)
+            await updatePerson(this.state.id, this.state.values)
             this.setState({
                 isNewPatient: false,
                 editing: false,
-                querying: false,
             })
         }
     }
 
+    /**
+     * On edit button click.
+     */
     onEditClick = () => {
         this.setState({ isNewPatient: true, editing: true, unchanged: true })
     }
 
+    /**
+     * On delete button click.
+     */
     onDeleteClick = async () => {
-        await deletePatient(this.state.id)
+        await deletePerson(this.state.id)
         this.setState({ goToHome: true })
     }
 
+    /**
+     * Checks that no required field is empty and that uniques are validated.
+     */
     validate = () => {
         const { attributes, values, uniques } = this.state
         for (let i = 0; i < attributes.length; i++)
@@ -154,12 +173,18 @@ export class EntityInformation extends Component {
         return true
     }
 
+    /**
+     * Called when a unique value is validated.
+     */
     setUniqueValid = (name, valid) => {
         let uniques = { ...this.state.uniques }
         uniques[name] = valid
         this.setState({ uniques: uniques })
     }
 
+    /**
+     * Returns buttons based on adding new person or editing.
+     */
     getButtonProps = () => {
         return this.state.isNewPatient
             ? [
@@ -175,20 +200,23 @@ export class EntityInformation extends Component {
                   {
                       label: 'Edit',
                       onClick: this.onEditClick,
-                      disabled: this.state.querying,
+                      disabled: false,
                       icon: 'edit',
                       kind: 'primary',
                   },
                   {
                       label: 'Delete',
                       onClick: this.onDeleteClick,
-                      disabled: this.state.querying,
+                      disabled: false,
                       icon: 'delete',
                       kind: 'destructive',
                   },
               ]
     }
 
+    /**
+     * Returns appropriate input type.
+     */
     getInput = attribute => {
         const { values, districts, isNewPatient } = this.state
 
@@ -265,11 +293,11 @@ export class EntityInformation extends Component {
     }
 
     render() {
-        const { loading, attributes, goToHome, half } = this.state
+        const { attributes, goToHome, half } = this.state
 
         if (goToHome) return <Redirect push to={'/'} />
 
-        if (loading) return null
+        if (!attributes) return null
 
         return (
             <Card>

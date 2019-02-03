@@ -2,6 +2,9 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Menu } from '@dhis2/ui/core'
 
+/**
+ * Sidebar menu.
+ */
 export class SidebarMenu extends Component {
     state = { path: null }
 

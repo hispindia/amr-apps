@@ -52,7 +52,6 @@
 }
 
 /* Remove default bullets */
-ul,
-#myUL {
+ul {
     list-style-type: none;
 }

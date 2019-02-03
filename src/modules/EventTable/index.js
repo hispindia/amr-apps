@@ -3,6 +3,9 @@ import { Card } from '@dhis2/ui/core'
 import MUIDataTable from 'mui-datatables'
 import TableToolbar from '../../inputs/TableToolbar'
 
+/**
+ * Table containg the persons events (records).
+ */
 export class EventTable extends React.Component {
     state = {
         patientClicked: null,

@@ -3,6 +3,9 @@ import { OrgUnitNode } from './OrgUnitNode'
 import './style.css'
 import { Card } from '@dhis2/ui/core'
 
+/**
+ * Organisation unit tree.
+ */
 export class OrgUnitTree extends React.Component {
     render() {
         return (

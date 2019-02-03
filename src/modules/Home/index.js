@@ -4,6 +4,9 @@ import { getEntities } from '../../api/api'
 import { EntityTable } from '../'
 import { Row, Title } from '../../helpers/helpers'
 
+/**
+ * Overview of persons.
+ */
 export class Home extends React.Component {
     state = {
         data: null,
