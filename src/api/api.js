@@ -4,12 +4,13 @@ import { removeTime } from '../helpers/date'
 
 const config = require('../config/config.json')
 
-let amrId = ''
+let amrProgramId = ''
 let personId = ''
 let entityLabel = ''
 let programStageId = ''
 let organismProgramId = ''
 let organismElementId = ''
+let amrDataElement = ''
 
 /**
  * Gets entity label.
@@ -26,7 +27,7 @@ export async function setAmrProgram() {
     const program = (await get(
         'programs.json?filter=shortName:eq:AMR&paging=false&fields=id,trackedEntityType[id,displayName],programStages'
     )).programs[0]
-    amrId = program.id
+    amrProgramId = program.id
     personId = program.trackedEntityType.id
     entityLabel = program.trackedEntityType.displayName
     programStageId = program.programStages[0].id
@@ -39,6 +40,10 @@ export async function setAmrProgram() {
     organismElementId = (await get(
         'trackedEntityAttributes.json?filter=code:eq:organism&paging=false'
     )).trackedEntityAttributes[0].id
+
+    amrDataElement = (await get(
+        'dataElements.json?filter=code:eq:AMR%20Id&paging=false'
+    )).dataElements[0].id
 }
 
 /**
@@ -48,7 +53,7 @@ export async function setAmrProgram() {
 export async function getProgramAttributes() {
     return (await get(
         'programs/' +
-            amrId +
+            amrProgramId +
             '/programTrackedEntityAttributes.json?fields=mandatory,sortOrder,trackedEntityAttribute[code,displayName,valueType,id,unique,name,optionSetValue,optionSet[options[code,name,id,displayName]]]'
     )).programTrackedEntityAttributes
 }
@@ -99,7 +104,7 @@ export async function addPerson(values, orgUnit) {
         enrollments: [
             {
                 orgUnit: orgUnit,
-                program: amrId,
+                program: amrProgramId,
                 enrollmentDate: now,
                 incidentDate: now,
             },
@@ -142,11 +147,11 @@ export async function getEntities(orgUnit) {
         'trackedEntityInstances.json?ou=' +
             orgUnit +
             '&ouMode=DESCENDANTS&order=created:desc&paging=false&fields=created,lastUpdated,attributes[displayName,valueType,attribute,value],enrollments[orgUnitName]&program=' +
-            amrId
+            amrProgramId
     )).trackedEntityInstances
     const metaData = (await get(
         'programs/' +
-            amrId +
+            amrProgramId +
             '.json?fields=programTrackedEntityAttributes[trackedEntityAttribute[displayName,valueType,id]]'
     )).programTrackedEntityAttributes
 
@@ -232,7 +237,7 @@ export async function getOrganisms() {
 export async function getEvents() {
     const events = (await get(
         'events.json?order=created:desc&paging=false&program=' +
-            amrId +
+            amrProgramId +
             '&fields=orgUnitName,lastUpdated,created,storedBy,dataValues[*]'
     )).events
     let data = {
@@ -409,4 +414,46 @@ export async function getOrgUnits() {
     for (let i = 0; i < data.length; i++) sortChildren(data[i])
 
     return data
+}
+
+/**
+ * Adds a new record (event).
+ * @param {Object} values - Values
+ */
+export async function addRecord(values, orgUnit, date) {
+    let dataValues = []
+    for (let key in values)
+        dataValues.push({
+            dataElement: key,
+            value: values[key],
+        })
+    let data = {
+        program: amrProgramId,
+        orgUnit: orgUnit,
+        eventDate: date ? date : moment().format('YYYY-MM-DD'),
+        dataValues: dataValues,
+    }
+    await postData('events/', data)
+}
+
+export async function generateAmrId(orgUnit) {
+    const orgUnitCode = (await get(
+        'organisationUnits/' + orgUnit + '.json?fields=code'
+    )).code
+    let amrId =
+        orgUnitCode + (Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000)
+    while (
+        (await get(
+            'events/query.json?programStage=' +
+                programStageId +
+                '&filter=' +
+                amrDataElement +
+                ':eq:' +
+                amrId
+        )).height !== 0
+    )
+        amrId =
+            orgUnitCode +
+            (Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000)
+    return amrId
 }

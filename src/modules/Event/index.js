@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
 import { Heading, Row, Title } from '../../helpers/helpers'
-import { getProgramStage, getOrganisms } from '../../api/api'
+import { getProgramStage, getOrganisms, generateAmrId } from '../../api/api'
 import {
     TextInput,
     RadioInput,
@@ -38,6 +38,13 @@ export class Event extends Component {
                 ] = ''
                 if (
                     programStage.programStageSections[i].dataElements[j]
+                        .code === 'AMR Id'
+                )
+                    values[
+                        programStage.programStageSections[i].dataElements[j].id
+                    ] = await generateAmrId(this.props.match.params.orgUnit)
+                if (
+                    programStage.programStageSections[i].dataElements[j]
                         .optionSetValue
                 ) {
                     let options = []
@@ -67,6 +74,7 @@ export class Event extends Component {
         this.setState({
             programStage: programStage,
             organisms: await getOrganisms(),
+            values: values,
         })
     }
 
@@ -92,6 +100,19 @@ export class Event extends Component {
                             value={this.state.values[dataElement.id]}
                             onChange={this.onChange}
                             required={dataElement.required}
+                        />
+                    </div>
+                )
+            case 'AMR Id':
+                return (
+                    <div key={dataElement.id} style={{ margin: 16 }}>
+                        <TextInput
+                            name={dataElement.id}
+                            label={dataElement.displayFormName}
+                            value={this.state.values[dataElement.id]}
+                            required={dataElement.required}
+                            onChange={this.onChange}
+                            disabled={true}
                         />
                     </div>
                 )
@@ -205,7 +226,7 @@ export class Event extends Component {
                     push
                     to={
                         '/orgUnit/' +
-                        this.props.match.orgUnit +
+                        this.props.match.params.orgUnit +
                         '/entity/' +
                         this.props.match.params.id
                     }

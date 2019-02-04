@@ -1,6 +1,6 @@
 {
     "eventForm": {
-        "specialElements": ["organism"],
+        "specialElements": ["organism", "AMR Id"],
         "specialSections": {
             "Institute / Hospital Information": ["Comorbidity"]
         },
