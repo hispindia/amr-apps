@@ -1,7 +1,9 @@
+/* eslint no-eval: 0 */
+
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
-import { Heading, Row, Title } from '../../helpers/helpers'
+import { Heading, Row, Title, Label } from '../../helpers/helpers'
 import { getProgramStage, getOrganisms, generateAmrId } from '../../api/api'
 import {
     TextInput,
@@ -25,51 +27,9 @@ export class Event extends Component {
     }
 
     componentDidMount = async () => {
-        let programStage = await getProgramStage()
-        let values = {}
-        for (let i = 0; i < programStage.programStageSections.length; i++) {
-            for (
-                let j = 0;
-                j < programStage.programStageSections[i].dataElements.length;
-                j++
-            ) {
-                values[
-                    programStage.programStageSections[i].dataElements[j].id
-                ] = ''
-                if (
-                    programStage.programStageSections[i].dataElements[j]
-                        .code === 'AMR Id'
-                )
-                    values[
-                        programStage.programStageSections[i].dataElements[j].id
-                    ] = await generateAmrId(this.props.match.params.orgUnit)
-                if (
-                    programStage.programStageSections[i].dataElements[j]
-                        .optionSetValue
-                ) {
-                    let options = []
-                    for (
-                        let h = 0;
-                        h <
-                        programStage.programStageSections[i].dataElements[j]
-                            .optionSet.options.length;
-                        h++
-                    )
-                        options.push({
-                            value:
-                                programStage.programStageSections[i]
-                                    .dataElements[j].optionSet.options[h].id,
-                            label:
-                                programStage.programStageSections[i]
-                                    .dataElements[j].optionSet.options[h]
-                                    .displayName,
-                        })
-                    programStage.programStageSections[i].dataElements[
-                        j
-                    ].optionSet.options = options
-                }
-            }
-        }
+        const { programStage, values } = await getProgramStage(
+            this.props.match.params.orgUnit
+        )
 
         this.setState({
             programStage: programStage,
@@ -139,19 +99,39 @@ export class Event extends Component {
                     }
                 }
                 return (
-                    <div key={'Comorbidity'} style={{ margin: 16 }}>
-                        <CheckboxInput
-                            objects={objects}
-                            name="Comorbidity"
-                            label="Comorbidity"
-                            values={values}
-                            onChange={this.onChange}
-                            required={true}
-                        />
+                    <div key={'Comorbidity'}>
+                        <div style={{ margin: 16 }}>
+                            <CheckboxInput
+                                objects={objects}
+                                name="Comorbidity"
+                                label="Comorbidity"
+                                values={values}
+                                onChange={this.onChange}
+                                required={true}
+                            />
+                        </div>
                         {childSection.dataElements
                             .filter(
-                                dataElement => dataElement.valueType === 'TEXT'
+                                dataElement =>
+                                    dataElement.valueType === 'TEXT' &&
+                                    this.shouldShow(dataElement)
                             )
+                            .map(dataElement =>
+                                this.getDataElement(dataElement)
+                            )}
+                    </div>
+                )
+            case 'Antibiotics / Antifungals (Taken for 3 days in last 1 month)':
+                return (
+                    <div key={'Comorbidity'}>
+                        <div style={{ margin: '16px 16px -16px 16px' }}>
+                            <Label>
+                                Antibiotics / Antifungals (Taken for 3 days in
+                                last 1 month)
+                            </Label>
+                        </div>
+                        {childSection.dataElements
+                            .filter(dataElement => this.shouldShow(dataElement))
                             .map(dataElement =>
                                 this.getDataElement(dataElement)
                             )}
@@ -215,6 +195,14 @@ export class Event extends Component {
         )
     }
 
+    shouldShow = element => {
+        try {
+            return element.hideCondition ? !eval(element.hideCondition) : true
+        } catch {
+            return true
+        }
+    }
+
     render() {
         const { programStage, backClicked } = this.state
 
@@ -233,6 +221,10 @@ export class Event extends Component {
                 />
             )
 
+        let sections = programStage.programStageSections.filter(section =>
+            this.shouldShow(section)
+        )
+
         return (
             <div style={{ margin: 16 }}>
                 <Row>
@@ -243,13 +235,18 @@ export class Event extends Component {
                     />
                     <Title>{'Record'}</Title>
                 </Row>
-                {programStage.programStageSections.map(section => {
+                {sections.map(section => {
                     let half = Math.ceil(
-                        (section.dataElements.length +
+                        (section.dataElements.filter(dataElement =>
+                            this.shouldShow(dataElement)
+                        ).length +
                             (section.childSections
                                 ? section.childSections.length
                                 : 0)) /
                             2
+                    )
+                    let dataElements = section.dataElements.filter(
+                        dataElement => this.shouldShow(dataElement)
                     )
                     return (
                         <div key={section.id} style={{ marginBottom: 16 }}>
@@ -265,7 +262,7 @@ export class Event extends Component {
                                     </div>
                                     <Grid container spacing={0}>
                                         <Grid item xs>
-                                            {section.dataElements
+                                            {dataElements
                                                 .slice(0, half)
                                                 .map(dataElement =>
                                                     config.eventForm.specialElements.includes(
@@ -280,7 +277,7 @@ export class Event extends Component {
                                                 )}
                                         </Grid>
                                         <Grid item xs>
-                                            {section.dataElements
+                                            {dataElements
                                                 .slice(half)
                                                 .map(dataElement =>
                                                     config.eventForm.specialElements.includes(

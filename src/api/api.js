@@ -293,7 +293,7 @@ export async function getDistricts(state) {
  * Gets AMR program stage.
  * @returns {Object} AMR program stage.
  */
-export async function getProgramStage() {
+export async function getProgramStage(orgUnit) {
     let programStage = await get(
         'programStages/' +
             programStageId +
@@ -310,7 +310,13 @@ export async function getProgramStage() {
         return -1
     }
 
-    for (let i = 0; i < programStage.programStageSections.length; i++)
+    let values = {}
+    const { dataElementRules, sectionRules } = await getProgramRules()
+
+    for (let i = 0; i < programStage.programStageSections.length; i++) {
+        if (sectionRules[programStage.programStageSections[i].id])
+            programStage.programStageSections[i].hideCondition =
+                sectionRules[programStage.programStageSections[i].id]
         for (
             let j = 0;
             j < programStage.programStageSections[i].dataElements.length;
@@ -320,11 +326,58 @@ export async function getProgramStage() {
                 programStage.programStageSections[i].dataElements[j].id
             )
             // Adding required and sort order properties.
+            if (
+                programStage.programStageSections[i].dataElements[j].code ===
+                'AMR Id'
+            )
+                values[
+                    programStage.programStageSections[i].dataElements[j].id
+                ] = await generateAmrId(orgUnit)
+            else
+                values[
+                    programStage.programStageSections[i].dataElements[j].id
+                ] = ''
             programStage.programStageSections[i].dataElements[j].required =
                 programStage.programStageDataElements[index].compulsory
             programStage.programStageSections[i].dataElements[j].sortOrder =
                 programStage.programStageDataElements[index].sortOrder
+            if (
+                dataElementRules[
+                    programStage.programStageSections[i].dataElements[j].id
+                ]
+            )
+                programStage.programStageSections[i].dataElements[
+                    j
+                ].hideCondition =
+                    dataElementRules[
+                        programStage.programStageSections[i].dataElements[j].id
+                    ]
+            if (
+                programStage.programStageSections[i].dataElements[j]
+                    .optionSetValue
+            ) {
+                let options = []
+                for (
+                    let h = 0;
+                    h <
+                    programStage.programStageSections[i].dataElements[j]
+                        .optionSet.options.length;
+                    h++
+                )
+                    options.push({
+                        value:
+                            programStage.programStageSections[i].dataElements[j]
+                                .optionSet.options[h].id,
+                        label:
+                            programStage.programStageSections[i].dataElements[j]
+                                .optionSet.options[h].displayName,
+                    })
+                programStage.programStageSections[i].dataElements[
+                    j
+                ].optionSet.options = options
+            }
         }
+    }
 
     let getSectionIndex = sectionName => {
         for (let i = 0; i < programStage.programStageSections.length; i++)
@@ -334,6 +387,7 @@ export async function getProgramStage() {
     }
 
     for (let i = 0; i < programStage.programStageSections.length; i++) {
+        // Section that have child sections.
         if (
             config.eventForm.specialSections[
                 programStage.programStageSections[i].name
@@ -354,17 +408,60 @@ export async function getProgramStage() {
                 }
             }
             programStage.programStageSections[i].childSections = childSections
-        } else if (
-            config.eventForm.ignoredSections.includes(
-                programStage.programStageSections[i].name
-            )
-        ) {
-            programStage.programStageSections.splice(i, 1)
-            i--
         }
     }
 
-    return programStage
+    return {
+        programStage: programStage,
+        values: values,
+    }
+}
+
+export async function getProgramRules() {
+    let getVar = string => {
+        const varName = string.match('#{(.*)}')[1]
+        for (let i = 0; i < programVariables.length; i++)
+            if (programVariables[i].name === varName)
+                return string.replace(
+                    /#{(.*)}/,
+                    "this.state.values['" +
+                        programVariables[i].dataElement.id +
+                        "']"
+                )
+    }
+
+    const programRules = (await get(
+        'programRules.json?paging=false&fields=condition,programRuleActions[programRuleActionType,dataElement[id,name],programStageSection[name,id]]&filter=program.id:eq:' +
+            amrProgramId
+    )).programRules
+    const programVariables = (await get(
+        'programRuleVariables.json?paging=false&fields=name,dataElement[id,name]&filter=program.id:eq:' +
+            amrProgramId
+    )).programRuleVariables
+    let dataElementRules = {}
+    let sectionRules = {}
+    for (let i = 0; i < programRules.length; i++) {
+        for (let j = 0; j < programRules[i].programRuleActions.length; j++) {
+            if (
+                programRules[i].programRuleActions[j].programRuleActionType ===
+                'HIDEFIELD'
+            )
+                dataElementRules[
+                    programRules[i].programRuleActions[j].dataElement.id
+                ] = getVar(programRules[i].condition)
+            else if (
+                programRules[i].programRuleActions[j].programRuleActionType ===
+                'HIDESECTION'
+            )
+                sectionRules[
+                    programRules[i].programRuleActions[j].programStageSection.id
+                ] = getVar(programRules[i].condition)
+        }
+    }
+    return {
+        dataElementRules: dataElementRules,
+        sectionRules: sectionRules,
+    }
 }
 
 /**
@@ -419,8 +516,10 @@ export async function getOrgUnits() {
 /**
  * Adds a new record (event).
  * @param {Object} values - Values
+ * @param {string} orgUnitId - Organisation unit ID.
+ * @param {string} date - Event date.
  */
-export async function addRecord(values, orgUnit, date) {
+export async function addRecord(values, orgUnitId, date) {
     let dataValues = []
     for (let key in values)
         dataValues.push({
@@ -429,19 +528,23 @@ export async function addRecord(values, orgUnit, date) {
         })
     let data = {
         program: amrProgramId,
-        orgUnit: orgUnit,
+        orgUnit: orgUnitId,
         eventDate: date ? date : moment().format('YYYY-MM-DD'),
         dataValues: dataValues,
     }
     await postData('events/', data)
 }
 
-export async function generateAmrId(orgUnit) {
+/**
+ * Generates AMR Id consisting of OU code and a random integer.
+ * @param {string} orgUnitId - Organisation unit ID.
+ * @returns {string} AMR Id.
+ */
+export async function generateAmrId(orgUnitId) {
     const orgUnitCode = (await get(
-        'organisationUnits/' + orgUnit + '.json?fields=code'
+        'organisationUnits/' + orgUnitId + '.json?fields=code'
     )).code
-    let amrId =
-        orgUnitCode + (Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000)
+    let amrId = orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
     while (
         (await get(
             'events/query.json?programStage=' +
@@ -452,8 +555,6 @@ export async function generateAmrId(orgUnit) {
                 amrId
         )).height !== 0
     )
-        amrId =
-            orgUnitCode +
-            (Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000)
+        amrId = orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
     return amrId
 }

@@ -5,7 +5,7 @@ import { App } from './App'
 import { setBaseUrl } from './api/crud'
 import { setAmrProgram } from './api/api'
 
-const developmentServer = 'http://ugle.asuscomm.com:8888'
+const developmentServer = 'https://amrtest.icmr.org.in/amr'
 const rootElement = document.getElementById('root')
 
 const withBaseUrl = async baseUrl => {
