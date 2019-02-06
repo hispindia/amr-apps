@@ -3,10 +3,25 @@ import { BrowserRouter, HashRouter } from 'react-router-dom'
 import './App.css'
 //import logo from './logo.svg';
 import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
 import { Main } from './Main'
 import { Sidebar } from './modules'
 import { Col, Row } from './helpers/helpers'
 import { getOrgUnits } from './api/api'
+
+const theme = createMuiTheme({
+    palette: {
+        primary: {
+            main: '#0d47a1',
+        },
+        secondary: {
+            main: '#4db6ac',
+        },
+    },
+    typography: {
+        useNextVariants: true,
+    },
+})
 
 export class App extends Component {
     state = {
@@ -35,19 +50,21 @@ export class App extends Component {
         return (
             <BrowserRouter>
                 <HashRouter>
-                    <div>
-                        <HeaderBar appName="Record Capture" />
-                        <Row>
-                            <Col>
-                                <Sidebar
-                                    onSelect={this.onSelect}
-                                    selected={this.state.selected}
-                                    orgUnits={this.state.orgUnits}
-                                />
-                            </Col>
-                            <Main selected={this.state.selected.id} />
-                        </Row>
-                    </div>
+                    <MuiThemeProvider theme={theme}>
+                        <div>
+                            <HeaderBar appName="Record Capture" />
+                            <Row>
+                                <Col>
+                                    <Sidebar
+                                        onSelect={this.onSelect}
+                                        selected={this.state.selected}
+                                        orgUnits={this.state.orgUnits}
+                                    />
+                                </Col>
+                                <Main selected={this.state.selected.id} />
+                            </Row>
+                        </div>
+                    </MuiThemeProvider>
                 </HashRouter>
             </BrowserRouter>
         )

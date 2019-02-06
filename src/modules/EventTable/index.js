@@ -7,14 +7,7 @@ import TableToolbar from '../../inputs/TableToolbar'
  * Table containg the persons events (records).
  */
 export class EventTable extends React.Component {
-    state = {
-        patientClicked: null,
-    }
-
     render() {
-        //if(this.state.patientClicked)
-        //    return <Redirect push to={"/patient/" + this.state.patientClicked}/>;
-
         return (
             <div style={{ marginTop: 16 }}>
                 <Card>
@@ -24,7 +17,7 @@ export class EventTable extends React.Component {
                         columns={this.props.data.headers}
                         options={{
                             selectableRows: false,
-                            onRowClick: this.onClick,
+                            onRowClick: row => this.props.onEventClick(row[0]),
                             elevation: 0,
                             customToolbar: () => {
                                 return (

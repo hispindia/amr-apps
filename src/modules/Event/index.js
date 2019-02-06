@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
 import { Heading, Row, Title, Label } from '../../helpers/helpers'
-import { getProgramStage, getOrganisms, generateAmrId } from '../../api/api'
+import { getProgramStage, getOrganisms } from '../../api/api'
 import {
     TextInput,
     RadioInput,
@@ -28,7 +28,10 @@ export class Event extends Component {
 
     componentDidMount = async () => {
         const { programStage, values } = await getProgramStage(
-            this.props.match.params.orgUnit
+            this.props.match.params.orgUnit,
+            this.props.match.params.amrId
+                ? this.props.match.params.amrId
+                : undefined
         )
 
         this.setState({

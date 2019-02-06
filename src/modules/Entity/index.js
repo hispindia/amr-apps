@@ -1,6 +1,6 @@
 import React from 'react'
 import { Redirect } from 'react-router-dom'
-import { getEvents, getEntityLabel } from '../../api/api'
+import { getEvents, getEntityLabel, getPersonsEvents } from '../../api/api'
 import { Title, Row } from '../../helpers/helpers'
 import { EventTable, EntityInformation } from '../'
 import { IconButton } from '../../inputs'
@@ -13,13 +13,17 @@ export class Entity extends React.Component {
         data: null,
         addClicked: false,
         backClicked: false,
+        eventClicked: null,
         forceTable: false,
     }
 
     componentDidMount = async () => {
-        const data = await getEvents()
+        if (this.props.match.params.id) await this.getEvents()
+    }
+
+    getEvents = async () => {
         this.setState({
-            data: data,
+            data: await getPersonsEvents(this.props.match.params.id),
         })
     }
 
@@ -28,6 +32,13 @@ export class Entity extends React.Component {
      */
     onAddClick = () => {
         this.setState({ addClicked: true })
+    }
+
+    /**
+     * On table row click.
+     */
+    onEventClick = amrId => {
+        this.setState({ eventClicked: amrId })
     }
 
     /**
@@ -48,6 +59,21 @@ export class Entity extends React.Component {
                         '/entity/' +
                         this.props.match.params.id +
                         '/event/'
+                    }
+                />
+            )
+
+        if (this.state.eventClicked)
+            return (
+                <Redirect
+                    push
+                    to={
+                        '/orgUnit/' +
+                        this.props.match.params.orgUnit +
+                        '/entity/' +
+                        this.props.match.params.id +
+                        '/event/' +
+                        this.state.eventClicked
                     }
                 />
             )
@@ -80,6 +106,7 @@ export class Entity extends React.Component {
                         <EventTable
                             data={this.state.data}
                             onAddClick={this.onAddClick}
+                            onEventClick={this.onEventClick}
                         />
                     </div>
                 ) : null}

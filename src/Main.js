@@ -29,6 +29,11 @@ export class Main extends Component {
                         path="/orgUnit/:orgUnit/entity/:id/event"
                         component={Event}
                     />
+                    <Route
+                        exact
+                        path="/orgUnit/:orgUnit/entity/:id/event/:amrId"
+                        component={Event}
+                    />
                 </Switch>
             </main>
         )
