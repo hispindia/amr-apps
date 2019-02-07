@@ -278,7 +278,8 @@ export async function getOrganisms() {
     for (let i = 0; i < data.length; i++) {
         let value = getValue(i)
         organisms.push({
-            value: data[i].trackedEntityInstance,
+            // value: data[i].trackedEntityInstance, // Uncomment if you want id
+            value: value,
             label: value,
         })
     }
@@ -506,7 +507,6 @@ export async function getProgramStage(orgUnit, amrId) {
             programStage.programStageSections[i].childSections = childSections
         }
     }
-    console.log(values)
 
     return {
         programStage: programStage,
@@ -519,15 +519,19 @@ export async function getProgramStage(orgUnit, amrId) {
  */
 export async function getProgramRules() {
     let getVar = string => {
-        const varName = string.match('#{(.*)}')[1]
-        for (let i = 0; i < programVariables.length; i++)
-            if (programVariables[i].name === varName)
-                return string.replace(
-                    /#{(.*)}/,
-                    "this.state.values['" +
-                        programVariables[i].dataElement.id +
-                        "']"
-                )
+        try {
+            const varName = string.match('#{(.*)}')[1]
+            for (let i = 0; i < programVariables.length; i++)
+                if (programVariables[i].name === varName)
+                    return string.replace(
+                        /#{(.*)}/,
+                        "this.state.values['" +
+                            programVariables[i].dataElement.id +
+                            "']"
+                    )
+        } catch {
+            return string
+        }
     }
 
     const programRules = (await get(
@@ -552,10 +556,24 @@ export async function getProgramRules() {
             else if (
                 programRules[i].programRuleActions[j].programRuleActionType ===
                 'HIDESECTION'
-            )
-                sectionRules[
-                    programRules[i].programRuleActions[j].programStageSection.id
-                ] = getVar(programRules[i].condition)
+            ) {
+                if (
+                    sectionRules[
+                        programRules[i].programRuleActions[j]
+                            .programStageSection.id
+                    ]
+                )
+                    sectionRules[
+                        programRules[i].programRuleActions[j]
+                            .programStageSection.id
+                    ].push(getVar(programRules[i].condition))
+                else
+                    sectionRules[
+                        programRules[i].programRuleActions[
+                            j
+                        ].programStageSection.id
+                    ] = [getVar(programRules[i].condition)]
+            }
         }
     }
     return {

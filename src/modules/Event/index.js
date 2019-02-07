@@ -200,10 +200,18 @@ export class Event extends Component {
 
     shouldShow = element => {
         try {
-            return element.hideCondition ? !eval(element.hideCondition) : true
+            return element.hideCondition
+                ? !this.evaluateAll(element.hideCondition)
+                : true
         } catch {
             return true
         }
+    }
+
+    evaluateAll = conditions => {
+        for (let i = 0; i < conditions.length; i++)
+            if (eval(conditions[i])) return true
+        return false
     }
 
     render() {
