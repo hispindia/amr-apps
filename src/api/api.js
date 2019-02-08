@@ -146,7 +146,7 @@ export async function getPersonsEvents(patientRegNr) {
                 removeTime(enrollments[i].events[j].created),
                 removeTime(enrollments[i].events[j].lastUpdated),
             ])
-    console.log(data)
+
     return data
 }
 
@@ -549,30 +549,36 @@ export async function getProgramRules() {
             if (
                 programRules[i].programRuleActions[j].programRuleActionType ===
                 'HIDEFIELD'
-            )
+            ) {
+                if (
+                    !dataElementRules[
+                        programRules[i].programRuleActions[j].dataElement.id
+                    ]
+                )
+                    dataElementRules[
+                        programRules[i].programRuleActions[j].dataElement.id
+                    ] = []
                 dataElementRules[
                     programRules[i].programRuleActions[j].dataElement.id
-                ] = getVar(programRules[i].condition)
-            else if (
+                ].push(getVar(programRules[i].condition))
+            } else if (
                 programRules[i].programRuleActions[j].programRuleActionType ===
                 'HIDESECTION'
             ) {
                 if (
-                    sectionRules[
+                    !sectionRules[
                         programRules[i].programRuleActions[j]
                             .programStageSection.id
                     ]
                 )
                     sectionRules[
-                        programRules[i].programRuleActions[j]
-                            .programStageSection.id
-                    ].push(getVar(programRules[i].condition))
-                else
-                    sectionRules[
                         programRules[i].programRuleActions[
                             j
                         ].programStageSection.id
-                    ] = [getVar(programRules[i].condition)]
+                    ] = []
+                sectionRules[
+                    programRules[i].programRuleActions[j].programStageSection.id
+                ].push(getVar(programRules[i].condition))
             }
         }
     }

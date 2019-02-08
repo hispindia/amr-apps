@@ -1,6 +1,6 @@
 import React from 'react'
 import { Redirect } from 'react-router-dom'
-import { getEvents, getEntityLabel, getPersonsEvents } from '../../api/api'
+import { getEntityLabel, getPersonsEvents } from '../../api/api'
 import { Title, Row } from '../../helpers/helpers'
 import { EventTable, EntityInformation } from '../'
 import { IconButton } from '../../inputs'
@@ -107,6 +107,7 @@ export class Entity extends React.Component {
                             data={this.state.data}
                             onAddClick={this.onAddClick}
                             onEventClick={this.onEventClick}
+                            addButton
                         />
                     </div>
                 ) : null}

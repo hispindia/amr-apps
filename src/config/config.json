@@ -5,6 +5,11 @@
             "Institute / Hospital Information": ["Comorbidity"],
             "Sample Information": [
                 "Antibiotics / Antifungals (Taken for 3 days in last 1 month)"
+            ],
+            "Test values": ["Disk Diffusion", "MIC"],
+            "Approval status": [
+                "Level 1 Approval status",
+                "Level 2 Approval status"
             ]
         }
     }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Route, Switch } from 'react-router-dom'
-import { Entity, Home, Event } from './modules'
+import { Entity, Home, Event, Events } from './modules'
 
 export class Main extends Component {
     render() {
@@ -34,6 +34,7 @@ export class Main extends Component {
                         path="/orgUnit/:orgUnit/entity/:id/event/:amrId"
                         component={Event}
                     />
+                    <Route path="/events" component={Events} />
                 </Switch>
             </main>
         )

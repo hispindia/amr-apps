@@ -20,11 +20,11 @@ export class EventTable extends React.Component {
                             onRowClick: row => this.props.onEventClick(row[0]),
                             elevation: 0,
                             customToolbar: () => {
-                                return (
+                                return this.props.addButton ? (
                                     <TableToolbar
                                         onAddClick={this.props.onAddClick}
                                     />
-                                )
+                                ) : null
                             },
                         }}
                     />

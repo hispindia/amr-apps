@@ -23,6 +23,17 @@ export class Sidebar extends Component {
                         />
                     )}
                 />
+                <Route
+                    path="/events"
+                    render={props => (
+                        <OrgUnitTree
+                            {...props}
+                            onSelect={this.props.onSelect}
+                            selected={this.props.selected}
+                            orgUnits={this.props.orgUnits}
+                        />
+                    )}
+                />
             </div>
         )
     }

@@ -39,6 +39,7 @@ export class Event extends Component {
             organisms: await getOrganisms(),
             values: values,
         })
+        console.log(values)
     }
 
     onChange = (name, value) => {
@@ -141,7 +142,18 @@ export class Event extends Component {
                     </div>
                 )
             default:
-                return null
+                return (
+                    <Grid item xs key={childSection.name}>
+                        <div style={{ margin: '16px 16px -16px 16px' }}>
+                            <Label>{childSection.name}</Label>
+                        </div>
+                        {childSection.dataElements
+                            .filter(dataElement => this.shouldShow(dataElement))
+                            .map(dataElement =>
+                                this.getDataElement(dataElement)
+                            )}
+                    </Grid>
+                )
         }
     }
 
@@ -204,6 +216,8 @@ export class Event extends Component {
                 ? !this.evaluateAll(element.hideCondition)
                 : true
         } catch {
+            console.log('Evaluetion failed:')
+            console.log(element)
             return true
         }
     }
@@ -271,36 +285,49 @@ export class Event extends Component {
                                     >
                                         <Heading>{section.displayName}</Heading>
                                     </div>
-                                    <Grid container spacing={0}>
-                                        <Grid item xs>
-                                            {dataElements
-                                                .slice(0, half)
-                                                .map(dataElement =>
-                                                    config.eventForm.specialElements.includes(
-                                                        dataElement.code
-                                                    )
-                                                        ? this.getSpecialDataElement(
-                                                              dataElement
-                                                          )
-                                                        : this.getDataElement(
-                                                              dataElement
-                                                          )
-                                                )}
+                                    {dataElements.length > 0 ? (
+                                        <Grid container spacing={0}>
+                                            <Grid item xs>
+                                                {dataElements
+                                                    .slice(0, half)
+                                                    .map(dataElement =>
+                                                        config.eventForm.specialElements.includes(
+                                                            dataElement.code
+                                                        )
+                                                            ? this.getSpecialDataElement(
+                                                                  dataElement
+                                                              )
+                                                            : this.getDataElement(
+                                                                  dataElement
+                                                              )
+                                                    )}
+                                            </Grid>
+                                            <Grid item xs>
+                                                {dataElements
+                                                    .slice(half)
+                                                    .map(dataElement =>
+                                                        config.eventForm.specialElements.includes(
+                                                            dataElement.code
+                                                        )
+                                                            ? this.getSpecialDataElement(
+                                                                  dataElement
+                                                              )
+                                                            : this.getDataElement(
+                                                                  dataElement
+                                                              )
+                                                    )}
+                                                {section.childSections
+                                                    ? section.childSections.map(
+                                                          childSection =>
+                                                              this.getChildSection(
+                                                                  childSection
+                                                              )
+                                                      )
+                                                    : null}
+                                            </Grid>
                                         </Grid>
-                                        <Grid item xs>
-                                            {dataElements
-                                                .slice(half)
-                                                .map(dataElement =>
-                                                    config.eventForm.specialElements.includes(
-                                                        dataElement.code
-                                                    )
-                                                        ? this.getSpecialDataElement(
-                                                              dataElement
-                                                          )
-                                                        : this.getDataElement(
-                                                              dataElement
-                                                          )
-                                                )}
+                                    ) : (
+                                        <Grid container spacing={0}>
                                             {section.childSections
                                                 ? section.childSections.map(
                                                       childSection =>
@@ -310,7 +337,7 @@ export class Event extends Component {
                                                   )
                                                 : null}
                                         </Grid>
-                                    </Grid>
+                                    )}
                                 </div>
                             </Card>
                         </div>
