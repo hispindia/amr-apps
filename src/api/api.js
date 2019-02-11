@@ -12,12 +12,12 @@ const l2RejectionReason = 'pz8SoHBO6RL'
 const l2RevisionReason = 'fEnFVvEFKVc'
 
 const amrProgramId = 'ecIoUziI2Gb'
-let personId = ''
-let entityLabel = ''
-let programStageId = ''
-let organismProgramId = ''
-let organismElementId = ''
-let amrDataElement = ''
+const personId = 'G5cty8Gzan7'
+const entityLabel = 'Person'
+const programStageId = 'dDxm1Z4oOUO'
+const organismProgramId = 'GjFZmYa8pOD'
+const organismElementId = 'iBc2wcKg2Ba'
+const amrDataElement = 'lIkk661BLpG'
 
 /**
  * Gets entity label.
@@ -30,6 +30,7 @@ export function getEntityLabel() {
 /**
  * Sets the id of the AMR program, AMR program, and person for later use.
  */
+/*          THIS IS NOT IN USE ANYMORE AFTER HARDCODING ID'S
 export async function setAmrProgram() {
     const program = (await get(
         'programs.json?filter=shortName:eq:AMR&paging=false&fields=id,trackedEntityType[id,displayName],programStages'
@@ -51,7 +52,7 @@ export async function setAmrProgram() {
     amrDataElement = (await get(
         'dataElements.json?filter=code:eq:AMR%20Id&paging=false'
     )).dataElements[0].id
-}
+}*/
 
 /**
  * Gets the attributes of the AMR program.
@@ -322,8 +323,9 @@ export async function getEventValues(amrId) {
  */
 export async function getEvents() {
     const events = (await get(
-        'events.json?paging=false&fields=orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program='
-         + amrProgramId + '&filter=tAyVrNUTVHX:eq:Rejected'
+        'events.json?paging=false&fields=orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program=' +
+            amrProgramId +
+            '&filter=tAyVrNUTVHX:eq:Rejected'
     )).events
     let data = {
         headers: [
@@ -690,29 +692,26 @@ export async function generateAmrId(orgUnitId) {
 }
 
 export async function updateEvent(values) {
-    let data = await get(
-        'events/' + values['event'] + '.json?fields=*'
-    )
+    let data = await get('events/' + values['event'] + '.json?fields=*')
 
     let dataValueIndex = dataElement => {
         for (let i = 0; i < data.dataValues.length; i++)
-            if ( data.dataValues[i].dataElement === dataElement)
-                return i
+            if (data.dataValues[i].dataElement === dataElement) return i
         return -1
-        
     }
 
     for (let dataElement in values) {
         // There's probably a better way to get the event attributes. Maybe schemas?
         if (!config.eventAttributes.includes(dataElement)) {
             let index = dataValueIndex(dataElement)
-            index === -1 ? data.dataValues.push({
-                dataElement: dataElement,
-                value: values[dataElement]
-            })
-            : data.dataValues[index].value = values[dataElement]
+            index === -1
+                ? data.dataValues.push({
+                      dataElement: dataElement,
+                      value: values[dataElement],
+                  })
+                : (data.dataValues[index].value = values[dataElement])
         }
     }
 
-    await put('events/' + values['event'], data)    
+    await put('events/' + values['event'], data)
 }
