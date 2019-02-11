@@ -20,8 +20,8 @@ const organismElementId = 'iBc2wcKg2Ba'
 const amrDataElement = 'lIkk661BLpG'
 
 const dataEntryGroup = 'mYdK5QT4ndl'
-const level1ApprovalGroup = 'O7EtwlwnAYq'
-const level2ApprovalGroup = 'XigjUyZB8UE'
+const l1ApprovalGroup = 'O7EtwlwnAYq'
+const l2ApprovalGroup = 'XigjUyZB8UE'
 
 const dataEntryUserGroup = 'mYdK5QT4ndl'
 const l1UserGroup = 'O7EtwlwnAYq'
@@ -421,18 +421,25 @@ export async function getProgramStage(orgUnit, amrId) {
         return -1
     }
 
-    const userGroups = (await get('me.json?fields=usergroups')).userGroups.map(userGroup => userGroup.id)
+    const userGroups = (await get('me.json?fields=userGroups')).userGroups.map(
+        userGroup => userGroup.id
+    )
 
-    let isDisabled = (stage, element) => {
+    let isDisabled = element => {
         switch (element.id) {
             case l1ApprovalStatus:
-                if (values[l1ApprovalStatus] === '')
+            case l1RejectionReason:
+            case l1RevisionReason:
+                if (!userGroups.includes(l1ApprovalGroup))
                     element.disabled = true
-            const l1RejectionReason = 'NLmLwjdSHMv'
-            const l1RevisionReason = 'wCNQtIHJRON'
-            const l2ApprovalStatus = 'sXDQT6Yaf77'
-            const l2RejectionReason = 'pz8SoHBO6RL'
-            const l2RevisionReason = 'fEnFVvEFKVc'
+            case l2ApprovalStatus:
+            case l2RejectionReason:
+            case l2RevisionReason:
+                if (
+                    !userGroups.includes(l2ApprovalGroup) ||
+                    l1ApprovalStatus === ''
+                )
+                    element.disabled = true
         }
     }
 
@@ -508,6 +515,7 @@ export async function getProgramStage(orgUnit, amrId) {
                     j
                 ].optionSet.options = options
             }
+            isDisabled(programStage.programStageSections[i].dataElements[j])
         }
     }
 
@@ -704,7 +712,8 @@ export async function generateAmrId(orgUnitId) {
         'organisationUnits/' + orgUnitId + '.json?fields=code'
     )).code
 
-    let newCode = () => orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
+    let newCode = () =>
+        orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
 
     let amrId = newCode()
     while (

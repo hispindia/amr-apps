@@ -15,7 +15,7 @@ import {
     DateInput,
 } from '../../inputs'
 import { Grid } from '@material-ui/core'
-import { EntityButtons } from '../EntityButtons';
+import { EntityButtons } from '../EntityButtons'
 
 // Used for inputs with special handling.
 const config = require('../../config/config.json')
@@ -104,6 +104,7 @@ export class Event extends Component {
                             value={this.state.values[dataElement.id]}
                             onChange={this.onChange}
                             required={dataElement.required}
+                            disabled={dataElement.disabled}
                         />
                     </div>
                 )
@@ -209,6 +210,7 @@ export class Event extends Component {
                             value={this.state.values[dataElement.id]}
                             onChange={this.onChange}
                             required={dataElement.required}
+                            disabled={dataElement.disabled}
                         />
                     ) : (
                         <SelectInput
@@ -218,6 +220,7 @@ export class Event extends Component {
                             value={this.state.values[dataElement.id]}
                             onChange={this.onChange}
                             required={dataElement.required}
+                            disabled={dataElement.disabled}
                         />
                     )
                 ) : dataElement.valueType === 'TRUE_ONLY' ? (
@@ -228,6 +231,7 @@ export class Event extends Component {
                         disabled={false}
                         onChange={this.onChange}
                         required={dataElement.required}
+                        disabled={dataElement.disabled}
                     />
                 ) : dataElement.valueType === 'DATE' ? (
                     <DateInput
@@ -236,6 +240,7 @@ export class Event extends Component {
                         value={this.state.values[dataElement.id]}
                         required={dataElement.required}
                         onChange={this.onChange}
+                        disabled={dataElement.disabled}
                     />
                 ) : (
                     <TextInput
@@ -244,6 +249,7 @@ export class Event extends Component {
                         value={this.state.values[dataElement.id]}
                         required={dataElement.required}
                         onChange={this.onChange}
+                        disabled={dataElement.disabled}
                     />
                 )}
             </div>
@@ -256,7 +262,7 @@ export class Event extends Component {
                 ? !this.evaluateAll(element.hideCondition)
                 : true
         } catch {
-            console.log('Evaluetion failed:')
+            console.log('Evaluation failed:')
             console.log(element)
             return true
         }
