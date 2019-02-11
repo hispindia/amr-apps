@@ -34,7 +34,13 @@ export class Main extends Component {
                         path="/orgUnit/:orgUnit/entity/:id/event/:amrId"
                         component={Event}
                     />
-                    <Route path="/events" component={Events} />
+                    <Route
+                        exact
+                        path="/events/:approvalStatus"
+                        render={props => (
+                            <Events {...props} selected={this.props.selected} />
+                        )}
+                    />
                 </Switch>
             </main>
         )

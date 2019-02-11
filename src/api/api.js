@@ -321,11 +321,15 @@ export async function getEventValues(amrId) {
  * Gets all events from the AMR program.
  * @returns {Object[]} All AMR events.
  */
-export async function getEvents() {
+export async function getEvents(orgUnit, approvalStatus) {
     const events = (await get(
         'events.json?paging=false&fields=orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program=' +
             amrProgramId +
-            '&filter=tAyVrNUTVHX:eq:Rejected'
+            '&orgUnit=' +
+            orgUnit +
+            '&ouMode=DESCENDANTS' +
+            '&filter=tAyVrNUTVHX:eq:' +
+            approvalStatus
     )).events
     let data = {
         headers: [

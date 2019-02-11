@@ -11,22 +11,26 @@ import { EventTable } from '../EventTable'
 export class Events extends React.Component {
     state = {
         data: null,
-        selected: null,
     }
 
     componentDidMount = async () => {
-        await this.getData(this.props.selected)
+        await this.getData()
     }
 
     componentWillReceiveProps = async props => {
-        if (this.state.selected && props.selected !== this.state.selected)
-            await this.getData(props.selected)
+        //if ((this.state.selected && props.selected !== this.state.selected) ||
+        //    props.match.params.approvalStatus !== this.state.approvalStatus)
+        await this.getData()
     }
 
-    getData = async selected => {
+    getData = async () => {
         this.setState({
-            data: await getEvents(),
-            selected: selected,
+            data: await getEvents(
+                this.props.selected,
+                this.props.match.params.approvalStatus
+            ),
+            selected: this.props.selected,
+            approvalStatus: this.props.match.params.approvalStatus,
         })
     }
 
@@ -48,7 +52,7 @@ export class Events extends React.Component {
         return (
             <div style={{ margin: 16 }}>
                 <Row>
-                    <Title>Rejected records</Title>
+                    <Title>{this.state.approvalStatus} records</Title>
                 </Row>
                 <div className="table">
                     <EventTable
