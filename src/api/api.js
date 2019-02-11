@@ -4,7 +4,14 @@ import { removeTime } from '../helpers/date'
 
 const config = require('../config/config.json')
 
-let amrProgramId = ''
+const l1ApprovalStatus = 'tAyVrNUTVHX'
+const l1RejectionReason = 'NLmLwjdSHMv'
+const l1RevisionReason = 'wCNQtIHJRON'
+const l2ApprovalStatus = 'sXDQT6Yaf77'
+const l2RejectionReason = 'pz8SoHBO6RL'
+const l2RevisionReason = 'fEnFVvEFKVc'
+
+const amrProgramId = 'ecIoUziI2Gb'
 let personId = ''
 let entityLabel = ''
 let programStageId = ''
@@ -27,7 +34,7 @@ export async function setAmrProgram() {
     const program = (await get(
         'programs.json?filter=shortName:eq:AMR&paging=false&fields=id,trackedEntityType[id,displayName],programStages'
     )).programs[0]
-    amrProgramId = program.id
+    //amrProgramId = program.id
     personId = program.trackedEntityType.id
     entityLabel = program.trackedEntityType.displayName
     programStageId = program.programStages[0].id
@@ -278,8 +285,7 @@ export async function getOrganisms() {
     for (let i = 0; i < data.length; i++) {
         let value = getValue(i)
         organisms.push({
-            // value: data[i].trackedEntityInstance, // Uncomment if you want id
-            value: value,
+            value: data[i].trackedEntityInstance,
             label: value,
         })
     }
@@ -316,9 +322,8 @@ export async function getEventValues(amrId) {
  */
 export async function getEvents() {
     const events = (await get(
-        'events.json?order=created:desc&paging=false&program=' +
-            amrProgramId +
-            '&fields=orgUnitName,lastUpdated,created,storedBy,dataValues[*]'
+        'events.json?paging=false&fields=orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program='
+         + amrProgramId + '&filter=tAyVrNUTVHX:eq:Rejected'
     )).events
     let data = {
         headers: [
@@ -361,6 +366,7 @@ export async function getEvents() {
             removeTime(events[i].created),
             removeTime(events[i].lastUpdated),
         ])
+    console.log(data)
     return data
 }
 
@@ -681,4 +687,32 @@ export async function generateAmrId(orgUnitId) {
     )
         amrId = orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
     return amrId
+}
+
+export async function updateEvent(values) {
+    let data = await get(
+        'events/' + values['event'] + '.json?fields=*'
+    )
+
+    let dataValueIndex = dataElement => {
+        for (let i = 0; i < data.dataValues.length; i++)
+            if ( data.dataValues[i].dataElement === dataElement)
+                return i
+        return -1
+        
+    }
+
+    for (let dataElement in values) {
+        // There's probably a better way to get the event attributes. Maybe schemas?
+        if (!config.eventAttributes.includes(dataElement)) {
+            let index = dataValueIndex(dataElement)
+            index === -1 ? data.dataValues.push({
+                dataElement: dataElement,
+                value: values[dataElement]
+            })
+            : data.dataValues[index].value = values[dataElement]
+        }
+    }
+
+    await put('events/' + values['event'], data)    
 }

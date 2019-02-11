@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
 import { Heading, Row, Title, Label } from '../../helpers/helpers'
-import { getProgramStage, getOrganisms } from '../../api/api'
+import { getProgramStage, getOrganisms, updateEvent } from '../../api/api'
 import {
     TextInput,
     RadioInput,
@@ -15,6 +15,7 @@ import {
     DateInput,
 } from '../../inputs'
 import { Grid } from '@material-ui/core'
+import { EntityButtons } from '../EntityButtons';
 
 // Used for inputs with special handling.
 const config = require('../../config/config.json')
@@ -50,6 +51,45 @@ export class Event extends Component {
 
     onBackClicked = () => {
         this.setState({ backClicked: true })
+    }
+
+    /**
+     * Returns buttons based on adding new person or editing.
+     */
+    getButtonProps = () => {
+        return true
+            ? [
+                  {
+                      label: 'Submit',
+                      onClick: this.onSubmitClick,
+                      disabled: false, //!this.validate() || this.state.unchanged,
+                      icon: 'done',
+                      kind: 'primary',
+                  },
+              ]
+            : [
+                  {
+                      label: 'Edit',
+                      onClick: this.onSubmitClick,
+                      disabled: false,
+                      icon: 'edit',
+                      kind: 'primary',
+                  },
+                  {
+                      label: 'Delete',
+                      onClick: this.onSubmitClick,
+                      disabled: false,
+                      icon: 'delete',
+                      kind: 'destructive',
+                  },
+              ]
+    }
+
+    /**
+     * On submit button click.
+     */
+    onSubmitClick = async () => {
+        await updateEvent(this.state.values)
     }
 
     getSpecialDataElement = dataElement => {
@@ -343,6 +383,7 @@ export class Event extends Component {
                         </div>
                     )
                 })}
+                <EntityButtons buttons={this.getButtonProps()} />
             </div>
         )
     }

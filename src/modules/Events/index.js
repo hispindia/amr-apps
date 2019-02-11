@@ -48,7 +48,7 @@ export class Events extends React.Component {
         return (
             <div style={{ margin: 16 }}>
                 <Row>
-                    <Title>{this.state.data.title}</Title>
+                    <Title>Rejected records</Title>
                 </Row>
                 <div className="table">
                     <EventTable
