@@ -19,6 +19,10 @@ let organismProgramId = ''
 let organismElementId = ''
 let amrDataElement = ''
 
+const dataEntryUserGroup = 'mYdK5QT4ndl'
+const l1UserGroup = 'O7EtwlwnAYq'
+const l2UserGroup = 'XigjUyZB8UE'
+
 /**
  * Gets entity label.
  * @returns {string} Entity Label.
@@ -405,6 +409,21 @@ export async function getProgramStage(orgUnit, amrId) {
             )
                 return i
         return -1
+    }
+
+    const userGroups = (await get('me.json?fields=usergroups')).userGroups.map(userGroup => userGroup.id)
+
+    let isDisabled = (stage, element) => {
+        switch (element.id) {
+            case l1ApprovalStatus:
+                if (values[l1ApprovalStatus] === '')
+                    element.disabled = true
+            const l1RejectionReason = 'NLmLwjdSHMv'
+            const l1RevisionReason = 'wCNQtIHJRON'
+            const l2ApprovalStatus = 'sXDQT6Yaf77'
+            const l2RejectionReason = 'pz8SoHBO6RL'
+            const l2RevisionReason = 'fEnFVvEFKVc'
+        }
     }
 
     let values = typeof amrId === 'undefined' ? {} : await getEventValues(amrId)
