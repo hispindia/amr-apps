@@ -19,6 +19,10 @@ const organismProgramId = 'GjFZmYa8pOD'
 const organismElementId = 'iBc2wcKg2Ba'
 const amrDataElement = 'lIkk661BLpG'
 
+const dataEntryGroup = 'mYdK5QT4ndl'
+const level1ApprovalGroup = 'O7EtwlwnAYq'
+const level2ApprovalGroup = 'XigjUyZB8UE'
+
 /**
  * Gets entity label.
  * @returns {string} Entity Label.
@@ -680,7 +684,10 @@ export async function generateAmrId(orgUnitId) {
     const orgUnitCode = (await get(
         'organisationUnits/' + orgUnitId + '.json?fields=code'
     )).code
-    let amrId = orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
+
+    let newCode = () => orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
+
+    let amrId = newCode()
     while (
         (await get(
             'events/query.json?programStage=' +
@@ -691,7 +698,7 @@ export async function generateAmrId(orgUnitId) {
                 amrId
         )).height !== 0
     )
-        amrId = orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
+        amrId = newCode()
     return amrId
 }
 
