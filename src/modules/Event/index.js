@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
 import { Heading, Row, Title, Label } from '../../helpers/helpers'
-import { getProgramStage, getOrganisms, updateEvent } from '../../api/api'
+import { getProgramStage, getOrganisms, updateEvent, getTestFields } from '../../api/api'
 import {
     TextInput,
     RadioInput,
@@ -42,6 +42,7 @@ export class Event extends Component {
         })
         console.log(values)
         console.log(programStage)
+        console.log(await getTestFields('ZWdxkMZPF5O'))
     }
 
     onChange = (name, value) => {

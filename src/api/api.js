@@ -701,3 +701,20 @@ export async function updateEvent(values) {
 
     await put('events/' + values['event'], data)
 }
+
+
+export async function getTestFields(organismId) {
+    const data = await get('dataStore/id/' + organismId + '.json')
+    
+    let fields = []
+    data[''].Disk_Diffusion.filter(field => field.display)
+    .forEach(field =>
+        fields.push(field.id)
+    )
+    data[''].MIC.filter(field => field.display)
+    .forEach(field =>
+        fields.push(field.id)
+    )
+
+    return fields
+}
