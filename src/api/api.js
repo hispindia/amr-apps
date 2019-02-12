@@ -1,5 +1,6 @@
-import { get, postData, del, put } from './crud'
 import * as moment from 'moment'
+import _ from 'lodash'
+import { get, postData, del, put } from './crud'
 import { removeTime } from '../helpers/date'
 
 const config = require('../config/config.json')
@@ -34,33 +35,6 @@ const l2UserGroup = 'XigjUyZB8UE'
 export function getEntityLabel() {
     return entityLabel
 }
-
-/**
- * Sets the id of the AMR program, AMR program, and person for later use.
- */
-/*          THIS IS NOT IN USE ANYMORE AFTER HARDCODING ID'S
-export async function setAmrProgram() {
-    const program = (await get(
-        'programs.json?filter=shortName:eq:AMR&paging=false&fields=id,trackedEntityType[id,displayName],programStages'
-    )).programs[0]
-    //amrProgramId = program.id
-    personId = program.trackedEntityType.id
-    entityLabel = program.trackedEntityType.displayName
-    programStageId = program.programStages[0].id
-
-    const organismProgram = (await get(
-        'programs.json?filter=code:eq:organism&paging=false&fields=id,trackedEntityType[id,displayName]'
-    )).programs[0]
-    organismProgramId = organismProgram.id
-
-    organismElementId = (await get(
-        'trackedEntityAttributes.json?filter=code:eq:organism&paging=false'
-    )).trackedEntityAttributes[0].id
-
-    amrDataElement = (await get(
-        'dataElements.json?filter=code:eq:AMR%20Id&paging=false'
-    )).dataElements[0].id
-}*/
 
 /**
  * Gets the attributes of the AMR program.
@@ -107,6 +81,11 @@ export async function getPerson(patientRegNr) {
     }
 }
 
+/**
+ * Gets all events belonging to the tracked entity instance with the provided patient registration number.
+ * @param {string} patientRegNr - Patient registration number.
+ * @returns {Object} Events in the form of headers and rows.
+ */
 export async function getPersonsEvents(patientRegNr) {
     const enrollments = (await get(
         'trackedEntityInstances.json?ouMode=ALL&fields=enrollments[events[lastUpdated,created,orgUnitName,storedBy,dataValues[dataElement,value]]]&filter=RkCL8PAxV22:eq:' +
@@ -139,29 +118,26 @@ export async function getPersonsEvents(patientRegNr) {
         rows: [],
     }
 
-    let getAmrId = (enrollment, event) => {
-        for (
-            let i = 0;
-            i < enrollments[enrollment].events[event].dataValues.length;
-            i++
+    // Returns the events AMR Id.
+    const getAmrId = event => {
+        const dataElement = event.dataValues.find(
+            dataValue => dataValue.dataElement === amrDataElement
         )
-            if (
-                enrollments[enrollment].events[event].dataValues[i]
-                    .dataElement === amrDataElement
-            )
-                return enrollments[enrollment].events[event].dataValues[i].value
-        return ''
+        return dataElement ? dataElement.value : ''
     }
 
-    for (let i = 0; i < enrollments.length; i++)
-        for (let j = 0; j < enrollments[i].events.length; j++)
+    // Adds all events in row form.
+    enrollments.forEach(enrollment => {
+        enrollment.events.forEach(event => {
             data.rows.push([
-                getAmrId(i, j),
-                enrollments[i].events[j].orgUnitName,
-                enrollments[i].events[j].storedBy,
-                removeTime(enrollments[i].events[j].created),
-                removeTime(enrollments[i].events[j].lastUpdated),
+                getAmrId(event),
+                event.orgUnitName,
+                event.storedBy,
+                removeTime(event.created),
+                removeTime(event.lastUpdated),
             ])
+        })
+    })
 
     return data
 }
@@ -214,8 +190,9 @@ export async function deletePerson(id) {
 }
 
 /**
- * Gets all person tracked entity instances.
- * @returns {Object} Headers with medadata and rows with data.
+ * Gets all person tracked entities belonging to the OU or it's children.
+ * @param {string} orgUnit - Organisation unit ID.
+ * @returns {Object} Entities in the form of headers and rows.
  */
 export async function getEntities(orgUnit) {
     const values = (await get(
@@ -249,59 +226,70 @@ export async function getEntities(orgUnit) {
         title: entityLabel + 's',
     }
 
-    let getAttributeValue = (index, id) => {
-        for (let i = 0; i < values[index].attributes.length; i++) {
-            if (values[index].attributes[i].attribute === id)
-                return values[index].attributes[i].value
-        }
-        return ''
+    // Gets the value of the attribute.
+    const getAttributeValue = (value, id) => {
+        const attribute = value.attributes.find(
+            attribute => attribute.attribute === id
+        )
+        return attribute ? attribute.value : ''
     }
 
-    for (let i = 0; i < metaData.length; i++)
+    // Adds the meta data headers.
+    metaData.forEach(metaD =>
         data.headers.push({
-            name: metaData[i].trackedEntityAttribute.displayName,
-            id: metaData[i].trackedEntityAttribute.id,
-            options: { display: i < 4 },
+            name: metaD.trackedEntityAttribute.displayName,
+            id: metaD.trackedEntityAttribute.id,
+            options: { display: data.headers.length < 7 },
         })
-    for (let i = 0; i < values.length; i++) {
+    )
+
+    // Adds the data rows.
+    values.forEach(value => {
         let entityValues = [
-            removeTime(values[i].created),
-            removeTime(values[i].lastUpdated),
-            values[i].enrollments[0].orgUnitName,
+            removeTime(value.created),
+            removeTime(value.lastUpdated),
+            value.enrollments[0].orgUnitName,
         ]
-        for (let j = 3; j < data.headers.length; j++)
-            entityValues.push(getAttributeValue(i, data.headers[j].id))
+        data.headers
+            .slice(3, data.headers.length)
+            .forEach(header =>
+                entityValues.push(getAttributeValue(value, header.id))
+            )
         data.rows.push(entityValues)
-    }
+    })
+
     return data
 }
 
+/**
+ * Gets all organisms.
+ * @returns {Object[]} Organisms with ID and organisms name.
+ */
 export async function getOrganisms() {
     const data = (await get(
         'trackedEntityInstances.json?ouMode=ALL&order=created:desc&paging=false&fields=trackedEntityInstance,attributes[displayName,attribute,value]&program=' +
             organismProgramId
     )).trackedEntityInstances
 
-    let getValue = index => {
-        for (let i = 0; i < data[index].attributes.length; i++) {
-            if (data[index].attributes[i].attribute === organismElementId)
-                return data[index].attributes[i].value
-        }
-        return ''
+    const getValue = data => {
+        const attribute = data.attributes.find(
+            attribute => attribute.attribute === organismElementId
+        )
+        return attribute ? attribute.value : ''
     }
 
     let organisms = []
-    for (let i = 0; i < data.length; i++) {
-        let value = getValue(i)
+    data.forEach(d =>
         organisms.push({
-            value: data[i].trackedEntityInstance,
-            label: value,
+            value: d.trackedEntityInstance,
+            label: getValue(d),
         })
-    }
+    )
 
     organisms.sort((a, b) =>
         a.label > b.label ? 1 : b.label > a.label ? -1 : 0
     )
+
     return organisms
 }
 
@@ -319,14 +307,18 @@ export async function getEventValues(amrId) {
             ':eq:' +
             amrId
     )
+
     let values = {}
-    for (let i = 0; i < data.headers.length; i++)
-        values[data.headers[i].name] = data.rows[0][i]
+    data.headers.forEach(
+        (header, index) => (values[header.name] = data.rows[0][index])
+    )
+
     return values
 }
 
 /**
- * Gets all events from the AMR program.
+ * Gets all events from the AMR program with the provided approval status.
+ * @param {string} approvalStatus - Approval status.
  * @returns {Object[]} All AMR events.
  */
 export async function getEvents(orgUnit, approvalStatus) {
@@ -339,6 +331,7 @@ export async function getEvents(orgUnit, approvalStatus) {
             '&filter=tAyVrNUTVHX:eq:' +
             approvalStatus
     )).events
+
     let data = {
         headers: [
             {
@@ -365,22 +358,23 @@ export async function getEvents(orgUnit, approvalStatus) {
         rows: [],
     }
 
-    let getAmrId = index => {
-        for (let i = 0; i < events[index].dataValues.length; i++)
-            if (events[index].dataValues[i].dataElement === amrDataElement)
-                return events[index].dataValues[i].value
-        return ''
+    const getAmrId = event => {
+        const dataElement = event.dataValues.find(
+            dataValue => dataValue.dataElement === amrDataElement
+        )
+        return dataElement > 0 ? dataElement.value : ''
     }
 
-    for (let i = 0; i < events.length; i++)
+    events.forEach(event =>
         data.rows.push([
-            getAmrId(i),
-            events[i].orgUnitName,
-            events[i].storedBy,
-            removeTime(events[i].created),
-            removeTime(events[i].lastUpdated),
+            getAmrId(event),
+            event.orgUnitName,
+            event.storedBy,
+            removeTime(event.created),
+            removeTime(event.lastUpdated),
         ])
-    console.log(data)
+    )
+
     return data
 }
 
@@ -411,16 +405,6 @@ export async function getProgramStage(orgUnit, amrId) {
             '.json?fields=displayName,programStageDataElements[dataElement[id],compulsory,sortOrder],programStageSections[id,name,displayName,dataElements[id,displayFormName,code,valueType,optionSetValue,optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
     )
 
-    let getIndex = dataElementId => {
-        for (let i = 0; i < programStage.programStageDataElements.length; i++)
-            if (
-                programStage.programStageDataElements[i].dataElement.id ===
-                dataElementId
-            )
-                return i
-        return -1
-    }
-
     const userGroups = (await get('me.json?fields=userGroups')).userGroups.map(
         userGroup => userGroup.id
     )
@@ -446,110 +430,61 @@ export async function getProgramStage(orgUnit, amrId) {
     let values = typeof amrId === 'undefined' ? {} : await getEventValues(amrId)
     const { dataElementRules, sectionRules } = await getProgramRules()
 
-    for (let i = 0; i < programStage.programStageSections.length; i++) {
-        if (sectionRules[programStage.programStageSections[i].id])
-            programStage.programStageSections[i].hideCondition =
-                sectionRules[programStage.programStageSections[i].id]
-        for (
-            let j = 0;
-            j < programStage.programStageSections[i].dataElements.length;
-            j++
-        ) {
-            let index = getIndex(
-                programStage.programStageSections[i].dataElements[j].id
-            )
-            if (
-                !values[programStage.programStageSections[i].dataElements[j].id]
-            ) {
-                if (
-                    programStage.programStageSections[i].dataElements[j]
-                        .code === 'AMR Id'
-                )
-                    values[
-                        programStage.programStageSections[i].dataElements[j].id
-                    ] = await generateAmrId(orgUnit)
-                else
-                    values[
-                        programStage.programStageSections[i].dataElements[j].id
-                    ] = ''
-            }
+    programStage.programStageSections.map(section => {
+        // Adding section hide rules.
+        if (sectionRules[section.id])
+            section.hideCondition = sectionRules[section.id]
+        section.dataElements.map(dataElement => {
             // Adding required and sort order properties.
-            programStage.programStageSections[i].dataElements[j].required =
-                programStage.programStageDataElements[index].compulsory
-            programStage.programStageSections[i].dataElements[j].sortOrder =
-                programStage.programStageDataElements[index].sortOrder
-            // Adding rules for hiding.
-            if (
-                dataElementRules[
-                    programStage.programStageSections[i].dataElements[j].id
-                ]
+            const element = programStage.programStageDataElements.find(
+                programStageDataElement =>
+                    programStageDataElement.dataElement.id === dataElement.id
             )
-                programStage.programStageSections[i].dataElements[
-                    j
-                ].hideCondition =
-                    dataElementRules[
-                        programStage.programStageSections[i].dataElements[j].id
-                    ]
+            dataElement.required = element.compulsory
+            dataElement.sortOrder = element.sortOrder
+            // Adding data element hide rules.
+            if (dataElementRules[dataElement.id])
+                dataElement.hideCondition = dataElementRules[dataElement.id]
             // Adding options.
-            if (
-                programStage.programStageSections[i].dataElements[j]
-                    .optionSetValue
-            ) {
+            if (dataElement.optionSetValue) {
                 let options = []
-                for (
-                    let h = 0;
-                    h <
-                    programStage.programStageSections[i].dataElements[j]
-                        .optionSet.options.length;
-                    h++
-                )
+                dataElement.optionSet.options.map(option =>
                     options.push({
-                        value:
-                            programStage.programStageSections[i].dataElements[j]
-                                .optionSet.options[h].code,
-                        label:
-                            programStage.programStageSections[i].dataElements[j]
-                                .optionSet.options[h].displayName,
+                        value: option.code,
+                        label: option.displayName,
                     })
-                programStage.programStageSections[i].dataElements[
-                    j
-                ].optionSet.options = options
-            }
-            isDisabled(programStage.programStageSections[i].dataElements[j])
-        }
-    }
-
-    let getSectionIndex = sectionName => {
-        for (let i = 0; i < programStage.programStageSections.length; i++)
-            if (programStage.programStageSections[i].name === sectionName)
-                return i
-        return -1
-    }
-
-    for (let i = 0; i < programStage.programStageSections.length; i++) {
-        // Section that have child sections.
-        if (
-            config.eventForm.specialSections[
-                programStage.programStageSections[i].name
-            ]
-        ) {
-            let childSections = []
-            for (let j in config.eventForm.specialSections[
-                programStage.programStageSections[i].name
-            ]) {
-                let index = getSectionIndex(
-                    config.eventForm.specialSections[
-                        programStage.programStageSections[i].name
-                    ][j]
                 )
-                if (index !== -1) {
-                    childSections.push(programStage.programStageSections[index])
-                    programStage.programStageSections.splice(index, 1)
-                }
+                dataElement.optionSet.options = options
             }
-            programStage.programStageSections[i].childSections = childSections
-        }
-    }
+            isDisabled(dataElement)
+            // Adding missing values.
+            if (!values[dataElement.id]) values[dataElement.id] = ''
+        })
+    })
+
+    // Adding child sections and removing child sections from main sections.
+    programStage.programStageSections
+        .filter(
+            programStageSection =>
+                config.eventForm.specialSections[programStageSection.name]
+        )
+        .forEach(programStageSection => {
+            let childSections = []
+            config.eventForm.specialSections[programStageSection.name].map(
+                sectionName => {
+                    let index = programStage.programStageSections
+                        .map(section => section.name)
+                        .indexOf(sectionName)
+                    if (index !== -1) {
+                        childSections.push(
+                            programStage.programStageSections[index]
+                        )
+                        programStage.programStageSections.splice(index, 1)
+                    }
+                }
+            )
+            programStageSection.childSections = childSections
+        })
 
     return {
         programStage: programStage,
@@ -558,20 +493,23 @@ export async function getProgramStage(orgUnit, amrId) {
 }
 
 /**
- * Gets program rules.
+ * Gets AMR program rules.
+ * @returns {Object} Object with data element and section rules.
  */
 export async function getProgramRules() {
-    let getVar = string => {
+    // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
+    const getVar = string => {
         try {
             const varName = string.match('#{(.*)}')[1]
-            for (let i = 0; i < programVariables.length; i++)
-                if (programVariables[i].name === varName)
-                    return string.replace(
-                        /#{(.*)}/,
-                        "this.state.values['" +
-                            programVariables[i].dataElement.id +
-                            "']"
-                    )
+            const matchedVar = programVariables.find(
+                programVariable => programVariable.name === varName
+            )
+            return matchedVar
+                ? string.replace(
+                      /#{(.*)}/,
+                      "this.state.values['" + matchedVar.dataElement.id + "']"
+                  )
+                : string
         } catch {
             return string
         }
@@ -581,50 +519,39 @@ export async function getProgramRules() {
         'programRules.json?paging=false&fields=condition,programRuleActions[programRuleActionType,dataElement[id,name],programStageSection[name,id]]&filter=program.id:eq:' +
             amrProgramId
     )).programRules
+
     const programVariables = (await get(
         'programRuleVariables.json?paging=false&fields=name,dataElement[id,name]&filter=program.id:eq:' +
             amrProgramId
     )).programRuleVariables
+
     let dataElementRules = {}
     let sectionRules = {}
-    for (let i = 0; i < programRules.length; i++) {
-        for (let j = 0; j < programRules[i].programRuleActions.length; j++) {
-            if (
-                programRules[i].programRuleActions[j].programRuleActionType ===
-                'HIDEFIELD'
-            ) {
-                if (
-                    !dataElementRules[
-                        programRules[i].programRuleActions[j].dataElement.id
-                    ]
-                )
-                    dataElementRules[
-                        programRules[i].programRuleActions[j].dataElement.id
-                    ] = []
-                dataElementRules[
-                    programRules[i].programRuleActions[j].dataElement.id
-                ].push(getVar(programRules[i].condition))
-            } else if (
-                programRules[i].programRuleActions[j].programRuleActionType ===
-                'HIDESECTION'
-            ) {
-                if (
-                    !sectionRules[
-                        programRules[i].programRuleActions[j]
-                            .programStageSection.id
-                    ]
-                )
-                    sectionRules[
-                        programRules[i].programRuleActions[
-                            j
-                        ].programStageSection.id
-                    ] = []
-                sectionRules[
-                    programRules[i].programRuleActions[j].programStageSection.id
-                ].push(getVar(programRules[i].condition))
+
+    // Keys are element/section id to be hidden. Values are hide conditions.
+    programRules.forEach(programRule =>
+        programRule.programRuleActions.forEach(programRuleAction => {
+            switch (programRuleAction.programRuleActionType) {
+                case 'HIDEFIELD':
+                    if (!dataElementRules[programRuleAction.dataElement.id])
+                        dataElementRules[programRuleAction.dataElement.id] = []
+                    dataElementRules[programRuleAction.dataElement.id].push(
+                        getVar(programRule.condition)
+                    )
+                    return
+                case 'HIDESECTION':
+                    if (!sectionRules[programRuleAction.programStageSection.id])
+                        sectionRules[
+                            programRuleAction.programStageSection.id
+                        ] = []
+                    sectionRules[programRuleAction.programStageSection.id].push(
+                        getVar(programRule.condition)
+                    )
+                    return
             }
-        }
-    }
+        })
+    )
+
     return {
         dataElementRules: dataElementRules,
         sectionRules: sectionRules,
@@ -636,19 +563,26 @@ export async function getProgramRules() {
  * @returns {Object[]} Organisation units.
  */
 export async function getOrgUnits() {
-    // Getting the id's of the users OU's.
+    // Getting the max OU level.
     const maxLevel = (await get(
         'organisationUnits.json?fields=level&pageSize=1&order=level:desc'
     )).organisationUnits[0].level
+
+    // Creating string which will be used in query.
     let childrenString = ''
-    for (let i = 0; i < maxLevel; i++)
-        childrenString += ',children[id,displayName'
-    for (let i = 0; i < maxLevel; i++) childrenString += ']'
+    _.times(maxLevel, () => (childrenString += ',children[id,displayName'))
+    _.times(maxLevel, () => (childrenString += ']'))
+
+    // Getting the user's OU's.
     const userOrgUnits = (await get('me.json?fields=organisationUnits'))
         .organisationUnits
+
+    // Creating string which will be used in query.
     let orgUnitsString = '[' + userOrgUnits[0].id
-    for (let i = 1; i < userOrgUnits.length; i++)
-        orgUnitsString += ',' + userOrgUnits[i].id
+    _.times(
+        userOrgUnits.length - 1,
+        index => (orgUnitsString += ',' + userOrgUnits[index + 1].id)
+    )
     orgUnitsString += ']'
 
     // Getting the OU's with descendants.
@@ -659,11 +593,11 @@ export async function getOrgUnits() {
             childrenString
     )).organisationUnits
 
+    // Sorts the children of the OU by display name.
     const sortChildren = orgUnit => {
         if (orgUnit.children)
             if (orgUnit.children.length) {
-                for (let i = 0; i < orgUnit.children.length; i++)
-                    sortChildren(orgUnit.children[i])
+                orgUnit.children.forEach(child => sortChildren(child))
                 orgUnit.children.sort((a, b) =>
                     a.displayName > b.displayName
                         ? 1
@@ -674,8 +608,8 @@ export async function getOrgUnits() {
             }
     }
 
-    // Sorting children by display name.
-    for (let i = 0; i < data.length; i++) sortChildren(data[i])
+    // Sorting descendants of each of the user's OU's.
+    data.forEach(d => sortChildren(d))
 
     return data
 }
@@ -688,18 +622,27 @@ export async function getOrgUnits() {
  */
 export async function addRecord(values, orgUnitId, date) {
     let dataValues = []
-    for (let key in values)
-        dataValues.push({
-            dataElement: key,
-            value: values[key],
-        })
-    let data = {
+    for (let key in values) {
+        if (key === amrDataElement)
+            dataValues.push({
+                dataElement: key,
+                value: await generateAmrId(orgUnitId),
+            })
+        else
+            dataValues.push({
+                dataElement: key,
+                value: values[key],
+            })
+    }
+    const data = {
         program: amrProgramId,
         orgUnit: orgUnitId,
         eventDate: date ? date : moment().format('YYYY-MM-DD'),
         dataValues: dataValues,
     }
     await postData('events/', data)
+    // TODO:
+    // Return AMR ID
 }
 
 /**
@@ -712,7 +655,7 @@ export async function generateAmrId(orgUnitId) {
         'organisationUnits/' + orgUnitId + '.json?fields=code'
     )).code
 
-    let newCode = () =>
+    const newCode = () =>
         orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
 
     let amrId = newCode()
@@ -730,25 +673,29 @@ export async function generateAmrId(orgUnitId) {
     return amrId
 }
 
+/**
+ * Updates event with new values.
+ * @param {Object} values - New values.
+ */
 export async function updateEvent(values) {
     let data = await get('events/' + values['event'] + '.json?fields=*')
 
-    let dataValueIndex = dataElement => {
-        for (let i = 0; i < data.dataValues.length; i++)
-            if (data.dataValues[i].dataElement === dataElement) return i
-        return -1
-    }
-
     for (let dataElement in values) {
+        // TODO:
         // There's probably a better way to get the event attributes. Maybe schemas?
-        if (!config.eventAttributes.includes(dataElement)) {
-            let index = dataValueIndex(dataElement)
-            index === -1
+        if (
+            !config.eventAttributes.includes(dataElement) ||
+            dataElement === amrDataElement
+        ) {
+            const dataE = data.dataValues.find(
+                dataValue => dataValue.dataElement === dataElement
+            )
+            !dataE
                 ? data.dataValues.push({
                       dataElement: dataElement,
                       value: values[dataElement],
                   })
-                : (data.dataValues[index].value = values[dataElement])
+                : (dataE.value = values[dataElement])
         }
     }
 

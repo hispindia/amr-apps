@@ -140,7 +140,7 @@ export class Event extends Component {
                         values[childSection.dataElements[i].id] =
                             this.state.values[
                                 childSection.dataElements[i].id
-                            ] === true
+                            ] === 'true'
                     }
                 }
                 return (
