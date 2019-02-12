@@ -24,6 +24,7 @@ export class CheckboxInput extends React.Component {
      */
     onChange = (name, value) => {
         let values = { ...this.state.values }
+        value = value ? 'true' : ''
         values[name] = value
         this.setState({ values: values })
         this.props.onChange(name, value)
@@ -31,7 +32,7 @@ export class CheckboxInput extends React.Component {
 
     render() {
         return (
-            <div style={{ marginLeft: 8, marginRight: 8, marginTop: -8 }}>
+            <div>
                 <Label>
                     {this.props.label}
                     {this.props.required ? '*' : null}
@@ -44,7 +45,7 @@ export class CheckboxInput extends React.Component {
                                     name={id}
                                     value={id}
                                     label={this.props.objects[id]}
-                                    checked={this.state.values[id]}
+                                    checked={this.state.values[id] === 'true'}
                                     onChange={this.onChange}
                                     disabled={this.props.disabled}
                                 />

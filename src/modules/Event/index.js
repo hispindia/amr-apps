@@ -41,6 +41,7 @@ export class Event extends Component {
             values: values,
         })
         console.log(values)
+        console.log(programStage)
     }
 
     onChange = (name, value) => {
@@ -129,27 +130,26 @@ export class Event extends Component {
     getChildSection = childSection => {
         switch (childSection.name) {
             case 'Comorbidity':
+            case 'Patient with devices':
                 let objects = {}
                 let values = {}
-                for (let i = 0; i < childSection.dataElements.length; i++) {
-                    if (
-                        childSection.dataElements[i].valueType === 'TRUE_ONLY'
-                    ) {
-                        objects[childSection.dataElements[i].id] =
-                            childSection.dataElements[i].displayFormName
-                        values[childSection.dataElements[i].id] =
-                            this.state.values[
-                                childSection.dataElements[i].id
-                            ] === 'true'
-                    }
-                }
+                childSection.dataElements
+                    .filter(
+                        dataElement => dataElement.valueType === 'TRUE_ONLY'
+                    )
+                    .forEach(dataElement => {
+                        objects[dataElement.id] = dataElement.displayFormName
+                        values[dataElement.id] = this.state.values[
+                            dataElement.id
+                        ]
+                    })
                 return (
-                    <div key={'Comorbidity'}>
-                        <div style={{ margin: 16 }}>
+                    <div key={childSection.name}>
+                        <div style={{ padding: 16 }}>
                             <CheckboxInput
                                 objects={objects}
-                                name="Comorbidity"
-                                label="Comorbidity"
+                                name={childSection.name}
+                                label={childSection.name}
                                 values={values}
                                 onChange={this.onChange}
                                 required={true}
@@ -168,7 +168,7 @@ export class Event extends Component {
                 )
             case 'Antibiotics / Antifungals (Taken for 3 days in last 1 month)':
                 return (
-                    <div key={'Comorbidity'}>
+                    <div key={childSection.name}>
                         <div style={{ margin: '16px 16px -16px 16px' }}>
                             <Label>
                                 Antibiotics / Antifungals (Taken for 3 days in
@@ -262,8 +262,8 @@ export class Event extends Component {
                 ? !this.evaluateAll(element.hideCondition)
                 : true
         } catch {
-            console.log('Evaluation failed:')
-            console.log(element)
+            console.error('Evaluation failed:')
+            console.error(element)
             return true
         }
     }
