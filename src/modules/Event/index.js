@@ -363,24 +363,34 @@ export class Event extends Component {
                                                               )
                                                     )}
                                                 {section.childSections
-                                                    ? section.childSections.map(
-                                                          childSection =>
+                                                    ? section.childSections
+                                                          .filter(section =>
+                                                              this.shouldShow(
+                                                                  section
+                                                              )
+                                                          )
+                                                          .map(childSection =>
                                                               this.getChildSection(
                                                                   childSection
                                                               )
-                                                      )
+                                                          )
                                                     : null}
                                             </Grid>
                                         </Grid>
                                     ) : (
                                         <Grid container spacing={0}>
                                             {section.childSections
-                                                ? section.childSections.map(
-                                                      childSection =>
+                                                ? section.childSections
+                                                      .filter(section =>
+                                                          this.shouldShow(
+                                                              section
+                                                          )
+                                                      )
+                                                      .map(childSection =>
                                                           this.getChildSection(
                                                               childSection
                                                           )
-                                                  )
+                                                      )
                                                 : null}
                                         </Grid>
                                     )}
