@@ -4,7 +4,12 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
 import { Heading, Row, Title, Label } from '../../helpers/helpers'
-import { getProgramStage, getOrganisms, updateEvent, getTestFields } from '../../api/api'
+import {
+    getProgramStage,
+    getOrganisms,
+    updateEvent,
+    getTestFields,
+} from '../../api/api'
 import {
     TextInput,
     RadioInput,
@@ -28,7 +33,11 @@ export class Event extends Component {
     }
 
     componentDidMount = async () => {
-        const { programStage, values } = await getProgramStage(
+        const {
+            programStage,
+            values,
+            organismDataElementId,
+        } = await getProgramStage(
             this.props.match.params.orgUnit,
             this.props.match.params.amrId
                 ? this.props.match.params.amrId
@@ -39,16 +48,36 @@ export class Event extends Component {
             programStage: programStage,
             organisms: await getOrganisms(),
             values: values,
+            organismDataElementId: organismDataElementId,
         })
-        console.log(values)
-        console.log(programStage)
-        console.log(await getTestFields('ZWdxkMZPF5O'))
+        //console.log(values)
+        //console.log(programStage)
+        //console.log(await getTestFields('ZWdxkMZPF5O'))
+        //console.log(organismDataElementId)
     }
 
-    onChange = (name, value) => {
+    onChange = async (name, value) => {
         let values = { ...this.state.values }
+        let testFields = { ...this.state.testFields }
         values[name] = value
-        this.setState({ values: values })
+
+        if (name === this.state.organismDataElementId)
+            testFields = await getTestFields(value)
+
+        this.setState({ values: values, testFields: testFields })
+    }
+
+    getTestFieldColor = elementId => {
+        try {
+            const value = parseInt(this.state.values[elementId])
+            const testField = this.state.testFields[elementId]
+
+            if (value >= testField.Resistant) return 'red'
+            else if (value >= testField.Intermediate_Low) return 'orange'
+            else if (value < testField.Intermediate_High) return 'green'
+        } catch {
+            return ''
+        }
     }
 
     onBackClicked = () => {
@@ -183,6 +212,26 @@ export class Event extends Component {
                             )}
                     </div>
                 )
+            case 'Disk Diffusion':
+            case 'MIC':
+                return (
+                    <Grid item xs key={childSection.name}>
+                        <div style={{ margin: '16px 16px -16px 16px' }}>
+                            <Label>{childSection.name}</Label>
+                        </div>
+                        {childSection.dataElements
+                            .filter(dataElement => this.shouldShow(dataElement))
+                            .filter(dataElement =>
+                                this.state.testFields[dataElement.id]
+                                    ? this.state.testFields[dataElement.id]
+                                          .display
+                                    : false
+                            )
+                            .map(dataElement =>
+                                this.getDataElement(dataElement)
+                            )}
+                    </Grid>
+                )
             default:
                 return (
                     <Grid item xs key={childSection.name}>
@@ -251,6 +300,13 @@ export class Event extends Component {
                         required={dataElement.required}
                         onChange={this.onChange}
                         disabled={dataElement.disabled}
+                        backgroundColor={
+                            this.state.testFields
+                                ? this.state.testFields[dataElement.id]
+                                    ? this.getTestFieldColor(dataElement.id)
+                                    : ''
+                                : ''
+                        }
                     />
                 )}
             </div>

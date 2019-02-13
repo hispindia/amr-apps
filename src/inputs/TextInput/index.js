@@ -78,7 +78,13 @@ export class TextInput extends React.Component {
 
     render() {
         return (
-            <div className="input">
+            <div
+                className={
+                    this.props.backgroundColor
+                        ? 'input ' + this.props.backgroundColor
+                        : 'input'
+                }
+            >
                 <InputField
                     required={this.props.required}
                     name={this.props.name}

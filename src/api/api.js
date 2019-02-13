@@ -28,6 +28,8 @@ const dataEntryUserGroup = 'mYdK5QT4ndl'
 const l1UserGroup = 'O7EtwlwnAYq'
 const l2UserGroup = 'XigjUyZB8UE'
 
+const organismDataElementId = 'SaQe2REkGVw'
+
 /**
  * Gets entity label.
  * @returns {string} Entity Label.
@@ -395,8 +397,8 @@ export async function getDistricts(state) {
 }
 
 /**
- * Gets AMR program stage.
- * @returns {Object} AMR program stage.
+ * Gets AMR program stage, values, and organism data element ID.
+ * @returns {Object} AMR program stage, values, and organism data element ID.
  */
 export async function getProgramStage(orgUnit, amrId) {
     let programStage = await get(
@@ -489,6 +491,7 @@ export async function getProgramStage(orgUnit, amrId) {
     return {
         programStage: programStage,
         values: values,
+        organismDataElementId: organismDataElementId,
     }
 }
 
@@ -702,18 +705,18 @@ export async function updateEvent(values) {
     await put('events/' + values['event'], data)
 }
 
-
 export async function getTestFields(organismId) {
     const data = await get('dataStore/id/' + organismId + '.json')
-    
-    let fields = []
-    data[''].Disk_Diffusion.filter(field => field.display)
-    .forEach(field =>
-        fields.push(field.id)
+
+    let fields = {}
+
+    if (!data['Panel1']) return fields
+
+    data['Panel1'].Disk_Diffusion.filter(field => field.display).forEach(
+        field => (fields[field.id] = field)
     )
-    data[''].MIC.filter(field => field.display)
-    .forEach(field =>
-        fields.push(field.id)
+    data['Panel1'].MIC.filter(field => field.display).forEach(
+        field => (fields[field.id] = field)
     )
 
     return fields

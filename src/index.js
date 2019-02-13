@@ -3,15 +3,13 @@ import ReactDOM from 'react-dom'
 import * as serviceWorker from './serviceWorker'
 import { App } from './App'
 import { setBaseUrl } from './api/crud'
-//import { setAmrProgram } from './api/api'
 
 const developmentServer = 'https://amrtest.icmr.org.in/amr'
 const rootElement = document.getElementById('root')
 
-const withBaseUrl = async baseUrl => {
+const withBaseUrl = baseUrl => {
     baseUrl = `${baseUrl}/api`
     setBaseUrl(baseUrl)
-    //await setAmrProgram()
 
     ReactDOM.render(<App />, rootElement)
     serviceWorker.unregister()
