@@ -20,13 +20,13 @@ const organismProgramId = 'GjFZmYa8pOD'
 const organismElementId = 'iBc2wcKg2Ba'
 const amrDataElement = 'lIkk661BLpG'
 
-const dataEntryGroup = 'mYdK5QT4ndl'
+//const dataEntryGroup = 'mYdK5QT4ndl'
 const l1ApprovalGroup = 'O7EtwlwnAYq'
 const l2ApprovalGroup = 'XigjUyZB8UE'
 
-const dataEntryUserGroup = 'mYdK5QT4ndl'
-const l1UserGroup = 'O7EtwlwnAYq'
-const l2UserGroup = 'XigjUyZB8UE'
+//const dataEntryUserGroup = 'mYdK5QT4ndl'
+//const l1UserGroup = 'O7EtwlwnAYq'
+//const l2UserGroup = 'XigjUyZB8UE'
 
 const organismDataElementId = 'SaQe2REkGVw'
 
@@ -418,6 +418,7 @@ export async function getProgramStage(orgUnit, amrId) {
             case l1RevisionReason:
                 if (!userGroups.includes(l1ApprovalGroup))
                     element.disabled = true
+                return
             case l2ApprovalStatus:
             case l2RejectionReason:
             case l2RevisionReason:
@@ -426,17 +427,20 @@ export async function getProgramStage(orgUnit, amrId) {
                     l1ApprovalStatus === ''
                 )
                     element.disabled = true
+                return
+            default:
+                return
         }
     }
 
     let values = typeof amrId === 'undefined' ? {} : await getEventValues(amrId)
     const { dataElementRules, sectionRules } = await getProgramRules()
 
-    programStage.programStageSections.map(section => {
+    programStage.programStageSections.forEach(section => {
         // Adding section hide rules.
         if (sectionRules[section.id])
             section.hideCondition = sectionRules[section.id]
-        section.dataElements.map(dataElement => {
+        section.dataElements.forEach(dataElement => {
             // Adding required and sort order properties.
             const element = programStage.programStageDataElements.find(
                 programStageDataElement =>
@@ -450,7 +454,7 @@ export async function getProgramStage(orgUnit, amrId) {
             // Adding options.
             if (dataElement.optionSetValue) {
                 let options = []
-                dataElement.optionSet.options.map(option =>
+                dataElement.optionSet.options.forEach(option =>
                     options.push({
                         value: option.code,
                         label: option.displayName,
@@ -472,7 +476,7 @@ export async function getProgramStage(orgUnit, amrId) {
         )
         .forEach(programStageSection => {
             let childSections = []
-            config.eventForm.specialSections[programStageSection.name].map(
+            config.eventForm.specialSections[programStageSection.name].forEach(
                 sectionName => {
                     let index = programStage.programStageSections
                         .map(section => section.name)
@@ -550,6 +554,8 @@ export async function getProgramRules() {
                     sectionRules[programRuleAction.programStageSection.id].push(
                         getVar(programRule.condition)
                     )
+                    return
+                default:
                     return
             }
         })
@@ -679,9 +685,52 @@ export async function generateAmrId(orgUnitId) {
 /**
  * Updates event with new values.
  * @param {Object} values - New values.
+ * @param {Object} testFields - Test fields meta data.
  */
-export async function updateEvent(values) {
+export async function updateEvent(values, testFields) {
     let data = await get('events/' + values['event'] + '.json?fields=*')
+
+    // Setting result values.
+    Object.keys(testFields)
+        .filter(testFieldId => testFields[testFieldId].name.endsWith('_Result'))
+        .forEach(testResultFieldId => {
+            const testValueFieldIds = Object.keys(testFields).filter(
+                testValueFieldId =>
+                    values[testValueFieldId] !== '' &&
+                    testFields[testValueFieldId].Resistant &&
+                    testFields[testValueFieldId].Intermediate_Low &&
+                    testFields[testValueFieldId].Susceptible &&
+                    (testFields[testResultFieldId].name ===
+                        testFields[testValueFieldId].name + '_Result' ||
+                        testFields[testResultFieldId].name.replace(
+                            '_Result',
+                            ''
+                        ) ===
+                            testFields[testValueFieldId].name.replace(
+                                /_(.*)/,
+                                ''
+                            ))
+            )
+            if (testValueFieldIds.length > 0) {
+                // Prioritising MIC over DD.
+                const testValueFieldId =
+                    testValueFieldIds.length > 1
+                        ? testValueFieldIds.find(id =>
+                              testFields[id].name.includes('MIC')
+                          )
+                        : testValueFieldIds[0]
+                const testValueField = testFields[testValueFieldId]
+                const intValue = parseInt(values[testValueFieldId])
+                values[testResultFieldId] =
+                    intValue >= testValueField.Resistant
+                        ? 'Resistant'
+                        : intValue >= testValueField.Intermediate_Low
+                        ? 'Intermediate'
+                        : intValue <= testValueField.Susceptible
+                        ? 'Susceptible'
+                        : ''
+            }
+        })
 
     for (let dataElement in values) {
         // TODO:
@@ -716,6 +765,9 @@ export async function getTestFields(organismId) {
         field => (fields[field.id] = field)
     )
     data['Panel1'].MIC.filter(field => field.display).forEach(
+        field => (fields[field.id] = field)
+    )
+    data['Panel1'].Results.filter(field => field.display).forEach(
         field => (fields[field.id] = field)
     )
 

@@ -84,6 +84,7 @@ export class DateInput extends React.Component {
                     help={this.state.errorText}
                     disabled={this.props.disabled}
                     size="dense"
+                    required={this.props.required}
                 />
             </div>
         )

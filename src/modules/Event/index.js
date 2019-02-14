@@ -49,10 +49,12 @@ export class Event extends Component {
             organisms: await getOrganisms(),
             values: values,
             organismDataElementId: organismDataElementId,
+            testFields: values[organismDataElementId]
+                ? await getTestFields(values[organismDataElementId])
+                : {},
         })
         //console.log(values)
         //console.log(programStage)
-        //console.log(await getTestFields('ZWdxkMZPF5O'))
         //console.log(organismDataElementId)
     }
 
@@ -120,7 +122,7 @@ export class Event extends Component {
      * On submit button click.
      */
     onSubmitClick = async () => {
-        await updateEvent(this.state.values)
+        await updateEvent(this.state.values, this.state.testFields)
     }
 
     getSpecialDataElement = dataElement => {
@@ -278,7 +280,6 @@ export class Event extends Component {
                         name={dataElement.id}
                         label={dataElement.displayFormName}
                         checked={this.state.values[dataElement.id]}
-                        disabled={false}
                         onChange={this.onChange}
                         required={dataElement.required}
                         disabled={dataElement.disabled}

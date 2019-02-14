@@ -1,0 +1,15 @@
+#sidebar_menu .ui_menu_item_4jpdr:first-child :first-child {
+    color: var(--blue700);
+}
+
+#sidebar_menu .ui_menu_item_4jpdr:nth-child(2) :first-child {
+    color: var(--yellow700);
+}
+
+#sidebar_menu .ui_menu_item_4jpdr:nth-child(3) :first-child {
+    color: var(--red700);
+}
+
+#sidebar_menu .ui_menu_item_4jpdr:nth-child(4) :first-child {
+    color: var(--green700);
+}

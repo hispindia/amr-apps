@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Menu } from '@dhis2/ui/core'
+import './style.css'
 
 /**
  * Sidebar menu.
@@ -37,7 +38,7 @@ export class SidebarMenu extends Component {
 
     render() {
         return (
-            <div>
+            <div id="sidebar_menu">
                 {this.state.path ? (
                     <Redirect push to={this.state.path} />
                 ) : null}

@@ -1,7 +1,6 @@
 import React from 'react'
 import { Redirect } from 'react-router-dom'
-import { getEntities, getEvents } from '../../api/api'
-import { EntityTable } from '../'
+import { getEvents } from '../../api/api'
 import { Row, Title } from '../../helpers/helpers'
 import { EventTable } from '../EventTable'
 
