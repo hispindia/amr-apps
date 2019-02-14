@@ -1,19 +1,17 @@
 import React from 'react'
-import { Redirect } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { getEntityLabel, getPersonsEvents } from '../../api/api'
 import { Title, Row } from '../../helpers/helpers'
-import { EventTable, EntityInformation } from '../'
-import { IconButton } from '../../inputs'
+import { EventTable } from '../'
+import IconButton from '../../inputs/IconButton'
+import EntityInformation from '../EntityInformation'
 
 /**
  * Consists of entity information and event table.
  */
-export class Entity extends React.Component {
+class Entity extends React.Component {
     state = {
         data: null,
-        addClicked: false,
-        backClicked: false,
-        eventClicked: null,
         forceTable: false,
     }
 
@@ -31,57 +29,37 @@ export class Entity extends React.Component {
      * On table add click.
      */
     onAddClick = () => {
-        this.setState({ addClicked: true })
+        this.props.history.push(
+            '/orgUnit/' +
+                this.props.match.params.orgUnit +
+                '/entity/' +
+                this.props.match.params.id +
+                '/event/'
+        )
     }
 
     /**
      * On table row click.
      */
     onEventClick = amrId => {
-        this.setState({ eventClicked: amrId })
+        this.props.history.push(
+            '/orgUnit/' +
+                this.props.match.params.orgUnit +
+                '/entity/' +
+                this.props.match.params.id +
+                '/event/' +
+                amrId
+        )
     }
 
     /**
      * On back arrow click.
      */
     backClicked = () => {
-        this.setState({ backClicked: true })
+        this.props.history.push('/')
     }
 
     render() {
-        if (this.state.addClicked)
-            return (
-                <Redirect
-                    push
-                    to={
-                        '/orgUnit/' +
-                        this.props.match.params.orgUnit +
-                        '/entity/' +
-                        this.props.match.params.id +
-                        '/event/'
-                    }
-                />
-            )
-
-        if (this.state.eventClicked)
-            return (
-                <Redirect
-                    push
-                    to={
-                        '/orgUnit/' +
-                        this.props.match.params.orgUnit +
-                        '/entity/' +
-                        this.props.match.params.id +
-                        '/event/' +
-                        this.state.eventClicked
-                    }
-                />
-            )
-
-        if (this.state.backClicked) return <Redirect push to={'/'} />
-
-        if (!this.state.data) return null
-
         return (
             <div style={{ margin: 16 }}>
                 <Row>
@@ -101,7 +79,7 @@ export class Entity extends React.Component {
                     orgUnit={this.props.match.params.orgUnit}
                     onEntityAdded={this.onNewEnityAdded}
                 />
-                {this.props.match.params.id ? (
+                {this.state.data ? (
                     <div className="table">
                         <EventTable
                             data={this.state.data}
@@ -115,3 +93,5 @@ export class Entity extends React.Component {
         )
     }
 }
+
+export default withRouter(Entity)

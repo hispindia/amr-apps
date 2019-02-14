@@ -1,22 +1,16 @@
 import React, { Component } from 'react'
-import { Redirect } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { Icon } from '@dhis2/ui/core'
 
 /**
  * Icon Button.
  */
-export class IconButton extends Component {
-    static id = 'icon_button'
-    state = { clicked: false }
-
+class IconButton extends Component {
     onClick = () => {
-        this.setState({ clicked: true })
+        this.props.history.push(this.props.redirect)
     }
 
     render() {
-        if (this.state.clicked)
-            return <Redirect push to={this.props.redirect} />
-
         return (
             <div className="icon_button">
                 <Icon
@@ -28,3 +22,5 @@ export class IconButton extends Component {
         )
     }
 }
+
+export default withRouter(IconButton)

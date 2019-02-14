@@ -1,14 +1,12 @@
 import React, { Component } from 'react'
-import { Redirect } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { Menu } from '@dhis2/ui/core'
 import './style.css'
 
 /**
  * Sidebar menu.
  */
-export class SidebarMenu extends Component {
-    state = { path: null }
-
+class SidebarMenu extends Component {
     menuItems = [
         {
             label: 'Persons',
@@ -33,15 +31,12 @@ export class SidebarMenu extends Component {
     ]
 
     onClick = path => {
-        this.setState({ path: path })
+        this.props.history.push(path)
     }
 
     render() {
         return (
             <div id="sidebar_menu">
-                {this.state.path ? (
-                    <Redirect push to={this.state.path} />
-                ) : null}
                 <Menu
                     size="dense"
                     list={this.menuItems}
@@ -51,3 +46,5 @@ export class SidebarMenu extends Component {
         )
     }
 }
+
+export default withRouter(SidebarMenu)

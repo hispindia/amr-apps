@@ -5,9 +5,9 @@ import './App.css'
 import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
 import { Main } from './Main'
-import { Sidebar } from './modules'
 import { Col, Row } from './helpers/helpers'
 import { getOrgUnits } from './api/api'
+import { Sidebar } from './modules'
 
 const theme = createMuiTheme({
     palette: {

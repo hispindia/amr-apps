@@ -1,16 +1,15 @@
 import React from 'react'
-import { Redirect } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { getEntities } from '../../api/api'
-import { EntityTable } from '../'
 import { Row, Title } from '../../helpers/helpers'
+import EntityTable from '../EntityTable'
 
 /**
  * Overview of persons.
  */
-export class Home extends React.Component {
+class Home extends React.Component {
     state = {
         data: null,
-        newClicked: false,
         selected: null,
     }
 
@@ -31,18 +30,10 @@ export class Home extends React.Component {
     }
 
     onAddClick = () => {
-        this.setState({ newClicked: true })
+        this.props.history.push('orgUnit/' + this.props.selected + '/entity')
     }
 
     render() {
-        if (this.state.newClicked)
-            return (
-                <Redirect
-                    push
-                    to={'orgUnit/' + this.props.selected + '/entity'}
-                />
-            )
-
         if (!this.state.data) return null
 
         return (
@@ -61,3 +52,5 @@ export class Home extends React.Component {
         )
     }
 }
+
+export default withRouter(Home)

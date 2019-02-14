@@ -1,7 +1,7 @@
 /* eslint no-eval: 0 */
 
 import React, { Component } from 'react'
-import { Redirect } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
 import { Heading, Row, Title, Label } from '../../helpers/helpers'
 import {
@@ -15,12 +15,12 @@ import {
     RadioInput,
     SelectInput,
     SwitchInput,
-    IconButton,
     CheckboxInput,
     DateInput,
 } from '../../inputs'
 import { Grid } from '@material-ui/core'
 import { EntityButtons } from '../EntityButtons'
+import IconButton from '../../inputs/IconButton'
 
 // Used for inputs with special handling.
 const config = require('../../config/config.json')
@@ -83,7 +83,12 @@ export class Event extends Component {
     }
 
     onBackClicked = () => {
-        this.setState({ backClicked: true })
+        this.props.history.push(
+            '/orgUnit/' +
+                this.props.match.params.orgUnit +
+                '/entity/' +
+                this.props.match.params.id
+        )
     }
 
     /**
@@ -333,22 +338,9 @@ export class Event extends Component {
     }
 
     render() {
-        const { programStage, backClicked } = this.state
+        const { programStage } = this.state
 
         if (!programStage) return null
-
-        if (backClicked)
-            return (
-                <Redirect
-                    push
-                    to={
-                        '/orgUnit/' +
-                        this.props.match.params.orgUnit +
-                        '/entity/' +
-                        this.props.match.params.id
-                    }
-                />
-            )
 
         let sections = programStage.programStageSections.filter(section =>
             this.shouldShow(section)
@@ -462,3 +454,5 @@ export class Event extends Component {
         )
     }
 }
+
+export default withRouter(Event)

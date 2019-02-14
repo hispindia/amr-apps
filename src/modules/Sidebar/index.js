@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Route } from 'react-router-dom'
 import { OrgUnitTree } from './OrgUnitTree'
-import { SidebarMenu } from './SidebarMenu'
+import SidebarMenu from './SidebarMenu'
 
 /**
  * Sidebar with menu and possibly OU tree.

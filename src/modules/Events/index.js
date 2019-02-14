@@ -1,5 +1,5 @@
 import React from 'react'
-import { Redirect } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { getEvents } from '../../api/api'
 import { Row, Title } from '../../helpers/helpers'
 import { EventTable } from '../EventTable'
@@ -38,14 +38,6 @@ export class Events extends React.Component {
     }
 
     render() {
-        if (this.state.newClicked)
-            return (
-                <Redirect
-                    push
-                    to={'orgUnit/' + this.props.selected + '/entity'}
-                />
-            )
-
         if (!this.state.data) return null
 
         return (

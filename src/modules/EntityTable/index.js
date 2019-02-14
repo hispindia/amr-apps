@@ -1,5 +1,5 @@
 import React from 'react'
-import { Redirect } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
 import MUIDataTable from 'mui-datatables'
 import TableToolbar from '../../inputs/TableToolbar'
@@ -7,29 +7,14 @@ import TableToolbar from '../../inputs/TableToolbar'
 /**
  * Table containing all persons belonging to the selected OU or it's descendants.
  */
-export class EntityTable extends React.Component {
-    state = {
-        entityClicked: null,
-    }
-
+class EntityTable extends React.Component {
     onClick = row => {
-        this.setState({ entityClicked: row[3] })
+        this.props.history.push(
+            'orgUnit/' + this.props.orgUnit + '/entity/' + row[3]
+        )
     }
 
     render() {
-        if (this.state.entityClicked)
-            return (
-                <Redirect
-                    push
-                    to={
-                        'orgUnit/' +
-                        this.props.orgUnit +
-                        '/entity/' +
-                        this.state.entityClicked
-                    }
-                />
-            )
-
         return (
             <Card>
                 <MUIDataTable
@@ -53,3 +38,5 @@ export class EntityTable extends React.Component {
         )
     }
 }
+
+export default withRouter(EntityTable)

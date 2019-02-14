@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { Route, Switch } from 'react-router-dom'
-import { Entity, Home, Event, Events } from './modules'
+import { Event, Events } from './modules'
+import Home from './modules/Home'
+import Entity from './modules/Entity'
 
 export class Main extends Component {
     render() {

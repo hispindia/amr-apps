@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Redirect } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { Grid } from '@material-ui/core'
 import { Card } from '@dhis2/ui/core'
 import { Heading } from '../../helpers/helpers'
@@ -17,7 +17,7 @@ import { TextInput, AgeInput, RadioInput, SelectInput } from '../../inputs'
 /**
  * Entity information section.
  */
-export class EntityInformation extends Component {
+class EntityInformation extends Component {
     state = {
         values: {}, // Current or new values.
         stateId: '', // Districts are populated when state is selected.
@@ -157,7 +157,7 @@ export class EntityInformation extends Component {
      */
     onDeleteClick = async () => {
         await deletePerson(this.state.id)
-        this.setState({ goToHome: true })
+        this.props.history.push('/')
     }
 
     /**
@@ -293,9 +293,7 @@ export class EntityInformation extends Component {
     }
 
     render() {
-        const { attributes, goToHome, half } = this.state
-
-        if (goToHome) return <Redirect push to={'/'} />
+        const { attributes, half } = this.state
 
         if (!attributes) return null
 
@@ -323,3 +321,5 @@ export class EntityInformation extends Component {
         )
     }
 }
+
+export default withRouter(EntityInformation)
