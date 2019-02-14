@@ -48,3 +48,7 @@ body {
     background-color: rgba(0, 255, 0, 0.082) !important;
     z-index: 0;
 }
+
+.table h6 {
+    margin-left: 8px !important;
+}

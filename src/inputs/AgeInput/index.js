@@ -143,7 +143,7 @@ export class AgeInput extends React.Component {
 
     render() {
         return (
-            <div>
+            <div className="input">
                 <Label>
                     {this.props.label}
                     {this.props.required ? '*' : null}

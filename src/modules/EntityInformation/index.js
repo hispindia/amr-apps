@@ -223,7 +223,7 @@ class EntityInformation extends Component {
         return (
             <div
                 key={attribute.trackedEntityAttribute.id}
-                style={{ marginBottom: 24 }}
+                style={{ padding: 16 }}
             >
                 {attribute.trackedEntityAttribute.valueType === 'AGE' ? (
                     <AgeInput
@@ -300,8 +300,15 @@ class EntityInformation extends Component {
         return (
             <Card>
                 <div style={{ margin: 16 }}>
-                    <Heading>Information</Heading>
-                    <Grid container spacing={16}>
+                    <div
+                        style={{
+                            marginLeft: 8,
+                            marginRight: 8,
+                        }}
+                    >
+                        <Heading>Information</Heading>
+                    </div>
+                    <Grid container spacing={0}>
                         <Grid item xs>
                             {attributes
                                 .filter(
