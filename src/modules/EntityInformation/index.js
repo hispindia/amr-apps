@@ -7,7 +7,6 @@ import {
     getProgramAttributes,
     getDistricts,
     addPerson,
-    getPersonValues,
     deletePerson,
     updatePerson,
     getStateAttributeId,
@@ -22,7 +21,6 @@ import { TextInput, AgeInput, RadioInput, SelectInput } from '../../inputs'
 class EntityInformation extends Component {
     state = {
         values: {}, // Current or new values.
-        stateId: '', // Districts are populated when state is selected.
         districts: [], // Populated after state is selected.
         uniques: [], // Unique textfield values are validated.
         goToHome: false, // Redirects to home after deleting entity.
@@ -31,55 +29,19 @@ class EntityInformation extends Component {
     }
 
     componentDidMount = async () => {
-        let programAttributes = await getProgramAttributes()
-        let values = {}
-        let uniques = {}
-        let stateId = ''
-        let districts = []
-        let id = ''
-        let isNewPatient = true
-        for (let i = 0; i < programAttributes.length; i++) {
-            values[programAttributes[i].trackedEntityAttribute.id] = ''
-            if (programAttributes[i].trackedEntityAttribute.code === 'state')
-                stateId = programAttributes[i].trackedEntityAttribute.id
-            if (programAttributes[i].trackedEntityAttribute.unique)
-                uniques[programAttributes[i].trackedEntityAttribute.id] = true
-            if (programAttributes[i].trackedEntityAttribute.optionSetValue) {
-                let options = []
-                for (
-                    let j = 0;
-                    j <
-                    programAttributes[i].trackedEntityAttribute.optionSet
-                        .options.length;
-                    j++
-                ) {
-                    options.push({
-                        value:
-                            programAttributes[i].trackedEntityAttribute
-                                .optionSet.options[j].code,
-                        label:
-                            programAttributes[i].trackedEntityAttribute
-                                .optionSet.options[j].displayName,
-                    })
-                }
-                programAttributes[
-                    i
-                ].trackedEntityAttribute.optionSet.options = options
-            }
-        }
-
-        if (this.props.id) {
-            values = await getPersonValues(this.props.id)
-            districts = await getDistricts(values[stateId])
-            isNewPatient = false
-        }
+        const {
+            programAttributes,
+            values,
+            uniques,
+            districts,
+        } = await getProgramAttributes(this.props.id ? this.props.id : null)
 
         this.setState({
             attributes: programAttributes,
             values: values,
-            stateId: stateId,
+            uniques: uniques,
             districts: districts,
-            isNewPatient: isNewPatient,
+            isNewPatient: this.props.id ? false : true,
             half: Math.floor(programAttributes.length / 2),
         })
     }

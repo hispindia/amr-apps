@@ -58,15 +58,47 @@ export function getDistrictAttributeId() {
 }
 
 /**
- * Gets the attributes of the AMR program.
- * @returns {Object[]} Attributes
+ * Gets the attributes and values of the AMR program.
+ * @returns {Object} Program attributes, values, uniques, districts.
  */
-export async function getProgramAttributes() {
-    return (await get(
+export async function getProgramAttributes(entityId) {
+    const programAttributes = (await get(
         'programs/' +
             amrProgramId +
             '/programTrackedEntityAttributes.json?fields=mandatory,sortOrder,trackedEntityAttribute[code,displayName,valueType,id,unique,name,optionSetValue,optionSet[options[code,name,id,displayName]]]'
     )).programTrackedEntityAttributes
+
+    let values = entityId ? await getPersonValues(entityId) : {}
+    let uniques = {}
+
+    programAttributes.forEach(programAttribute => {
+        if (programAttribute.trackedEntityAttribute.unique)
+            uniques[programAttribute.trackedEntityAttribute.id] = true
+        if (!values[programAttribute.trackedEntityAttribute.id])
+            values[programAttribute.trackedEntityAttribute.id] = ''
+        if (programAttribute.trackedEntityAttribute.optionSetValue) {
+            let options = []
+            programAttribute.trackedEntityAttribute.optionSet.options.forEach(
+                option =>
+                    options.push({
+                        value: option.code,
+                        label: option.displayName,
+                    })
+            )
+            programAttribute.trackedEntityAttribute.optionSet.options = options
+        }
+    })
+
+    let districts = []
+    if (values[stateAttributeId])
+        districts = await getDistricts(values[stateAttributeId])
+
+    return {
+        programAttributes: programAttributes,
+        values: values,
+        uniques: uniques,
+        districts: districts,
+    }
 }
 
 /**
@@ -342,29 +374,6 @@ export async function getOrganisms() {
     )
 
     return organisms
-}
-
-/**
- * Gets values for a single event.
- * @param {string} amrId - AMR Id.
- * @returns {Object} Event values.
- */
-export async function getEventValues2(amrId) {
-    const data = await get(
-        'events/query.json?includeAllDataElements=true&programStage=' +
-            programStageId +
-            '&filter=' +
-            amrDataElement +
-            ':eq:' +
-            amrId
-    )
-
-    let values = {}
-    data.headers.forEach(
-        (header, index) => (values[header.name] = data.rows[0][index])
-    )
-
-    return values
 }
 
 /**
