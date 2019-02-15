@@ -104,7 +104,12 @@ class EntityInformation extends Component {
      */
     onSubmitClick = async () => {
         if (!this.state.editing) {
-            await addPerson(this.state.values, this.props.orgUnit)
+            this.props.history.push(
+                '/orgUnit/' +
+                    this.props.match.params.orgUnit +
+                    '/entity/' +
+                    (await addPerson(this.state.values, this.props.orgUnit))
+            )
             this.setState({ isNewPatient: false })
             this.props.onEntityAdded()
         } else {

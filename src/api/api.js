@@ -180,6 +180,7 @@ export async function getPersonsEvents(entityId) {
 /**
  * Adds a new person tracked entity instance and enrolls to AMR program.
  * @param {Object} values - Values
+ * @returns {string} Tracked entity instance ID.
  */
 export async function addPerson(values, orgUnit) {
     const now = moment().format('YYYY-MM-DD')
@@ -198,7 +199,9 @@ export async function addPerson(values, orgUnit) {
     }
     for (let key in values)
         data.attributes.push({ attribute: key, value: values[key] })
-    await postData('trackedEntityInstances/', data)
+
+    return (await (await postData('trackedEntityInstances/', data)).json())
+        .response.importSummaries[0].reference
 }
 
 /**
