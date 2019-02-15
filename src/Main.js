@@ -23,17 +23,17 @@ export class Main extends Component {
                     />
                     <Route
                         exact
-                        path="/orgUnit/:orgUnit/entity/:id"
+                        path="/orgUnit/:orgUnit/entity/:entity"
                         component={Entity}
                     />
                     <Route
                         exact
-                        path="/orgUnit/:orgUnit/entity/:id/event"
+                        path="/orgUnit/:orgUnit/entity/:entity/event"
                         component={Event}
                     />
                     <Route
                         exact
-                        path="/orgUnit/:orgUnit/entity/:id/event/:amrId"
+                        path="/orgUnit/:orgUnit/entity/:entity/event/:event"
                         component={Event}
                     />
                     <Route

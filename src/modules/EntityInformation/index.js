@@ -7,9 +7,11 @@ import {
     getProgramAttributes,
     getDistricts,
     addPerson,
-    getPerson,
+    getPersonValues,
     deletePerson,
     updatePerson,
+    getStateAttributeId,
+    getDistrictAttributeId,
 } from '../../api/api'
 import { EntityButtons } from '../'
 import { TextInput, AgeInput, RadioInput, SelectInput } from '../../inputs'
@@ -67,17 +69,14 @@ class EntityInformation extends Component {
         }
 
         if (this.props.id) {
-            const patientData = await this.searchEntity(this.props.id)
-            values = patientData.values
-            id = patientData.id
-            districts = await this.addDistricts(values[stateId])
+            values = await getPersonValues(this.props.id)
+            districts = await getDistricts(values[stateId])
             isNewPatient = false
         }
 
         this.setState({
             attributes: programAttributes,
             values: values,
-            id: id,
             stateId: stateId,
             districts: districts,
             isNewPatient: isNewPatient,
@@ -86,43 +85,15 @@ class EntityInformation extends Component {
     }
 
     /**
-     * Searches for person by patient registration number and gets values.
-     */
-    searchEntity = async value => {
-        const data = await getPerson(value)
-        let patientData = { values: [], id: data.trackedEntityInstance }
-        if (data) {
-            for (let i = 0; i < data.attributes.length; i++)
-                patientData.values[data.attributes[i].attribute] =
-                    data.attributes[i].value
-        }
-        return patientData
-    }
-
-    /**
-     * Adds the selected state's districts.
-     */
-    addDistricts = async value => {
-        let options = await getDistricts(value)
-        let districts = []
-        for (let j = 0; j < options.length; j++)
-            districts.push({
-                value: options[j].code,
-                label: options[j].displayName,
-            })
-        return districts
-    }
-
-    /**
      * Called on every input field change.
      */
     onChange = async (name, value) => {
         let values = { ...this.state.values }
         values[name] = value
-        if (name === this.state.stateId) {
+        if (name === getStateAttributeId()) {
             this.setState({
                 values: values,
-                districts: await this.addDistricts(value),
+                districts: await getDistricts(value),
                 unchanged: false,
             })
         } else this.setState({ values: values, unchanged: false })
@@ -137,7 +108,7 @@ class EntityInformation extends Component {
             this.setState({ isNewPatient: false })
             this.props.onEntityAdded()
         } else {
-            await updatePerson(this.state.id, this.state.values)
+            await updatePerson(this.props.id, this.state.values)
             this.setState({
                 isNewPatient: false,
                 editing: false,
@@ -156,7 +127,7 @@ class EntityInformation extends Component {
      * On delete button click.
      */
     onDeleteClick = async () => {
-        await deletePerson(this.state.id)
+        await deletePerson(this.props.id)
         this.props.history.push('/')
     }
 
@@ -254,8 +225,8 @@ class EntityInformation extends Component {
                         <SelectInput
                             required={attribute.mandatory}
                             objects={
-                                attribute.trackedEntityAttribute.code !==
-                                'district'
+                                attribute.trackedEntityAttribute.id !==
+                                getDistrictAttributeId()
                                     ? attribute.trackedEntityAttribute.optionSet
                                           .options
                                     : districts
@@ -267,8 +238,8 @@ class EntityInformation extends Component {
                             onChange={this.onChange}
                             disabled={
                                 !isNewPatient ||
-                                (attribute.trackedEntityAttribute.code ===
-                                    'district' &&
+                                (attribute.trackedEntityAttribute.id ===
+                                    getDistrictAttributeId() &&
                                     districts.length === 0)
                             }
                             helperText={

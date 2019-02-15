@@ -10,7 +10,7 @@ import TableToolbar from '../../inputs/TableToolbar'
 class EntityTable extends React.Component {
     onClick = row => {
         this.props.history.push(
-            'orgUnit/' + this.props.orgUnit + '/entity/' + row[3]
+            'orgUnit/' + row[row.length - 2] + '/entity/' + row[row.length - 1]
         )
     }
 

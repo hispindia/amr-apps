@@ -30,12 +30,31 @@ const l2ApprovalGroup = 'XigjUyZB8UE'
 
 const organismDataElementId = 'SaQe2REkGVw'
 
+const stateAttributeId = 'jfydZttH7ls'
+const districtAttributeId = 'OkKucSXfbQ2'
+
 /**
  * Gets entity label.
  * @returns {string} Entity Label.
  */
 export function getEntityLabel() {
     return entityLabel
+}
+
+/**
+ * Gets state attribute ID.
+ * @returns {string} State attribute ID.
+ */
+export function getStateAttributeId() {
+    return stateAttributeId
+}
+
+/**
+ * Gets district attribute ID.
+ * @returns {string} district attribute ID.
+ */
+export function getDistrictAttributeId() {
+    return districtAttributeId
 }
 
 /**
@@ -68,31 +87,38 @@ export async function isUnique(property, value) {
 }
 
 /**
- * Gets tracked entity instance of type person by patient registration number.
- * @param {string} patientRegNr - Patient registration number.
- * @returns {Object} Tracked entity instance.
+ * Gets tracked entity instance values.
+ * @param {string} entityId - Tracked entity instance ID.
+ * @returns {Object} Values.
  */
-export async function getPerson(patientRegNr) {
-    try {
-        return (await get(
-            'trackedEntityInstances.json?ouMode=ALL&fields=trackedEntityInstance,enrollments[events[lastUpdated,created,storedBy,dataValues[dataElement,value]]],attributes[code,displayName,valueType,attribute,value]&filter=RkCL8PAxV22:eq:' +
-                patientRegNr
-        )).trackedEntityInstances[0]
-    } catch {
-        return null
-    }
+export async function getPersonValues(entityId) {
+    const data = await get(
+        'trackedEntityInstances/' +
+            entityId +
+            '.json?ouMode=ALL&fields=attributes[code,displayName,valueType,attribute,value]'
+    )
+
+    if (!data) return null
+
+    let values = {}
+    data.attributes.forEach(
+        attribute => (values[attribute.attribute] = attribute.value)
+    )
+
+    return values
 }
 
 /**
  * Gets all events belonging to the tracked entity instance with the provided patient registration number.
- * @param {string} patientRegNr - Patient registration number.
+ * @param {string} entityId - Patient registration number.
  * @returns {Object} Events in the form of headers and rows.
  */
-export async function getPersonsEvents(patientRegNr) {
+export async function getPersonsEvents(entityId) {
     const enrollments = (await get(
-        'trackedEntityInstances.json?ouMode=ALL&fields=enrollments[events[lastUpdated,created,orgUnitName,storedBy,dataValues[dataElement,value]]]&filter=RkCL8PAxV22:eq:' +
-            patientRegNr
-    )).trackedEntityInstances[0].enrollments
+        'trackedEntityInstances/' +
+            entityId +
+            '.json?ouMode=ALL&fields=enrollments[events[event,lastUpdated,created,orgUnitName,storedBy,dataValues[dataElement,value]]]'
+    )).enrollments
 
     let data = {
         headers: [
@@ -116,6 +142,11 @@ export async function getPersonsEvents(patientRegNr) {
                 name: 'Updated',
                 column: 'Updated',
             },
+            {
+                name: 'Event',
+                column: 'Event',
+                options: { display: false },
+            },
         ],
         rows: [],
     }
@@ -129,17 +160,19 @@ export async function getPersonsEvents(patientRegNr) {
     }
 
     // Adds all events in row form.
-    enrollments.forEach(enrollment => {
-        enrollment.events.forEach(event => {
-            data.rows.push([
-                getAmrId(event),
-                event.orgUnitName,
-                event.storedBy,
-                removeTime(event.created),
-                removeTime(event.lastUpdated),
-            ])
+    if (enrollments)
+        enrollments.forEach(enrollment => {
+            enrollment.events.forEach(event => {
+                data.rows.push([
+                    getAmrId(event),
+                    event.orgUnitName,
+                    event.storedBy,
+                    removeTime(event.created),
+                    removeTime(event.lastUpdated),
+                    event.event,
+                ])
+            })
         })
-    })
 
     return data
 }
@@ -200,7 +233,7 @@ export async function getEntities(orgUnit) {
     const values = (await get(
         'trackedEntityInstances.json?ou=' +
             orgUnit +
-            '&ouMode=DESCENDANTS&order=created:desc&paging=false&fields=created,lastUpdated,attributes[displayName,valueType,attribute,value],enrollments[orgUnitName]&program=' +
+            '&ouMode=DESCENDANTS&order=created:desc&paging=false&fields=orgUnit,trackedEntityInstance,created,lastUpdated,attributes[displayName,valueType,attribute,value],enrollments[orgUnitName]&program=' +
             amrProgramId
     )).trackedEntityInstances
     const metaData = (await get(
@@ -221,7 +254,7 @@ export async function getEntities(orgUnit) {
                 options: { display: false },
             },
             {
-                name: 'Organisation Unit',
+                name: 'Organisation unit',
             },
         ],
         rows: [],
@@ -245,6 +278,18 @@ export async function getEntities(orgUnit) {
         })
     )
 
+    // OU ID and Entity are not displayed by default.
+    data.headers.push(
+        {
+            name: 'Organisation unit ID',
+            options: { display: false },
+        },
+        {
+            name: 'Entity',
+            options: { display: false },
+        }
+    )
+
     // Adds the data rows.
     values.forEach(value => {
         let entityValues = [
@@ -253,10 +298,11 @@ export async function getEntities(orgUnit) {
             value.enrollments[0].orgUnitName,
         ]
         data.headers
-            .slice(3, data.headers.length)
+            .slice(3, data.headers.length - 2)
             .forEach(header =>
                 entityValues.push(getAttributeValue(value, header.id))
             )
+        entityValues.push(value.orgUnit, value.trackedEntityInstance)
         data.rows.push(entityValues)
     })
 
@@ -300,7 +346,7 @@ export async function getOrganisms() {
  * @param {string} amrId - AMR Id.
  * @returns {Object} Event values.
  */
-export async function getEventValues(amrId) {
+export async function getEventValues2(amrId) {
     const data = await get(
         'events/query.json?includeAllDataElements=true&programStage=' +
             programStageId +
@@ -319,13 +365,29 @@ export async function getEventValues(amrId) {
 }
 
 /**
+ * Gets values for a single event.
+ * @param {string} eventId - AMR Id.
+ * @returns {Object} Event values.
+ */
+export async function getEventValues(eventId) {
+    const dataValues = (await get('events/' + eventId + '.json')).dataValues
+
+    let values = {}
+    dataValues.forEach(
+        dataValue => (values[dataValue.dataElement] = dataValue.value)
+    )
+
+    return values
+}
+
+/**
  * Gets all events from the AMR program with the provided approval status.
  * @param {string} approvalStatus - Approval status.
  * @returns {Object[]} All AMR events.
  */
 export async function getEvents(orgUnit, approvalStatus) {
     const events = (await get(
-        'events.json?paging=false&fields=orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program=' +
+        'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program=' +
             amrProgramId +
             '&orgUnit=' +
             orgUnit +
@@ -356,6 +418,21 @@ export async function getEvents(orgUnit, approvalStatus) {
                 name: 'Updated',
                 column: 'Updated',
             },
+            {
+                name: 'Organisation unit ID',
+                column: 'Organisation unit ID',
+                options: { display: false },
+            },
+            {
+                name: 'Entity',
+                column: 'Entity',
+                options: { display: false },
+            },
+            {
+                name: 'Event',
+                column: 'Event',
+                options: { display: false },
+            },
         ],
         rows: [],
     }
@@ -364,7 +441,7 @@ export async function getEvents(orgUnit, approvalStatus) {
         const dataElement = event.dataValues.find(
             dataValue => dataValue.dataElement === amrDataElement
         )
-        return dataElement > 0 ? dataElement.value : ''
+        return dataElement ? dataElement.value : ''
     }
 
     events.forEach(event =>
@@ -374,6 +451,9 @@ export async function getEvents(orgUnit, approvalStatus) {
             event.storedBy,
             removeTime(event.created),
             removeTime(event.lastUpdated),
+            event.orgUnit,
+            event.trackedEntityInstance,
+            event.event,
         ])
     )
 
@@ -386,14 +466,22 @@ export async function getEvents(orgUnit, approvalStatus) {
  * @returns {Object[]} Option sets.
  */
 export async function getDistricts(state) {
-    try {
-        return (await get(
-            'optionSets.json?paging=false&fields=options[name,displayName,id,code]&filter=code:eq:' +
-                state
-        )).optionSets[0].options
-    } catch {
-        return []
-    }
+    const data = await get(
+        'optionSets.json?paging=false&fields=options[name,displayName,id,code]&filter=code:eq:' +
+            state
+    )
+
+    if (!data) return []
+
+    let districts = []
+    data.optionSets[0].options.forEach(option =>
+        districts.push({
+            value: option.code,
+            label: option.displayName,
+        })
+    )
+
+    return districts
 }
 
 /**
@@ -687,8 +775,8 @@ export async function generateAmrId(orgUnitId) {
  * @param {Object} values - New values.
  * @param {Object} testFields - Test fields meta data.
  */
-export async function updateEvent(values, testFields) {
-    let data = await get('events/' + values['event'] + '.json?fields=*')
+export async function updateEvent(values, testFields, eventId) {
+    let data = await get('events/' + eventId + '.json')
 
     // Setting result values.
     Object.keys(testFields)
@@ -733,25 +821,18 @@ export async function updateEvent(values, testFields) {
         })
 
     for (let dataElement in values) {
-        // TODO:
-        // There's probably a better way to get the event attributes. Maybe schemas?
-        if (
-            !config.eventAttributes.includes(dataElement) ||
-            dataElement === amrDataElement
-        ) {
-            const dataE = data.dataValues.find(
-                dataValue => dataValue.dataElement === dataElement
-            )
-            !dataE
-                ? data.dataValues.push({
-                      dataElement: dataElement,
-                      value: values[dataElement],
-                  })
-                : (dataE.value = values[dataElement])
-        }
+        const dataE = data.dataValues.find(
+            dataValue => dataValue.dataElement === dataElement
+        )
+        !dataE
+            ? data.dataValues.push({
+                  dataElement: dataElement,
+                  value: values[dataElement],
+              })
+            : (dataE.value = values[dataElement])
     }
 
-    await put('events/' + values['event'], data)
+    await put('events/' + eventId, data)
 }
 
 export async function getTestFields(organismId) {

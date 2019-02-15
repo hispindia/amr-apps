@@ -16,12 +16,14 @@ class Entity extends React.Component {
     }
 
     componentDidMount = async () => {
-        if (this.props.match.params.id) await this.getEvents()
+        if (this.props.match.params.entity) await this.getEvents()
     }
 
-    getEvents = async () => {
+    getEvents = async entityId => {
         this.setState({
-            data: await getPersonsEvents(this.props.match.params.id),
+            data: await getPersonsEvents(
+                entityId ? entityId : this.props.match.params.entity
+            ),
         })
     }
 
@@ -33,7 +35,7 @@ class Entity extends React.Component {
             '/orgUnit/' +
                 this.props.match.params.orgUnit +
                 '/entity/' +
-                this.props.match.params.id +
+                this.props.match.params.entity +
                 '/event/'
         )
     }
@@ -41,14 +43,14 @@ class Entity extends React.Component {
     /**
      * On table row click.
      */
-    onEventClick = amrId => {
+    onEventClick = row => {
         this.props.history.push(
             '/orgUnit/' +
                 this.props.match.params.orgUnit +
                 '/entity/' +
-                this.props.match.params.id +
+                this.props.match.params.entity +
                 '/event/' +
-                amrId
+                row[row.length - 1]
         )
     }
 
@@ -72,12 +74,12 @@ class Entity extends React.Component {
                 </Row>
                 <EntityInformation
                     id={
-                        this.props.match.params.id
-                            ? this.props.match.params.id
+                        this.props.match.params.entity
+                            ? this.props.match.params.entity
                             : null
                     }
                     orgUnit={this.props.match.params.orgUnit}
-                    onEntityAdded={this.onNewEnityAdded}
+                    onEntityAdded={this.getEvents}
                 />
                 {this.state.data ? (
                     <div className="table">

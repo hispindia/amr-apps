@@ -17,7 +17,7 @@ export class EventTable extends React.Component {
                         columns={this.props.data.headers}
                         options={{
                             selectableRows: false,
-                            onRowClick: row => this.props.onEventClick(row[0]),
+                            onRowClick: row => this.props.onEventClick(row),
                             elevation: 0,
                             customToolbar: () => {
                                 return this.props.addButton ? (

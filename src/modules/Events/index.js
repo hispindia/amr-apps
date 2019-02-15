@@ -33,8 +33,10 @@ export class Events extends React.Component {
         })
     }
 
-    onEventClick = amrId => {
-        console.log(amrId)
+    onEventClick = row => {
+        this.props.history.push(
+            '/orgUnit/' + row[5] + '/entity/' + row[6] + '/event/' + row[7]
+        )
     }
 
     render() {

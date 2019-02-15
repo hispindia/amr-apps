@@ -39,8 +39,8 @@ export class Event extends Component {
             organismDataElementId,
         } = await getProgramStage(
             this.props.match.params.orgUnit,
-            this.props.match.params.amrId
-                ? this.props.match.params.amrId
+            this.props.match.params.event
+                ? this.props.match.params.event
                 : undefined
         )
 
@@ -87,7 +87,7 @@ export class Event extends Component {
             '/orgUnit/' +
                 this.props.match.params.orgUnit +
                 '/entity/' +
-                this.props.match.params.id
+                this.props.match.params.entity
         )
     }
 
@@ -127,7 +127,11 @@ export class Event extends Component {
      * On submit button click.
      */
     onSubmitClick = async () => {
-        await updateEvent(this.state.values, this.state.testFields)
+        await updateEvent(
+            this.state.values,
+            this.state.testFields,
+            this.props.match.params.event
+        )
     }
 
     getSpecialDataElement = dataElement => {
