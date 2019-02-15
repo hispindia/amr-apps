@@ -10,7 +10,7 @@ export class Sidebar extends Component {
     render() {
         return (
             <div id="sidebar" style={{ margin: 16 }}>
-                <SidebarMenu />
+                <SidebarMenu selected={this.props.selected} />
                 <Route
                     exact
                     path="/"

@@ -393,6 +393,31 @@ export async function getEventValues(eventId) {
 }
 
 /**
+ * Gets the amount of events by approval status.
+ * @param {string} orgUnit - Organisation unit ID.
+ * @param {string[]} approvalStatuses - Approval statuses.
+ * @returns {Object} Counts of events.
+ */
+export async function getEventCounts(orgUnit, approvalStatuses) {
+    let counts = []
+    for (const approvalStatus of approvalStatuses) {
+        counts.push(
+            (await get(
+                'events.json?paging=false&fields=event&program=' +
+                    amrProgramId +
+                    '&orgUnit=' +
+                    orgUnit +
+                    '&ouMode=DESCENDANTS' +
+                    '&filter=tAyVrNUTVHX:eq:' +
+                    approvalStatus
+            )).events.length
+        )
+    }
+
+    return counts
+}
+
+/**
  * Gets all events from the AMR program with the provided approval status.
  * @param {string} approvalStatus - Approval status.
  * @returns {Object[]} All AMR events.
