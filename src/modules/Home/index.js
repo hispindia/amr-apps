@@ -14,17 +14,16 @@ class Home extends React.Component {
     }
 
     componentDidMount = async () => {
-        await this.getData(this.props.selected)
+        await this.getData()
     }
 
-    componentWillReceiveProps = async props => {
-        if (this.state.selected && props.selected !== this.state.selected)
-            await this.getData(props.selected)
+    componentDidUpdate = async () => {
+        if (this.props.selected !== this.state.selected) await this.getData()
     }
 
     getData = async selected => {
         this.setState({
-            data: await getEntities(selected),
+            data: await getEntities(this.props.selected),
             selected: selected,
         })
     }

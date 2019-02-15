@@ -10,16 +10,20 @@ import { EventTable } from '../EventTable'
 export class Events extends React.Component {
     state = {
         data: null,
+        selected: null,
+        approvalStatus: null,
     }
 
     componentDidMount = async () => {
         await this.getData()
     }
 
-    componentWillReceiveProps = async props => {
-        //if ((this.state.selected && props.selected !== this.state.selected) ||
-        //    props.match.params.approvalStatus !== this.state.approvalStatus)
-        await this.getData()
+    componentDidUpdate = async () => {
+        if (
+            this.props.selected !== this.state.selected ||
+            this.props.match.params.approvalStatus !== this.state.approvalStatus
+        )
+            await this.getData()
     }
 
     getData = async () => {

@@ -37,11 +37,11 @@ class SidebarMenu extends Component {
         await this.updateCounts()
     }
 
-    componentWillReceiveProps = async props => {
+    componentDidUpdate = async () => {
         await this.updateCounts()
     }
 
-    updateCounts = async () => {
+    updateCounts = async selected => {
         let menuItems = [...this.state.menuItems]
         let counts = await getEventCounts(this.props.selected.id, [
             'Resend',
