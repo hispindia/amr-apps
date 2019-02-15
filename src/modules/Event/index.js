@@ -9,6 +9,7 @@ import {
     getOrganisms,
     updateEvent,
     getTestFields,
+    addEvent,
 } from '../../api/api'
 import {
     TextInput,
@@ -28,7 +29,6 @@ const config = require('../../config/config.json')
 export class Event extends Component {
     state = {
         programStage: null,
-        backClicked: false,
         values: {},
     }
 
@@ -53,9 +53,6 @@ export class Event extends Component {
                 ? await getTestFields(values[organismDataElementId])
                 : {},
         })
-        //console.log(values)
-        //console.log(programStage)
-        //console.log(organismDataElementId)
     }
 
     onChange = async (name, value) => {
@@ -100,7 +97,7 @@ export class Event extends Component {
                   {
                       label: 'Submit',
                       onClick: this.onSubmitClick,
-                      disabled: false, //!this.validate() || this.state.unchanged,
+                      disabled: this.props.match.params.event, //!this.validate() || this.state.unchanged,
                       icon: 'done',
                       kind: 'primary',
                   },
@@ -127,10 +124,16 @@ export class Event extends Component {
      * On submit button click.
      */
     onSubmitClick = async () => {
-        await updateEvent(
+        /*await updateEvent(
             this.state.values,
             this.state.testFields,
             this.props.match.params.event
+        )*/
+
+        await addEvent(
+            this.state.values,
+            this.state.testFields,
+            this.props.match.params.entity
         )
     }
 

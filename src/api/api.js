@@ -32,6 +32,7 @@ const organismDataElementId = 'SaQe2REkGVw'
 
 const stateAttributeId = 'jfydZttH7ls'
 const districtAttributeId = 'OkKucSXfbQ2'
+const sampleDateElementId = 'TajY6FbPSRs'
 
 /**
  * Gets entity label.
@@ -808,13 +809,13 @@ export async function generateAmrId(orgUnitId) {
 }
 
 /**
- * Updates event with new values.
+ * Adds values to event.
+ * @param {Object} event - Event.
  * @param {Object} values - New values.
  * @param {Object} testFields - Test fields meta data.
+ * @returns {Object} Event.
  */
-export async function updateEvent(values, testFields, eventId) {
-    let data = await get('events/' + eventId + '.json')
-
+async function setEventValues(event, values, testFields) {
     // Setting result values.
     Object.keys(testFields)
         .filter(testFieldId => testFields[testFieldId].name.endsWith('_Result'))
@@ -857,19 +858,57 @@ export async function updateEvent(values, testFields, eventId) {
             }
         })
 
+    if (!values[amrDataElement])
+        values[amrDataElement] = await generateAmrId(event.orgUnit)
+
     for (let dataElement in values) {
-        const dataE = data.dataValues.find(
+        const dataE = event.dataValues.find(
             dataValue => dataValue.dataElement === dataElement
         )
         !dataE
-            ? data.dataValues.push({
+            ? event.dataValues.push({
                   dataElement: dataElement,
                   value: values[dataElement],
               })
             : (dataE.value = values[dataElement])
     }
 
-    await put('events/' + eventId, data)
+    return event
+}
+
+export async function addEvent(values, testFields, entityId) {
+    const { orgUnit, enrollment } = (await get(
+        'trackedEntityInstances/' +
+            entityId +
+            '.json?fields=enrollments[orgUnit,enrollment]'
+    )).enrollments[0]
+
+    let event = await setEventValues(
+        {
+            dataValues: [],
+            enrollment: enrollment,
+            eventDate: values[sampleDateElementId],
+            orgUnit: orgUnit,
+            program: amrProgramId,
+            programStage: programStageId,
+            trackedEntityInstance: entityId,
+        },
+        values,
+        testFields
+    )
+
+    await postData('events', event)
+}
+
+/**
+ * Updates event with new values.
+ * @param {Object} values - New values.
+ * @param {Object} testFields - Test fields meta data.
+ */
+export async function updateEvent(values, testFields, eventId) {
+    let event = await get('events/' + eventId + '.json')
+    event = setEventValues(event, values, testFields)
+    await put('events/' + eventId, event)
 }
 
 export async function getTestFields(organismId) {

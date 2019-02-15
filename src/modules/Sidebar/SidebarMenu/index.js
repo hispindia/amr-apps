@@ -31,6 +31,7 @@ class SidebarMenu extends Component {
                 icon: 'check_circle_outline',
             },
         ],
+        selected: null,
     }
 
     componentDidMount = async () => {
@@ -38,10 +39,11 @@ class SidebarMenu extends Component {
     }
 
     componentDidUpdate = async () => {
-        await this.updateCounts()
+        if (this.props.selected !== this.state.selected)
+            await this.updateCounts()
     }
 
-    updateCounts = async selected => {
+    updateCounts = async () => {
         let menuItems = [...this.state.menuItems]
         let counts = await getEventCounts(this.props.selected.id, [
             'Resend',
@@ -56,7 +58,7 @@ class SidebarMenu extends Component {
                     (menuItem.label = menuItem.label.replace(/\d/, counts[i]))
             )
 
-        this.setState({ menuItems: menuItems })
+        this.setState({ menuItems: menuItems, selected: this.props.selected })
     }
 
     onClick = path => {

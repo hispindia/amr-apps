@@ -21,10 +21,10 @@ class Home extends React.Component {
         if (this.props.selected !== this.state.selected) await this.getData()
     }
 
-    getData = async selected => {
+    getData = async () => {
         this.setState({
             data: await getEntities(this.props.selected),
-            selected: selected,
+            selected: this.props.selected,
         })
     }
 
