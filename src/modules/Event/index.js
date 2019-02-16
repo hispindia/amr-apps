@@ -38,7 +38,6 @@ export class Event extends Component {
             values,
             organismDataElementId,
         } = await getProgramStage(
-            this.props.match.params.orgUnit,
             this.props.match.params.event
                 ? this.props.match.params.event
                 : undefined
