@@ -1,6 +1,7 @@
 import React from 'react'
 import { Radio } from '@dhis2/ui/core'
 import { RowW, Label } from '../../helpers/helpers'
+import './style.css'
 
 /**
  * Input consisting of a group of radios.
@@ -42,6 +43,15 @@ export class RadioInput extends React.Component {
                                 checked={this.state.value === object.value}
                                 onChange={this.onChange}
                                 disabled={this.props.disabled}
+                                status={
+                                    object.value === 'Approved'
+                                        ? 'valid'
+                                        : object.value === 'Resend'
+                                        ? 'warning'
+                                        : object.value === 'Rejected'
+                                        ? 'error'
+                                        : 'default'
+                                }
                             />
                         </div>
                     ))}

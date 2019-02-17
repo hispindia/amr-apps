@@ -34,21 +34,6 @@ body {
     min-width: 300px;
 }
 
-.red .ui_inputfield_flatline_kvrmz {
-    background-color: rgba(255, 0, 0, 0.082) !important;
-    z-index: 0;
-}
-
-.orange .ui_inputfield_flatline_kvrmz {
-    background-color: rgba(255, 145, 0, 0.082) !important;
-    z-index: 0;
-}
-
-.green .ui_inputfield_flatline_kvrmz {
-    background-color: rgba(0, 255, 0, 0.082) !important;
-    z-index: 0;
-}
-
 .table h6 {
     margin-left: 8px !important;
 }

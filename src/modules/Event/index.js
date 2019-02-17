@@ -37,6 +37,7 @@ export class Event extends Component {
             programStage,
             values,
             organismDataElementId,
+            isResend,
         } = await getProgramStage(
             this.props.match.params.event
                 ? this.props.match.params.event
@@ -48,6 +49,7 @@ export class Event extends Component {
             organisms: await getOrganisms(),
             values: values,
             organismDataElementId: organismDataElementId,
+            isResend: isResend,
             testFields: values[organismDataElementId]
                 ? await getTestFields(values[organismDataElementId])
                 : {},
@@ -150,7 +152,8 @@ export class Event extends Component {
             ? await updateEvent(
                   this.state.values,
                   this.state.testFields,
-                  this.props.match.params.event
+                  this.props.match.params.event,
+                  this.state.isResend
               )
             : await addEvent(
                   this.state.values,

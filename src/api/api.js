@@ -399,9 +399,14 @@ export async function getEventValues(eventId) {
  * @param {string[]} approvalStatuses - Approval statuses.
  * @returns {Object} Counts of events.
  */
-export async function getEventCounts(orgUnit, approvalStatuses) {
+export async function getEventCounts(orgUnit) {
     let counts = []
-    for (const approvalStatus of approvalStatuses) {
+    for (const approvalStatus of [
+        'Resend',
+        'Rejected',
+        'Approved',
+        'Validate',
+    ]) {
         counts.push(
             (await get(
                 'events.json?paging=false&fields=event&program=' +
@@ -409,9 +414,22 @@ export async function getEventCounts(orgUnit, approvalStatuses) {
                     '&orgUnit=' +
                     orgUnit +
                     '&ouMode=DESCENDANTS' +
-                    '&filter=tAyVrNUTVHX:eq:' +
+                    '&filter=' +
+                    l1ApprovalStatus +
+                    ':eq:' +
                     approvalStatus
-            )).events.length
+            )).events.length +
+                (await get(
+                    'events.json?paging=false&fields=event&program=' +
+                        amrProgramId +
+                        '&orgUnit=' +
+                        orgUnit +
+                        '&ouMode=DESCENDANTS' +
+                        '&filter=' +
+                        l2ApprovalStatus +
+                        ':eq:' +
+                        approvalStatus
+                )).events.length
         )
     }
 
@@ -424,15 +442,21 @@ export async function getEventCounts(orgUnit, approvalStatuses) {
  * @returns {Object[]} All AMR events.
  */
 export async function getEvents(orgUnit, approvalStatus) {
-    const events = (await get(
-        'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program=' +
-            amrProgramId +
-            '&orgUnit=' +
-            orgUnit +
-            '&ouMode=DESCENDANTS' +
-            '&filter=tAyVrNUTVHX:eq:' +
-            approvalStatus
-    )).events
+    const eventSets = []
+    for (const level of [l1ApprovalStatus, l2ApprovalStatus])
+        eventSets.push(
+            (await get(
+                'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program=' +
+                    amrProgramId +
+                    '&orgUnit=' +
+                    orgUnit +
+                    '&ouMode=DESCENDANTS' +
+                    '&filter=' +
+                    level +
+                    ':eq:' +
+                    approvalStatus
+            )).events
+        )
 
     let data = {
         headers: [
@@ -482,17 +506,19 @@ export async function getEvents(orgUnit, approvalStatus) {
         return dataElement ? dataElement.value : ''
     }
 
-    events.forEach(event =>
-        data.rows.push([
-            getAmrId(event),
-            event.orgUnitName,
-            event.storedBy,
-            removeTime(event.created),
-            removeTime(event.lastUpdated),
-            event.orgUnit,
-            event.trackedEntityInstance,
-            event.event,
-        ])
+    eventSets.forEach(events =>
+        events.forEach(event =>
+            data.rows.push([
+                getAmrId(event),
+                event.orgUnitName,
+                event.storedBy,
+                removeTime(event.created),
+                removeTime(event.lastUpdated),
+                event.orgUnit,
+                event.trackedEntityInstance,
+                event.event,
+            ])
+        )
     )
 
     return data
@@ -638,7 +664,9 @@ export async function getProgramStage(eventId) {
         programStage: programStage,
         values: values,
         organismDataElementId: organismDataElementId,
-        //isEditable: isEditable,
+        isResend: [values[l1ApprovalStatus], values[l2ApprovalStatus]].includes(
+            'Resend'
+        ),
     }
 }
 
@@ -900,6 +928,11 @@ export async function addEvent(values, testFields, entityId) {
             '.json?fields=enrollments[orgUnit,enrollment]'
     )).enrollments[0]
 
+    values[l1ApprovalStatus] =
+        values[l1ApprovalStatus] === '' ? 'Validate' : values[l1ApprovalStatus]
+    values[l2ApprovalStatus] =
+        values[l2ApprovalStatus] === '' ? 'Validate' : values[l2ApprovalStatus]
+
     let event = await setEventValues(
         {
             dataValues: [],
@@ -922,8 +955,14 @@ export async function addEvent(values, testFields, entityId) {
  * @param {Object} values - New values.
  * @param {Object} testFields - Test fields meta data.
  */
-export async function updateEvent(values, testFields, eventId) {
+export async function updateEvent(values, testFields, eventId, isResend) {
     let event = await get('events/' + eventId + '.json')
+
+    if (isResend)
+        values[l1ApprovalStatus] === 'Resend'
+            ? (values[l1ApprovalStatus] = values[l1RevisionReason] = '')
+            : (values[l2ApprovalStatus] = values[l2RevisionReason] = '')
+
     event = await setEventValues(event, values, testFields)
     await put('events/' + eventId, event)
 }

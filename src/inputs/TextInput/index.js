@@ -2,6 +2,7 @@ import React from 'react'
 import InputField from '@dhis2/ui/core/InputField'
 import _ from 'lodash'
 import { isUnique } from '../../api/api'
+import './style.css'
 
 /**
  * Textfield input.

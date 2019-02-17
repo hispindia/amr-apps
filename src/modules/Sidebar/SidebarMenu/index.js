@@ -16,19 +16,24 @@ class SidebarMenu extends Component {
                 icon: 'people',
             },
             {
-                label: 'Records for Revision (0)',
+                label: 'Records for revision (0)',
                 value: '/events/Resend/',
-                icon: 'help_outline',
+                icon: 'error_outline',
             },
             {
-                label: 'Rejected Records (0)',
+                label: 'Rejected records (0)',
                 value: '/events/Rejected/',
                 icon: 'highlight_off',
             },
             {
-                label: 'Accepted Records (0)',
+                label: 'Accepted records (0)',
                 value: '/events/Approved/',
                 icon: 'check_circle_outline',
+            },
+            {
+                label: 'Records for validation (0)',
+                value: '/events/Approved/',
+                icon: 'help_outline',
             },
         ],
         selected: null,
@@ -52,11 +57,7 @@ class SidebarMenu extends Component {
      */
     updateCounts = async () => {
         let menuItems = [...this.state.menuItems]
-        let counts = await getEventCounts(this.props.selected.id, [
-            'Resend',
-            'Rejected',
-            'Approved',
-        ])
+        let counts = await getEventCounts(this.props.selected.id)
 
         // Updating count number in menu.
         menuItems
