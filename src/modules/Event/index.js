@@ -96,7 +96,7 @@ export class Event extends Component {
                   {
                       label: 'Submit',
                       onClick: this.onSubmitClick,
-                      disabled: this.props.match.params.event, //!this.validate() || this.state.unchanged,
+                      disabled: false, //!this.validate() || this.state.unchanged,
                       icon: 'done',
                       kind: 'primary',
                   },
@@ -123,17 +123,40 @@ export class Event extends Component {
      * On submit button click.
      */
     onSubmitClick = async () => {
-        /*await updateEvent(
-            this.state.values,
-            this.state.testFields,
-            this.props.match.params.event
-        )*/
-
-        await addEvent(
-            this.state.values,
-            this.state.testFields,
-            this.props.match.params.entity
+        const { programStage, values } = this.state
+        const sections = programStage.programStageSections.filter(
+            section => !['Name', 'Approval status'].includes(section.name)
         )
+
+        // Removing hidden values.
+        sections.forEach(section => {
+            const removeValues = dataElements => {
+                dataElements
+                    .filter(
+                        dataElement =>
+                            !this.shouldShow(dataElement) &&
+                            values[dataElement.id] !== ''
+                    )
+                    .forEach(dataElement => (values[dataElement.id] = ''))
+            }
+            removeValues(section.dataElements)
+            if (section.childSections)
+                section.childSections.forEach(childSection =>
+                    removeValues(childSection.dataElements)
+                )
+        })
+
+        this.props.match.params.event
+            ? await updateEvent(
+                  this.state.values,
+                  this.state.testFields,
+                  this.props.match.params.event
+              )
+            : await addEvent(
+                  this.state.values,
+                  this.state.testFields,
+                  this.props.match.params.entity
+              )
     }
 
     getSpecialDataElement = dataElement => {
@@ -181,7 +204,10 @@ export class Event extends Component {
                         dataElement => dataElement.valueType === 'TRUE_ONLY'
                     )
                     .forEach(dataElement => {
-                        objects[dataElement.id] = dataElement.displayFormName
+                        objects[dataElement.id] = {
+                            label: dataElement.displayFormName,
+                            disabled: dataElement.disabled,
+                        }
                         values[dataElement.id] = this.state.values[
                             dataElement.id
                         ]
@@ -209,26 +235,10 @@ export class Event extends Component {
                             )}
                     </div>
                 )
-            case 'Antibiotics / Antifungals (Taken for 3 days in last 1 month)':
-                return (
-                    <div key={childSection.name}>
-                        <div style={{ margin: '16px 16px -16px 16px' }}>
-                            <Label>
-                                Antibiotics / Antifungals (Taken for 3 days in
-                                last 1 month)
-                            </Label>
-                        </div>
-                        {childSection.dataElements
-                            .filter(dataElement => this.shouldShow(dataElement))
-                            .map(dataElement =>
-                                this.getDataElement(dataElement)
-                            )}
-                    </div>
-                )
             case 'Disk Diffusion':
             case 'MIC':
                 return (
-                    <Grid item xs key={childSection.name}>
+                    <div key={childSection.name}>
                         <div style={{ margin: '16px 16px -16px 16px' }}>
                             <Label>{childSection.name}</Label>
                         </div>
@@ -243,11 +253,11 @@ export class Event extends Component {
                             .map(dataElement =>
                                 this.getDataElement(dataElement)
                             )}
-                    </Grid>
+                    </div>
                 )
             default:
                 return (
-                    <Grid item xs key={childSection.name}>
+                    <div key={childSection.name}>
                         <div style={{ margin: '16px 16px -16px 16px' }}>
                             <Label>{childSection.name}</Label>
                         </div>
@@ -256,7 +266,7 @@ export class Event extends Component {
                             .map(dataElement =>
                                 this.getDataElement(dataElement)
                             )}
-                    </Grid>
+                    </div>
                 )
         }
     }
@@ -348,7 +358,7 @@ export class Event extends Component {
 
         if (!programStage) return null
 
-        let sections = programStage.programStageSections.filter(section =>
+        const sections = programStage.programStageSections.filter(section =>
             this.shouldShow(section)
         )
 
@@ -363,7 +373,7 @@ export class Event extends Component {
                     <Title>{'Record'}</Title>
                 </Row>
                 {sections.map(section => {
-                    let half = Math.ceil(
+                    const half = Math.ceil(
                         (section.dataElements.filter(dataElement =>
                             this.shouldShow(dataElement)
                         ).length +
@@ -372,9 +382,14 @@ export class Event extends Component {
                                 : 0)) /
                             2
                     )
-                    let dataElements = section.dataElements.filter(
+                    const dataElements = section.dataElements.filter(
                         dataElement => this.shouldShow(dataElement)
                     )
+                    let childSections = section.childSections
+                    if (section.childSections)
+                        childSections = section.childSections.filter(
+                            childSection => this.shouldShow(childSection)
+                        )
                     return (
                         <div key={section.id} style={{ marginBottom: 16 }}>
                             <Card>
@@ -435,19 +450,39 @@ export class Event extends Component {
                                         </Grid>
                                     ) : (
                                         <Grid container spacing={0}>
-                                            {section.childSections
-                                                ? section.childSections
-                                                      .filter(section =>
-                                                          this.shouldShow(
-                                                              section
+                                            <Grid item xs>
+                                                {childSections
+                                                    ? childSections
+                                                          .slice(
+                                                              0,
+                                                              Math.ceil(
+                                                                  childSections.length /
+                                                                      2
+                                                              )
                                                           )
-                                                      )
-                                                      .map(childSection =>
-                                                          this.getChildSection(
-                                                              childSection
+                                                          .map(childSection =>
+                                                              this.getChildSection(
+                                                                  childSection
+                                                              )
                                                           )
-                                                      )
-                                                : null}
+                                                    : null}
+                                            </Grid>
+                                            <Grid item xs>
+                                                {childSections
+                                                    ? childSections
+                                                          .slice(
+                                                              Math.ceil(
+                                                                  childSections.length /
+                                                                      2
+                                                              )
+                                                          )
+                                                          .map(childSection =>
+                                                              this.getChildSection(
+                                                                  childSection
+                                                              )
+                                                          )
+                                                    : null}
+                                            </Grid>
                                         </Grid>
                                     )}
                                 </div>

@@ -15,24 +15,5 @@
                 "Level 2 Approval status"
             ]
         }
-    },
-    "eventAttributes": [
-        "event",
-        "enrollment",
-        "created",
-        "lastUpdated",
-        "storedBy",
-        "completedBy",
-        "completedDate",
-        "eventDate",
-        "dueDate",
-        "orgUnit",
-        "orgUnitName",
-        "status",
-        "programStage",
-        "program",
-        "attributeOptionCombo",
-        "deleted",
-        "geometry"
-    ]
+    }
 }

@@ -384,8 +384,8 @@ export async function getOrganisms() {
  */
 export async function getEventValues(eventId) {
     const dataValues = (await get('events/' + eventId + '.json')).dataValues
-
     let values = {}
+
     dataValues.forEach(
         dataValue => (values[dataValue.dataElement] = dataValue.value)
     )
@@ -538,7 +538,7 @@ export async function getProgramStage(eventId) {
         userGroup => userGroup.id
     )
 
-    let isDisabled = element => {
+    const isDisabled = element => {
         switch (element.id) {
             case l1ApprovalStatus:
             case l1RejectionReason:
@@ -556,12 +556,26 @@ export async function getProgramStage(eventId) {
                     element.disabled = true
                 return
             default:
+                element.disabled =
+                    typeof eventId === 'undefined'
+                        ? false
+                        : userGroups.includes(l2ApprovalGroup) &&
+                          values[l2ApprovalStatus] === 'Approved'
+                        ? false
+                        : userGroups.includes(l1ApprovalGroup) &&
+                          values[l1ApprovalStatus] === 'Approved'
+                        ? false
+                        : values[l2ApprovalStatus] === 'Resend' ||
+                          values[l1ApprovalStatus] === 'Resend'
+                        ? false
+                        : true
                 return
         }
     }
 
     let values =
         typeof eventId === 'undefined' ? {} : await getEventValues(eventId)
+
     const { dataElementRules, sectionRules } = await getProgramRules()
 
     programStage.programStageSections.forEach(section => {
@@ -624,6 +638,7 @@ export async function getProgramStage(eventId) {
         programStage: programStage,
         values: values,
         organismDataElementId: organismDataElementId,
+        //isEditable: isEditable,
     }
 }
 
@@ -909,7 +924,7 @@ export async function addEvent(values, testFields, entityId) {
  */
 export async function updateEvent(values, testFields, eventId) {
     let event = await get('events/' + eventId + '.json')
-    event = setEventValues(event, values, testFields)
+    event = await setEventValues(event, values, testFields)
     await put('events/' + eventId, event)
 }
 

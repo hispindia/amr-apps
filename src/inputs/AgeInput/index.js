@@ -149,7 +149,7 @@ export class AgeInput extends React.Component {
                     {this.props.required ? '*' : null}
                 </Label>
                 <RowW>
-                    <div style={{ marginRight: 16, width: 100 }}>
+                    <div style={{ marginRight: 16, width: 70 }}>
                         <InputField
                             name={'years'}
                             label={'Years'}
@@ -160,7 +160,7 @@ export class AgeInput extends React.Component {
                             size="dense"
                         />
                     </div>
-                    <div style={{ marginRight: 16, width: 100 }}>
+                    <div style={{ marginRight: 16, width: 70 }}>
                         <InputField
                             name={'months'}
                             label={'Months'}
@@ -171,7 +171,7 @@ export class AgeInput extends React.Component {
                             size="dense"
                         />
                     </div>
-                    <div style={{ width: 100 }}>
+                    <div style={{ width: 70 }}>
                         <InputField
                             name={'days'}
                             label={'Days'}

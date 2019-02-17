@@ -39,10 +39,17 @@ class SidebarMenu extends Component {
     }
 
     componentDidUpdate = async () => {
-        if (this.props.selected !== this.state.selected)
+        // Updates counts, if URL has changed.
+        if (
+            this.props.selected !== this.state.selected ||
+            this.props.history.location.pathname !== this.state.pathname
+        )
             await this.updateCounts()
     }
 
+    /**
+     * Updates count number in menu.
+     */
     updateCounts = async () => {
         let menuItems = [...this.state.menuItems]
         let counts = await getEventCounts(this.props.selected.id, [
@@ -51,6 +58,7 @@ class SidebarMenu extends Component {
             'Approved',
         ])
 
+        // Updating count number in menu.
         menuItems
             .slice(1)
             .forEach(
@@ -58,7 +66,11 @@ class SidebarMenu extends Component {
                     (menuItem.label = menuItem.label.replace(/\d/, counts[i]))
             )
 
-        this.setState({ menuItems: menuItems, selected: this.props.selected })
+        this.setState({
+            menuItems: menuItems,
+            selected: this.props.selected,
+            pathname: this.props.history.location.pathname,
+        })
     }
 
     onClick = path => {

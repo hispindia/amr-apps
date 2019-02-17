@@ -44,10 +44,10 @@ export class CheckboxInput extends React.Component {
                                 <Checkbox
                                     name={id}
                                     value={id}
-                                    label={this.props.objects[id]}
+                                    label={this.props.objects[id].label}
                                     checked={this.state.values[id] === 'true'}
                                     onChange={this.onChange}
-                                    disabled={this.props.disabled}
+                                    disabled={this.props.objects[id].disabled}
                                 />
                             </div>
                         ))}
