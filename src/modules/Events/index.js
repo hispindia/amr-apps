@@ -1,11 +1,10 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import { getEvents } from '../../api/api'
 import { Row, Title } from '../../helpers/helpers'
 import { EventTable } from '../EventTable'
 
 /**
- * Overview of persons.
+ * Events with a particular approval status.
  */
 export class Events extends React.Component {
     state = {
