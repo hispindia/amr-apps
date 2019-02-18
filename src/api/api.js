@@ -3,43 +3,43 @@ import _ from 'lodash'
 import { get, postData, del, put } from './crud'
 import { removeTime } from '../helpers/date'
 
-const config = require('../config/config.json')
+const _config = require('../config/config.json')
 
-const l1ApprovalStatus = 'tAyVrNUTVHX'
-const l1RejectionReason = 'NLmLwjdSHMv'
-const l1RevisionReason = 'wCNQtIHJRON'
-const l2ApprovalStatus = 'sXDQT6Yaf77'
-const l2RejectionReason = 'pz8SoHBO6RL'
-const l2RevisionReason = 'fEnFVvEFKVc'
+const _l1ApprovalStatus = 'tAyVrNUTVHX'
+const _l1RejectionReason = 'NLmLwjdSHMv'
+const _l1RevisionReason = 'wCNQtIHJRON'
+const _l2ApprovalStatus = 'sXDQT6Yaf77'
+const _l2RejectionReason = 'pz8SoHBO6RL'
+const _l2RevisionReason = 'fEnFVvEFKVc'
 
-const amrProgramId = 'ecIoUziI2Gb'
-const personId = 'G5cty8Gzan7'
-const entityLabel = 'Person'
-const programStageId = 'dDxm1Z4oOUO'
-const organismProgramId = 'GjFZmYa8pOD'
-const organismElementId = 'iBc2wcKg2Ba'
-const amrDataElement = 'lIkk661BLpG'
+const _amrProgramId = 'ecIoUziI2Gb'
+const _personId = 'G5cty8Gzan7'
+const _entityLabel = 'Person'
+const _programStageId = 'dDxm1Z4oOUO'
+const _organismProgramId = 'GjFZmYa8pOD'
+const _organismElementId = 'iBc2wcKg2Ba'
+const _amrDataElement = 'lIkk661BLpG'
 
-//const dataEntryGroup = 'mYdK5QT4ndl'
-const l1ApprovalGroup = 'O7EtwlwnAYq'
-const l2ApprovalGroup = 'XigjUyZB8UE'
+const _deoGroup = 'mYdK5QT4ndl'
+const _l1ApprovalGroup = 'O7EtwlwnAYq'
+const _l2ApprovalGroup = 'XigjUyZB8UE'
 
-//const dataEntryUserGroup = 'mYdK5QT4ndl'
-//const l1UserGroup = 'O7EtwlwnAYq'
-//const l2UserGroup = 'XigjUyZB8UE'
+const _organismDataElementId = 'SaQe2REkGVw'
 
-const organismDataElementId = 'SaQe2REkGVw'
+const _stateAttributeId = 'jfydZttH7ls'
+const _districtAttributeId = 'OkKucSXfbQ2'
+const _sampleDateElementId = 'TajY6FbPSRs'
 
-const stateAttributeId = 'jfydZttH7ls'
-const districtAttributeId = 'OkKucSXfbQ2'
-const sampleDateElementId = 'TajY6FbPSRs'
+let _isDeoUser
+let _isL1User
+let _isL2User
 
 /**
  * Gets entity label.
  * @returns {string} Entity Label.
  */
 export function getEntityLabel() {
-    return entityLabel
+    return _entityLabel
 }
 
 /**
@@ -47,7 +47,7 @@ export function getEntityLabel() {
  * @returns {string} State attribute ID.
  */
 export function getStateAttributeId() {
-    return stateAttributeId
+    return _stateAttributeId
 }
 
 /**
@@ -55,7 +55,27 @@ export function getStateAttributeId() {
  * @returns {string} district attribute ID.
  */
 export function getDistrictAttributeId() {
-    return districtAttributeId
+    return _districtAttributeId
+}
+
+export function getUserAccess() {
+    return {
+        isDeoUser: _isDeoUser,
+        isL1User: _isL1User,
+        isL2User: _isL2User,
+    }
+}
+
+/**
+ * Sets user access.
+ */
+export async function setUserAccess() {
+    const userGroups = (await get('me.json?fields=userGroups')).userGroups.map(
+        userGroup => userGroup.id
+    )
+    _isDeoUser = userGroups.includes(_deoGroup)
+    _isL1User = userGroups.includes(_l1ApprovalGroup)
+    _isL2User = userGroups.includes(_l2ApprovalGroup)
 }
 
 /**
@@ -65,7 +85,7 @@ export function getDistrictAttributeId() {
 export async function getProgramAttributes(entityId) {
     const programAttributes = (await get(
         'programs/' +
-            amrProgramId +
+            _amrProgramId +
             '/programTrackedEntityAttributes.json?fields=mandatory,sortOrder,trackedEntityAttribute[code,displayName,valueType,id,unique,name,optionSetValue,optionSet[options[code,name,id,displayName]]]'
     )).programTrackedEntityAttributes
 
@@ -91,8 +111,8 @@ export async function getProgramAttributes(entityId) {
     })
 
     let districts = []
-    if (values[stateAttributeId])
-        districts = await getDistricts(values[stateAttributeId])
+    if (values[_stateAttributeId])
+        districts = await getDistricts(values[_stateAttributeId])
 
     return {
         programAttributes: programAttributes,
@@ -187,7 +207,7 @@ export async function getPersonsEvents(entityId) {
     // Returns the events AMR Id.
     const getAmrId = event => {
         const dataElement = event.dataValues.find(
-            dataValue => dataValue.dataElement === amrDataElement
+            dataValue => dataValue.dataElement === _amrDataElement
         )
         return dataElement ? dataElement.value : ''
     }
@@ -218,13 +238,13 @@ export async function getPersonsEvents(entityId) {
 export async function addPerson(values, orgUnit) {
     const now = moment().format('YYYY-MM-DD')
     let data = {
-        trackedEntityType: personId,
+        trackedEntityType: _personId,
         orgUnit: orgUnit,
         attributes: [],
         enrollments: [
             {
                 orgUnit: orgUnit,
-                program: amrProgramId,
+                program: _amrProgramId,
                 enrollmentDate: now,
                 incidentDate: now,
             },
@@ -270,11 +290,11 @@ export async function getEntities(orgUnit) {
         'trackedEntityInstances.json?ou=' +
             orgUnit +
             '&ouMode=DESCENDANTS&order=created:desc&paging=false&fields=orgUnit,trackedEntityInstance,created,lastUpdated,attributes[displayName,valueType,attribute,value],enrollments[orgUnitName]&program=' +
-            amrProgramId
+            _amrProgramId
     )).trackedEntityInstances
     const metaData = (await get(
         'programs/' +
-            amrProgramId +
+            _amrProgramId +
             '.json?fields=programTrackedEntityAttributes[trackedEntityAttribute[displayName,valueType,id]]'
     )).programTrackedEntityAttributes
 
@@ -294,7 +314,7 @@ export async function getEntities(orgUnit) {
             },
         ],
         rows: [],
-        title: entityLabel + 's',
+        title: _entityLabel + 's',
     }
 
     // Gets the value of the attribute.
@@ -352,12 +372,12 @@ export async function getEntities(orgUnit) {
 export async function getOrganisms() {
     const data = (await get(
         'trackedEntityInstances.json?ouMode=ALL&order=created:desc&paging=false&fields=trackedEntityInstance,attributes[displayName,attribute,value]&program=' +
-            organismProgramId
+            _organismProgramId
     )).trackedEntityInstances
 
     const getValue = data => {
         const attribute = data.attributes.find(
-            attribute => attribute.attribute === organismElementId
+            attribute => attribute.attribute === _organismElementId
         )
         return attribute ? attribute.value : ''
     }
@@ -400,38 +420,50 @@ export async function getEventValues(eventId) {
  * @returns {Object} Counts of events.
  */
 export async function getEventCounts(orgUnit) {
-    let counts = []
-    for (const approvalStatus of [
-        'Resend',
-        'Rejected',
-        'Approved',
-        'Validate',
-    ]) {
-        counts.push(
-            (await get(
-                'events.json?paging=false&fields=event&program=' +
-                    amrProgramId +
-                    '&orgUnit=' +
-                    orgUnit +
-                    '&ouMode=DESCENDANTS' +
-                    '&filter=' +
-                    l1ApprovalStatus +
-                    ':eq:' +
-                    approvalStatus
-            )).events.length +
-                (await get(
-                    'events.json?paging=false&fields=event&program=' +
-                        amrProgramId +
-                        '&orgUnit=' +
-                        orgUnit +
-                        '&ouMode=DESCENDANTS' +
-                        '&filter=' +
-                        l2ApprovalStatus +
-                        ':eq:' +
-                        approvalStatus
-                )).events.length
-        )
+    let counts = {}
+    for (const approvalStatus of ['Resend', 'Rejected', 'Validate']) {
+        let events = (await get(
+            'events.json?paging=false&fields=event&program=' +
+                _amrProgramId +
+                '&orgUnit=' +
+                orgUnit +
+                '&ouMode=DESCENDANTS' +
+                '&filter=' +
+                _l1ApprovalStatus +
+                ':eq:' +
+                approvalStatus
+        )).events
+        const events2 = (await get(
+            'events.json?paging=false&fields=event&program=' +
+                _amrProgramId +
+                '&orgUnit=' +
+                orgUnit +
+                '&ouMode=DESCENDANTS' +
+                '&filter=' +
+                _l2ApprovalStatus +
+                ':eq:' +
+                approvalStatus
+        )).events
+        // In order to avoid duplicates.
+        events2.forEach(event => {
+            if (events.indexOf(event) == -1) events.push(event)
+        })
+        counts[approvalStatus] = events.length
     }
+
+    // Only looking for events where approved at both levels.
+    counts['Approved'] = (await get(
+        'events.json?paging=false&fields=event&program=' +
+            _amrProgramId +
+            '&orgUnit=' +
+            orgUnit +
+            '&ouMode=DESCENDANTS' +
+            '&filter=' +
+            _l1ApprovalStatus +
+            ':eq:Approved,' +
+            _l2ApprovalStatus +
+            ':eq:Approved'
+    )).events.length
 
     return counts
 }
@@ -442,21 +474,52 @@ export async function getEventCounts(orgUnit) {
  * @returns {Object[]} All AMR events.
  */
 export async function getEvents(orgUnit, approvalStatus) {
-    const eventSets = []
-    for (const level of [l1ApprovalStatus, l2ApprovalStatus])
-        eventSets.push(
-            (await get(
+    // If looking for approved events, both levels needs to be approved.
+    // Otherwise, just one of the levels needs to be approved.
+    let events = []
+    switch (approvalStatus) {
+        case 'Approved':
+            events = (await get(
                 'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program=' +
-                    amrProgramId +
+                    _amrProgramId +
                     '&orgUnit=' +
                     orgUnit +
                     '&ouMode=DESCENDANTS' +
                     '&filter=' +
-                    level +
+                    _l1ApprovalStatus +
+                    ':eq:Approved,' +
+                    _l2ApprovalStatus +
+                    ':eq:Approved'
+            )).events
+        default:
+            events = (await get(
+                'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program=' +
+                    _amrProgramId +
+                    '&orgUnit=' +
+                    orgUnit +
+                    '&ouMode=DESCENDANTS' +
+                    '&filter=' +
+                    _l1ApprovalStatus +
                     ':eq:' +
                     approvalStatus
             )).events
-        )
+            const events2 = (await get(
+                'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program=' +
+                    _amrProgramId +
+                    '&orgUnit=' +
+                    orgUnit +
+                    '&ouMode=DESCENDANTS' +
+                    '&filter=' +
+                    _l2ApprovalStatus +
+                    ':eq:' +
+                    approvalStatus
+            )).events
+            // In order to avoid duplicates.
+            events2.forEach(event2 => {
+                if (!events.find(event => event.event === event2.event))
+                    events.push(event2)
+            })
+    }
 
     let data = {
         headers: [
@@ -501,24 +564,22 @@ export async function getEvents(orgUnit, approvalStatus) {
 
     const getAmrId = event => {
         const dataElement = event.dataValues.find(
-            dataValue => dataValue.dataElement === amrDataElement
+            dataValue => dataValue.dataElement === _amrDataElement
         )
         return dataElement ? dataElement.value : ''
     }
 
-    eventSets.forEach(events =>
-        events.forEach(event =>
-            data.rows.push([
-                getAmrId(event),
-                event.orgUnitName,
-                event.storedBy,
-                removeTime(event.created),
-                removeTime(event.lastUpdated),
-                event.orgUnit,
-                event.trackedEntityInstance,
-                event.event,
-            ])
-        )
+    events.forEach(event =>
+        data.rows.push([
+            getAmrId(event),
+            event.orgUnitName,
+            event.storedBy,
+            removeTime(event.created),
+            removeTime(event.lastUpdated),
+            event.orgUnit,
+            event.trackedEntityInstance,
+            event.event,
+        ])
     )
 
     return data
@@ -556,43 +617,34 @@ export async function getDistricts(state) {
 export async function getProgramStage(eventId) {
     let programStage = await get(
         'programStages/' +
-            programStageId +
+            _programStageId +
             '.json?fields=displayName,programStageDataElements[dataElement[id],compulsory,sortOrder],programStageSections[id,name,displayName,dataElements[id,displayFormName,code,valueType,optionSetValue,optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
-    )
-
-    const userGroups = (await get('me.json?fields=userGroups')).userGroups.map(
-        userGroup => userGroup.id
     )
 
     const isDisabled = element => {
         switch (element.id) {
-            case l1ApprovalStatus:
-            case l1RejectionReason:
-            case l1RevisionReason:
-                if (!userGroups.includes(l1ApprovalGroup))
+            case _l1ApprovalStatus:
+            case _l1RejectionReason:
+            case _l1RevisionReason:
+                if (!_isL1User || values[_l1ApprovalStatus] === 'Approved')
                     element.disabled = true
                 return
-            case l2ApprovalStatus:
-            case l2RejectionReason:
-            case l2RevisionReason:
-                if (
-                    !userGroups.includes(l2ApprovalGroup) ||
-                    l1ApprovalStatus === ''
-                )
+            case _l2ApprovalStatus:
+            case _l2RejectionReason:
+            case _l2RevisionReason:
+                if (!_isL2User || values[_l2ApprovalStatus] === 'Approved')
                     element.disabled = true
                 return
             default:
                 element.disabled =
                     typeof eventId === 'undefined'
                         ? false
-                        : userGroups.includes(l2ApprovalGroup) &&
-                          values[l2ApprovalStatus] === 'Approved'
+                        : _isL2User && values[_l2ApprovalStatus] !== 'Approved'
                         ? false
-                        : userGroups.includes(l1ApprovalGroup) &&
-                          values[l1ApprovalStatus] === 'Approved'
+                        : _isL1User && values[_l1ApprovalStatus] !== 'Approved'
                         ? false
-                        : values[l2ApprovalStatus] === 'Resend' ||
-                          values[l1ApprovalStatus] === 'Resend'
+                        : values[_l2ApprovalStatus] === 'Resend' ||
+                          values[_l1ApprovalStatus] === 'Resend'
                         ? false
                         : true
                 return
@@ -640,11 +692,11 @@ export async function getProgramStage(eventId) {
     programStage.programStageSections
         .filter(
             programStageSection =>
-                config.eventForm.specialSections[programStageSection.name]
+                _config.eventForm.specialSections[programStageSection.name]
         )
         .forEach(programStageSection => {
             let childSections = []
-            config.eventForm.specialSections[programStageSection.name].forEach(
+            _config.eventForm.specialSections[programStageSection.name].forEach(
                 sectionName => {
                     let index = programStage.programStageSections
                         .map(section => section.name)
@@ -663,10 +715,11 @@ export async function getProgramStage(eventId) {
     return {
         programStage: programStage,
         values: values,
-        organismDataElementId: organismDataElementId,
-        isResend: [values[l1ApprovalStatus], values[l2ApprovalStatus]].includes(
-            'Resend'
-        ),
+        organismDataElementId: _organismDataElementId,
+        isResend: [
+            values[_l1ApprovalStatus],
+            values[_l2ApprovalStatus],
+        ].includes('Resend'),
     }
 }
 
@@ -695,12 +748,12 @@ export async function getProgramRules() {
 
     const programRules = (await get(
         'programRules.json?paging=false&fields=condition,programRuleActions[programRuleActionType,dataElement[id,name],programStageSection[name,id]]&filter=program.id:eq:' +
-            amrProgramId
+            _amrProgramId
     )).programRules
 
     const programVariables = (await get(
         'programRuleVariables.json?paging=false&fields=name,dataElement[id,name]&filter=program.id:eq:' +
-            amrProgramId
+            _amrProgramId
     )).programRuleVariables
 
     let dataElementRules = {}
@@ -803,7 +856,7 @@ export async function getOrgUnits() {
 export async function addRecord(values, orgUnitId, date) {
     let dataValues = []
     for (let key in values) {
-        if (key === amrDataElement)
+        if (key === _amrDataElement)
             dataValues.push({
                 dataElement: key,
                 value: await generateAmrId(orgUnitId),
@@ -815,7 +868,7 @@ export async function addRecord(values, orgUnitId, date) {
             })
     }
     const data = {
-        program: amrProgramId,
+        program: _amrProgramId,
         orgUnit: orgUnitId,
         eventDate: date ? date : moment().format('YYYY-MM-DD'),
         dataValues: dataValues,
@@ -842,9 +895,9 @@ export async function generateAmrId(orgUnitId) {
     while (
         (await get(
             'events/query.json?programStage=' +
-                programStageId +
+                _programStageId +
                 '&filter=' +
-                amrDataElement +
+                _amrDataElement +
                 ':eq:' +
                 amrId
         )).height !== 0
@@ -903,8 +956,8 @@ async function setEventValues(event, values, testFields) {
             }
         })
 
-    if (!values[amrDataElement])
-        values[amrDataElement] = await generateAmrId(event.orgUnit)
+    if (!values[_amrDataElement])
+        values[_amrDataElement] = await generateAmrId(event.orgUnit)
 
     for (let dataElement in values) {
         const dataE = event.dataValues.find(
@@ -928,19 +981,23 @@ export async function addEvent(values, testFields, entityId) {
             '.json?fields=enrollments[orgUnit,enrollment]'
     )).enrollments[0]
 
-    values[l1ApprovalStatus] =
-        values[l1ApprovalStatus] === '' ? 'Validate' : values[l1ApprovalStatus]
-    values[l2ApprovalStatus] =
-        values[l2ApprovalStatus] === '' ? 'Validate' : values[l2ApprovalStatus]
+    values[_l1ApprovalStatus] =
+        values[_l1ApprovalStatus] === ''
+            ? 'Validate'
+            : values[_l1ApprovalStatus]
+    values[_l2ApprovalStatus] =
+        values[_l2ApprovalStatus] === ''
+            ? 'Validate'
+            : values[_l2ApprovalStatus]
 
     let event = await setEventValues(
         {
             dataValues: [],
             enrollment: enrollment,
-            eventDate: values[sampleDateElementId],
+            eventDate: values[_sampleDateElementId],
             orgUnit: orgUnit,
-            program: amrProgramId,
-            programStage: programStageId,
+            program: _amrProgramId,
+            programStage: _programStageId,
             trackedEntityInstance: entityId,
         },
         values,
@@ -959,9 +1016,9 @@ export async function updateEvent(values, testFields, eventId, isResend) {
     let event = await get('events/' + eventId + '.json')
 
     if (isResend)
-        values[l1ApprovalStatus] === 'Resend'
-            ? (values[l1ApprovalStatus] = values[l1RevisionReason] = '')
-            : (values[l2ApprovalStatus] = values[l2RevisionReason] = '')
+        values[_l1ApprovalStatus] === 'Resend'
+            ? (values[_l1ApprovalStatus] = values[_l1RevisionReason] = '')
+            : (values[_l2ApprovalStatus] = values[_l2RevisionReason] = '')
 
     event = await setEventValues(event, values, testFields)
     await put('events/' + eventId, event)

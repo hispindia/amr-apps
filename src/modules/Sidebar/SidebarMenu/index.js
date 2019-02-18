@@ -19,21 +19,25 @@ class SidebarMenu extends Component {
                 label: 'Records for revision (0)',
                 value: '/events/Resend/',
                 icon: 'error_outline',
+                status: 'Resend',
             },
             {
                 label: 'Rejected records (0)',
                 value: '/events/Rejected/',
                 icon: 'highlight_off',
+                status: 'Rejected',
             },
             {
                 label: 'Accepted records (0)',
                 value: '/events/Approved/',
                 icon: 'check_circle_outline',
+                status: 'Approved',
             },
             {
                 label: 'Records for validation (0)',
-                value: '/events/Approved/',
+                value: '/events/Validate/',
                 icon: 'help_outline',
+                status: 'Validate',
             },
         ],
         selected: null,
@@ -63,8 +67,11 @@ class SidebarMenu extends Component {
         menuItems
             .slice(1)
             .forEach(
-                (menuItem, i) =>
-                    (menuItem.label = menuItem.label.replace(/\d/, counts[i]))
+                menuItem =>
+                    (menuItem.label = menuItem.label.replace(
+                        /\d/,
+                        counts[menuItem.status]
+                    ))
             )
 
         this.setState({
