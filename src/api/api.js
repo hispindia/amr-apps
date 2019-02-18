@@ -445,8 +445,9 @@ export async function getEventCounts(orgUnit) {
                 approvalStatus
         )).events
         // In order to avoid duplicates.
-        events2.forEach(event => {
-            if (events.indexOf(event) == -1) events.push(event)
+        events2.forEach(event2 => {
+            if (!events.find(event => event.event === event2.event))
+                events.push(event2)
         })
         counts[approvalStatus] = events.length
     }
@@ -491,6 +492,7 @@ export async function getEvents(orgUnit, approvalStatus) {
                     _l2ApprovalStatus +
                     ':eq:Approved'
             )).events
+            break
         default:
             events = (await get(
                 'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program=' +
@@ -903,6 +905,7 @@ export async function generateAmrId(orgUnitId) {
         )).height !== 0
     )
         amrId = newCode()
+
     return amrId
 }
 
