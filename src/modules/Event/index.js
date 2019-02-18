@@ -30,6 +30,7 @@ export class Event extends Component {
     state = {
         programStage: null,
         values: {},
+        showModal: true,
     }
 
     componentDidMount = async () => {
