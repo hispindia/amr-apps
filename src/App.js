@@ -21,6 +21,12 @@ const theme = createMuiTheme({
     typography: {
         useNextVariants: true,
     },
+    overrides: {
+        MUIDataTableToolbar: {
+            titleRoot: { marginLeft: 16 },
+            titleText: { fontSize: '1.25rem !important' },
+        },
+    },
 })
 
 export class App extends Component {

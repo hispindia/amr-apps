@@ -6,16 +6,8 @@ body {
     letter-spacing: 0.0075em;
 }
 
-.arrow_back:hover {
-    color: var(--primary800);
-}
-
 .ui_card_base_l2vmf {
     height: auto !important;
-}
-
-.table h6 {
-    margin-left: 8px !important;
 }
 
 /* Setting valid radio to green, if not disabled. */

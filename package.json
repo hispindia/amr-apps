@@ -34,7 +34,7 @@
     "lodash": "^4.17.11",
     "material-ui-pickers": "^2.1.1",
     "moment": "^2.23.0",
-    "mui-datatables": "^2.0.0-beta-52",
+    "mui-datatables": "^2.0.0-beta-54",
     "raw-loader": "^1.0.0",
     "react": "^16",
     "react-dom": "^16",
