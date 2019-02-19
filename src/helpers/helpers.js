@@ -26,9 +26,10 @@ export const Text = styled.div`
 `
 
 export const Label = styled.div`
-    margin: 12px 0;
+    color: var(--grey700);
+    white-space: nowrap;
+    margin: 12px;
     line-height: 24px;
-    font-weight: 500;
 `
 
 export const Row = styled.div`

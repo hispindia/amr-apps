@@ -26,6 +26,12 @@ const theme = createMuiTheme({
             titleRoot: { marginLeft: 16 },
             titleText: { fontSize: '1.25rem !important' },
         },
+        MUIDataTableBodyRow: {
+            root: {
+                userSelect: 'none',
+                cursor: 'pointer',
+            },
+        },
     },
 })
 

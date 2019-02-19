@@ -1,10 +1,10 @@
 import React from 'react'
 import { Radio } from '@dhis2/ui/core'
 import styled from 'styled-components'
-import { RowW, Label, OptionSpacer } from '../../helpers/helpers'
+import { RowW, Label, OptionSpacer, Input } from '../../helpers/helpers'
 
 const RadioGroup = styled.div`
-    margin-left: 8px;
+    margin-left: 0px;
     margin-right: 8px;
     margin-top: -8px;
 `
@@ -33,7 +33,7 @@ export class RadioInput extends React.Component {
 
     render() {
         return (
-            <RadioGroup>
+            <Input>
                 <Label>
                     {this.props.label}
                     {this.props.required ? '*' : null}
@@ -62,7 +62,7 @@ export class RadioInput extends React.Component {
                         </OptionSpacer>
                     ))}
                 </RowW>
-            </RadioGroup>
+            </Input>
         )
     }
 }
