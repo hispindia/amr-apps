@@ -3,7 +3,18 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
-import { Heading, Row, Title, Label } from '../../helpers/helpers'
+import { Grid } from '@material-ui/core'
+import styled from 'styled-components'
+import {
+    Heading,
+    Row,
+    Title,
+    Label,
+    Margin,
+    Padding,
+    MarginSides,
+    MarginBottom,
+} from '../../helpers/helpers'
 import {
     getProgramStage,
     getOrganisms,
@@ -19,12 +30,15 @@ import {
     CheckboxInput,
     DateInput,
 } from '../../inputs'
-import { Grid } from '@material-ui/core'
 import { EntityButtons } from '../EntityButtons'
 import IconButton from '../../inputs/IconButton'
 
 // Used for inputs with special handling.
 const config = require('../../config/config.json')
+
+const ChildSectionLabel = styled.div`
+    margin: 16px 16px -16px;
+`
 
 export class Event extends Component {
     state = {
@@ -167,7 +181,7 @@ export class Event extends Component {
         switch (dataElement.code) {
             case 'organism':
                 return (
-                    <div key={dataElement.id} style={{ margin: 16 }}>
+                    <Margin key={dataElement.id}>
                         <SelectInput
                             objects={this.state.organisms}
                             name={dataElement.id}
@@ -177,11 +191,11 @@ export class Event extends Component {
                             required={dataElement.required}
                             disabled={dataElement.disabled}
                         />
-                    </div>
+                    </Margin>
                 )
             case 'AMR Id':
                 return (
-                    <div key={dataElement.id} style={{ margin: 16 }}>
+                    <Margin key={dataElement.id}>
                         <TextInput
                             name={dataElement.id}
                             label={dataElement.displayFormName}
@@ -190,7 +204,7 @@ export class Event extends Component {
                             onChange={this.onChange}
                             disabled={true}
                         />
-                    </div>
+                    </Margin>
                 )
             default:
                 return null
@@ -218,7 +232,7 @@ export class Event extends Component {
                     })
                 return (
                     <div key={childSection.name}>
-                        <div style={{ padding: 16 }}>
+                        <Padding>
                             <CheckboxInput
                                 objects={objects}
                                 name={childSection.name}
@@ -227,7 +241,7 @@ export class Event extends Component {
                                 onChange={this.onChange}
                                 required={true}
                             />
-                        </div>
+                        </Padding>
                         {childSection.dataElements
                             .filter(
                                 dataElement =>
@@ -243,9 +257,9 @@ export class Event extends Component {
             case 'MIC':
                 return (
                     <div key={childSection.name}>
-                        <div style={{ margin: '16px 16px -16px 16px' }}>
+                        <ChildSectionLabel>
                             <Label>{childSection.name}</Label>
-                        </div>
+                        </ChildSectionLabel>
                         {childSection.dataElements
                             .filter(dataElement => this.shouldShow(dataElement))
                             .filter(dataElement =>
@@ -262,9 +276,9 @@ export class Event extends Component {
             default:
                 return (
                     <div key={childSection.name}>
-                        <div style={{ margin: '16px 16px -16px 16px' }}>
+                        <ChildSectionLabel>
                             <Label>{childSection.name}</Label>
-                        </div>
+                        </ChildSectionLabel>
                         {childSection.dataElements
                             .filter(dataElement => this.shouldShow(dataElement))
                             .map(dataElement =>
@@ -277,7 +291,7 @@ export class Event extends Component {
 
     getDataElement = dataElement => {
         return (
-            <div key={dataElement.id} style={{ padding: 16 }}>
+            <Padding key={dataElement.id}>
                 {dataElement.optionSetValue ? (
                     dataElement.optionSet.options.length < 5 ? (
                         <RadioInput
@@ -335,7 +349,7 @@ export class Event extends Component {
                         }
                     />
                 )}
-            </div>
+            </Padding>
         )
     }
 
@@ -367,7 +381,7 @@ export class Event extends Component {
         )
 
         return (
-            <div style={{ margin: 16 }}>
+            <Margin>
                 <Row>
                     <IconButton
                         name="arrow_back"
@@ -395,17 +409,12 @@ export class Event extends Component {
                             childSection => this.shouldShow(childSection)
                         )
                     return (
-                        <div key={section.id} style={{ marginBottom: 16 }}>
+                        <MarginBottom key={section.id}>
                             <Card>
-                                <div style={{ margin: 16 }}>
-                                    <div
-                                        style={{
-                                            marginLeft: 8,
-                                            marginRight: 8,
-                                        }}
-                                    >
+                                <Margin>
+                                    <MarginSides>
                                         <Heading>{section.displayName}</Heading>
-                                    </div>
+                                    </MarginSides>
                                     {dataElements.length > 0 ? (
                                         <Grid container spacing={0}>
                                             <Grid item xs>
@@ -489,13 +498,13 @@ export class Event extends Component {
                                             </Grid>
                                         </Grid>
                                     )}
-                                </div>
+                                </Margin>
                             </Card>
-                        </div>
+                        </MarginBottom>
                     )
                 })}
                 <EntityButtons buttons={this.getButtonProps()} />
-            </div>
+            </Margin>
         )
     }
 }

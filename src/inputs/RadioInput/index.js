@@ -1,7 +1,13 @@
 import React from 'react'
 import { Radio } from '@dhis2/ui/core'
-import { RowW, Label } from '../../helpers/helpers'
-import './style.css'
+import styled from 'styled-components'
+import { RowW, Label, OptionSpacer } from '../../helpers/helpers'
+
+const RadioGroup = styled.div`
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-top: -8px;
+`
 
 /**
  * Input consisting of a group of radios.
@@ -27,14 +33,14 @@ export class RadioInput extends React.Component {
 
     render() {
         return (
-            <div style={{ marginLeft: 8, marginRight: 8, marginTop: -8 }}>
+            <RadioGroup>
                 <Label>
                     {this.props.label}
                     {this.props.required ? '*' : null}
                 </Label>
                 <RowW>
                     {this.props.objects.map(object => (
-                        <div key={object.value} style={{ marginRight: 40 }}>
+                        <OptionSpacer key={object.value}>
                             <Radio
                                 key={object.value}
                                 name={object.value}
@@ -53,10 +59,10 @@ export class RadioInput extends React.Component {
                                         : 'default'
                                 }
                             />
-                        </div>
+                        </OptionSpacer>
                     ))}
                 </RowW>
-            </div>
+            </RadioGroup>
         )
     }
 }

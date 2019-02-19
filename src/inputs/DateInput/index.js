@@ -3,6 +3,7 @@ import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
 import MomentUtils from '@date-io/moment'
 import * as moment from 'moment'
 import InputField from '@dhis2/ui/core/InputField'
+import { Input } from '../../helpers/helpers'
 
 /**
  * Date picker.
@@ -65,10 +66,9 @@ export class DateInput extends React.Component {
      */
     getField = () => {
         return (
-            <div
+            <Input
                 onClick={this.props.disabled ? null : this.openPicker}
                 onKeyPress={this.props.disabled ? null : this.onKeyPress}
-                className="input"
             >
                 <InputField
                     name={this.props.name}
@@ -86,7 +86,7 @@ export class DateInput extends React.Component {
                     size="dense"
                     required={this.props.required}
                 />
-            </div>
+            </Input>
         )
     }
 

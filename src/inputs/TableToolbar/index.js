@@ -3,28 +3,32 @@ import IconButton from '@material-ui/core/IconButton'
 import Tooltip from '@material-ui/core/Tooltip'
 import AddIcon from '@material-ui/icons/Add'
 import { withStyles } from '@material-ui/core/styles'
-import './style.css'
+import styled from 'styled-components'
 
 const defaultToolbarStyles = {
     iconButton: {},
 }
+
+const IconContainer = styled(IconButton)`
+    color: white !important;
+    background: linear-gradient(180deg, #1565c0, #0650a3);
+    border: 1px solid var(--primary800);
+    &:hover {
+        background: linear-gradient(180deg, #054fa3, #034793);
+    }
+`
 
 /**
  * Adds an extra add button to the table toolbar.
  */
 class TableToolbar extends React.Component {
     render() {
-        const { classes } = this.props
-
         return (
             <React.Fragment>
                 <Tooltip title={'Add'}>
-                    <IconButton
-                        onClick={this.props.onAddClick}
-                        className={'add_button'}
-                    >
-                        <AddIcon className={classes.deleteIcon} />
-                    </IconButton>
+                    <IconContainer onClick={this.props.onAddClick}>
+                        <AddIcon />
+                    </IconContainer>
                 </Tooltip>
             </React.Fragment>
         )

@@ -1,6 +1,6 @@
 import React from 'react'
 import { getEvents } from '../../api/api'
-import { Row, Title } from '../../helpers/helpers'
+import { Row, Title, Margin } from '../../helpers/helpers'
 import { EventTable } from '../EventTable'
 
 /**
@@ -46,7 +46,7 @@ export class Events extends React.Component {
         if (!this.state.data) return null
 
         return (
-            <div style={{ margin: 16 }}>
+            <Margin>
                 <Row>
                     <Title>{this.state.approvalStatus} records</Title>
                 </Row>
@@ -56,7 +56,7 @@ export class Events extends React.Component {
                         onEventClick={this.onEventClick}
                     />
                 </div>
-            </div>
+            </Margin>
         )
     }
 }

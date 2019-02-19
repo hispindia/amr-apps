@@ -3,7 +3,17 @@ import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
 import MomentUtils from '@date-io/moment'
 import * as moment from 'moment'
 import InputField from '@dhis2/ui/core/InputField'
-import { RowW, Label } from '../../helpers/helpers'
+import styled from 'styled-components'
+import { RowW, Label, Input } from '../../helpers/helpers'
+
+const TopSpacer = styled.div`
+    margin-top: 16px;
+`
+
+const UnitContainer = styled.div`
+    margin-right: 16px;
+    width: 70px;
+`
 
 /**
  * Age input consisting of date picker and year/month/date input fields.
@@ -117,10 +127,9 @@ export class AgeInput extends React.Component {
      */
     getField = () => {
         return (
-            <div
+            <TopSpacer
                 onClick={this.props.disabled ? null : this.openPicker}
                 onKeyPress={this.props.disabled ? null : this.onKeyPress}
-                style={{ marginTop: 16 }}
             >
                 <InputField
                     name={this.props.name}
@@ -137,19 +146,19 @@ export class AgeInput extends React.Component {
                     disabled={this.props.disabled}
                     size="dense"
                 />
-            </div>
+            </TopSpacer>
         )
     }
 
     render() {
         return (
-            <div className="input">
+            <Input>
                 <Label>
                     {this.props.label}
                     {this.props.required ? '*' : null}
                 </Label>
                 <RowW>
-                    <div style={{ marginRight: 16, width: 70 }}>
+                    <UnitContainer>
                         <InputField
                             name={'years'}
                             label={'Years'}
@@ -159,8 +168,8 @@ export class AgeInput extends React.Component {
                             disabled={this.props.disabled}
                             size="dense"
                         />
-                    </div>
-                    <div style={{ marginRight: 16, width: 70 }}>
+                    </UnitContainer>
+                    <UnitContainer>
                         <InputField
                             name={'months'}
                             label={'Months'}
@@ -170,8 +179,8 @@ export class AgeInput extends React.Component {
                             disabled={this.props.disabled}
                             size="dense"
                         />
-                    </div>
-                    <div style={{ width: 70 }}>
+                    </UnitContainer>
+                    <UnitContainer>
                         <InputField
                             name={'days'}
                             label={'Days'}
@@ -181,7 +190,7 @@ export class AgeInput extends React.Component {
                             disabled={this.props.disabled}
                             size="dense"
                         />
-                    </div>
+                    </UnitContainer>
                 </RowW>
                 <MuiPickersUtilsProvider utils={MomentUtils}>
                     <DatePicker
@@ -194,7 +203,7 @@ export class AgeInput extends React.Component {
                         }}
                     />
                 </MuiPickersUtilsProvider>
-            </div>
+            </Input>
         )
     }
 }

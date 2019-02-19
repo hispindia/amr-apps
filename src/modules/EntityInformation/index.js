@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Grid } from '@material-ui/core'
 import { Card } from '@dhis2/ui/core'
-import { Heading } from '../../helpers/helpers'
+import { Heading, Padding, Margin, MarginSides } from '../../helpers/helpers'
 import {
     getProgramAttributes,
     getDistricts,
@@ -159,10 +159,7 @@ class EntityInformation extends Component {
         const { values, districts, isNewPatient } = this.state
 
         return (
-            <div
-                key={attribute.trackedEntityAttribute.id}
-                style={{ padding: 16 }}
-            >
+            <Padding key={attribute.trackedEntityAttribute.id}>
                 {attribute.trackedEntityAttribute.valueType === 'AGE' ? (
                     <AgeInput
                         required={attribute.mandatory}
@@ -226,7 +223,7 @@ class EntityInformation extends Component {
                         disabled={!isNewPatient}
                     />
                 )}
-            </div>
+            </Padding>
         )
     }
 
@@ -237,15 +234,10 @@ class EntityInformation extends Component {
 
         return (
             <Card>
-                <div style={{ margin: 16 }}>
-                    <div
-                        style={{
-                            marginLeft: 8,
-                            marginRight: 8,
-                        }}
-                    >
+                <Margin>
+                    <MarginSides>
                         <Heading>Information</Heading>
-                    </div>
+                    </MarginSides>
                     <Grid container spacing={0}>
                         <Grid item xs>
                             {attributes
@@ -261,7 +253,7 @@ class EntityInformation extends Component {
                         </Grid>
                     </Grid>
                     <EntityButtons buttons={this.getButtonProps()} />
-                </div>
+                </Margin>
             </Card>
         )
     }

@@ -6,34 +6,62 @@ body {
     letter-spacing: 0.0075em;
 }
 
-.icon_button .ui_icon_base_1s8vb {
-    font-size: 2rem;
-    cursor: pointer;
-}
-
-.icon_button {
-    height: 32px;
-    margin-right: 16px;
-    margin-top: 23px;
-}
-
 .arrow_back:hover {
     color: var(--primary800);
-}
-
-.icon_button:hover {
-    background: rgba(0, 0, 0, 0.08);
-    border-radius: 50%;
 }
 
 .ui_card_base_l2vmf {
     height: auto !important;
 }
 
-.input {
-    min-width: 300px;
-}
-
 .table h6 {
     margin-left: 8px !important;
+}
+
+/* Setting valid radio to green, if not disabled. */
+.ui_radio_valid-icon_ixvar:not(.ui_radio_disabled_ixvar) {
+    color: var(--green600) !important;
+}
+
+/* Scrollbar for select dropdown */
+.ui_selectfield_menu_1a3v8 > .ui_card_base_l2vmf {
+    overflow: auto;
+    max-height: 300px;
+}
+
+/* Same width on dropdown as field */
+.ui_selectfield_menu_1a3v8 {
+    width: inherit !important;
+}
+
+.red .ui_inputfield_flatline_kvrmz {
+    background-color: rgba(255, 0, 0, 0.082) !important;
+}
+
+.orange .ui_inputfield_flatline_kvrmz {
+    background-color: rgba(255, 145, 0, 0.082) !important;
+}
+
+.green .ui_inputfield_flatline_kvrmz {
+    background-color: rgba(0, 255, 0, 0.082) !important;
+}
+
+#sidebar_menu .ui_menu_item_4jpdr:first-child :first-child {
+    color: var(--blue600);
+}
+
+#sidebar_menu .ui_menu_item_4jpdr:nth-child(2) :first-child {
+    color: var(--yellow600);
+}
+
+#sidebar_menu .ui_menu_item_4jpdr:nth-child(3) :first-child {
+    color: var(--red600);
+}
+
+#sidebar_menu .ui_menu_item_4jpdr:nth-child(4) :first-child {
+    color: var(--green600);
+}
+
+#sidebar_menu .ui_menu_item_4jpdr:nth-child(5) :first-child {
+    color: var(--teal600);
 }

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Route } from 'react-router-dom'
 import { OrgUnitTree } from './OrgUnitTree'
 import SidebarMenu from './SidebarMenu'
+import { Margin } from '../../helpers/helpers'
 
 /**
  * Sidebar with menu and possibly OU tree.
@@ -9,7 +10,7 @@ import SidebarMenu from './SidebarMenu'
 export class Sidebar extends Component {
     render() {
         return (
-            <div id="sidebar" style={{ margin: 16 }}>
+            <Margin>
                 <SidebarMenu selected={this.props.selected} />
                 <Route
                     exact
@@ -34,7 +35,7 @@ export class Sidebar extends Component {
                         />
                     )}
                 />
-            </div>
+            </Margin>
         )
     }
 }

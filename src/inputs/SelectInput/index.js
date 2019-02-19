@@ -1,6 +1,6 @@
 import React from 'react'
 import SelectField from '@dhis2/ui/core/SelectField'
-import './style.css'
+import { Input } from '../../helpers/helpers'
 
 /**
  * Single select field.
@@ -31,7 +31,7 @@ export class SelectInput extends React.Component {
 
     render() {
         return (
-            <div className="input">
+            <Input>
                 <SelectField
                     name={this.props.name}
                     kind="outlined"
@@ -43,7 +43,7 @@ export class SelectInput extends React.Component {
                     disabled={this.props.disabled}
                     size="dense"
                 />
-            </div>
+            </Input>
         )
     }
 }

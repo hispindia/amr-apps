@@ -1,7 +1,7 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { getEntityLabel, getPersonsEvents } from '../../api/api'
-import { Title, Row } from '../../helpers/helpers'
+import { Title, Row, Margin } from '../../helpers/helpers'
 import { EventTable } from '../'
 import IconButton from '../../inputs/IconButton'
 import EntityInformation from '../EntityInformation'
@@ -63,7 +63,7 @@ class Entity extends React.Component {
 
     render() {
         return (
-            <div style={{ margin: 16 }}>
+            <Margin>
                 <Row>
                     <IconButton
                         name="arrow_back"
@@ -91,7 +91,7 @@ class Entity extends React.Component {
                         />
                     </div>
                 ) : null}
-            </div>
+            </Margin>
         )
     }
 }

@@ -1,6 +1,7 @@
 import React from 'react'
 import { Checkbox } from '@dhis2/ui/core'
-import { RowW, Label } from '../../helpers/helpers'
+import styled from 'styled-components'
+import { RowW, Label, OptionSpacer } from '../../helpers/helpers'
 
 /**
  * Input consisting of a a group of checkboxes.
@@ -37,22 +38,20 @@ export class CheckboxInput extends React.Component {
                     {this.props.label}
                     {this.props.required ? '*' : null}
                 </Label>
-                <div className="checkboxes">
-                    <RowW>
-                        {Object.keys(this.props.objects).map(id => (
-                            <div key={id} style={{ marginRight: 40 }}>
-                                <Checkbox
-                                    name={id}
-                                    value={id}
-                                    label={this.props.objects[id].label}
-                                    checked={this.state.values[id] === 'true'}
-                                    onChange={this.onChange}
-                                    disabled={this.props.objects[id].disabled}
-                                />
-                            </div>
-                        ))}
-                    </RowW>
-                </div>
+                <RowW>
+                    {Object.keys(this.props.objects).map(id => (
+                        <OptionSpacer key={id}>
+                            <Checkbox
+                                name={id}
+                                value={id}
+                                label={this.props.objects[id].label}
+                                checked={this.state.values[id] === 'true'}
+                                onChange={this.onChange}
+                                disabled={this.props.objects[id].disabled}
+                            />
+                        </OptionSpacer>
+                    ))}
+                </RowW>
             </div>
         )
     }

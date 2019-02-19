@@ -1,7 +1,7 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { getEntities } from '../../api/api'
-import { Row, Title } from '../../helpers/helpers'
+import { Row, Title, Margin } from '../../helpers/helpers'
 import EntityTable from '../EntityTable'
 
 /**
@@ -36,7 +36,7 @@ class Home extends React.Component {
         if (!this.state.data) return null
 
         return (
-            <div style={{ margin: 16 }}>
+            <Margin>
                 <Row>
                     <Title>{this.state.data.title}</Title>
                 </Row>
@@ -47,7 +47,7 @@ class Home extends React.Component {
                         orgUnit={this.props.selected}
                     />
                 </div>
-            </div>
+            </Margin>
         )
     }
 }

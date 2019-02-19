@@ -2,6 +2,7 @@ import React from 'react'
 import { Card } from '@dhis2/ui/core'
 import MUIDataTable from 'mui-datatables'
 import TableToolbar from '../../inputs/TableToolbar'
+import { MarginTop } from '../../helpers/helpers'
 
 /**
  * Table containg the persons events (records).
@@ -9,7 +10,7 @@ import TableToolbar from '../../inputs/TableToolbar'
 export class EventTable extends React.Component {
     render() {
         return (
-            <div style={{ marginTop: 16 }}>
+            <MarginTop>
                 <Card>
                     <MUIDataTable
                         title={'Records'}
@@ -29,7 +30,7 @@ export class EventTable extends React.Component {
                         }}
                     />
                 </Card>
-            </div>
+            </MarginTop>
         )
     }
 }

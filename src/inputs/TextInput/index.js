@@ -2,7 +2,6 @@ import React from 'react'
 import InputField from '@dhis2/ui/core/InputField'
 import _ from 'lodash'
 import { isUnique } from '../../api/api'
-import './style.css'
 
 /**
  * Textfield input.
@@ -12,13 +11,6 @@ export class TextInput extends React.Component {
         value: '',
         errorText: '',
         validating: false,
-    }
-
-    style = {
-        position: 'absolute',
-        right: 0,
-        top: 20,
-        zIndex: 1,
     }
 
     constructor(props) {
