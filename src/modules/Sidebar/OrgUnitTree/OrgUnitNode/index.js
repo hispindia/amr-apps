@@ -1,60 +1,93 @@
 import React from 'react'
-import './style.css'
+import styled, { css } from 'styled-components'
 import { Row } from '../../../../helpers/helpers'
+
+const Caret = styled.span`
+    cursor: pointer;
+    user-select: none;
+    &::before {
+        content: '\\2023';
+        color: black;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    :hover::before {
+        color: var(--primary800);
+    }
+    ${props =>
+        props.opened &&
+        css`
+            &:before {
+                transform: rotate(90deg);
+            }
+        `}
+`
+
+const OrgUnitText = styled.span`
+    cursor: pointer;
+    user-select: none;
+    &:hover {
+        color: var(--primary800);
+    }
+    ${props =>
+        props.isSelected &&
+        css`
+            color: var(--primary800);
+        `}
+`
+
+const ChildTree = styled.ul`
+    list-style-type: none;
+    ${props =>
+        !props.opened &&
+        css`
+            display: none;
+        `}
+`
 
 /**
  * Organisation unit node.
  */
 export class OrgUnitNode extends React.Component {
-    state = {
-        opened: false,
-    }
+    state = { opened: false }
 
     onCarretClick = () => {
         this.setState({ opened: !this.state.opened })
     }
 
     render() {
+        const { selected, orgUnit, onSelect } = this.props
+        const opened = this.state.opened
+
         return (
-            <li key={this.props.orgUnit.id} className="">
+            <li key={orgUnit.id}>
                 <Row>
-                    {this.props.orgUnit.children.length > 0 ? (
-                        <span
-                            className={
-                                this.state.opened ? 'caret caret-down' : 'caret'
-                            }
-                            onClick={this.onCarretClick}
-                        />
-                    ) : (
-                        <span className="no-caret" />
-                    )}
-                    <span
-                        className={
-                            this.props.selected.id === this.props.orgUnit.id
-                                ? 'ou-text ou-selected'
-                                : 'ou-text'
-                        }
+                    {orgUnit.children.length > 0 ? (
+                        <Caret opened={opened} onClick={this.onCarretClick} />
+                    ) : null}
+                    <OrgUnitText
+                        isSelected={selected.id === orgUnit.id}
                         onClick={() =>
-                            this.props.onSelect({
-                                id: this.props.orgUnit.id,
-                                name: this.props.orgUnit.displayName,
+                            onSelect({
+                                id: orgUnit.id,
+                                name: orgUnit.displayName,
                             })
                         }
                     >
-                        {this.props.orgUnit.displayName}
-                    </span>
+                        {orgUnit.displayName}
+                    </OrgUnitText>
                 </Row>
-                {this.props.orgUnit.children.length > 0 ? (
-                    <ul className={this.state.opened ? '' : 'nested'}>
-                        {this.props.orgUnit.children.map(child => (
+                {orgUnit.children.length > 0 && opened ? (
+                    <ChildTree opened={this.state.opened}>
+                        {orgUnit.children.map(child => (
                             <OrgUnitNode
                                 orgUnit={child}
                                 key={child.id}
-                                onSelect={this.props.onSelect}
-                                selected={this.props.selected}
+                                onSelect={onSelect}
+                                selected={selected}
                             />
                         ))}
-                    </ul>
+                    </ChildTree>
                 ) : null}
             </li>
         )

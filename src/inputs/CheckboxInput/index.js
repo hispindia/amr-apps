@@ -1,6 +1,5 @@
 import React from 'react'
 import { Checkbox } from '@dhis2/ui/core'
-import styled from 'styled-components'
 import { RowW, Label, OptionSpacer } from '../../helpers/helpers'
 
 /**

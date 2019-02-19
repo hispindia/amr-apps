@@ -82,6 +82,14 @@ export const MarginBottom = styled.div`
     margin-bottom: 16px;
 `
 
+export const MarginSmall = styled.div`
+    margin: 8px;
+`
+
+export const MarginTopSmall = styled.div`
+    margin-top: 8px;
+`
+
 export const Padding = styled.div`
     padding: 16px;
 `

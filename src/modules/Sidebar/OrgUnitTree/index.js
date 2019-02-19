@@ -1,7 +1,14 @@
 import React from 'react'
 import { OrgUnitNode } from './OrgUnitNode'
-import './style.css'
 import { Card } from '@dhis2/ui/core'
+import styled from 'styled-components'
+import { MarginTopSmall, MarginSmall } from '../../../helpers/helpers'
+
+const OrgUnitTreeStyle = styled.ul`
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+`
 
 /**
  * Organisation unit tree.
@@ -9,10 +16,10 @@ import { Card } from '@dhis2/ui/core'
 export class OrgUnitTree extends React.Component {
     render() {
         return (
-            <div id="org_unit_tree_spacing">
+            <MarginTopSmall>
                 <Card>
-                    <div id="org_unit_tree_container">
-                        <ul id="org_unit_tree">
+                    <MarginSmall>
+                        <OrgUnitTreeStyle>
                             {this.props.orgUnits.map(orgUnit => (
                                 <OrgUnitNode
                                     orgUnit={orgUnit}
@@ -22,10 +29,10 @@ export class OrgUnitTree extends React.Component {
                                     selected={this.props.selected}
                                 />
                             ))}
-                        </ul>
-                    </div>
+                        </OrgUnitTreeStyle>
+                    </MarginSmall>
                 </Card>
-            </div>
+            </MarginTopSmall>
         )
     }
 }
