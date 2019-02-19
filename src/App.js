@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { BrowserRouter, HashRouter } from 'react-router-dom'
-import './App.css'
+import './css'
 //import logo from './logo.svg';
 import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
