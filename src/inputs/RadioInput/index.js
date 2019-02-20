@@ -1,13 +1,6 @@
 import React from 'react'
 import { Radio } from '@dhis2/ui/core'
-import styled from 'styled-components'
 import { RowW, Label, OptionSpacer, Input } from '../../helpers/helpers'
-
-const RadioGroup = styled.div`
-    margin-left: 0px;
-    margin-right: 8px;
-    margin-top: -8px;
-`
 
 /**
  * Input consisting of a group of radios.

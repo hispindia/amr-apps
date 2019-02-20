@@ -99,6 +99,7 @@ export class DateInput extends React.Component {
                         onChange={this.setDate}
                         showTodayButton
                         TextFieldComponent={this.getField}
+                        maxDate={moment()}
                         ref={node => {
                             this.picker = node
                         }}
