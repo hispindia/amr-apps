@@ -97,11 +97,11 @@ export class AgeInput extends React.Component {
                 years = v
                 break
             case 'months':
-                if (v < 0 || v > 13) return
+                if (v < 0 || v > 12) return
                 months = v
                 break
             case 'days':
-                if (v < 0 || v > 32) return
+                if (v < 0 || v > 31) return
                 days = v
                 break
             default:
