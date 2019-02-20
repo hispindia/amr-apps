@@ -12,10 +12,10 @@ const _l2ApprovalStatus = 'sXDQT6Yaf77'
 const _l2RejectionReason = 'pz8SoHBO6RL'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
-const _amrProgramId = 'ecIoUziI2Gb'
-const _personId = 'G5cty8Gzan7'
+const _amrProgramId = 'dzizG8i1cmP'
+const _personId = 'tOJvIFXsB5V'
 const _entityLabel = 'Person'
-const _programStageId = 'dDxm1Z4oOUO'
+const _programStageId = 'UW26ioWbKzv'
 const _organismProgramId = 'GjFZmYa8pOD'
 const _organismElementId = 'iBc2wcKg2Ba'
 const _amrDataElement = 'lIkk661BLpG'
@@ -26,8 +26,8 @@ const _l2ApprovalGroup = 'XigjUyZB8UE'
 
 const _organismDataElementId = 'SaQe2REkGVw'
 
-const _stateAttributeId = 'jfydZttH7ls'
-const _districtAttributeId = 'OkKucSXfbQ2'
+const _stateAttributeId = 'ZgUp0jFVxdY'
+const _districtAttributeId = 'SOVNMvY8TOf'
 const _sampleDateElementId = 'TajY6FbPSRs'
 
 let _isDeoUser
@@ -253,6 +253,8 @@ export async function addPerson(values, orgUnit) {
     for (let key in values)
         data.attributes.push({ attribute: key, value: values[key] })
 
+    console.log(values)
+    console.log(data)
     return (await (await postData('trackedEntityInstances/', data)).json())
         .response.importSummaries[0].reference
 }
@@ -285,18 +287,20 @@ export async function deletePerson(id) {
  * @param {string} orgUnit - Organisation unit ID.
  * @returns {Object} Entities in the form of headers and rows.
  */
-export async function getEntities(orgUnit) {
+export async function getPersons(orgUnit) {
     const values = (await get(
         'trackedEntityInstances.json?ou=' +
             orgUnit +
-            '&ouMode=DESCENDANTS&order=created:desc&paging=false&fields=orgUnit,trackedEntityInstance,created,lastUpdated,attributes[displayName,valueType,attribute,value],enrollments[orgUnitName]&program=' +
-            _amrProgramId
+            '&ouMode=DESCENDANTS&order=created:desc&paging=false&fields=orgUnit,trackedEntityInstance,created,lastUpdated,attributes[displayName,valueType,attribute,value],enrollments[orgUnitName]'
     )).trackedEntityInstances
     const metaData = (await get(
         'programs/' +
             _amrProgramId +
             '.json?fields=programTrackedEntityAttributes[trackedEntityAttribute[displayName,valueType,id]]'
     )).programTrackedEntityAttributes
+
+    console.log(values)
+    console.log(metaData)
 
     // Created and Updated are not displayed by default.
     let data = {
@@ -423,9 +427,7 @@ export async function getEventCounts(orgUnit) {
     let counts = {}
     for (const approvalStatus of ['Resend', 'Rejected', 'Validate']) {
         let events = (await get(
-            'events.json?paging=false&fields=event&program=' +
-                _amrProgramId +
-                '&orgUnit=' +
+            'events.json?paging=false&fields=event&orgUnit=' +
                 orgUnit +
                 '&ouMode=DESCENDANTS' +
                 '&filter=' +
@@ -434,9 +436,7 @@ export async function getEventCounts(orgUnit) {
                 approvalStatus
         )).events
         const events2 = (await get(
-            'events.json?paging=false&fields=event&program=' +
-                _amrProgramId +
-                '&orgUnit=' +
+            'events.json?paging=false&fields=event&orgUnit=' +
                 orgUnit +
                 '&ouMode=DESCENDANTS' +
                 '&filter=' +
@@ -454,9 +454,7 @@ export async function getEventCounts(orgUnit) {
 
     // Only looking for events where approved at both levels.
     counts['Approved'] = (await get(
-        'events.json?paging=false&fields=event&program=' +
-            _amrProgramId +
-            '&orgUnit=' +
+        'events.json?paging=false&fields=event&orgUnit=' +
             orgUnit +
             '&ouMode=DESCENDANTS' +
             '&filter=' +
@@ -594,14 +592,12 @@ export async function getEvents(orgUnit, approvalStatus) {
  */
 export async function getDistricts(state) {
     const data = await get(
-        'optionSets.json?paging=false&fields=options[name,displayName,id,code]&filter=code:eq:' +
+        'optionGroups.json?paging=false&fields=options[name,displayName,id,code]&filter=name:eq:' +
             state
     )
 
-    if (!data) return []
-
     let districts = []
-    data.optionSets[0].options.forEach(option =>
+    data.optionGroups[0].options.forEach(option =>
         districts.push({
             value: option.code,
             label: option.displayName,
