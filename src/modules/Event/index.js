@@ -17,7 +17,7 @@ import {
 } from '../../helpers/helpers'
 import {
     getProgramStage,
-    getOrganisms,
+    //getOrganisms,
     updateEvent,
     getTestFields,
     addEvent,
@@ -32,9 +32,6 @@ import {
 } from '../../inputs'
 import { EntityButtons } from '../EntityButtons'
 import IconButton from '../../inputs/IconButton'
-
-// Used for inputs with special handling.
-const config = require('../../config/config.json')
 
 const ChildSectionLabel = styled.div`
     margin: 16px 16px -16px;
@@ -61,7 +58,7 @@ export class Event extends Component {
 
         this.setState({
             programStage: programStage,
-            organisms: await getOrganisms(),
+            //organisms: await getOrganisms(),
             values: values,
             organismDataElementId: organismDataElementId,
             isResend: isResend,
@@ -177,40 +174,6 @@ export class Event extends Component {
               )
     }
 
-    getSpecialDataElement = dataElement => {
-        switch (dataElement.code) {
-            case 'organism':
-                return (
-                    <Margin key={dataElement.id}>
-                        <SelectInput
-                            objects={this.state.organisms}
-                            name={dataElement.id}
-                            label={dataElement.displayFormName}
-                            value={this.state.values[dataElement.id]}
-                            onChange={this.onChange}
-                            required={dataElement.required}
-                            disabled={dataElement.disabled}
-                        />
-                    </Margin>
-                )
-            case 'AMR Id':
-                return (
-                    <Margin key={dataElement.id}>
-                        <TextInput
-                            name={dataElement.id}
-                            label={dataElement.displayFormName}
-                            value={this.state.values[dataElement.id]}
-                            required={dataElement.required}
-                            onChange={this.onChange}
-                            disabled={true}
-                        />
-                    </Margin>
-                )
-            default:
-                return null
-        }
-    }
-
     getChildSection = childSection => {
         switch (childSection.name) {
             case 'Comorbidity':
@@ -239,7 +202,6 @@ export class Event extends Component {
                                 label={childSection.name}
                                 values={values}
                                 onChange={this.onChange}
-                                required={true}
                             />
                         </Padding>
                         {childSection.dataElements
@@ -421,30 +383,18 @@ export class Event extends Component {
                                                 {dataElements
                                                     .slice(0, half)
                                                     .map(dataElement =>
-                                                        config.eventForm.specialElements.includes(
-                                                            dataElement.code
+                                                        this.getDataElement(
+                                                            dataElement
                                                         )
-                                                            ? this.getSpecialDataElement(
-                                                                  dataElement
-                                                              )
-                                                            : this.getDataElement(
-                                                                  dataElement
-                                                              )
                                                     )}
                                             </Grid>
                                             <Grid item xs>
                                                 {dataElements
                                                     .slice(half)
                                                     .map(dataElement =>
-                                                        config.eventForm.specialElements.includes(
-                                                            dataElement.code
+                                                        this.getDataElement(
+                                                            dataElement
                                                         )
-                                                            ? this.getSpecialDataElement(
-                                                                  dataElement
-                                                              )
-                                                            : this.getDataElement(
-                                                                  dataElement
-                                                              )
                                                     )}
                                                 {section.childSections
                                                     ? section.childSections

@@ -13,11 +13,8 @@ const _l2RejectionReason = 'pz8SoHBO6RL'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
 const _amrProgramId = 'dzizG8i1cmP'
-const _personId = 'tOJvIFXsB5V'
-const _entityLabel = 'Person'
+const _personTypeId = 'tOJvIFXsB5V'
 const _programStageId = 'UW26ioWbKzv'
-const _organismProgramId = 'GjFZmYa8pOD'
-const _organismElementId = 'iBc2wcKg2Ba'
 const _amrDataElement = 'lIkk661BLpG'
 
 const _deoGroup = 'mYdK5QT4ndl'
@@ -34,13 +31,7 @@ let _isDeoUser
 let _isL1User
 let _isL2User
 
-/**
- * Gets entity label.
- * @returns {string} Entity Label.
- */
-export function getEntityLabel() {
-    return _entityLabel
-}
+let _orgUnitNames = {}
 
 /**
  * Gets state attribute ID.
@@ -69,7 +60,7 @@ export function getUserAccess() {
 /**
  * Sets user access.
  */
-export async function setUserAccess() {
+export async function initUserAccess() {
     const userGroups = (await get('me.json?fields=userGroups')).userGroups.map(
         userGroup => userGroup.id
     )
@@ -86,7 +77,9 @@ export async function getProgramAttributes(entityId) {
     const programAttributes = (await get(
         'programs/' +
             _amrProgramId +
-            '/programTrackedEntityAttributes.json?fields=mandatory,sortOrder,trackedEntityAttribute[code,displayName,valueType,id,unique,name,optionSetValue,optionSet[options[code,name,id,displayName]]]'
+            `/programTrackedEntityAttributes.json?fields=mandatory,sortOrder,
+            trackedEntityAttribute[code,displayName,valueType,id,unique,name,optionSetValue,
+                optionSet[options[code,name,id,displayName]]]`
     )).programTrackedEntityAttributes
 
     let values = entityId ? await getPersonValues(entityId) : {}
@@ -131,7 +124,8 @@ export async function getProgramAttributes(entityId) {
 export async function isUnique(property, value) {
     return (
         (await get(
-            'trackedEntityInstances.json?ouMode=ALL&fields=attributes[code,displayName,valueType,attribute,value]&filter=' +
+            `trackedEntityInstances.json?ouMode=ALL&fields=
+            attributes[code,displayName,valueType,attribute,value]&filter=` +
                 property +
                 ':eq:' +
                 value
@@ -170,7 +164,8 @@ export async function getPersonsEvents(entityId) {
     const enrollments = (await get(
         'trackedEntityInstances/' +
             entityId +
-            '.json?ouMode=ALL&fields=enrollments[events[event,lastUpdated,created,orgUnitName,storedBy,dataValues[dataElement,value]]]'
+            `.json?ouMode=ALL&fields=enrollments[events[event,lastUpdated,created,
+            orgUnitName,storedBy,dataValues[dataElement,value]]]`
     )).enrollments
 
     let data = {
@@ -238,7 +233,7 @@ export async function getPersonsEvents(entityId) {
 export async function addPerson(values, orgUnit) {
     const now = moment().format('YYYY-MM-DD')
     let data = {
-        trackedEntityType: _personId,
+        trackedEntityType: _personTypeId,
         orgUnit: orgUnit,
         attributes: [],
         enrollments: [
@@ -253,8 +248,6 @@ export async function addPerson(values, orgUnit) {
     for (let key in values)
         data.attributes.push({ attribute: key, value: values[key] })
 
-    console.log(values)
-    console.log(data)
     return (await (await postData('trackedEntityInstances/', data)).json())
         .response.importSummaries[0].reference
 }
@@ -271,7 +264,7 @@ export async function updatePerson(id, values) {
     data.attributes = []
     for (let key in values)
         data.attributes.push({ attribute: key, value: values[key] })
-    console.log(await put('trackedEntityInstances/' + id, data))
+    await put('trackedEntityInstances/' + id, data)
 }
 
 /**
@@ -291,16 +284,15 @@ export async function getPersons(orgUnit) {
     const values = (await get(
         'trackedEntityInstances.json?ou=' +
             orgUnit +
-            '&ouMode=DESCENDANTS&order=created:desc&paging=false&fields=orgUnit,trackedEntityInstance,created,lastUpdated,attributes[displayName,valueType,attribute,value],enrollments[orgUnitName]'
+            `&ouMode=DESCENDANTS&order=created:desc&paging=false&
+            fields=orgUnit,trackedEntityInstance,created,lastUpdated,
+            attributes[displayName,valueType,attribute,value],enrollments[orgUnitName]`
     )).trackedEntityInstances
     const metaData = (await get(
         'programs/' +
             _amrProgramId +
             '.json?fields=programTrackedEntityAttributes[trackedEntityAttribute[displayName,valueType,id]]'
     )).programTrackedEntityAttributes
-
-    console.log(values)
-    console.log(metaData)
 
     // Created and Updated are not displayed by default.
     let data = {
@@ -318,7 +310,7 @@ export async function getPersons(orgUnit) {
             },
         ],
         rows: [],
-        title: _entityLabel + 's',
+        title: 'Persons',
     }
 
     // Gets the value of the attribute.
@@ -355,7 +347,7 @@ export async function getPersons(orgUnit) {
         let entityValues = [
             removeTime(value.created),
             removeTime(value.lastUpdated),
-            value.enrollments[0].orgUnitName,
+            _orgUnitNames[value.orgUnit],
         ]
         data.headers
             .slice(3, data.headers.length - 2)
@@ -373,10 +365,11 @@ export async function getPersons(orgUnit) {
  * Gets all organisms.
  * @returns {Object[]} Organisms with ID and organisms name.
  */
-export async function getOrganisms() {
+/*export async function getOrganisms() {
     const data = (await get(
-        'trackedEntityInstances.json?ouMode=ALL&order=created:desc&paging=false&fields=trackedEntityInstance,attributes[displayName,attribute,value]&program=' +
-            _organismProgramId
+        `trackedEntityInstances.json?ouMode=ALL&order=created:desc&paging=false&
+        fields=trackedEntityInstance,attributes[displayName,attribute,value]&program=`
+        + _organismProgramId
     )).trackedEntityInstances
 
     const getValue = data => {
@@ -399,7 +392,7 @@ export async function getOrganisms() {
     )
 
     return organisms
-}
+}*/
 
 /**
  * Gets values for a single event.
@@ -479,7 +472,8 @@ export async function getEvents(orgUnit, approvalStatus) {
     switch (approvalStatus) {
         case 'Approved':
             events = (await get(
-                'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program=' +
+                `events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,
+                lastUpdated,created,storedBy,dataValues[dataElement,value]&program=` +
                     _amrProgramId +
                     '&orgUnit=' +
                     orgUnit +
@@ -493,7 +487,8 @@ export async function getEvents(orgUnit, approvalStatus) {
             break
         default:
             events = (await get(
-                'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program=' +
+                `events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,
+                lastUpdated,created,storedBy,dataValues[dataElement,value]&program=` +
                     _amrProgramId +
                     '&orgUnit=' +
                     orgUnit +
@@ -504,7 +499,8 @@ export async function getEvents(orgUnit, approvalStatus) {
                     approvalStatus
             )).events
             const events2 = (await get(
-                'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,lastUpdated,created,storedBy,dataValues[dataElement,value]&program=' +
+                `events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,
+                lastUpdated,created,storedBy,dataValues[dataElement,value]&program=` +
                     _amrProgramId +
                     '&orgUnit=' +
                     orgUnit +
@@ -616,7 +612,9 @@ export async function getProgramStage(eventId) {
     let programStage = await get(
         'programStages/' +
             _programStageId +
-            '.json?fields=displayName,programStageDataElements[dataElement[id],compulsory,sortOrder],programStageSections[id,name,displayName,dataElements[id,displayFormName,code,valueType,optionSetValue,optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
+            `.json?fields=displayName,programStageDataElements[dataElement[id],compulsory,sortOrder],
+            programStageSections[id,name,displayName,dataElements[id,displayFormName,code,valueType,optionSetValue,
+                optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]`
     )
 
     const isDisabled = element => {
@@ -633,6 +631,8 @@ export async function getProgramStage(eventId) {
                 if (!_isL2User || values[_l2ApprovalStatus] === 'Approved')
                     element.disabled = true
                 return
+            case _amrDataElement:
+                element.disabled = true
             default:
                 element.disabled =
                     typeof eventId === 'undefined'
@@ -745,8 +745,8 @@ export async function getProgramRules() {
     }
 
     const programRules = (await get(
-        'programRules.json?paging=false&fields=condition,programRuleActions[programRuleActionType,dataElement[id,name],programStageSection[name,id]]&filter=program.id:eq:' +
-            _amrProgramId
+        `programRules.json?paging=false&fields=condition,programRuleActions[programRuleActionType,dataElement[id,name],
+        programStageSection[name,id]]&filter=program.id:eq:` + _amrProgramId
     )).programRules
 
     const programVariables = (await get(
@@ -826,6 +826,7 @@ export async function getOrgUnits() {
 
     // Sorts the children of the OU by display name.
     const sortChildren = orgUnit => {
+        _orgUnitNames[orgUnit.id] = orgUnit.displayName
         if (orgUnit.children)
             if (orgUnit.children.length) {
                 orgUnit.children.forEach(child => sortChildren(child))

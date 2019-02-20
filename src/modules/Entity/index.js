@@ -70,7 +70,7 @@ class Entity extends React.Component {
                         icon="arrow_back"
                         onClick={this.backClicked}
                     />
-                    <Title>{getEntityLabel()}</Title>
+                    <Title>Person</Title>
                 </Row>
                 <EntityInformation
                     id={
