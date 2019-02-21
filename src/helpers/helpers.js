@@ -30,6 +30,7 @@ export const Label = styled.div`
     white-space: nowrap;
     margin: 12px;
     line-height: 24px;
+    font-weight: 500;
     ${props =>
         props.required &&
         !props.disabled &&

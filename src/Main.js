@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { Route, Switch } from 'react-router-dom'
-import { EventPanel, EventInformation, Events } from './modules'
+import { Events, Event } from './modules'
 import Home from './modules/Home'
 import Entity from './modules/Entity'
+import EventInformation from './modules/EventInformation'
 
 export class Main extends Component {
     render() {
@@ -29,7 +30,7 @@ export class Main extends Component {
                     <Route
                         exact
                         path="/orgUnit/:orgUnit/entity/:entity/event"
-                        component={EventPanel}
+                        component={Event}
                     />
                     <Route
                         exact

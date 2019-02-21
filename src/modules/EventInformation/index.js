@@ -37,20 +37,35 @@ const ChildSectionLabel = styled.div`
     margin: 16px 16px -16px;
 `
 
-export class EventInformation extends Component {
+class EventInformation extends Component {
     state = {
+        programStageId: null,
         programStage: null,
         values: {},
         showModal: true,
     }
 
     componentDidMount = async () => {
+        await this.getProgramStage()
+    }
+
+    componentDidUpdate = async prevProps => {
+        if (
+            prevProps.programStageId !== this.props.programStageId ||
+            prevProps.programId !== this.props.programId
+        )
+            await this.getProgramStage()
+    }
+
+    getProgramStage = async () => {
+        const { programId, programStageId, organismCode } = this.props
         const {
             programStage,
             values,
             organismDataElementId,
             isResend,
         } = await getProgramStage(
+            programStageId,
             this.props.match.params.event
                 ? this.props.match.params.event
                 : undefined
@@ -62,10 +77,12 @@ export class EventInformation extends Component {
             values: values,
             organismDataElementId: organismDataElementId,
             isResend: isResend,
+            programStageId: programStageId,
             testFields: values[organismDataElementId]
                 ? await getTestFields(values[organismDataElementId])
                 : {},
         })
+        console.log(programStage)
     }
 
     onChange = async (name, value) => {
@@ -105,6 +122,7 @@ export class EventInformation extends Component {
      * Returns buttons based on adding new person or editing.
      */
     getButtonProps = () => {
+        return []
         return true
             ? [
                   {
@@ -209,26 +227,6 @@ export class EventInformation extends Component {
                                 dataElement =>
                                     dataElement.valueType === 'TEXT' &&
                                     this.shouldShow(dataElement)
-                            )
-                            .map(dataElement =>
-                                this.getDataElement(dataElement)
-                            )}
-                    </div>
-                )
-            case 'Disk Diffusion':
-            case 'MIC':
-                return (
-                    <div key={childSection.name}>
-                        <ChildSectionLabel>
-                            <Label>{childSection.name}</Label>
-                        </ChildSectionLabel>
-                        {childSection.dataElements
-                            .filter(dataElement => this.shouldShow(dataElement))
-                            .filter(dataElement =>
-                                this.state.testFields[dataElement.id]
-                                    ? this.state.testFields[dataElement.id]
-                                          .display
-                                    : false
                             )
                             .map(dataElement =>
                                 this.getDataElement(dataElement)
@@ -343,15 +341,7 @@ export class EventInformation extends Component {
         )
 
         return (
-            <Margin>
-                <Row>
-                    <IconButton
-                        name="arrow_back"
-                        icon="arrow_back"
-                        onClick={this.onBackClicked}
-                    />
-                    <Title>{'Record'}</Title>
-                </Row>
+            <MarginBottom>
                 {sections.map(section => {
                     const half = Math.ceil(
                         (section.dataElements.filter(dataElement =>
@@ -454,7 +444,7 @@ export class EventInformation extends Component {
                     )
                 })}
                 <EntityButtons buttons={this.getButtonProps()} />
-            </Margin>
+            </MarginBottom>
         )
     }
 }

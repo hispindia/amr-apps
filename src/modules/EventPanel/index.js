@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
 import {
     Heading,
     Row,
@@ -20,9 +19,11 @@ export class EventPanel extends Component {
         programs: null,
         programStages: null,
         organisms: null,
-        program: '',
-        programStage: '',
-        organism: '',
+        values: {
+            programId: '',
+            programStageId: '',
+            organismCode: '',
+        },
     }
 
     componentDidMount = async () => {
@@ -35,40 +36,32 @@ export class EventPanel extends Component {
 
     onProgramChange = async (name, value) => {
         const { programs, programStages } = this.state
+        let values = {
+            programId: value,
+            programStageId:
+                programStages[value].length > 1 ? '' : programStages[value][0],
+            organismCode: '',
+        }
         this.setState({
-            program: value,
-            programStage: programStages.length > 1 ? '' : programStages[0],
             organisms: await getOrganisms(
                 programs.find(program => program.value === value).label
             ),
-            organism: '',
+            values: values,
         })
     }
 
     onChange = (name, value) => {
-        this.setState({ [name]: value })
+        let values = { ...this.state.values }
+        values[name] = value
+        this.setState({ values: values })
+        if (!Object.values(values).includes('')) this.props.onPanel(values)
     }
 
     render() {
-        const {
-            programs,
-            programStages,
-            organisms,
-            program,
-            programStage,
-            organism,
-        } = this.state
+        const { programs, programStages, organisms, values } = this.state
 
         return !programs ? null : (
-            <Margin>
-                <Row>
-                    <IconButton
-                        name="arrow_back"
-                        icon="arrow_back"
-                        onClick={this.onBackClicked}
-                    />
-                    <Title>{'Record'}</Title>
-                </Row>
+            <MarginBottom>
                 <MarginBottom>
                     <Card>
                         <Margin>
@@ -80,23 +73,28 @@ export class EventPanel extends Component {
                                     <Padding>
                                         <SelectInput
                                             objects={programs}
-                                            name={'program'}
+                                            name={'programId'}
                                             label={'Organism group'}
-                                            value={this.state.program}
+                                            value={values.programId}
                                             onChange={this.onProgramChange}
                                             required
                                         />
                                     </Padding>
-                                    {program &&
-                                        programStages[program].length > 1 && (
+                                    {values.programId &&
+                                        programStages[values.programId].length >
+                                            1 && (
                                             <Padding>
                                                 <SelectInput
                                                     objects={
-                                                        programStages[program]
+                                                        programStages[
+                                                            values.programId
+                                                        ]
                                                     }
-                                                    name={'programStage'}
+                                                    name={'programStageId'}
                                                     label={'Type'}
-                                                    value={programStage}
+                                                    value={
+                                                        values.programStageId
+                                                    }
                                                     onChange={this.onChange}
                                                     required
                                                 />
@@ -108,9 +106,9 @@ export class EventPanel extends Component {
                                         <Padding>
                                             <SelectInput
                                                 objects={organisms}
-                                                name={'organism'}
+                                                name={'organismCode'}
                                                 label={'Organism'}
-                                                value={organism}
+                                                value={values.organismCode}
                                                 onChange={this.onChange}
                                                 required
                                             />
@@ -121,9 +119,7 @@ export class EventPanel extends Component {
                         </Margin>
                     </Card>
                 </MarginBottom>
-            </Margin>
+            </MarginBottom>
         )
     }
 }
-
-export default withRouter(EventPanel)

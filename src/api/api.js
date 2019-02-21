@@ -660,14 +660,16 @@ export async function getDistricts(state) {
  * @param {string} eventId - Event ID.
  * @returns {Object} AMR program stage, values, and organism data element ID.
  */
-export async function getProgramStage(eventId) {
+export async function getProgramStage(programStageId, eventId) {
     let programStage = await get(
         'programStages/' +
-            _programStageId +
+            programStageId +
             `.json?fields=displayName,programStageDataElements[dataElement[id],compulsory,sortOrder],
             programStageSections[id,name,displayName,dataElements[id,displayFormName,code,valueType,optionSetValue,
                 optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]`
     )
+
+    console.log(programStage)
 
     const isDisabled = element => {
         switch (element.id) {
