@@ -66,6 +66,7 @@ class EventInformation extends Component {
             isResend,
         } = await getProgramStage(
             programStageId,
+            organismCode,
             this.props.match.params.event
                 ? this.props.match.params.event
                 : undefined

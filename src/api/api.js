@@ -660,7 +660,7 @@ export async function getDistricts(state) {
  * @param {string} eventId - Event ID.
  * @returns {Object} AMR program stage, values, and organism data element ID.
  */
-export async function getProgramStage(programStageId, eventId) {
+export async function getProgramStage(programStageId, organismCode, eventId) {
     let programStage = await get(
         'programStages/' +
             programStageId +
@@ -706,6 +706,8 @@ export async function getProgramStage(programStageId, eventId) {
 
     let values =
         typeof eventId === 'undefined' ? {} : await getEventValues(eventId)
+
+    values[_organismDataElementId] = organismCode
 
     const { dataElementRules, sectionRules } = await getProgramRules()
 
