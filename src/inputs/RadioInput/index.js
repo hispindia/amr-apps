@@ -27,10 +27,7 @@ export class RadioInput extends React.Component {
     render() {
         return (
             <Input>
-                <Label>
-                    {this.props.label}
-                    {this.props.required ? '*' : null}
-                </Label>
+                <Label required={this.props.required}>{this.props.label}</Label>
                 <RowW>
                     {this.props.objects.map(object => (
                         <OptionSpacer key={object.value}>

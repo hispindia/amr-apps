@@ -37,7 +37,7 @@ const ChildSectionLabel = styled.div`
     margin: 16px 16px -16px;
 `
 
-export class Event extends Component {
+export class EventInformation extends Component {
     state = {
         programStage: null,
         values: {},
@@ -459,4 +459,4 @@ export class Event extends Component {
     }
 }
 
-export default withRouter(Event)
+export default withRouter(EventInformation)

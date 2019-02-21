@@ -5,8 +5,8 @@
                 "Comorbidity",
                 "Patient with devices"
             ],
-            "Sample Information": [
-                "Antibiotics / Antifungals (Taken for 3 days in last 1 month)"
+            "Sample information": [
+                "Antibiotics/Antifungals (Taken for 3 days in last 1 month)"
             ],
             "Test values": ["Disk Diffusion", "MIC"],
             "Approval status": [

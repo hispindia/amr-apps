@@ -362,6 +362,58 @@ export async function getPersons(orgUnit) {
 }
 
 /**
+ * Gets all programs and their program stages.
+ * @returns {Object} Programs and program stages.
+ */
+export async function getPrograms() {
+    const data = (await get(
+        'programs.json?paging=false&fields=id,name,programStages[id,name]'
+    )).programs
+
+    let programs = []
+    let programStages = {}
+    data.forEach(program => {
+        programs.push({
+            value: program.id,
+            label: program.name,
+        })
+        let stages = []
+        program.programStages.forEach(programStage =>
+            stages.push({
+                value: programStage.id,
+                label: programStage.name,
+            })
+        )
+        programStages[program.id] = stages
+    })
+
+    return { programs, programStages }
+}
+
+/**
+ * Gets organisms belonging to an organism group.
+ * @param {string} organismGroup - Organism/program name.
+ * @returns {Object[]} Organisms.
+ */
+export async function getOrganisms(organismGroup) {
+    const options = (await get(
+        'optionGroups.json?paging=false&fields=name,options[code,displayName]&filter=name:eq:' +
+            organismGroup
+    )).optionGroups[0].options
+
+    let organisms = []
+    options.forEach(option => {
+        if (!organisms.find(organism => organism.value === option.code))
+            organisms.push({
+                value: option.code,
+                label: option.displayName,
+            })
+    })
+
+    return organisms
+}
+
+/**
  * Gets all organisms.
  * @returns {Object[]} Organisms with ID and organisms name.
  */
@@ -633,6 +685,7 @@ export async function getProgramStage(eventId) {
                 return
             case _amrDataElement:
                 element.disabled = true
+                return
             default:
                 element.disabled =
                     typeof eventId === 'undefined'

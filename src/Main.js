@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Route, Switch } from 'react-router-dom'
-import { Event, Events } from './modules'
+import { EventPanel, EventInformation, Events } from './modules'
 import Home from './modules/Home'
 import Entity from './modules/Entity'
 
@@ -29,12 +29,12 @@ export class Main extends Component {
                     <Route
                         exact
                         path="/orgUnit/:orgUnit/entity/:entity/event"
-                        component={Event}
+                        component={EventPanel}
                     />
                     <Route
                         exact
                         path="/orgUnit/:orgUnit/entity/:entity/event/:event"
-                        component={Event}
+                        component={EventInformation}
                     />
                     <Route
                         exact

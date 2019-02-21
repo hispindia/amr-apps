@@ -42,6 +42,7 @@ export class SelectInput extends React.Component {
                     onChange={this.onChange}
                     disabled={this.props.disabled}
                     size="dense"
+                    required={this.props.required}
                 />
             </Input>
         )

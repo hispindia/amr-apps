@@ -1,6 +1,6 @@
 import React from 'react'
 import { Divider as CoreDivider } from '@dhis2/ui/core/helpers'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 export const Title = styled.h1`
     display: block;
@@ -30,6 +30,16 @@ export const Label = styled.div`
     white-space: nowrap;
     margin: 12px;
     line-height: 24px;
+    ${props =>
+        props.required &&
+        !props.disabled &&
+        css`
+            ::after {
+                content: '*';
+                color: var(--red600);
+                padding-left: 4px;
+            }
+        `}
 `
 
 export const Row = styled.div`

@@ -33,10 +33,7 @@ export class CheckboxInput extends React.Component {
     render() {
         return (
             <div>
-                <Label>
-                    {this.props.label}
-                    {this.props.required ? '*' : null}
-                </Label>
+                <Label required={this.props.required}>{this.props.label}</Label>
                 <RowW>
                     {Object.keys(this.props.objects).map(id => (
                         <OptionSpacer key={id}>

@@ -15,6 +15,14 @@ const UnitContainer = styled.div`
     width: 70px;
 `
 
+const RequiredStar = styled.label`
+    &::after: {
+        content: '*';
+        color: var(--red600);
+        padding-left: 4px;
+    }
+`
+
 /**
  * Age input consisting of date picker and year/month/date input fields.
  */
@@ -153,10 +161,7 @@ export class AgeInput extends React.Component {
     render() {
         return (
             <Input>
-                <Label>
-                    {this.props.label}
-                    {this.props.required ? '*' : null}
-                </Label>
+                <Label required={this.props.required}>{this.props.label}</Label>
                 <RowW>
                     <UnitContainer>
                         <InputField
