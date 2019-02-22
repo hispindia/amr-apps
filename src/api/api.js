@@ -3,8 +3,6 @@ import _ from 'lodash'
 import { get, postData, del, put } from './crud'
 import { removeTime } from '../helpers/date'
 
-const _config = require('../config/config.json')
-
 const _l1ApprovalStatus = 'tAyVrNUTVHX'
 const _l1RejectionReason = 'NLmLwjdSHMv'
 const _l1RevisionReason = 'wCNQtIHJRON'
@@ -23,8 +21,8 @@ const _l2ApprovalGroup = 'XigjUyZB8UE'
 
 const _organismDataElementId = 'SaQe2REkGVw'
 
-const _stateAttributeId = 'ZgUp0jFVxdY'
-const _districtAttributeId = 'SOVNMvY8TOf'
+//const _stateAttributeId = 'ZgUp0jFVxdY'
+//const _districtAttributeId = 'SOVNMvY8TOf'
 const _sampleDateElementId = 'TajY6FbPSRs'
 
 let _isDeoUser
@@ -37,17 +35,17 @@ let _orgUnitNames = {}
  * Gets state attribute ID.
  * @returns {string} State attribute ID.
  */
-export function getStateAttributeId() {
+/*export function getStateAttributeId() {
     return _stateAttributeId
-}
+}*/
 
 /**
  * Gets district attribute ID.
  * @returns {string} district attribute ID.
  */
-export function getDistrictAttributeId() {
+/*export function getDistrictAttributeId() {
     return _districtAttributeId
-}
+}*/
 
 export function getUserAccess() {
     return {
@@ -69,11 +67,104 @@ export async function initUserAccess() {
     _isL2User = userGroups.includes(_l2ApprovalGroup)
 }
 
+export async function getEntityRules(attributeIds) {
+    // Replaces 'A{xxx}' with 'this.state.values['id of xxx']'
+    const getCondition = condition => {
+        try {
+            const attributeId = attributeIds[condition.match('A{(.*)}')[1]]
+            return attributeId
+                ? condition.replace(/A{(.*)}/, "values['" + attributeId + "']")
+                : condition
+        } catch {
+            return condition
+        }
+    }
+
+    let data = (await get(
+        'programRules.json?paging=false&fields=name,programRuleActions[' +
+            'programRuleActionType,optionGroup[options[code,displayName]],trackedEntityAttribute[name,id]' +
+            ',programRule[condition]]&filter=programRuleActions.trackedEntityAttribute:!null' +
+            '&filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD]'
+    )).programRules
+
+    let rules = []
+    data.forEach(d => {
+        if (!rules.find(rule => rule.name === d.name)) {
+            d.programRuleActions.forEach(programRuleAction => {
+                programRuleAction.programRule.condition = getCondition(
+                    programRuleAction.programRule.condition
+                )
+                if (
+                    programRuleAction.programRuleActionType ===
+                    'SHOWOPTIONGROUP'
+                ) {
+                    let options = []
+                    programRuleAction.optionGroup.options.forEach(option =>
+                        options.push({
+                            value: option.code,
+                            label: option.displayName,
+                        })
+                    )
+                    programRuleAction.optionGroup = options
+                }
+            })
+            rules.push(d)
+        }
+    })
+
+    return rules
+}
+
+/**
+ * Gets the attributes and values of the AMR program.
+ * @param {string} entityId - Entity id.
+ * @returns {Object} Attributes, values, uniques, districts.
+ */
+export async function getEntityAttributes(entityId) {
+    const attributes = (await get(
+        'trackedEntityTypes/' +
+            _personTypeId +
+            `.json?fields=trackedEntityTypeAttributes[mandatory,trackedEntityAttribute[name,
+        id,displayName,valueType,unique,optionSetValue,optionSet[options[displayName,code]]]]`
+    )).trackedEntityTypeAttributes
+
+    let values = entityId ? await getPersonValues(entityId) : {}
+    let uniques = {}
+    let attributeIds = {}
+
+    attributes.forEach(attribute => {
+        if (attribute.trackedEntityAttribute.unique)
+            uniques[attribute.trackedEntityAttribute.id] = true
+        if (!values[attribute.trackedEntityAttribute.id])
+            values[attribute.trackedEntityAttribute.id] = ''
+        if (attribute.trackedEntityAttribute.optionSetValue) {
+            let options = []
+            attribute.trackedEntityAttribute.optionSet.options.forEach(option =>
+                options.push({
+                    value: option.code,
+                    label: option.displayName,
+                })
+            )
+            attribute.trackedEntityAttribute.optionSet.options = options
+        }
+        attribute.hide = false
+        attributeIds[attribute.trackedEntityAttribute.name] =
+            attribute.trackedEntityAttribute.id
+    })
+
+    return {
+        attributes: attributes,
+        values: values,
+        uniques: uniques,
+        rules: await getEntityRules(attributeIds),
+    }
+}
+
 /**
  * Gets the attributes and values of the AMR program.
  * @returns {Object} Program attributes, values, uniques, districts.
  */
-export async function getProgramAttributes(entityId) {
+/*export async function getProgramAttributes2(entityId) {
     const programAttributes = (await get(
         'programs/' +
             _amrProgramId +
@@ -113,7 +204,7 @@ export async function getProgramAttributes(entityId) {
         uniques: uniques,
         districts: districts,
     }
-}
+}*/
 
 /**
  * Checks if any tracked entity instance has property with value.
@@ -231,23 +322,24 @@ export async function getPersonsEvents(entityId) {
  * @returns {string} Tracked entity instance ID.
  */
 export async function addPerson(values, orgUnit) {
-    const now = moment().format('YYYY-MM-DD')
+    //const now = moment().format('YYYY-MM-DD')
     let data = {
         trackedEntityType: _personTypeId,
         orgUnit: orgUnit,
         attributes: [],
-        enrollments: [
+        /*enrollments: [
             {
                 orgUnit: orgUnit,
                 program: _amrProgramId,
                 enrollmentDate: now,
                 incidentDate: now,
             },
-        ],
+        ],*/
     }
     for (let key in values)
         data.attributes.push({ attribute: key, value: values[key] })
 
+    console.log(data)
     return (await (await postData('trackedEntityInstances/', data)).json())
         .response.importSummaries[0].reference
 }
@@ -264,6 +356,7 @@ export async function updatePerson(id, values) {
     data.attributes = []
     for (let key in values)
         data.attributes.push({ attribute: key, value: values[key] })
+
     await put('trackedEntityInstances/' + id, data)
 }
 
@@ -638,7 +731,7 @@ export async function getEvents(orgUnit, approvalStatus) {
  * @param {string} state - Option set code.
  * @returns {Object[]} Option sets.
  */
-export async function getDistricts(state) {
+/*export async function getDistricts(state) {
     const data = await get(
         'optionGroups.json?paging=false&fields=options[name,displayName,id,code]&filter=name:eq:' +
             state
@@ -653,7 +746,7 @@ export async function getDistricts(state) {
     )
 
     return districts
-}
+}*/
 
 /**
  * Gets AMR program stage, values, and organism data element ID.
@@ -668,8 +761,6 @@ export async function getProgramStage(programStageId, organismCode, eventId) {
             programStageSections[id,name,displayName,dataElements[id,displayFormName,code,valueType,optionSetValue,
                 optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]`
     )
-
-    console.log(programStage)
 
     const isDisabled = element => {
         switch (element.id) {
@@ -744,28 +835,31 @@ export async function getProgramStage(programStageId, organismCode, eventId) {
     })
 
     // Adding child sections and removing child sections from main sections.
-    programStage.programStageSections
-        .filter(
-            programStageSection =>
-                _config.eventForm.specialSections[programStageSection.name]
-        )
-        .forEach(programStageSection => {
-            let childSections = []
-            _config.eventForm.specialSections[programStageSection.name].forEach(
-                sectionName => {
-                    let index = programStage.programStageSections
-                        .map(section => section.name)
-                        .indexOf(sectionName)
-                    if (index !== -1) {
-                        childSections.push(
-                            programStage.programStageSections[index]
-                        )
-                        programStage.programStageSections.splice(index, 1)
-                    }
-                }
+    programStage.programStageSections.forEach(programStageSection => {
+        let childSections = []
+        programStage.programStageSections
+            .filter(childSection =>
+                childSection.name.match(
+                    new RegExp('{' + programStageSection.name + '}.*')
+                )
             )
-            programStageSection.childSections = childSections
-        })
+            .forEach(childSection => {
+                programStage.programStageSections.splice(
+                    programStage.programStageSections.indexOf(
+                        programStage.programStageSections.find(
+                            section => section.name === childSection.name
+                        )
+                    ),
+                    1
+                )
+                childSection.name = childSection.name.replace(
+                    new RegExp('{' + programStageSection.name + '}'),
+                    ''
+                )
+                childSections.push(childSection)
+            })
+        programStageSection.childSections = childSections
+    })
 
     return {
         programStage: programStage,

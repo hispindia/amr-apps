@@ -6,16 +6,11 @@ import { Input } from '../../helpers/helpers'
  * Single select field.
  */
 export class SelectInput extends React.Component {
-    state = {
-        value: '',
-        labelWidth: 0,
-    }
+    state = { value: '' }
 
     componentDidMount = async () => {
         if (this.props.value) {
-            this.setState({
-                value: this.props.value,
-            })
+            this.setState({ value: this.props.value })
         }
     }
 

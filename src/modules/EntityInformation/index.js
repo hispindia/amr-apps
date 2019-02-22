@@ -1,16 +1,15 @@
+/* eslint no-eval: 0 */
+
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Grid } from '@material-ui/core'
 import { Card } from '@dhis2/ui/core'
 import { Heading, Padding, Margin, MarginSides } from '../../helpers/helpers'
 import {
-    getProgramAttributes,
-    getDistricts,
+    getEntityAttributes,
     addPerson,
     deletePerson,
     updatePerson,
-    getStateAttributeId,
-    getDistrictAttributeId,
 } from '../../api/api'
 import { EntityButtons } from '../'
 import { TextInput, AgeInput, RadioInput, SelectInput } from '../../inputs'
@@ -21,7 +20,6 @@ import { TextInput, AgeInput, RadioInput, SelectInput } from '../../inputs'
 class EntityInformation extends Component {
     state = {
         values: {}, // Current or new values.
-        districts: [], // Populated after state is selected.
         uniques: [], // Unique textfield values are validated.
         goToHome: false, // Redirects to home after deleting entity.
         editing: false, // Will be true after Edit button is clicked.
@@ -29,20 +27,19 @@ class EntityInformation extends Component {
     }
 
     componentDidMount = async () => {
-        const {
-            programAttributes,
-            values,
-            uniques,
-            districts,
-        } = await getProgramAttributes(this.props.id ? this.props.id : null)
+        let { attributes, values, uniques, rules } = await getEntityAttributes(
+            this.props.id ? this.props.id : null
+        )
+
+        const postRules = this.checkRules(values, attributes, rules)
 
         this.setState({
-            attributes: programAttributes,
-            values: values,
+            attributes: postRules.attributes,
+            values: postRules.values,
             uniques: uniques,
-            districts: districts,
             isNewPatient: this.props.id ? false : true,
-            half: Math.floor(programAttributes.length / 2),
+            half: Math.floor(attributes.length / 2),
+            rules: rules,
         })
     }
 
@@ -51,14 +48,62 @@ class EntityInformation extends Component {
      */
     onChange = async (name, value) => {
         let values = { ...this.state.values }
+        let attributes = [...this.state.attributes]
+        const rules = this.state.rules
+
         values[name] = value
-        if (name === getStateAttributeId()) {
-            this.setState({
-                values: values,
-                districts: await getDistricts(value),
-                unchanged: false,
+        const postRules = this.checkRules(values, attributes, rules)
+
+        this.setState({
+            values: postRules.values,
+            attributes: postRules.attributes,
+            unchanged: false,
+        })
+    }
+
+    checkRules = (values, attributes, rules) => {
+        rules.forEach(rule => {
+            rule.programRuleActions.forEach(r => {
+                switch (r.programRuleActionType) {
+                    case 'SHOWOPTIONGROUP':
+                        if (eval(r.programRule.condition)) {
+                            let affectedAttribute = attributes.find(
+                                attribute =>
+                                    attribute.trackedEntityAttribute.id ===
+                                    r.trackedEntityAttribute.id
+                            )
+                            if (
+                                affectedAttribute.trackedEntityAttribute
+                                    .optionSet.options !== r.optionGroup
+                            ) {
+                                affectedAttribute.trackedEntityAttribute.optionSet.options =
+                                    r.optionGroup
+                                values[
+                                    affectedAttribute.trackedEntityAttribute.id
+                                ] = ''
+                            }
+                        }
+                        break
+                    case 'HIDEFIELD':
+                        const hide = eval(r.programRule.condition)
+                        let affectedAttribute = attributes.find(
+                            attribute =>
+                                attribute.trackedEntityAttribute.id ===
+                                r.trackedEntityAttribute.id
+                        )
+                        if (hide !== affectedAttribute.hide) {
+                            affectedAttribute.hide = hide
+                            values[
+                                affectedAttribute.trackedEntityAttribute.id
+                            ] = ''
+                        }
+                        break
+                    default:
+                        break
+                }
             })
-        } else this.setState({ values: values, unchanged: false })
+        })
+        return { values, attributes }
     }
 
     /**
@@ -156,7 +201,9 @@ class EntityInformation extends Component {
      * Returns appropriate input type.
      */
     getInput = attribute => {
-        const { values, districts, isNewPatient } = this.state
+        if (attribute.hide) return null
+
+        const { values, isNewPatient } = this.state
 
         return (
             <Padding key={attribute.trackedEntityAttribute.id}>
@@ -172,7 +219,7 @@ class EntityInformation extends Component {
                     />
                 ) : attribute.trackedEntityAttribute.optionSetValue ? (
                     attribute.trackedEntityAttribute.optionSet.options.length <
-                    5 ? (
+                    4 ? (
                         <RadioInput
                             required={attribute.mandatory}
                             objects={
@@ -189,26 +236,14 @@ class EntityInformation extends Component {
                         <SelectInput
                             required={attribute.mandatory}
                             objects={
-                                attribute.trackedEntityAttribute.id !==
-                                getDistrictAttributeId()
-                                    ? attribute.trackedEntityAttribute.optionSet
-                                          .options
-                                    : districts
+                                attribute.trackedEntityAttribute.optionSet
+                                    .options
                             }
                             name={attribute.trackedEntityAttribute.id}
                             label={attribute.trackedEntityAttribute.displayName}
                             value={values[attribute.trackedEntityAttribute.id]}
-                            labelWidth={60}
                             onChange={this.onChange}
-                            disabled={
-                                !isNewPatient ||
-                                (attribute.trackedEntityAttribute.id ===
-                                    getDistrictAttributeId() &&
-                                    districts.length === 0)
-                            }
-                            helperText={
-                                !isNewPatient ? '' : 'Select state first'
-                            }
+                            disabled={!isNewPatient}
                         />
                     )
                 ) : (
@@ -241,14 +276,12 @@ class EntityInformation extends Component {
                     <Grid container spacing={0}>
                         <Grid item xs>
                             {attributes
-                                .filter(
-                                    attribute => attribute.sortOrder <= half
-                                )
+                                .slice(0, half)
                                 .map(attribute => this.getInput(attribute))}
                         </Grid>
                         <Grid item xs>
                             {attributes
-                                .filter(attribute => attribute.sortOrder > half)
+                                .slice(half)
                                 .map(attribute => this.getInput(attribute))}
                         </Grid>
                     </Grid>
