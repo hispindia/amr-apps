@@ -30,7 +30,7 @@ class EntityInformation extends Component {
         let { attributes, values, uniques, rules } = await getEntityAttributes(
             this.props.id ? this.props.id : null
         )
-
+        console.log(attributes)
         const postRules = this.checkRules(values, attributes, rules)
 
         this.setState({
@@ -74,10 +74,12 @@ class EntityInformation extends Component {
                             )
                             if (
                                 affectedAttribute.trackedEntityAttribute
-                                    .optionSet.options !== r.optionGroup
+                                    .optionSet.id !== r.optionGroup.id
                             ) {
-                                affectedAttribute.trackedEntityAttribute.optionSet.options =
-                                    r.optionGroup
+                                affectedAttribute.trackedEntityAttribute.optionSet = {
+                                    id: r.optionGroup.id,
+                                    options: r.optionGroup.options
+                                }
                                 values[
                                     affectedAttribute.trackedEntityAttribute.id
                                 ] = ''

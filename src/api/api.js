@@ -82,7 +82,7 @@ export async function getEntityRules(attributeIds) {
 
     let data = (await get(
         'programRules.json?paging=false&fields=name,programRuleActions[' +
-            'programRuleActionType,optionGroup[options[code,displayName]],trackedEntityAttribute[name,id]' +
+            'programRuleActionType,optionGroup[id,options[code,displayName]],trackedEntityAttribute[name,id]' +
             ',programRule[condition]]&filter=programRuleActions.trackedEntityAttribute:!null' +
             '&filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD]'
     )).programRules
@@ -99,13 +99,14 @@ export async function getEntityRules(attributeIds) {
                     'SHOWOPTIONGROUP'
                 ) {
                     let options = []
+
                     programRuleAction.optionGroup.options.forEach(option =>
                         options.push({
                             value: option.code,
                             label: option.displayName,
                         })
                     )
-                    programRuleAction.optionGroup = options
+                    programRuleAction.optionGroup.options = options
                 }
             })
             rules.push(d)
@@ -125,7 +126,7 @@ export async function getEntityAttributes(entityId) {
         'trackedEntityTypes/' +
             _personTypeId +
             `.json?fields=trackedEntityTypeAttributes[mandatory,trackedEntityAttribute[name,
-        id,displayName,valueType,unique,optionSetValue,optionSet[options[displayName,code]]]]`
+        id,displayName,valueType,unique,optionSetValue,optionSet[id,options[displayName,code]]]]`
     )).trackedEntityTypeAttributes
 
     let values = entityId ? await getPersonValues(entityId) : {}
