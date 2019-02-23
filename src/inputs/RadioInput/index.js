@@ -11,12 +11,16 @@ export class RadioInput extends React.Component {
     }
 
     componentDidMount = () => {
-        if (this.props.value) this.setState({ value: this.props.value })
+        this.initValue(this.props)
     }
 
     componentWillReceiveProps = props => {
-        if (this.state.value !== props.value)
-            this.setState({ value: props.value })
+        if (this.state.value !== props.value) this.initValue(props)
+    }
+
+    initValue = props => {
+        if (props.objects.length === 1) this.onChange(props.objects[0].value)
+        else if (props.value) this.setState({ value: props.value })
     }
 
     onChange = value => {
