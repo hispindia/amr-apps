@@ -30,12 +30,11 @@ class EntityInformation extends Component {
         let { attributes, values, uniques, rules } = await getEntityAttributes(
             this.props.id ? this.props.id : null
         )
-        console.log(attributes)
-        const postRules = this.checkRules(values, attributes, rules)
+        this.checkRules(values, attributes, rules)
 
         this.setState({
-            attributes: postRules.attributes,
-            values: postRules.values,
+            attributes: attributes,
+            values: values,
             uniques: uniques,
             isNewPatient: this.props.id ? false : true,
             half: Math.floor(attributes.length / 2),
@@ -52,11 +51,11 @@ class EntityInformation extends Component {
         const rules = this.state.rules
 
         values[name] = value
-        const postRules = this.checkRules(values, attributes, rules)
+        this.checkRules(values, attributes, rules)
 
         this.setState({
-            values: postRules.values,
-            attributes: postRules.attributes,
+            values: values,
+            attributes: attributes,
             unchanged: false,
         })
     }
@@ -78,7 +77,7 @@ class EntityInformation extends Component {
                             ) {
                                 affectedAttribute.trackedEntityAttribute.optionSet = {
                                     id: r.optionGroup.id,
-                                    options: r.optionGroup.options
+                                    options: r.optionGroup.options,
                                 }
                                 values[
                                     affectedAttribute.trackedEntityAttribute.id
@@ -105,7 +104,6 @@ class EntityInformation extends Component {
                 }
             })
         })
-        return { values, attributes }
     }
 
     /**

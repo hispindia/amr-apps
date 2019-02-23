@@ -340,7 +340,6 @@ export async function addPerson(values, orgUnit) {
     for (let key in values)
         data.attributes.push({ attribute: key, value: values[key] })
 
-    console.log(data)
     return (await (await postData('trackedEntityInstances/', data)).json())
         .response.importSummaries[0].reference
 }
@@ -754,11 +753,16 @@ export async function getEvents(orgUnit, approvalStatus) {
  * @param {string} eventId - Event ID.
  * @returns {Object} AMR program stage, values, and organism data element ID.
  */
-export async function getProgramStage(programStageId, organismCode, eventId) {
+export async function getProgramStage(
+    programId,
+    programStageId,
+    organismCode,
+    eventId
+) {
     let programStage = await get(
         'programStages/' +
             programStageId +
-            `.json?fields=displayName,programStageDataElements[dataElement[id],compulsory,sortOrder],
+            `.json?fields=displayName,programStageDataElements[dataElement[id,formName],compulsory],
             programStageSections[id,name,displayName,dataElements[id,displayFormName,code,valueType,optionSetValue,
                 optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]`
     )
@@ -801,23 +805,18 @@ export async function getProgramStage(programStageId, organismCode, eventId) {
 
     values[_organismDataElementId] = organismCode
 
-    const { dataElementRules, sectionRules } = await getProgramRules()
+    //let dataElementIds = {}
+    //programStage.programStageDataElements.forEach(dataElement => dataElementIds[dataElement.dataElement.formName] = dataElement.dataElement.id)
 
     programStage.programStageSections.forEach(section => {
-        // Adding section hide rules.
-        if (sectionRules[section.id])
-            section.hideCondition = sectionRules[section.id]
+        section.hide = false
         section.dataElements.forEach(dataElement => {
-            // Adding required and sort order properties.
-            const element = programStage.programStageDataElements.find(
+            // Adding required property.
+            dataElement.required = programStage.programStageDataElements.find(
                 programStageDataElement =>
                     programStageDataElement.dataElement.id === dataElement.id
-            )
-            dataElement.required = element.compulsory
-            dataElement.sortOrder = element.sortOrder
-            // Adding data element hide rules.
-            if (dataElementRules[dataElement.id])
-                dataElement.hideCondition = dataElementRules[dataElement.id]
+            ).compulsory
+            dataElement.hide = false
             // Adding options.
             if (dataElement.optionSetValue) {
                 let options = []
@@ -865,7 +864,7 @@ export async function getProgramStage(programStageId, organismCode, eventId) {
     return {
         programStage: programStage,
         values: values,
-        organismDataElementId: _organismDataElementId,
+        rules: await getProgramRules(programId, programStageId),
         isResend: [
             values[_l1ApprovalStatus],
             values[_l2ApprovalStatus],
@@ -877,68 +876,58 @@ export async function getProgramStage(programStageId, organismCode, eventId) {
  * Gets AMR program rules.
  * @returns {Object} Object with data element and section rules.
  */
-export async function getProgramRules() {
+export async function getProgramRules(programId, programStageId) {
     // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
-    const getVar = string => {
+    const getCondition = condition => {
         try {
-            const varName = string.match('#{(.*)}')[1]
-            const matchedVar = programVariables.find(
-                programVariable => programVariable.name === varName
-            )
-            return matchedVar
-                ? string.replace(
-                      /#{(.*)}/,
-                      "this.state.values['" + matchedVar.dataElement.id + "']"
-                  )
-                : string
+            const id = programRuleVariables.find(
+                variable => variable.name === condition.match('#{(.*)}')[1]
+            ).dataElement.id
+            return id
+                ? condition.replace(/#{(.*)}/, "values['" + id + "']")
+                : condition
         } catch {
-            return string
+            return condition
         }
     }
 
-    const programRules = (await get(
-        `programRules.json?paging=false&fields=condition,programRuleActions[programRuleActionType,dataElement[id,name],
-        programStageSection[name,id]]&filter=program.id:eq:` + _amrProgramId
+    let dataElementRules = (await get(
+        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],programRuleActionType,optionGroup[id,options[' +
+            'code,displayName]]&filter=programRuleActions.dataElement:!null&filter=programStage:null&' +
+            'filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD]&filter=program.id:eq:' +
+            programId
     )).programRules
 
-    const programVariables = (await get(
-        'programRuleVariables.json?paging=false&fields=name,dataElement[id,name]&filter=program.id:eq:' +
-            _amrProgramId
+    let sectionRules = (await get(
+        'programRules.json?paging=false&fields=condition,programRuleActions[programStageSection[name,id],programRuleActionType]' +
+            '&filter=programRuleActions.programStageSection:!null&filter=programStage:null&filter=' +
+            'programRuleActions.programRuleActionType:eq:HIDESECTION&filter=program.id:eq:' +
+            programId
+    )).programRules
+
+    const programRuleVariables = (await get(
+        'programRuleVariables.json?paging=false&fields=name,dataElement&filter=program.id:eq:' +
+            programId
     )).programRuleVariables
 
-    let dataElementRules = {}
-    let sectionRules = {}
-
-    // Keys are element/section id to be hidden. Values are hide conditions.
-    programRules.forEach(programRule =>
-        programRule.programRuleActions.forEach(programRuleAction => {
-            switch (programRuleAction.programRuleActionType) {
-                case 'HIDEFIELD':
-                    if (!dataElementRules[programRuleAction.dataElement.id])
-                        dataElementRules[programRuleAction.dataElement.id] = []
-                    dataElementRules[programRuleAction.dataElement.id].push(
-                        getVar(programRule.condition)
-                    )
-                    return
-                case 'HIDESECTION':
-                    if (!sectionRules[programRuleAction.programStageSection.id])
-                        sectionRules[
-                            programRuleAction.programStageSection.id
-                        ] = []
-                    sectionRules[programRuleAction.programStageSection.id].push(
-                        getVar(programRule.condition)
-                    )
-                    return
-                default:
-                    return
+    let rules = dataElementRules.concat(sectionRules)
+    rules.forEach(rule => {
+        rule.condition = getCondition(rule.condition)
+        rule.programRuleActions.forEach(programRuleAction => {
+            if (programRuleAction.programRuleActionType === 'SHOWOPTIONGROUP') {
+                let options = []
+                programRuleAction.optionGroup.options.forEach(option =>
+                    options.push({
+                        value: option.code,
+                        label: option.displayName,
+                    })
+                )
+                programRuleAction.optionGroup.options = options
             }
         })
-    )
+    })
 
-    return {
-        dataElementRules: dataElementRules,
-        sectionRules: sectionRules,
-    }
+    return rules
 }
 
 /**

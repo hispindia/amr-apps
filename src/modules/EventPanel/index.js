@@ -1,15 +1,12 @@
 import React, { Component } from 'react'
 import {
     Heading,
-    Row,
-    Title,
     Margin,
     Padding,
     MarginSides,
     MarginBottom,
 } from '../../helpers/helpers'
 import { SelectInput } from '../../inputs'
-import IconButton from '../../inputs/IconButton'
 import { Card } from '@dhis2/ui/core/Card'
 import { getPrograms, getOrganisms } from '../../api/api'
 import { Grid } from '@material-ui/core'
