@@ -70,14 +70,19 @@ export async function initUserAccess() {
 export async function getEntityRules(attributeIds) {
     // Replaces 'A{xxx}' with 'this.state.values['id of xxx']'
     const getCondition = condition => {
-        try {
-            const attributeId = attributeIds[condition.match('A{(.*)}')[1]]
-            return attributeId
-                ? condition.replace(/A{(.*)}/, "values['" + attributeId + "']")
-                : condition
-        } catch {
-            return condition
-        }
+        const variableDuplicated = condition.match(/A\{.*?\}/g)
+        let variables = []
+        if (!variableDuplicated) return condition
+        variableDuplicated.forEach(duplicated => {
+            if (variables.indexOf(duplicated) === -1) variables.push(duplicated)
+        })
+
+        variables.forEach(variable => {
+            const id = attributeIds[variable.substring(2, variable.length - 1)]
+            condition = condition.replace(/A\{.*?\}/g, "values['" + id + "']")
+        })
+
+        return condition
     }
 
     let data = (await get(
@@ -879,16 +884,23 @@ export async function getProgramStage(
 export async function getProgramRules(programId, programStageId) {
     // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
     const getCondition = condition => {
-        try {
+        const variableDuplicated = condition.match(/#\{.*?\}/g)
+        let variables = []
+        if (!variableDuplicated) return condition
+        variableDuplicated.forEach(duplicated => {
+            if (variables.indexOf(duplicated) === -1) variables.push(duplicated)
+        })
+
+        variables.forEach(variable => {
             const id = programRuleVariables.find(
-                variable => variable.name === condition.match('#{(.*)}')[1]
+                ruleVariable =>
+                    ruleVariable.name ===
+                    variable.substring(2, variable.length - 1)
             ).dataElement.id
-            return id
-                ? condition.replace(/#{(.*)}/, "values['" + id + "']")
-                : condition
-        } catch {
-            return condition
-        }
+            condition = condition.replace(/#\{.*?\}/g, "values['" + id + "']")
+        })
+
+        return condition
     }
 
     let dataElementRules = (await get(
@@ -916,12 +928,14 @@ export async function getProgramRules(programId, programStageId) {
         rule.programRuleActions.forEach(programRuleAction => {
             if (programRuleAction.programRuleActionType === 'SHOWOPTIONGROUP') {
                 let options = []
-                programRuleAction.optionGroup.options.forEach(option =>
-                    options.push({
-                        value: option.code,
-                        label: option.displayName,
-                    })
-                )
+                // For some reason there are duplicates in the option group. Organisms only?
+                programRuleAction.optionGroup.options.forEach(option => {
+                    if (!options.find(o => o.value === option.code))
+                        options.push({
+                            value: option.code,
+                            label: option.displayName,
+                        })
+                })
                 programRuleAction.optionGroup.options = options
             }
         })

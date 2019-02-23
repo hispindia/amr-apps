@@ -125,45 +125,50 @@ class EventInformation extends Component {
 
         rules.forEach(rule => {
             rule.programRuleActions.forEach(r => {
-                switch (r.programRuleActionType) {
-                    case 'SHOWOPTIONGROUP':
-                        if (eval(rule.condition)) {
+                try {
+                    switch (r.programRuleActionType) {
+                        case 'SHOWOPTIONGROUP':
+                            if (eval(rule.condition)) {
+                                let affectedDataElement = getAffectedDataElement(
+                                    r.dataElement.id
+                                )
+                                if (
+                                    affectedDataElement.optionSet.id !==
+                                    r.optionGroup.id
+                                ) {
+                                    affectedDataElement.optionSet = {
+                                        id: r.optionGroup.id,
+                                        options: r.optionGroup.options,
+                                    }
+                                    values[affectedDataElement.id] = ''
+                                }
+                            }
+                            break
+                        case 'HIDEFIELD':
+                            const hide = eval(rule.condition)
                             let affectedDataElement = getAffectedDataElement(
                                 r.dataElement.id
                             )
-                            if (
-                                affectedDataElement.optionSet.id !==
-                                r.optionGroup.id
-                            ) {
-                                affectedDataElement.optionSet = {
-                                    id: r.optionGroup.id,
-                                    options: r.optionGroup.options,
+                            if (affectedDataElement)
+                                if (hide !== affectedDataElement.hide) {
+                                    affectedDataElement.hide = hide
+                                    values[affectedDataElement.id] = ''
                                 }
-                                values[affectedDataElement.id] = ''
-                            }
-                        }
-                        break
-                    case 'HIDEFIELD':
-                        const hide = eval(rule.condition)
-                        let affectedDataElement = getAffectedDataElement(
-                            r.dataElement.id
-                        )
-                        if (hide !== affectedDataElement.hide) {
-                            affectedDataElement.hide = hide
-                            values[affectedDataElement.id] = ''
-                        }
-                        break
-                    case 'HIDESECTION':
-                        const hideS = eval(rule.condition)
-                        let affectedSection = getAffectedSection(
-                            r.programStageSection.id
-                        )
-                        if (affectedSection)
-                            if (hideS !== affectedSection.hide)
-                                affectedSection.hide = hideS
-                        break
-                    default:
-                        break
+                            break
+                        case 'HIDESECTION':
+                            const hideS = eval(rule.condition)
+                            let affectedSection = getAffectedSection(
+                                r.programStageSection.id
+                            )
+                            if (affectedSection)
+                                if (hideS !== affectedSection.hide)
+                                    affectedSection.hide = hideS
+                            break
+                        default:
+                            break
+                    }
+                } catch {
+                    console.warn('Failed to evaluate rule:', rule)
                 }
             })
         })

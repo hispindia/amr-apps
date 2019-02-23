@@ -36,7 +36,9 @@ export class EventPanel extends Component {
         let values = {
             programId: value,
             programStageId:
-                programStages[value].length > 1 ? '' : programStages[value][0],
+                programStages[value].length > 1
+                    ? ''
+                    : programStages[value][0].value,
             organismCode: '',
         }
         this.setState({
