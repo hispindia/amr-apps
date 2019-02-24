@@ -19,7 +19,7 @@ const _deoGroup = 'mYdK5QT4ndl'
 const _l1ApprovalGroup = 'O7EtwlwnAYq'
 const _l2ApprovalGroup = 'XigjUyZB8UE'
 
-const _organismDataElementId = 'SaQe2REkGVw'
+const _organismsDataElementId = 'SaQe2REkGVw'
 
 //const _stateAttributeId = 'ZgUp0jFVxdY'
 //const _districtAttributeId = 'SOVNMvY8TOf'
@@ -46,6 +46,14 @@ let _orgUnitNames = {}
 /*export function getDistrictAttributeId() {
     return _districtAttributeId
 }*/
+
+/**
+ * Gets organisms data element ID.
+ * @returns {string} Organisms data element ID.
+ */
+export function getOrganismsDataElementId() {
+    return _organismsDataElementId
+}
 
 export function getUserAccess() {
     return {
@@ -387,10 +395,10 @@ export async function getPersons(orgUnit) {
             attributes[displayName,valueType,attribute,value],enrollments[orgUnitName]`
     )).trackedEntityInstances
     const metaData = (await get(
-        'programs/' +
-            _amrProgramId +
-            '.json?fields=programTrackedEntityAttributes[trackedEntityAttribute[displayName,valueType,id]]'
-    )).programTrackedEntityAttributes
+        'trackedEntityTypes/' +
+            _personTypeId +
+            '.json?fields=trackedEntityTypeAttributes[trackedEntityAttribute[displayName,id]]'
+    )).trackedEntityTypeAttributes
 
     // Created and Updated are not displayed by default.
     let data = {
@@ -550,14 +558,18 @@ export async function getOrganisms(organismGroup) {
  * @returns {Object} Event values.
  */
 export async function getEventValues(eventId) {
-    const dataValues = (await get('events/' + eventId + '.json')).dataValues
+    const data = await get('events/' + eventId + '.json')
     let values = {}
 
-    dataValues.forEach(
+    data.dataValues.forEach(
         dataValue => (values[dataValue.dataElement] = dataValue.value)
     )
 
-    return values
+    return {
+        programId: data.program,
+        programStageId: data.programStage,
+        values: values,
+    }
 }
 
 /**
@@ -764,14 +776,6 @@ export async function getProgramStage(
     organismCode,
     eventId
 ) {
-    let programStage = await get(
-        'programStages/' +
-            programStageId +
-            `.json?fields=displayName,programStageDataElements[dataElement[id,formName],compulsory],
-            programStageSections[id,name,displayName,dataElements[id,displayFormName,code,valueType,optionSetValue,
-                optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]`
-    )
-
     const isDisabled = element => {
         switch (element.id) {
             case _l1ApprovalStatus:
@@ -805,10 +809,23 @@ export async function getProgramStage(
         }
     }
 
-    let values =
-        typeof eventId === 'undefined' ? {} : await getEventValues(eventId)
+    let values = {}
+    if (eventId !== 'undefined') {
+        let eventData = await getEventValues(eventId)
+        programId = eventData.programId
+        programStageId = eventData.programStageId
+        values = eventData.values
+    }
 
-    values[_organismDataElementId] = organismCode
+    let programStage = await get(
+        'programStages/' +
+            programStageId +
+            `.json?fields=displayName,programStageDataElements[dataElement[id,formName],compulsory],
+            programStageSections[id,name,displayName,dataElements[id,displayFormName,code,valueType,optionSetValue,
+                optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]`
+    )
+
+    values[_organismsDataElementId] = organismCode
 
     //let dataElementIds = {}
     //programStage.programStageDataElements.forEach(dataElement => dataElementIds[dataElement.dataElement.formName] = dataElement.dataElement.id)

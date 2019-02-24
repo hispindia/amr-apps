@@ -1,14 +1,18 @@
 import React, { Component } from 'react'
 import { Route, Switch } from 'react-router-dom'
+import styled from 'styled-components'
 import { Events, Event } from './modules'
 import Home from './modules/Home'
 import Entity from './modules/Entity'
-import EventInformation from './modules/EventInformation'
+
+const MainSection = styled.main`
+    width: 100%;
+`
 
 export class Main extends Component {
     render() {
         return (
-            <main style={{ width: '100%' }}>
+            <MainSection>
                 <Switch>
                     <Route
                         exact
@@ -17,26 +21,23 @@ export class Main extends Component {
                             <Home {...props} selected={this.props.selected} />
                         )}
                     />
-                    <Route
-                        exact
-                        path="/orgUnit/:orgUnit/entity"
-                        component={Entity}
-                    />
-                    <Route
-                        exact
-                        path="/orgUnit/:orgUnit/entity/:entity"
-                        component={Entity}
-                    />
-                    <Route
-                        exact
-                        path="/orgUnit/:orgUnit/entity/:entity/event"
-                        component={Event}
-                    />
-                    <Route
-                        exact
-                        path="/orgUnit/:orgUnit/entity/:entity/event/:event"
-                        component={EventInformation}
-                    />
+                    {[
+                        '/orgUnit/:orgUnit/entity',
+                        '/orgUnit/:orgUnit/entity/:entity',
+                    ].map(path => (
+                        <Route
+                            key={path}
+                            exact
+                            path={path}
+                            component={Entity}
+                        />
+                    ))}
+                    {[
+                        '/orgUnit/:orgUnit/entity/:entity/event',
+                        '/orgUnit/:orgUnit/entity/:entity/event/:event',
+                    ].map(path => (
+                        <Route key={path} exact path={path} component={Event} />
+                    ))}
                     <Route
                         exact
                         path="/events/:approvalStatus"
@@ -45,7 +46,7 @@ export class Main extends Component {
                         )}
                     />
                 </Switch>
-            </main>
+            </MainSection>
         )
     }
 }

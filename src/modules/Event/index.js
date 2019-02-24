@@ -15,6 +15,15 @@ export class Event extends Component {
         this.setState(values)
     }
 
+    onBackClicked = () => {
+        this.props.history.push(
+            '/orgUnit/' +
+                this.props.match.params.orgUnit +
+                '/entity/' +
+                this.props.match.params.entity
+        )
+    }
+
     render() {
         const { programId, programStageId, organismCode } = this.state
 

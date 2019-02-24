@@ -19,6 +19,7 @@ import {
     updateEvent,
     getTestFields,
     addEvent,
+    getOrganismsDataElementId,
 } from '../../api/api'
 import {
     TextInput,
@@ -51,6 +52,11 @@ class EventInformation extends Component {
             prevProps.programId !== this.props.programId
         )
             await this.getProgramStage()
+        else if (prevProps.organismCode !== this.props.organismCode) {
+            let values = { ...this.state.values }
+            values[getOrganismsDataElementId()] = this.props.organismCode
+            this.setState({ values: values })
+        }
     }
 
     getProgramStage = async () => {
@@ -91,6 +97,11 @@ class EventInformation extends Component {
     }
 
     checkRules = (values, sections, rules) => {
+        /**
+         * Gets the data element that is affected by rule.
+         * @param {string} id - Data element id.
+         * @returns {Object} Data element.
+         */
         const getAffectedDataElement = id => {
             let affectedDataElement
             for (let section of sections) {
@@ -109,6 +120,11 @@ class EventInformation extends Component {
             return null
         }
 
+        /**
+         * Gets the section that is affected by rule.
+         * @param {string} id - section id.
+         * @returns {Object} Section.
+         */
         const getAffectedSection = id => {
             let affectedSection
             for (let section of sections) {
@@ -132,6 +148,7 @@ class EventInformation extends Component {
                                 let affectedDataElement = getAffectedDataElement(
                                     r.dataElement.id
                                 )
+                                // Changing options if it is not the same.
                                 if (
                                     affectedDataElement.optionSet.id !==
                                     r.optionGroup.id
@@ -140,7 +157,15 @@ class EventInformation extends Component {
                                         id: r.optionGroup.id,
                                         options: r.optionGroup.options,
                                     }
-                                    values[affectedDataElement.id] = ''
+                                    // Only reset selected value if the options do not include current value.
+                                    if (
+                                        !affectedDataElement.optionSet.options.find(
+                                            option =>
+                                                option.value ===
+                                                values[affectedDataElement.id]
+                                        )
+                                    )
+                                        values[affectedDataElement.id] = ''
                                 }
                             }
                             break
