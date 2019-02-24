@@ -25,6 +25,9 @@ export class Events extends React.Component {
             await this.getData()
     }
 
+    /**
+     * Gets the data for the events.
+     */
     getData = async () => {
         this.setState({
             data: await getEvents(
@@ -36,6 +39,9 @@ export class Events extends React.Component {
         })
     }
 
+    /**
+     * Called when table row is clicked.
+     */
     onEventClick = row => {
         this.props.history.push(
             '/orgUnit/' + row[5] + '/entity/' + row[6] + '/event/' + row[7]

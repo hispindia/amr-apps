@@ -21,6 +21,9 @@ class Home extends React.Component {
         if (this.props.selected !== this.state.selected) await this.getData()
     }
 
+    /**
+     * Gets the person data.
+     */
     getData = async () => {
         this.setState({
             data: await getPersons(this.props.selected),

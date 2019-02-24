@@ -79,9 +79,20 @@ class EntityInformation extends Component {
                                     id: r.optionGroup.id,
                                     options: r.optionGroup.options,
                                 }
-                                values[
-                                    affectedAttribute.trackedEntityAttribute.id
-                                ] = ''
+                                // Only reset selected value if the options do not include current value.
+                                if (
+                                    !affectedAttribute.trackedEntityAttribute.optionSet.options.find(
+                                        option =>
+                                            option.value ===
+                                            values[
+                                                affectedAttribute
+                                                    .trackedEntityAttribute.id
+                                            ]
+                                    )
+                                )
+                                    values[
+                                        affectedAttribute.trackedEntityAttribute.id
+                                    ] = ''
                             }
                         }
                         break

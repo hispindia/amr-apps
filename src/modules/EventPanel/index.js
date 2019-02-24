@@ -11,6 +11,9 @@ import { Card } from '@dhis2/ui/core/Card'
 import { getPrograms, getOrganisms } from '../../api/api'
 import { Grid } from '@material-ui/core'
 
+/**
+ * Contains event panal and/or event information.
+ */
 export class EventPanel extends Component {
     state = {
         programs: null,
@@ -31,6 +34,9 @@ export class EventPanel extends Component {
         })
     }
 
+    /**
+     * Called when a new program is selected.
+     */
     onProgramChange = async (name, value) => {
         const { programs, programStages } = this.state
         let values = {
@@ -49,6 +55,9 @@ export class EventPanel extends Component {
         })
     }
 
+    /**
+     * Called when a new program stage or organism is selected.
+     */
     onChange = (name, value) => {
         let values = { ...this.state.values }
         values[name] = value
@@ -56,6 +65,10 @@ export class EventPanel extends Component {
         if (!Object.values(values).includes('')) this.props.onPanel(values)
     }
 
+    /**
+     * Gets the data elements to be rendered.
+     * @returns {Object[]} Data elements.
+     */
     getDataElements = () => {
         const { programs, programStages, organisms, values } = this.state
 
@@ -65,7 +78,6 @@ export class EventPanel extends Component {
                 label: 'Organism group',
                 objects: programs,
                 onChange: this.onProgramChange,
-                show: true,
             },
         ]
         if (values.programId && programStages[values.programId].length > 0)
@@ -86,6 +98,11 @@ export class EventPanel extends Component {
         return dataElements
     }
 
+    /**
+     * Gets the input component.
+     * @param {Object} dataElement - Data element.
+     * @returns {Component} Input component.
+     */
     getInput = dataElement => {
         return (
             <Padding key={dataElement.id}>

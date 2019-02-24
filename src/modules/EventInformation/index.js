@@ -17,7 +17,7 @@ import {
     getProgramStage,
     //getOrganisms,
     updateEvent,
-    getTestFields,
+    //getTestFields,
     addEvent,
     getOrganismsDataElementId,
 } from '../../api/api'
@@ -47,15 +47,17 @@ class EventInformation extends Component {
     }
 
     componentDidUpdate = async prevProps => {
-        if (
-            prevProps.programStageId !== this.props.programStageId ||
-            prevProps.programId !== this.props.programId
-        )
-            await this.getProgramStage()
-        else if (prevProps.organismCode !== this.props.organismCode) {
-            let values = { ...this.state.values }
-            values[getOrganismsDataElementId()] = this.props.organismCode
-            this.setState({ values: values })
+        if (prevProps) {
+            if (
+                prevProps.programStageId !== this.props.programStageId ||
+                prevProps.programId !== this.props.programId
+            )
+                await this.getProgramStage()
+            else if (prevProps.organismCode !== this.props.organismCode) {
+                let values = { ...this.state.values }
+                values[getOrganismsDataElementId()] = this.props.organismCode
+                this.setState({ values: values })
+            }
         }
     }
 
@@ -225,7 +227,6 @@ class EventInformation extends Component {
      * Returns buttons based on adding new person or editing.
      */
     getButtonProps = () => {
-        return []
         return true
             ? [
                   {
@@ -258,13 +259,13 @@ class EventInformation extends Component {
      * On submit button click.
      */
     onSubmitClick = async () => {
-        const { programStage, values } = this.state
-        const sections = programStage.programStageSections.filter(
+        //const { programStage, values } = this.state
+        /*const sections = programStage.programStageSections.filter(
             section => !['Name', 'Approval status'].includes(section.name)
-        )
+        )*/
 
         // Removing hidden values.
-        sections.forEach(section => {
+        /*programStage.programStageSections.forEach(section => {
             const removeValues = dataElements => {
                 dataElements
                     .filter(
@@ -278,79 +279,84 @@ class EventInformation extends Component {
                 section.childSections.forEach(childSection =>
                     removeValues(childSection.dataElements)
                 )
-        })
+        })*/
 
         this.props.match.params.event
             ? await updateEvent(
                   this.state.values,
-                  this.state.testFields,
-                  this.props.match.params.event,
-                  this.state.isResend
+                  this.props.match.params.event
               )
             : await addEvent(
                   this.state.values,
-                  this.state.testFields,
+                  this.props.programId,
+                  this.props.programStageId,
+                  this.props.match.params.orgUnit,
                   this.props.match.params.entity
               )
     }
 
+    /**
+     * Gets the child section component.
+     * @param {Object} childSection - Child section.
+     * @returns {Component} Child section component.
+     */
     getChildSection = childSection => {
-        switch (childSection.name) {
-            case 'Comorbidity':
-            case 'Patient with devices':
-                let objects = {}
-                let values = {}
-                childSection.dataElements
-                    .filter(
-                        dataElement => dataElement.valueType === 'TRUE_ONLY'
-                    )
-                    .forEach(dataElement => {
-                        objects[dataElement.id] = {
-                            label: dataElement.displayFormName,
-                            disabled: dataElement.disabled,
-                        }
-                        values[dataElement.id] = this.state.values[
-                            dataElement.id
-                        ]
-                    })
-                return (
-                    <div key={childSection.name}>
-                        <Padding>
-                            <CheckboxInput
-                                objects={objects}
-                                name={childSection.name}
-                                label={childSection.name}
-                                values={values}
-                                onChange={this.onChange}
-                            />
-                        </Padding>
-                        {childSection.dataElements
-                            .filter(
-                                dataElement =>
-                                    dataElement.valueType === 'TEXT' &&
-                                    !dataElement.hide
-                            )
-                            .map(dataElement =>
-                                this.getDataElement(dataElement)
-                            )}
-                    </div>
-                )
-            default:
-                return (
-                    <div key={childSection.name}>
-                        <ChildSectionLabel>
-                            <Label>{childSection.name}</Label>
-                        </ChildSectionLabel>
-                        {childSection.dataElements
-                            .filter(dataElement => !dataElement.hide)
-                            .map(dataElement =>
-                                this.getDataElement(dataElement)
-                            )}
-                    </div>
-                )
+        // If all, or all but one, of the data elements are of type TRUE_ONLY, the section is rendered as a group of checkboxes.
+        if (
+            childSection.dataElements.filter(
+                dataElement => dataElement.valueType === 'TRUE_ONLY'
+            ).length >
+            childSection.dataElements.length - 2
+        ) {
+            let objects = {}
+            let values = {}
+            childSection.dataElements
+                .filter(dataElement => dataElement.valueType === 'TRUE_ONLY')
+                .forEach(dataElement => {
+                    objects[dataElement.id] = {
+                        label: dataElement.displayFormName,
+                        disabled: dataElement.disabled,
+                    }
+                    values[dataElement.id] = this.state.values[dataElement.id]
+                })
+            return (
+                <div key={childSection.name}>
+                    <Padding>
+                        <CheckboxInput
+                            objects={objects}
+                            name={childSection.name}
+                            label={childSection.name}
+                            values={values}
+                            onChange={this.onChange}
+                        />
+                    </Padding>
+                    {childSection.dataElements
+                        .filter(
+                            dataElement =>
+                                dataElement.valueType === 'TEXT' &&
+                                !dataElement.hide
+                        )
+                        .map(dataElement => this.getDataElement(dataElement))}
+                </div>
+            )
         }
+        return (
+            <div key={childSection.name}>
+                <ChildSectionLabel>
+                    <Label>{childSection.name}</Label>
+                </ChildSectionLabel>
+                {childSection.dataElements
+                    .filter(dataElement => !dataElement.hide)
+                    .map(dataElement => this.getDataElement(dataElement))}
+            </div>
+        )
     }
 
+    /**
+     * Gets the data element component.
+     * @param {Object} dataElement - Data element.
+     * @returns {Component} Date element component.
+     */
     getDataElement = dataElement => {
         return (
             <Padding key={dataElement.id}>

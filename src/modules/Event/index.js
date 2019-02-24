@@ -11,10 +11,16 @@ export class Event extends Component {
         organismCode: null,
     }
 
+    /**
+     * Called on new panel values.
+     */
     onPanel = values => {
         this.setState(values)
     }
 
+    /**
+     * Called when back button is clicked.
+     */
     onBackClicked = () => {
         this.props.history.push(
             '/orgUnit/' +
