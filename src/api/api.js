@@ -26,6 +26,7 @@ let _isDeoUser
 let _isL1User
 let _isL2User
 
+let _username = ''
 let _orgUnitNames = {}
 
 /**
@@ -47,10 +48,15 @@ export function getUserAccess() {
 /**
  * Sets user access.
  */
-export async function initUserAccess() {
-    const userGroups = (await get('me.json?fields=userGroups')).userGroups.map(
-        userGroup => userGroup.id
+export async function initUser() {
+    const user = await get(
+        'me.json?fields=userGroups,userCredentials[username]'
     )
+    console.log(user)
+
+    _username = user.userCredentials.username
+
+    const userGroups = user.userGroups.map(userGroup => userGroup.id)
     _isDeoUser = userGroups.includes(_deoGroup)
     _isL1User = userGroups.includes(_l1ApprovalGroup)
     _isL2User = userGroups.includes(_l2ApprovalGroup)
@@ -533,55 +539,20 @@ export async function getEventCounts(orgUnit) {
 }
 
 /**
- * Gets all events from the AMR program with the provided approval status.
- * @param {string} approvalStatus - Approval status.
- * @returns {Object[]} All AMR events.
+ * Gets all events created by the user.
+ * @param {string} orgUnit - Organisation unit to look within.
+ * @returns {Object[]} All events.
  */
-export async function getEvents(orgUnit, approvalStatus) {
-    // If looking for approved events, both levels needs to be approved.
-    // Otherwise, just one of the levels needs to be approved.
-    let events = []
-    switch (approvalStatus) {
-        case 'Approved':
-            events = (await get(
-                'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,' +
-                    'lastUpdated,created,storedBy,dataValues[dataElement,value]&orgUnit=' +
-                    orgUnit +
-                    '&ouMode=DESCENDANTS' +
-                    '&filter=' +
-                    _l1ApprovalStatus +
-                    ':eq:Approved,' +
-                    _l2ApprovalStatus +
-                    ':eq:Approved'
-            )).events
-            break
-        default:
-            events = (await get(
-                'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,' +
-                    'lastUpdated,created,storedBy,dataValues[dataElement,value]&orgUnit=' +
-                    orgUnit +
-                    '&ouMode=DESCENDANTS' +
-                    '&filter=' +
-                    _l1ApprovalStatus +
-                    ':eq:' +
-                    approvalStatus
-            )).events
-            const events2 = (await get(
-                'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,' +
-                    'lastUpdated,created,storedBy,dataValues[dataElement,value]&orgUnit=' +
-                    orgUnit +
-                    '&ouMode=DESCENDANTS' +
-                    '&filter=' +
-                    _l2ApprovalStatus +
-                    ':eq:' +
-                    approvalStatus
-            )).events
-            // In order to avoid duplicates.
-            events2.forEach(event2 => {
-                if (!events.find(event => event.event === event2.event))
-                    events.push(event2)
-            })
-    }
+export async function getEvents(orgUnit) {
+    const allEvents = (await get(
+        'events.json?paging=false&fields=storedBy,orgUnit,trackedEntityInstance,event,' +
+            'lastUpdated,created,dataValues[dataElement,value]&orgUnit=' +
+            orgUnit +
+            '&ouMode=DESCENDANTS'
+    )).events
+
+    // Does not seem to be possible to filter by storedBy with the API.
+    const events = allEvents.filter(event => event.storedBy === _username)
 
     let data = {
         headers: [
@@ -590,12 +561,12 @@ export async function getEvents(orgUnit, approvalStatus) {
                 column: 'Amr Id',
             },
             {
-                name: 'Organisation unit',
-                column: 'Organisation unit',
+                name: 'Approval level 1',
+                column: 'Approval level 1',
             },
             {
-                name: 'Stored by',
-                column: 'Stored by',
+                name: 'Approval level 2',
+                column: 'Approval level 2',
             },
             {
                 name: 'Created',
@@ -624,25 +595,34 @@ export async function getEvents(orgUnit, approvalStatus) {
         rows: [],
     }
 
-    const getAmrId = event => {
-        const dataElement = event.dataValues.find(
-            dataValue => dataValue.dataElement === _amrDataElement
-        )
-        return dataElement ? dataElement.value : ''
+    const getValues = event => {
+        const getValue = dataElement =>
+            event.dataValues.find(
+                dataValue => dataValue.dataElement === dataElement
+            )
+        const amrDataElement = getValue(_amrDataElement)
+        const l1DataElement = getValue(_l1ApprovalStatus)
+        const l2DataElement = getValue(_l2ApprovalStatus)
+        return {
+            amrValue: amrDataElement ? amrDataElement.value : '',
+            l1Value: l1DataElement ? l1DataElement.value : '',
+            l2Value: l2DataElement ? l2DataElement.value : '',
+        }
     }
 
-    events.forEach(event =>
+    events.forEach(event => {
+        const { amrValue, l1Value, l2Value } = getValues(event)
         data.rows.push([
-            getAmrId(event),
-            event.orgUnitName,
-            event.storedBy,
+            amrValue,
+            l1Value,
+            l2Value,
             removeTime(event.created),
             removeTime(event.lastUpdated),
             event.orgUnit,
             event.trackedEntityInstance,
             event.event,
         ])
-    )
+    })
 
     return data
 }

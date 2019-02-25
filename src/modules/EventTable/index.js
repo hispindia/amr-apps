@@ -13,7 +13,7 @@ export class EventTable extends React.Component {
             <MarginTop>
                 <Card>
                     <MUIDataTable
-                        title={'Records'}
+                        title={this.props.title}
                         data={this.props.data.rows}
                         columns={this.props.data.headers}
                         options={{

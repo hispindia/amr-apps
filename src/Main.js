@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Route, Switch } from 'react-router-dom'
 import styled from 'styled-components'
-import { Events, Event } from './modules'
+import { Events, Event, EventOverview } from './modules'
 import Home from './modules/Home'
 import Entity from './modules/Entity'
 
@@ -18,7 +18,10 @@ export class Main extends Component {
                         exact
                         path="/"
                         render={props => (
-                            <Home {...props} selected={this.props.selected} />
+                            <EventOverview
+                                {...props}
+                                selected={this.props.selected}
+                            />
                         )}
                     />
                     {[
