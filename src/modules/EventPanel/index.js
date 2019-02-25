@@ -5,6 +5,7 @@ import {
     Padding,
     MarginSides,
     MarginBottom,
+    ProgressSection,
 } from '../../helpers/helpers'
 import { SelectInput, RadioInput } from '../../inputs'
 import { Card } from '@dhis2/ui/core/Card'
@@ -132,6 +133,8 @@ export class EventPanel extends Component {
     render() {
         const dataElements = this.getDataElements()
         const half = Math.ceil(dataElements.length / 2)
+
+        if (!this.state.programs) return <ProgressSection />
 
         return !this.state.programs ? null : (
             <MarginBottom>

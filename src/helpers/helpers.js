@@ -1,4 +1,6 @@
+import React from 'react'
 import styled, { css } from 'styled-components'
+import { Card, CircularProgress } from '@dhis2/ui'
 
 export const Title = styled.h1`
     display: block;
@@ -102,4 +104,18 @@ export const MarginTopSmall = styled.div`
 
 export const Padding = styled.div`
     padding: 16px;
+`
+
+export const ProgressSection = () => (
+    <MarginBottom>
+        <Card>
+            <WitdhHeight>
+                <CircularProgress overlay />
+            </WitdhHeight>
+        </Card>
+    </MarginBottom>
+)
+
+const WitdhHeight = styled.div`
+    height: 100px;
 `

@@ -12,6 +12,7 @@ import {
     Padding,
     MarginSides,
     MarginBottom,
+    ProgressSection,
 } from '../../helpers/helpers'
 import {
     getProgramStage,
@@ -424,7 +425,7 @@ class EventInformation extends Component {
     render() {
         const { programStage } = this.state
 
-        if (!programStage) return null
+        if (!programStage) return <ProgressSection />
 
         const sections = programStage.programStageSections.filter(
             section => !section.hide

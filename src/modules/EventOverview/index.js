@@ -1,6 +1,6 @@
 import React from 'react'
 import { getEvents } from '../../api/api'
-import { Margin } from '../../helpers/helpers'
+import { Margin, ProgressSection } from '../../helpers/helpers'
 import { EventTable } from '../EventTable'
 import TitleRow from '../TitleRow'
 
@@ -36,18 +36,20 @@ export class EventOverview extends React.Component {
     }
 
     render() {
-        if (!this.state.data) return null
-
         return (
             <Margin>
                 <TitleRow title="My records" />
-                <EventTable
-                    data={this.state.data}
-                    onEventClick={this.onEventClick}
-                    onAddClick={this.onAddClick}
-                    title=""
-                    addButton
-                />
+                {!this.state.data ? (
+                    <ProgressSection />
+                ) : (
+                    <EventTable
+                        data={this.state.data}
+                        onEventClick={this.onEventClick}
+                        onAddClick={this.onAddClick}
+                        title=""
+                        addButton
+                    />
+                )}
             </Margin>
         )
     }

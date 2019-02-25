@@ -10,13 +10,12 @@ import {
     Margin,
     MarginSides,
     MarginBottom,
+    ProgressSection,
 } from '../../helpers/helpers'
 import {
     getEntityAttributes,
-    addPerson,
-    deletePerson,
-    updatePerson,
     getPersonValues,
+    checkUnique,
 } from '../../api/api'
 import { TextInput, AgeInput, RadioInput, SelectInput } from '../../inputs'
 
@@ -27,9 +26,7 @@ class EntityInformation extends Component {
     state = {
         values: {}, // Current or new values.
         uniques: [], // Unique textfield values are validated.
-        goToHome: false, // Redirects to home after deleting entity.
-        editing: false, // Will be true after Edit button is clicked.
-        unchanged: false, // Submit button is disabled when editing and values are unchanged.
+        readOnly: false,
     }
 
     componentDidMount = async () => {
@@ -42,7 +39,6 @@ class EntityInformation extends Component {
             attributes: attributes,
             values: values,
             uniques: uniques,
-            isNewPatient: this.props.id ? false : true,
             half: Math.floor(attributes.length / 2),
             rules: rules,
         })
@@ -51,22 +47,62 @@ class EntityInformation extends Component {
     /**
      * Called on every input field change.
      */
-    onChange = async (name, value) => {
+    onChange = (name, value) => {
         let values = { ...this.state.values }
+        values[name] = value
+        this.onNewValues(values)
+    }
+
+    onNewValues = values => {
         let attributes = [...this.state.attributes]
         const { rules, uniques } = this.state
-
-        values[name] = value
         this.checkRules(values, attributes, rules)
-
         this.setState({
             values: values,
             attributes: attributes,
-            unchanged: false,
         })
-
         if (this.validate(attributes, values, uniques))
             this.props.onValidValues(values)
+    }
+
+    /**
+     * Checks that no required field is empty and that uniques are validated.
+     */
+    validate = (attributes, values, uniques) => {
+        if (
+            attributes.find(
+                attribute =>
+                    attribute.mandatory &&
+                    values[attribute.trackedEntityAttribute.id] === ''
+            )
+        )
+            return false
+        for (let key in uniques) if (!uniques[key]) return false
+        return true
+    }
+
+    /**
+     * Checks if unique value is valid.
+     * @param {string} id - Attribute ID.
+     * @param {string} value - Attribute value.
+     * @param {string} label - Attribute label.
+     * @returns {boolean} True if valid.
+     */
+    validateUnique = async (id, value, label) => {
+        const entityId = await checkUnique(id, value)
+        if (entityId)
+            if (
+                window.confirm(
+                    `A person with ${label} ${value} is already registered. Do you want to get this person?`
+                )
+            ) {
+                this.onNewValues(await getPersonValues(entityId))
+                return true
+            }
+        let uniques = { ...this.state.uniques }
+        uniques[id] = false
+        this.setState({ uniques: uniques })
+        return false
     }
 
     checkRules = (values, attributes, rules) => {
@@ -127,84 +163,12 @@ class EntityInformation extends Component {
     }
 
     /**
-     * On submit button click.
-     */
-    onSubmitClick = async () => {
-        if (!this.state.editing) {
-            this.props.history.push(
-                '/orgUnit/' +
-                    this.props.match.params.orgUnit +
-                    '/entity/' +
-                    (await addPerson(this.state.values, this.props.orgUnit))
-            )
-            this.setState({ isNewPatient: false })
-            this.props.onEntityAdded()
-        } else {
-            await updatePerson(this.props.id, this.state.values)
-            this.setState({
-                isNewPatient: false,
-                editing: false,
-            })
-        }
-    }
-
-    /**
-     * On edit button click.
-     */
-    onEditClick = () => {
-        this.setState({ isNewPatient: true, editing: true, unchanged: true })
-    }
-
-    /**
-     * On delete button click.
-     */
-    onDeleteClick = async () => {
-        await deletePerson(this.props.id)
-        this.props.history.push('/')
-    }
-
-    /**
-     * Checks that no required field is empty and that uniques are validated.
-     */
-    validate = (attributes, values, uniques) => {
-        if (
-            attributes.find(
-                attribute =>
-                    attribute.mandatory &&
-                    values[attribute.trackedEntityAttribute.id] === ''
-            )
-        )
-            return false
-        for (let key in uniques) if (!uniques[key]) return false
-        return true
-    }
-
-    /**
-     * Called when a unique value is validated.
-     */
-    setUniqueValid = async (name, enityId, label, value) => {
-        if (enityId)
-            if (
-                window.confirm(
-                    `A person with ${label} ${value} is already registered. Do you want to get this person?`
-                )
-            ) {
-                this.setState({ values: await getPersonValues(enityId) })
-                return true
-            }
-        let uniques = { ...this.state.uniques }
-        uniques[name] = enityId !== false
-        this.setState({ uniques: uniques })
-        return false
-    }
-
-    /**
      * Returns appropriate input type.
      */
     getInput = attribute => {
         if (attribute.hide) return null
 
-        const { values, isNewPatient } = this.state
+        const { values, readOnly } = this.state
 
         return (
             <Padding key={attribute.trackedEntityAttribute.id}>
@@ -216,7 +180,7 @@ class EntityInformation extends Component {
                         label={attribute.trackedEntityAttribute.displayName}
                         value={values[attribute.trackedEntityAttribute.id]}
                         onChange={this.onChange}
-                        disabled={!isNewPatient}
+                        disabled={readOnly}
                     />
                 ) : attribute.trackedEntityAttribute.optionSetValue ? (
                     attribute.trackedEntityAttribute.optionSet.options.length <
@@ -231,7 +195,7 @@ class EntityInformation extends Component {
                             label={attribute.trackedEntityAttribute.displayName}
                             value={values[attribute.trackedEntityAttribute.id]}
                             onChange={this.onChange}
-                            disabled={!isNewPatient}
+                            disabled={readOnly}
                         />
                     ) : (
                         <SelectInput
@@ -244,19 +208,19 @@ class EntityInformation extends Component {
                             label={attribute.trackedEntityAttribute.displayName}
                             value={values[attribute.trackedEntityAttribute.id]}
                             onChange={this.onChange}
-                            disabled={!isNewPatient}
+                            disabled={readOnly}
                         />
                     )
                 ) : (
                     <TextInput
                         required={attribute.mandatory}
                         unique={attribute.trackedEntityAttribute.unique}
-                        onUnique={this.setUniqueValid}
+                        validateUnique={this.validateUnique}
                         name={attribute.trackedEntityAttribute.id}
                         label={attribute.trackedEntityAttribute.displayName}
                         value={values[attribute.trackedEntityAttribute.id]}
                         onChange={this.onChange}
-                        disabled={!isNewPatient}
+                        disabled={readOnly}
                     />
                 )}
             </Padding>
@@ -266,7 +230,7 @@ class EntityInformation extends Component {
     render() {
         const { attributes, half } = this.state
 
-        if (!attributes) return null
+        if (!attributes) return <ProgressSection />
 
         return (
             <MarginBottom>

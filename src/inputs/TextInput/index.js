@@ -1,7 +1,6 @@
 import React from 'react'
 import InputField from '@dhis2/ui/core/InputField'
 import _ from 'lodash'
-import { checkUnique } from '../../api/api'
 
 /**
  * Textfield input.
@@ -46,24 +45,12 @@ export class TextInput extends React.Component {
      * @returns Appropriate error text. Empty if valid.
      */
     validate = async value => {
+        const { name, label, required, unique } = this.props
         let errorText = ''
-        if (this.props.required)
-            if (value === '' || value === null)
-                errorText = 'This field is required'
-        if (this.props.unique)
-            if (value !== '') {
-                const entityId = await checkUnique(this.props.name, value)
-                if (entityId)
-                    if (
-                        !(await this.props.onUnique(
-                            this.props.name,
-                            entityId,
-                            this.props.label,
-                            value
-                        ))
-                    )
-                        errorText = 'This field requires a unique value'
-            }
+        if (required && !value) errorText = 'This field is required'
+        if (unique && value)
+            if (!(await this.props.validateUnique(name, value, label)))
+                errorText = 'This field requires a unique value'
         return errorText
     }
 
