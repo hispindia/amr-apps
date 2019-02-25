@@ -52,7 +52,6 @@ export async function initUser() {
     const user = await get(
         'me.json?fields=userGroups,userCredentials[username]'
     )
-    console.log(user)
 
     _username = user.userCredentials.username
 

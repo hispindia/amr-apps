@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { Route, Switch } from 'react-router-dom'
 import styled from 'styled-components'
-import { Events, Event, EventOverview } from './modules'
-import Home from './modules/Home'
+import { Events, EventOverview, Record } from './modules'
+//import Home from './modules/Home'
 import Entity from './modules/Entity'
 
 const MainSection = styled.main`
@@ -36,10 +36,15 @@ export class Main extends Component {
                         />
                     ))}
                     {[
-                        '/orgUnit/:orgUnit/entity/:entity/event',
+                        '/orgUnit/:orgUnit/event',
                         '/orgUnit/:orgUnit/entity/:entity/event/:event',
                     ].map(path => (
-                        <Route key={path} exact path={path} component={Event} />
+                        <Route
+                            key={path}
+                            exact
+                            path={path}
+                            component={Record}
+                        />
                     ))}
                     <Route
                         exact

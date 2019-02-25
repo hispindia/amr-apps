@@ -1,7 +1,8 @@
 import React from 'react'
 import { getEvents } from '../../api/api'
-import { Row, Title, Margin } from '../../helpers/helpers'
+import { Margin } from '../../helpers/helpers'
 import { EventTable } from '../EventTable'
+import TitleRow from '../TitleRow'
 
 /**
  * Shows all events created by user.
@@ -39,18 +40,14 @@ export class EventOverview extends React.Component {
 
         return (
             <Margin>
-                <Row>
-                    <Title>My records</Title>
-                </Row>
-                <div className="table">
-                    <EventTable
-                        data={this.state.data}
-                        onEventClick={this.onEventClick}
-                        onAddClick={this.onAddClick}
-                        title=""
-                        addButton
-                    />
-                </div>
+                <TitleRow title="My records" />
+                <EventTable
+                    data={this.state.data}
+                    onEventClick={this.onEventClick}
+                    onAddClick={this.onAddClick}
+                    title=""
+                    addButton
+                />
             </Margin>
         )
     }

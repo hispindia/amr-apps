@@ -4,14 +4,19 @@ import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Grid } from '@material-ui/core'
 import { Card } from '@dhis2/ui/core'
-import { Heading, Padding, Margin, MarginSides } from '../../helpers/helpers'
+import {
+    Heading,
+    Padding,
+    Margin,
+    MarginSides,
+    MarginBottom,
+} from '../../helpers/helpers'
 import {
     getEntityAttributes,
     addPerson,
     deletePerson,
     updatePerson,
 } from '../../api/api'
-import { EntityButtons } from '../'
 import { TextInput, AgeInput, RadioInput, SelectInput } from '../../inputs'
 
 /**
@@ -48,7 +53,7 @@ class EntityInformation extends Component {
     onChange = async (name, value) => {
         let values = { ...this.state.values }
         let attributes = [...this.state.attributes]
-        const rules = this.state.rules
+        const { rules, uniques } = this.state
 
         values[name] = value
         this.checkRules(values, attributes, rules)
@@ -58,6 +63,9 @@ class EntityInformation extends Component {
             attributes: attributes,
             unchanged: false,
         })
+
+        if (this.validate(attributes, values, uniques))
+            this.props.onValidValues(values)
     }
 
     checkRules = (values, attributes, rules) => {
@@ -157,8 +165,7 @@ class EntityInformation extends Component {
     /**
      * Checks that no required field is empty and that uniques are validated.
      */
-    validate = () => {
-        const { attributes, values, uniques } = this.state
+    validate = (attributes, values, uniques) => {
         for (let i = 0; i < attributes.length; i++)
             if (attributes[i].mandatory)
                 if (values[attributes[i].trackedEntityAttribute.id] === '')
@@ -174,38 +181,6 @@ class EntityInformation extends Component {
         let uniques = { ...this.state.uniques }
         uniques[name] = valid
         this.setState({ uniques: uniques })
-    }
-
-    /**
-     * Returns buttons based on adding new person or editing.
-     */
-    getButtonProps = () => {
-        return this.state.isNewPatient
-            ? [
-                  {
-                      label: 'Submit',
-                      onClick: this.onSubmitClick,
-                      disabled: !this.validate() || this.state.unchanged,
-                      icon: 'done',
-                      kind: 'primary',
-                  },
-              ]
-            : [
-                  {
-                      label: 'Edit',
-                      onClick: this.onEditClick,
-                      disabled: false,
-                      icon: 'edit',
-                      kind: 'primary',
-                  },
-                  {
-                      label: 'Delete',
-                      onClick: this.onDeleteClick,
-                      disabled: false,
-                      icon: 'delete',
-                      kind: 'destructive',
-                  },
-              ]
     }
 
     /**
@@ -279,26 +254,27 @@ class EntityInformation extends Component {
         if (!attributes) return null
 
         return (
-            <Card>
-                <Margin>
-                    <MarginSides>
-                        <Heading>Information</Heading>
-                    </MarginSides>
-                    <Grid container spacing={0}>
-                        <Grid item xs>
-                            {attributes
-                                .slice(0, half)
-                                .map(attribute => this.getInput(attribute))}
+            <MarginBottom>
+                <Card>
+                    <Margin>
+                        <MarginSides>
+                            <Heading>Person</Heading>
+                        </MarginSides>
+                        <Grid container spacing={0}>
+                            <Grid item xs>
+                                {attributes
+                                    .slice(0, half)
+                                    .map(attribute => this.getInput(attribute))}
+                            </Grid>
+                            <Grid item xs>
+                                {attributes
+                                    .slice(half)
+                                    .map(attribute => this.getInput(attribute))}
+                            </Grid>
                         </Grid>
-                        <Grid item xs>
-                            {attributes
-                                .slice(half)
-                                .map(attribute => this.getInput(attribute))}
-                        </Grid>
-                    </Grid>
-                    <EntityButtons buttons={this.getButtonProps()} />
-                </Margin>
-            </Card>
+                    </Margin>
+                </Card>
+            </MarginBottom>
         )
     }
 }
