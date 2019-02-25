@@ -172,18 +172,16 @@ export async function getEntityAttributes(entityId) {
  * Checks if any tracked entity instance has property with value.
  * @param {string} property - Property.
  * @param {string} value - Value.
- * @returns {boolean} - True if unique.
+ * @returns {boolean} - False if unique, tracked entity instance ID otherwise.
  */
-export async function isUnique(property, value) {
-    return (
-        (await get(
-            `trackedEntityInstances.json?ouMode=ALL&fields=
-            attributes[code,displayName,valueType,attribute,value]&filter=` +
-                property +
-                ':eq:' +
-                value
-        )).trackedEntityInstances.length === 0
-    )
+export async function checkUnique(property, value) {
+    const entities = (await get(
+        'trackedEntityInstances.json?ouMode=ALL&fields=trackedEntityInstance&filter=' +
+            property +
+            ':eq:' +
+            value
+    )).trackedEntityInstances
+    return entities.length > 0 ? entities[0].trackedEntityInstance : false
 }
 
 /**

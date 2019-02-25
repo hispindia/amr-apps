@@ -16,6 +16,7 @@ import {
     addPerson,
     deletePerson,
     updatePerson,
+    getPersonValues,
 } from '../../api/api'
 import { TextInput, AgeInput, RadioInput, SelectInput } from '../../inputs'
 
@@ -166,10 +167,14 @@ class EntityInformation extends Component {
      * Checks that no required field is empty and that uniques are validated.
      */
     validate = (attributes, values, uniques) => {
-        for (let i = 0; i < attributes.length; i++)
-            if (attributes[i].mandatory)
-                if (values[attributes[i].trackedEntityAttribute.id] === '')
-                    return false
+        if (
+            attributes.find(
+                attribute =>
+                    attribute.mandatory &&
+                    values[attribute.trackedEntityAttribute.id] === ''
+            )
+        )
+            return false
         for (let key in uniques) if (!uniques[key]) return false
         return true
     }
@@ -177,10 +182,20 @@ class EntityInformation extends Component {
     /**
      * Called when a unique value is validated.
      */
-    setUniqueValid = (name, valid) => {
+    setUniqueValid = async (name, enityId, label, value) => {
+        if (enityId)
+            if (
+                window.confirm(
+                    `A person with ${label} ${value} is already registered. Do you want to get this person?`
+                )
+            ) {
+                this.setState({ values: await getPersonValues(enityId) })
+                return true
+            }
         let uniques = { ...this.state.uniques }
-        uniques[name] = valid
+        uniques[name] = enityId !== false
         this.setState({ uniques: uniques })
+        return false
     }
 
     /**
