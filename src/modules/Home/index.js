@@ -1,6 +1,6 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
-import { getEntities } from '../../api/api'
+import { getPersons } from '../../api/api'
 import { Row, Title, Margin } from '../../helpers/helpers'
 import EntityTable from '../EntityTable'
 
@@ -21,9 +21,12 @@ class Home extends React.Component {
         if (this.props.selected !== this.state.selected) await this.getData()
     }
 
+    /**
+     * Gets the person data.
+     */
     getData = async () => {
         this.setState({
-            data: await getEntities(this.props.selected),
+            data: await getPersons(this.props.selected),
             selected: this.props.selected,
         })
     }

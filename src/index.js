@@ -3,15 +3,15 @@ import ReactDOM from 'react-dom'
 import * as serviceWorker from './serviceWorker'
 import { App } from './App'
 import { setBaseUrl } from './api/crud'
-import { setUserAccess } from './api/api'
+import { initUserAccess } from './api/api'
 
-const developmentServer = 'https://amrtest.icmr.org.in/amr'
+const developmentServer = 'http://apps.hispindia.org/amr'
 const rootElement = document.getElementById('root')
 
 const withBaseUrl = async baseUrl => {
     baseUrl = `${baseUrl}/api`
     setBaseUrl(baseUrl)
-    await setUserAccess()
+    await initUserAccess()
 
     ReactDOM.render(<App />, rootElement)
     serviceWorker.unregister()

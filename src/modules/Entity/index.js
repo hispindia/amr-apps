@@ -1,6 +1,6 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
-import { getEntityLabel, getPersonsEvents } from '../../api/api'
+import { getPersonsEvents } from '../../api/api'
 import { Title, Row, Margin } from '../../helpers/helpers'
 import { EventTable } from '../'
 import IconButton from '../../inputs/IconButton'
@@ -12,7 +12,6 @@ import EntityInformation from '../EntityInformation'
 class Entity extends React.Component {
     state = {
         data: null,
-        forceTable: false,
     }
 
     componentDidMount = async () => {
@@ -70,7 +69,7 @@ class Entity extends React.Component {
                         icon="arrow_back"
                         onClick={this.backClicked}
                     />
-                    <Title>{getEntityLabel()}</Title>
+                    <Title>Person</Title>
                 </Row>
                 <EntityInformation
                     id={

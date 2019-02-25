@@ -48,3 +48,10 @@
 #sidebar_menu .ui_menu_item_4jpdr:nth-child(5) :first-child {
     color: var(--teal600);
 }
+
+/* Required star color and spacing. */
+.ui_selectfield_label_1a3v8.ui_selectfield_required_1a3v8::after,
+.ui_inputfield_label_kvrmz.ui_inputfield_required_kvrmz::after {
+    color: var(--red600);
+    padding-left: 4px;
+}

@@ -1,6 +1,4 @@
-import React from 'react'
-import { Divider as CoreDivider } from '@dhis2/ui/core/helpers'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 export const Title = styled.h1`
     display: block;
@@ -28,8 +26,19 @@ export const Text = styled.div`
 export const Label = styled.div`
     color: var(--grey700);
     white-space: nowrap;
-    margin: 12px;
+    padding: 0px 12px 12px 12px;
     line-height: 24px;
+    font-weight: 500;
+    ${props =>
+        props.required &&
+        !props.disabled &&
+        css`
+            ::after {
+                content: '*';
+                color: var(--red600);
+                padding-left: 4px;
+            }
+        `}
 `
 
 export const Row = styled.div`
@@ -94,6 +103,3 @@ export const MarginTopSmall = styled.div`
 export const Padding = styled.div`
     padding: 16px;
 `
-
-export const Divider = () => <CoreDivider margin="43px 0 60px 0" />
-export const Spacer = ({ height }) => <div style={{ height, width: '100%' }} />

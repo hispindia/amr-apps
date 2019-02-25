@@ -4,11 +4,7 @@ import MomentUtils from '@date-io/moment'
 import * as moment from 'moment'
 import InputField from '@dhis2/ui/core/InputField'
 import styled from 'styled-components'
-import { RowW, Label, Input } from '../../helpers/helpers'
-
-const TopSpacer = styled.div`
-    margin-top: 16px;
-`
+import { RowW, Label, Input, MarginTop } from '../../helpers/helpers'
 
 const UnitContainer = styled.div`
     margin-right: 16px;
@@ -97,7 +93,7 @@ export class AgeInput extends React.Component {
                 years = v
                 break
             case 'months':
-                if (v < 0 || v > 12) return
+                if (v < 0 || v > 11) return
                 months = v
                 break
             case 'days':
@@ -127,7 +123,7 @@ export class AgeInput extends React.Component {
      */
     getField = () => {
         return (
-            <TopSpacer
+            <MarginTop
                 onClick={this.props.disabled ? null : this.openPicker}
                 onKeyPress={this.props.disabled ? null : this.onKeyPress}
             >
@@ -146,17 +142,14 @@ export class AgeInput extends React.Component {
                     disabled={this.props.disabled}
                     size="dense"
                 />
-            </TopSpacer>
+            </MarginTop>
         )
     }
 
     render() {
         return (
             <Input>
-                <Label>
-                    {this.props.label}
-                    {this.props.required ? '*' : null}
-                </Label>
+                <Label required={this.props.required}>{this.props.label}</Label>
                 <RowW>
                     <UnitContainer>
                         <InputField
