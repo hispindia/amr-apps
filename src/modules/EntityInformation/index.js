@@ -53,16 +53,17 @@ class EntityInformation extends Component {
         this.onNewValues(values)
     }
 
-    onNewValues = values => {
+    onNewValues = (values, entityId) => {
         let attributes = [...this.state.attributes]
         const { rules, uniques } = this.state
         this.checkRules(values, attributes, rules)
         this.setState({
             values: values,
             attributes: attributes,
+            entityId: entityId ? entityId : null,
         })
         if (this.validate(attributes, values, uniques))
-            this.props.onValidValues(values)
+            this.props.onValidValues(values, entityId)
     }
 
     /**
@@ -96,13 +97,13 @@ class EntityInformation extends Component {
                     `A person with ${label} ${value} is already registered. Do you want to get this person?`
                 )
             ) {
-                this.onNewValues(await getPersonValues(entityId))
+                this.onNewValues(await getPersonValues(entityId), entityId)
                 return true
-            }
+            } else return false
         let uniques = { ...this.state.uniques }
-        uniques[id] = false
+        uniques[id] = true
         this.setState({ uniques: uniques })
-        return false
+        return true
     }
 
     checkRules = (values, attributes, rules) => {

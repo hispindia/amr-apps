@@ -993,31 +993,75 @@ async function setEventValues(event, values) {
     return event
 }
 
+async function addPersonWithEvent(entityValues, event) {
+    let data = {
+        trackedEntityType: _personTypeId,
+        orgUnit: event.orgUnit,
+        attributes: Object.keys(entityValues).map(key => {
+            return { attribute: key, value: entityValues[key] }
+        }),
+        enrollments: [
+            {
+                orgUnit: event.orgUnit,
+                program: event.program,
+                enrollmentDate: event.eventDate,
+                incidentDate: event.eventDate,
+                events: [event],
+            },
+        ],
+    }
+
+    console.log(data)
+
+    await postData('trackedEntityInstances/', data)
+}
+
 /**
  * Adds a new event. Enrolls person if not already enrolled.
- * @param {Object[]} values - Values.
+ * @param {Object[]} eventValues - Values.
  * @param {string} programId - Program ID.
  * @param {string} programStageId - Program stage ID.
  * @param {string} orgUnitId - Organisation unit ID.
  * @param {string} entityId - Tracked entity instance ID.
  */
 export async function addEvent(
-    values,
+    eventValues,
     programId,
     programStageId,
     orgUnitId,
+    entityValues,
     entityId
 ) {
-    const date = values[_sampleDateElementId]
-        ? values[_sampleDateElementId]
+    /*
+    eventValues,
+    panelValues.programId,
+    panelValues.programStageId,
+    this.props.match.params.orgUnit,
+    entityValues,
+    entityId
+    */
+
+    const date = eventValues[_sampleDateElementId]
+        ? eventValues[_sampleDateElementId]
         : moment()
 
-    const enrollments = (await get(
-        'trackedEntityInstances/' +
-            entityId +
-            '.json?fields=enrollments[program]'
-    )).enrollments
+    let event = await setEventValues(
+        {
+            dataValues: [],
+            eventDate: date,
+            orgUnit: orgUnitId,
+            program: programId,
+            programStage: programStageId,
+            trackedEntityInstance: entityId,
+        },
+        eventValues
+    )
 
+    if (!entityId) return await addPersonWithEvent(entityValues, event)
+    console.log('oops')
+
+    /*    let enrollments = []
+        enrollments = (await get('trackedEntityInstances/' + entityId + '.json?fields=enrollments[program]')).enrollments
     const isEnrolled = enrollments.find(
         enrollment => enrollment.program === programId
     )
@@ -1029,7 +1073,7 @@ export async function addEvent(
             enrollmentDate: date,
             incidentDate: date,
         })
-    }
+    }*/
 
     /*enrollments: [
             {
@@ -1049,21 +1093,7 @@ export async function addEvent(
             ? 'Validate'
             : values[_l2ApprovalStatus]*/
 
-    let event = await setEventValues(
-        {
-            dataValues: [],
-            //enrollment: enrollment,
-            eventDate: date,
-            orgUnit: orgUnitId,
-            program: programId,
-            programStage: programStageId,
-            trackedEntityInstance: entityId,
-        },
-        values
-        //testFields
-    )
-
-    await postData('events', event)
+    //await postData('events', event)
 }
 
 /**

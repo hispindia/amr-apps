@@ -30,7 +30,6 @@ import {
     CheckboxInput,
     DateInput,
 } from '../../inputs'
-import { EntityButtons } from '../EntityButtons'
 
 const ChildSectionLabel = styled.div`
     margin: 16px 16px -16px;
@@ -87,16 +86,35 @@ class EventInformation extends Component {
 
     onChange = async (name, value) => {
         let values = { ...this.state.values }
-        let programStage = { ...this.state.programStage }
         values[name] = value
+        this.onNewValues(values)
+    }
 
-        this.checkRules(
-            values,
-            programStage.programStageSections,
-            this.state.rules
-        )
+    onNewValues = values => {
+        let programStage = { ...this.state.programStage }
+        const rules = this.state.rules
+        this.checkRules(values, programStage.programStageSections, rules)
+        this.setState({
+            values: values,
+            programStage: programStage,
+        })
+        if (this.validateValues(programStage.programStageSections, values))
+            this.props.onValidValues(values)
+    }
 
-        this.setState({ values: values })
+    validateValues = (sections, values) => {
+        for (let section of sections) {
+            if (section.childSections)
+                this.validateValues(section.childSections, values)
+            if (
+                section.dataElements.find(
+                    dataElement =>
+                        dataElement.required && values[dataElement.id] === ''
+                )
+            )
+                return false
+        }
+        return true
     }
 
     checkRules = (values, sections, rules) => {
@@ -214,47 +232,6 @@ class EventInformation extends Component {
             return ''
         }
     }*/
-
-    onBackClicked = () => {
-        this.props.history.push(
-            '/orgUnit/' +
-                this.props.match.params.orgUnit +
-                '/entity/' +
-                this.props.match.params.entity
-        )
-    }
-
-    /**
-     * Returns buttons based on adding new person or editing.
-     */
-    getButtonProps = () => {
-        return true
-            ? [
-                  {
-                      label: 'Submit',
-                      onClick: this.onSubmitClick,
-                      disabled: false, //!this.validate() || this.state.unchanged,
-                      icon: 'done',
-                      kind: 'primary',
-                  },
-              ]
-            : [
-                  {
-                      label: 'Edit',
-                      onClick: this.onSubmitClick,
-                      disabled: false,
-                      icon: 'edit',
-                      kind: 'primary',
-                  },
-                  {
-                      label: 'Delete',
-                      onClick: this.onSubmitClick,
-                      disabled: false,
-                      icon: 'delete',
-                      kind: 'destructive',
-                  },
-              ]
-    }
 
     /**
      * On submit button click.
@@ -528,7 +505,6 @@ class EventInformation extends Component {
                         </MarginBottom>
                     )
                 })}
-                <EntityButtons buttons={this.getButtonProps()} />
             </MarginBottom>
         )
     }
