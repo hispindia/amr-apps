@@ -712,6 +712,7 @@ export async function getProgramStage(
         })
     })
 
+    let remove = []
     // Adding child sections and removing child sections from main sections.
     programStage.programStageSections.forEach(programStageSection => {
         let childSections = []
@@ -722,14 +723,7 @@ export async function getProgramStage(
                 )
             )
             .forEach(childSection => {
-                programStage.programStageSections.splice(
-                    programStage.programStageSections.indexOf(
-                        programStage.programStageSections.find(
-                            section => section.name === childSection.name
-                        )
-                    ),
-                    1
-                )
+                remove.push(childSection.id)
                 childSection.name = childSection.name.replace(
                     new RegExp('{' + programStageSection.name + '}'),
                     ''
@@ -738,6 +732,10 @@ export async function getProgramStage(
             })
         programStageSection.childSections = childSections
     })
+
+    programStage.programStageSections = programStage.programStageSections.filter(
+        section => !remove.includes(section.id)
+    )
 
     return {
         programStage: programStage,
