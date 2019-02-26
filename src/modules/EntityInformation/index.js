@@ -26,6 +26,7 @@ class EntityInformation extends Component {
     state = {
         values: {}, // Current or new values.
         uniques: [], // Unique textfield values are validated.
+        entityId: null,
         readOnly: false,
     }
 
@@ -49,6 +50,7 @@ class EntityInformation extends Component {
      */
     onChange = (name, value) => {
         let values = { ...this.state.values }
+        if (values[name] === value) return
         values[name] = value
         this.onNewValues(values)
     }

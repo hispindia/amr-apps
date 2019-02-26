@@ -12,6 +12,7 @@ export class Record extends Component {
         entityValues: null,
         panelValues: null,
         eventValues: null,
+        entityId: null,
     }
 
     onValidEntityValues = (values, entityId) =>

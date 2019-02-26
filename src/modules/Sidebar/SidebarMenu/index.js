@@ -10,9 +10,9 @@ class SidebarMenu extends Component {
     state = {
         menuItems: [
             {
-                label: 'Persons',
+                label: 'My records',
                 value: '/',
-                icon: 'people',
+                icon: 'home',
             },
             {
                 label: 'Records for revision (0)',

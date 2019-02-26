@@ -1032,15 +1032,6 @@ export async function addEvent(
     entityValues,
     entityId
 ) {
-    /*
-    eventValues,
-    panelValues.programId,
-    panelValues.programStageId,
-    this.props.match.params.orgUnit,
-    entityValues,
-    entityId
-    */
-
     const date = eventValues[_sampleDateElementId]
         ? eventValues[_sampleDateElementId]
         : moment()
@@ -1057,11 +1048,16 @@ export async function addEvent(
         eventValues
     )
 
+    // If adding event and to new person.
     if (!entityId) return await addPersonWithEvent(entityValues, event)
-    console.log('oops')
 
-    /*    let enrollments = []
-        enrollments = (await get('trackedEntityInstances/' + entityId + '.json?fields=enrollments[program]')).enrollments
+    // Enrolling if not already enrolled.
+    let enrollments = []
+    enrollments = (await get(
+        'trackedEntityInstances/' +
+            entityId +
+            '.json?fields=enrollments[program]'
+    )).enrollments
     const isEnrolled = enrollments.find(
         enrollment => enrollment.program === programId
     )
@@ -1073,27 +1069,9 @@ export async function addEvent(
             enrollmentDate: date,
             incidentDate: date,
         })
-    }*/
+    }
 
-    /*enrollments: [
-            {
-                orgUnit: orgUnit,
-                program: _amrProgramId,
-                enrollmentDate: now,
-                incidentDate: now,
-            },
-        ],*/
-
-    /*values[_l1ApprovalStatus] =
-        values[_l1ApprovalStatus] === ''
-            ? 'Validate'
-            : values[_l1ApprovalStatus]
-    values[_l2ApprovalStatus] =
-        values[_l2ApprovalStatus] === ''
-            ? 'Validate'
-            : values[_l2ApprovalStatus]*/
-
-    //await postData('events', event)
+    await postData('events', event)
 }
 
 /**
