@@ -23,9 +23,7 @@ export class EventOverview extends React.Component {
      * Called when table row is clicked.
      */
     onEventClick = row => {
-        this.props.history.push(
-            '/orgUnit/' + row[5] + '/event/' + row[7] + '/entity/' + row[6]
-        )
+        this.props.history.push('/orgUnit/' + row[5] + '/event/' + row[6])
     }
 
     /**

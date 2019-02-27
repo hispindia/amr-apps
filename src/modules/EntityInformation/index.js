@@ -171,7 +171,8 @@ class EntityInformation extends Component {
     getInput = attribute => {
         if (attribute.hide) return null
 
-        const { values, readOnly } = this.state
+        const { values, entityId } = this.state
+        const disabled = entityId ? true : false
 
         return (
             <Padding key={attribute.trackedEntityAttribute.id}>
@@ -183,7 +184,7 @@ class EntityInformation extends Component {
                         label={attribute.trackedEntityAttribute.displayName}
                         value={values[attribute.trackedEntityAttribute.id]}
                         onChange={this.onChange}
-                        disabled={readOnly}
+                        disabled={disabled}
                     />
                 ) : attribute.trackedEntityAttribute.optionSetValue ? (
                     attribute.trackedEntityAttribute.optionSet.options.length <
@@ -198,7 +199,7 @@ class EntityInformation extends Component {
                             label={attribute.trackedEntityAttribute.displayName}
                             value={values[attribute.trackedEntityAttribute.id]}
                             onChange={this.onChange}
-                            disabled={readOnly}
+                            disabled={disabled}
                         />
                     ) : (
                         <SelectInput
@@ -211,7 +212,7 @@ class EntityInformation extends Component {
                             label={attribute.trackedEntityAttribute.displayName}
                             value={values[attribute.trackedEntityAttribute.id]}
                             onChange={this.onChange}
-                            disabled={readOnly}
+                            disabled={disabled}
                         />
                     )
                 ) : (
@@ -223,7 +224,7 @@ class EntityInformation extends Component {
                         label={attribute.trackedEntityAttribute.displayName}
                         value={values[attribute.trackedEntityAttribute.id]}
                         onChange={this.onChange}
-                        disabled={readOnly}
+                        disabled={disabled}
                     />
                 )}
             </Padding>

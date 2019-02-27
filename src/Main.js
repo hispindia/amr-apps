@@ -37,7 +37,7 @@ export class Main extends Component {
                     ))}
                     {[
                         '/orgUnit/:orgUnit/event',
-                        '/orgUnit/:orgUnit/entity/:entity/event/:event',
+                        '/orgUnit/:orgUnit/event/:event',
                     ].map(path => (
                         <Route
                             key={path}

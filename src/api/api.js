@@ -542,7 +542,7 @@ export async function getEventCounts(orgUnit) {
  */
 export async function getEvents(orgUnit) {
     const allEvents = (await get(
-        'events.json?paging=false&fields=storedBy,orgUnit,trackedEntityInstance,event,' +
+        'events.json?paging=false&fields=storedBy,orgUnit,event,' +
             'lastUpdated,created,dataValues[dataElement,value]&orgUnit=' +
             orgUnit +
             '&ouMode=DESCENDANTS'
@@ -579,11 +579,6 @@ export async function getEvents(orgUnit) {
                 options: { display: false },
             },
             {
-                name: 'Entity',
-                column: 'Entity',
-                options: { display: false },
-            },
-            {
                 name: 'Event',
                 column: 'Event',
                 options: { display: false },
@@ -616,7 +611,6 @@ export async function getEvents(orgUnit) {
             removeTime(event.created),
             removeTime(event.lastUpdated),
             event.orgUnit,
-            event.trackedEntityInstance,
             event.event,
         ])
     })
@@ -629,12 +623,7 @@ export async function getEvents(orgUnit) {
  * @param {string} eventId - Event ID.
  * @returns {Object} AMR program stage, values, and organism data element ID.
  */
-export async function getProgramStage(
-    programId,
-    programStageId,
-    organismCode,
-    eventId
-) {
+export async function getProgramStage(panelValues, eventId) {
     const isDisabled = element => {
         switch (element.id) {
             /*case _l1ApprovalStatus:
@@ -669,11 +658,17 @@ export async function getProgramStage(
     }
 
     let values = {}
+    let programId = {}
+    let programStageId = {}
     if (eventId) {
         let eventData = await getEventValues(eventId)
         programId = eventData.programId
         programStageId = eventData.programStageId
         values = eventData.values
+    } else {
+        programId = panelValues.programId
+        programStageId = panelValues.programStageId
+        values[_organismsDataElementId] = panelValues.organismCode
     }
 
     let programStage = await get(
@@ -683,8 +678,6 @@ export async function getProgramStage(
             programStageSections[id,name,displayName,dataElements[id,displayFormName,code,valueType,optionSetValue,
                 optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]`
     )
-
-    values[_organismsDataElementId] = organismCode
 
     programStage.programStageSections.forEach(section => {
         section.hide = false
@@ -766,7 +759,9 @@ export async function getProgramRules(programId, programStageId) {
             })
             variables.forEach(variable => {
                 const name = variable.substring(2, variable.length - 1)
-                const id = programRuleVariables.find(ruleVariable => ruleVariable.name === name).dataElement.id
+                const id = programRuleVariables.find(
+                    ruleVariable => ruleVariable.name === name
+                ).dataElement.id
                 condition = condition.replace(
                     new RegExp('#{' + name + '}', 'g'),
                     "values['" + id + "']"
@@ -1015,8 +1010,6 @@ async function addPersonWithEvent(entityValues, event) {
             },
         ],
     }
-
-    console.log(data)
 
     await postData('trackedEntityInstances/', data)
 }

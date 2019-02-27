@@ -64,14 +64,10 @@ class EventInformation extends Component {
 
     getProgramStage = async () => {
         this.setState({ loading: true })
-        const { programId, programStageId, organismCode } = this.props
+        const { panelValues, eventId } = this.props
         let { programStage, values, rules, isResend } = await getProgramStage(
-            programId,
-            programStageId,
-            organismCode,
-            this.props.match.params.event
-                ? this.props.match.params.event
-                : undefined
+            panelValues,
+            eventId
         )
 
         this.checkRules(values, programStage.programStageSections, rules)
@@ -81,7 +77,7 @@ class EventInformation extends Component {
             programStage: programStage,
             values: values,
             isResend: isResend,
-            programStageId: programStageId,
+            programStageId: panelValues ? panelValues.programStageId : null,
             rules: rules,
         })
     }
@@ -214,7 +210,9 @@ class EventInformation extends Component {
                             break
                         case 'ASSIGN':
                             if (eval(rule.condition)) {
-                                let affectedDataElement = getAffectedDataElement(r.dataElement.id)
+                                let affectedDataElement = getAffectedDataElement(
+                                    r.dataElement.id
+                                )
                                 // Assigning value.
                                 values[affectedDataElement.id] = r.data
                             }

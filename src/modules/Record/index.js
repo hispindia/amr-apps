@@ -13,7 +13,18 @@ export class Record extends Component {
         panelValues: null,
         eventValues: null,
         entityId: null,
+        eventId: null,
         buttonDisabled: true,
+        initialized: false,
+    }
+
+    componentDidMount = () => {
+        this.setState({
+            eventId: this.props.match.params.event
+                ? this.props.match.params.event
+                : null,
+            initialized: true,
+        })
     }
 
     onValidEntityValues = (values, entityId) =>
@@ -41,35 +52,53 @@ export class Record extends Component {
         window.alert(`AMR Id: ${amrId}`)
     }
 
-    render() {
-        const { entityValues, panelValues, buttonDisabled } = this.state
+    sections = () => {
+        const {
+            entityValues,
+            panelValues,
+            eventId,
+            buttonDisabled,
+        } = this.state
 
         return (
-            <Margin>
-                <TitleRow title="Record" backPath="/" />
-                <EntityInformation onValidValues={this.onValidEntityValues} />
+            <div>
+                {!eventId && (
+                    <EntityInformation
+                        onValidValues={this.onValidEntityValues}
+                    />
+                )}
                 {entityValues && <EventPanel onPanel={this.onPanel} />}
-                {panelValues && (
+                {(eventId || panelValues) && (
                     <EventInformation
-                        programId={panelValues.programId}
-                        programStageId={panelValues.programStageId}
-                        organismCode={panelValues.organismCode}
+                        eventId={eventId}
+                        panelValues={panelValues}
                         onValidValues={this.onValidEventValues}
                     />
                 )}
-                <EntityButtons
-                    buttons={[
-                        {
-                            label: 'Submit',
-                            onClick: this.onSubmitClick,
-                            disabled: buttonDisabled,
-                            icon: 'done',
-                            kind: 'primary',
-                            tooltip: 'Submit record.',
-                            disabledTooltip: 'A required field is empty.',
-                        },
-                    ]}
-                />
+                {!eventId && (
+                    <EntityButtons
+                        buttons={[
+                            {
+                                label: 'Submit',
+                                onClick: this.onSubmitClick,
+                                disabled: buttonDisabled,
+                                icon: 'done',
+                                kind: 'primary',
+                                tooltip: 'Submit record.',
+                                disabledTooltip: 'A required field is empty.',
+                            },
+                        ]}
+                    />
+                )}
+            </div>
+        )
+    }
+
+    render() {
+        return (
+            <Margin>
+                <TitleRow title="Record" backPath="/" />
+                {this.state.initialized && this.sections()}
             </Margin>
         )
     }
