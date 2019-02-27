@@ -27,7 +27,6 @@ class EntityInformation extends Component {
         values: {}, // Current or new values.
         uniques: [], // Unique textfield values are validated.
         entityId: null,
-        readOnly: false,
     }
 
     componentDidMount = async () => {
@@ -43,6 +42,11 @@ class EntityInformation extends Component {
             half: Math.floor(attributes.length / 2),
             rules: rules,
         })
+    }
+
+    componentDidUpdate = prevProps => {
+        if (this.props.entityId !== prevProps.entityId)
+            this.setState({ entityId: this.props.entityId })
     }
 
     /**

@@ -4,8 +4,8 @@ import EntityInformation from '../EntityInformation'
 import TitleRow from '../TitleRow'
 import EventInformation from '../EventInformation'
 import { EventPanel } from '../EventPanel'
-import { EntityButtons } from '../EntityButtons'
 import { addEvent } from '../../api/api'
+import { ButtonRow } from '../../inputs'
 
 export class Record extends Component {
     state = {
@@ -16,6 +16,7 @@ export class Record extends Component {
         eventId: null,
         buttonDisabled: true,
         initialized: false,
+        resetPanelValues: false,
     }
 
     componentDidMount = () => {
@@ -38,10 +39,10 @@ export class Record extends Component {
     onValidEventValues = values =>
         this.setState({ eventValues: values, buttonDisabled: false })
 
-    onSubmitClick = async () => {
+    onSubmitClick = async addMore => {
         this.setState({ buttonDisabled: true })
         const { entityValues, panelValues, eventValues, entityId } = this.state
-        const amrId = await addEvent(
+        const { amrId, newEntityId } = await addEvent(
             eventValues,
             panelValues.programId,
             panelValues.programStageId,
@@ -50,14 +51,26 @@ export class Record extends Component {
             entityId
         )
         window.alert(`AMR Id: ${amrId}`)
+        console.log(newEntityId)
+
+        if (addMore)
+            this.setState({
+                entityId: newEntityId,
+                panelValues: null,
+                eventValues: null,
+                resetPanelValues: true,
+            })
+        else this.props.history.push('/')
     }
 
     sections = () => {
         const {
             entityValues,
+            entityId,
             panelValues,
             eventId,
             buttonDisabled,
+            resetPanelValues,
         } = this.state
 
         return (
@@ -65,9 +78,15 @@ export class Record extends Component {
                 {!eventId && (
                     <EntityInformation
                         onValidValues={this.onValidEntityValues}
+                        entityId={entityId}
                     />
                 )}
-                {entityValues && <EventPanel onPanel={this.onPanel} />}
+                {entityValues && (
+                    <EventPanel
+                        reset={resetPanelValues}
+                        onPanel={this.onPanel}
+                    />
+                )}
                 {(eventId || panelValues) && (
                     <EventInformation
                         eventId={eventId}
@@ -76,11 +95,30 @@ export class Record extends Component {
                     />
                 )}
                 {!eventId && (
-                    <EntityButtons
+                    <ButtonRow
                         buttons={[
                             {
+                                label: 'Cancel',
+                                onClick: () => this.props.history.push('/'),
+                                disabled: false,
+                                icon: 'clear',
+                                kind: 'destructive',
+                                tooltip: 'Cancel and go back.',
+                                disabledTooltip: 'A required field is empty.',
+                            },
+                            {
+                                label: 'Submit and add new',
+                                onClick: () => this.onSubmitClick(true),
+                                disabled: buttonDisabled,
+                                icon: 'plus_one',
+                                kind: 'primary',
+                                tooltip:
+                                    'Submit record and add new record for the same person.',
+                                disabledTooltip: 'A required field is empty.',
+                            },
+                            {
                                 label: 'Submit',
-                                onClick: this.onSubmitClick,
+                                onClick: () => this.onSubmitClick(false),
                                 disabled: buttonDisabled,
                                 icon: 'done',
                                 kind: 'primary',

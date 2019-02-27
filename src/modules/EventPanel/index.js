@@ -35,6 +35,17 @@ export class EventPanel extends Component {
         })
     }
 
+    componentDidUpdate = prevProps => {
+        if (this.props.reset && !prevProps.reset)
+            this.setState({
+                values: {
+                    programId: '',
+                    programStageId: '',
+                    organismCode: '',
+                },
+            })
+    }
+
     /**
      * Called when a new program is selected.
      */

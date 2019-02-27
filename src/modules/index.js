@@ -1,5 +1,4 @@
 export * from './Entity'
-export * from './EntityButtons'
 export * from './EntityTable'
 export * from './Event'
 //export * from './EventInformation'

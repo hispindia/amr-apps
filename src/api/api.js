@@ -545,7 +545,7 @@ export async function getEvents(orgUnit) {
         'events.json?paging=false&fields=storedBy,orgUnit,event,' +
             'lastUpdated,created,dataValues[dataElement,value]&orgUnit=' +
             orgUnit +
-            '&ouMode=DESCENDANTS'
+            '&ouMode=DESCENDANTS&order=updated:desc'
     )).events
 
     // Does not seem to be possible to filter by storedBy with the API.
@@ -1011,7 +1011,8 @@ async function addPersonWithEvent(entityValues, event) {
         ],
     }
 
-    await postData('trackedEntityInstances/', data)
+    return (await (await postData('trackedEntityInstances/', data)).json())
+        .response.importSummaries[0].reference
 }
 
 /**
@@ -1047,10 +1048,11 @@ export async function addEvent(
     )
 
     // If adding event and to new person.
-    if (!entityId) {
-        await addPersonWithEvent(entityValues, event)
-        return amrId
-    }
+    if (!entityId)
+        return {
+            amrId: amrId,
+            entityId: await addPersonWithEvent(entityValues, event),
+        }
 
     // Enrolling if not already enrolled.
     let enrollments = []
@@ -1073,7 +1075,7 @@ export async function addEvent(
     }
 
     await postData('events', event)
-    return amrId
+    return { amrId: amrId, entityId: entityId }
 }
 
 /**
