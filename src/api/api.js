@@ -755,22 +755,30 @@ export async function getProgramStage(
 export async function getProgramRules(programId, programStageId) {
     // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
     const getCondition = condition => {
-        const variableDuplicated = condition.match(/#\{.*?\}/g)
-        let variables = []
-        if (!variableDuplicated) return condition
-        variableDuplicated.forEach(duplicated => {
-            if (variables.indexOf(duplicated) === -1) variables.push(duplicated)
-        })
+        const original = condition
+        try {
+            const variableDuplicated = condition.match(/#\{.*?\}/g)
+            let variables = []
+            if (!variableDuplicated) return condition
+            variableDuplicated.forEach(duplicated => {
+                if (variables.indexOf(duplicated) === -1)
+                    variables.push(duplicated)
+            })
 
-        variables.forEach(variable => {
-            const id = programRuleVariables.find(
-                ruleVariable =>
-                    ruleVariable.name ===
-                    variable.substring(2, variable.length - 1)
-            ).dataElement.id
-            condition = condition.replace(/#\{.*?\}/g, "values['" + id + "']")
-        })
-
+            variables.forEach(variable => {
+                const id = programRuleVariables.find(
+                    ruleVariable =>
+                        ruleVariable.name ===
+                        variable.substring(2, variable.length - 1)
+                ).dataElement.id
+                condition = condition.replace(
+                    /#\{.*?\}/g,
+                    "values['" + id + "']"
+                )
+            })
+        } catch {
+            console.warn('Improper condition:', original)
+        }
         return condition
     }
 
@@ -988,7 +996,10 @@ async function setEventValues(event, values) {
             : (dataE.value = values[dataElement])
     }
 
-    return event
+    return {
+        event: event,
+        amrId: values[_amrDataElement],
+    }
 }
 
 async function addPersonWithEvent(entityValues, event) {
@@ -1034,7 +1045,7 @@ export async function addEvent(
         ? eventValues[_sampleDateElementId]
         : moment()
 
-    let event = await setEventValues(
+    let { event, amrId } = await setEventValues(
         {
             dataValues: [],
             eventDate: date,
@@ -1047,7 +1058,10 @@ export async function addEvent(
     )
 
     // If adding event and to new person.
-    if (!entityId) return await addPersonWithEvent(entityValues, event)
+    if (!entityId) {
+        await addPersonWithEvent(entityValues, event)
+        return amrId
+    }
 
     // Enrolling if not already enrolled.
     let enrollments = []
@@ -1070,6 +1084,7 @@ export async function addEvent(
     }
 
     await postData('events', event)
+    return amrId
 }
 
 /**

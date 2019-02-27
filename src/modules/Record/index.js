@@ -13,6 +13,7 @@ export class Record extends Component {
         panelValues: null,
         eventValues: null,
         entityId: null,
+        buttonDisabled: true,
     }
 
     onValidEntityValues = (values, entityId) =>
@@ -23,11 +24,13 @@ export class Record extends Component {
 
     onPanel = values => this.setState({ panelValues: values })
 
-    onValidEventValues = values => this.setState({ eventValues: values })
+    onValidEventValues = values =>
+        this.setState({ eventValues: values, buttonDisabled: false })
 
     onSubmitClick = async () => {
+        this.setState({ buttonDisabled: true })
         const { entityValues, panelValues, eventValues, entityId } = this.state
-        await addEvent(
+        const amrId = await addEvent(
             eventValues,
             panelValues.programId,
             panelValues.programStageId,
@@ -35,10 +38,11 @@ export class Record extends Component {
             entityValues,
             entityId
         )
+        window.alert(`AMR Id: ${amrId}`)
     }
 
     render() {
-        const { entityValues, panelValues, eventValues } = this.state
+        const { entityValues, panelValues, buttonDisabled } = this.state
 
         return (
             <Margin>
@@ -53,19 +57,19 @@ export class Record extends Component {
                         onValidValues={this.onValidEventValues}
                     />
                 )}
-                {eventValues && (
-                    <EntityButtons
-                        buttons={[
-                            {
-                                label: 'Submit',
-                                onClick: this.onSubmitClick,
-                                disabled: false,
-                                icon: 'done',
-                                kind: 'primary',
-                            },
-                        ]}
-                    />
-                )}
+                <EntityButtons
+                    buttons={[
+                        {
+                            label: 'Submit',
+                            onClick: this.onSubmitClick,
+                            disabled: buttonDisabled,
+                            icon: 'done',
+                            kind: 'primary',
+                            tooltip: 'Submit record.',
+                            disabledTooltip: 'A required field is empty.',
+                        },
+                    ]}
+                />
             </Margin>
         )
     }

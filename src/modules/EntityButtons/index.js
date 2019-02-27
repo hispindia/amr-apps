@@ -17,15 +17,23 @@ export class EntityButtons extends Component {
                 <RowR>
                     {this.props.buttons.map(button => (
                         <PaddingLeft key={button.label}>
-                            <Button
-                                variant="contained"
-                                kind={button.kind}
-                                onClick={button.onClick}
-                                disabled={button.disabled}
-                                icon={button.icon}
+                            <div
+                                title={
+                                    button.disabled
+                                        ? button.disabledTooltip
+                                        : button.tooltip
+                                }
                             >
-                                {button.label}
-                            </Button>
+                                <Button
+                                    variant="contained"
+                                    kind={button.kind}
+                                    onClick={button.onClick}
+                                    disabled={button.disabled}
+                                    icon={button.icon}
+                                >
+                                    {button.label}
+                                </Button>
+                            </div>
                         </PaddingLeft>
                     ))}
                 </RowR>

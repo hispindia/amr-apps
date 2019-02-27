@@ -37,6 +37,7 @@ const ChildSectionLabel = styled.div`
 
 class EventInformation extends Component {
     state = {
+        loading: true,
         programStageId: null,
         programStage: null,
         values: {},
@@ -62,6 +63,7 @@ class EventInformation extends Component {
     }
 
     getProgramStage = async () => {
+        this.setState({ loading: true })
         const { programId, programStageId, organismCode } = this.props
         let { programStage, values, rules, isResend } = await getProgramStage(
             programId,
@@ -75,8 +77,8 @@ class EventInformation extends Component {
         this.checkRules(values, programStage.programStageSections, rules)
 
         this.setState({
+            loading: false,
             programStage: programStage,
-            //organisms: await getOrganisms(),
             values: values,
             isResend: isResend,
             programStageId: programStageId,
@@ -400,9 +402,9 @@ class EventInformation extends Component {
     }
 
     render() {
-        const { programStage } = this.state
+        const { programStage, loading } = this.state
 
-        if (!programStage) return <ProgressSection />
+        if (loading) return <ProgressSection />
 
         const sections = programStage.programStageSections.filter(
             section => !section.hide
