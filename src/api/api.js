@@ -764,15 +764,11 @@ export async function getProgramRules(programId, programStageId) {
                 if (variables.indexOf(duplicated) === -1)
                     variables.push(duplicated)
             })
-
             variables.forEach(variable => {
-                const id = programRuleVariables.find(
-                    ruleVariable =>
-                        ruleVariable.name ===
-                        variable.substring(2, variable.length - 1)
-                ).dataElement.id
+                const name = variable.substring(2, variable.length - 1)
+                const id = programRuleVariables.find(ruleVariable => ruleVariable.name === name).dataElement.id
                 condition = condition.replace(
-                    /#\{.*?\}/g,
+                    new RegExp('#{' + name + '}', 'g'),
                     "values['" + id + "']"
                 )
             })
@@ -784,17 +780,17 @@ export async function getProgramRules(programId, programStageId) {
 
     // Program specific dataElement rules.
     let dataElementRules = (await get(
-        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],programRuleActionType,optionGroup[id,options[' +
-            'code,displayName]]&filter=programRuleActions.dataElement:!null&filter=programStage:null&' +
-            'filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD]&filter=program.id:eq:' +
+        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],data,programRuleActionType,optionGroup[id,options[' +
+            'code,displayName]]&filter=programRuleActions.dataElement:!null&filter=programStage:null&order=priority:asc&' +
+            'filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD,ASSIGN]&filter=program.id:eq:' +
             programId
     )).programRules
 
     // ProgramStage specific dataElement rules.
     let dataElementRulesStage = (await get(
-        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],programRuleActionType,optionGroup[id,options[' +
+        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],data,programRuleActionType,optionGroup[id,options[' +
             'code,displayName]]&filter=programRuleActions.dataElement:!null&filter=programRuleActions.programRuleActionType:in:[' +
-            'SHOWOPTIONGROUP,HIDEFIELD]&filter=programStage.id:eq:' +
+            'SHOWOPTIONGROUP,HIDEFIELD,ASSIGN]&order=priority:asc&&filter=programStage.id:eq:' +
             programStageId
     )).programRules
 
@@ -802,7 +798,7 @@ export async function getProgramRules(programId, programStageId) {
     let sectionRules = (await get(
         'programRules.json?paging=false&fields=condition,programRuleActions[programStageSection[name,id],programRuleActionType]' +
             '&filter=programRuleActions.programStageSection:!null&filter=programStage:null&filter=' +
-            'programRuleActions.programRuleActionType:eq:HIDESECTION&filter=program.id:eq:' +
+            'programRuleActions.programRuleActionType:eq:HIDESECTION&order=priority:asc&&filter=program.id:eq:' +
             programId
     )).programRules
 
@@ -810,7 +806,7 @@ export async function getProgramRules(programId, programStageId) {
     let sectionRulesStage = (await get(
         'programRules.json?paging=false&fields=condition,programRuleActions[programStageSection[name,id],programRuleActionType]' +
             '&filter=programRuleActions.programStageSection:!null&programRuleActions.programRuleActionType:eq:' +
-            'HIDESECTION&filter=programStage.id:eq:' +
+            'HIDESECTION&order=priority:asc&&filter=programStage.id:eq:' +
             programStageId
     )).programRules
 

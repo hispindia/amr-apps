@@ -212,6 +212,13 @@ class EventInformation extends Component {
                                 if (hideS !== affectedSection.hide)
                                     affectedSection.hide = hideS
                             break
+                        case 'ASSIGN':
+                            if (eval(rule.condition)) {
+                                let affectedDataElement = getAffectedDataElement(r.dataElement.id)
+                                // Assigning value.
+                                values[affectedDataElement.id] = r.data
+                            }
+                            break
                         default:
                             break
                     }
