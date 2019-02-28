@@ -325,6 +325,7 @@ class EventInformation extends Component {
                 </div>
             )
         }
+
         return (
             <div key={childSection.name}>
                 <ChildSectionLabel>
@@ -434,6 +435,7 @@ class EventInformation extends Component {
                         childSections = section.childSections.filter(
                             childSection => !childSection.hide
                         )
+
                     return (
                         <MarginBottom key={section.id}>
                             <Card>
@@ -442,68 +444,86 @@ class EventInformation extends Component {
                                         <Heading>{section.displayName}</Heading>
                                     </MarginSides>
                                     {dataElements.length > 0 ? (
-                                        <Grid container spacing={0}>
-                                            <Grid item xs>
-                                                {dataElements
-                                                    .slice(0, half)
-                                                    .map(dataElement =>
-                                                        this.getDataElement(
-                                                            dataElement
-                                                        )
-                                                    )}
+                                        section.renderType.DESKTOP.type ===
+                                        'MATRIX' ? (
+                                            <Grid container spacing={0}>
+                                                {section.dataElements
+                                                    .filter(
+                                                        dataElement =>
+                                                            !dataElement.hide
+                                                    )
+                                                    .map(dataElement => (
+                                                        <Grid
+                                                            item
+                                                            key={dataElement.id}
+                                                        >
+                                                            {this.getDataElement(
+                                                                dataElement
+                                                            )}
+                                                        </Grid>
+                                                    ))}
                                             </Grid>
-                                            <Grid item xs>
-                                                {dataElements
-                                                    .slice(half)
-                                                    .map(dataElement =>
-                                                        this.getDataElement(
-                                                            dataElement
-                                                        )
-                                                    )}
-                                                {childSections
-                                                    ? childSections.map(
-                                                          childSection =>
-                                                              this.getChildSection(
-                                                                  childSection
-                                                              )
-                                                      )
-                                                    : null}
+                                        ) : (
+                                            <Grid container spacing={0}>
+                                                <Grid item xs>
+                                                    {dataElements
+                                                        .slice(0, half)
+                                                        .map(dataElement =>
+                                                            this.getDataElement(
+                                                                dataElement
+                                                            )
+                                                        )}
+                                                </Grid>
+                                                <Grid item xs>
+                                                    {dataElements
+                                                        .slice(half)
+                                                        .map(dataElement =>
+                                                            this.getDataElement(
+                                                                dataElement
+                                                            )
+                                                        )}
+                                                    {childSections &&
+                                                        childSections.map(
+                                                            childSection =>
+                                                                this.getChildSection(
+                                                                    childSection
+                                                                )
+                                                        )}
+                                                </Grid>
                                             </Grid>
-                                        </Grid>
+                                        )
                                     ) : (
                                         <Grid container spacing={0}>
                                             <Grid item xs>
-                                                {childSections
-                                                    ? childSections
-                                                          .slice(
-                                                              0,
-                                                              Math.ceil(
-                                                                  childSections.length /
-                                                                      2
-                                                              )
-                                                          )
-                                                          .map(childSection =>
-                                                              this.getChildSection(
-                                                                  childSection
-                                                              )
-                                                          )
-                                                    : null}
+                                                {childSections &&
+                                                    childSections
+                                                        .slice(
+                                                            0,
+                                                            Math.ceil(
+                                                                childSections.length /
+                                                                    2
+                                                            )
+                                                        )
+                                                        .map(childSection =>
+                                                            this.getChildSection(
+                                                                childSection
+                                                            )
+                                                        )}
                                             </Grid>
                                             <Grid item xs>
-                                                {childSections
-                                                    ? childSections
-                                                          .slice(
-                                                              Math.ceil(
-                                                                  childSections.length /
-                                                                      2
-                                                              )
-                                                          )
-                                                          .map(childSection =>
-                                                              this.getChildSection(
-                                                                  childSection
-                                                              )
-                                                          )
-                                                    : null}
+                                                {childSections &&
+                                                    childSections
+                                                        .slice(
+                                                            Math.ceil(
+                                                                childSections.length /
+                                                                    2
+                                                            )
+                                                        )
+                                                        .map(childSection =>
+                                                            this.getChildSection(
+                                                                childSection
+                                                            )
+                                                        )}
                                             </Grid>
                                         </Grid>
                                     )}

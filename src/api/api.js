@@ -675,7 +675,7 @@ export async function getProgramStage(panelValues, eventId) {
         'programStages/' +
             programStageId +
             `.json?fields=displayName,programStageDataElements[dataElement[id,formName],compulsory],
-            programStageSections[id,name,displayName,dataElements[id,displayFormName,code,valueType,optionSetValue,
+            programStageSections[id,name,displayName,renderType,dataElements[id,displayFormName,code,valueType,optionSetValue,
                 optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]`
     )
 

@@ -110,7 +110,7 @@ export class Record extends Component {
                                 label: 'Submit and add new',
                                 onClick: () => this.onSubmitClick(true),
                                 disabled: buttonDisabled,
-                                icon: 'plus_one',
+                                icon: 'add',
                                 kind: 'primary',
                                 tooltip:
                                     'Submit record and add new record for the same person.',
