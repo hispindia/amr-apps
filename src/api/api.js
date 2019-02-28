@@ -993,7 +993,28 @@ async function setEventValues(event, values) {
     }
 }
 
-async function addPersonWithEvent(entityValues, event) {
+export async function addPersonWithEvent(
+    eventValues,
+    programId,
+    programStageId,
+    orgUnitId,
+    entityValues
+) {
+    const date = eventValues[_sampleDateElementId]
+        ? eventValues[_sampleDateElementId]
+        : moment()
+
+    let { event, amrId } = await setEventValues(
+        {
+            dataValues: [],
+            eventDate: date,
+            orgUnit: orgUnitId,
+            program: programId,
+            programStage: programStageId,
+        },
+        eventValues
+    )
+
     let data = {
         trackedEntityType: _personTypeId,
         orgUnit: event.orgUnit,
@@ -1011,8 +1032,13 @@ async function addPersonWithEvent(entityValues, event) {
         ],
     }
 
-    return (await (await postData('trackedEntityInstances/', data)).json())
-        .response.importSummaries[0].reference
+    return {
+        amrId: amrId,
+        entityId: (await (await postData(
+            'trackedEntityInstances/',
+            data
+        )).json()).response.importSummaries[0].reference,
+    }
 }
 
 /**
@@ -1028,7 +1054,6 @@ export async function addEvent(
     programId,
     programStageId,
     orgUnitId,
-    entityValues,
     entityId
 ) {
     const date = eventValues[_sampleDateElementId]
@@ -1047,13 +1072,6 @@ export async function addEvent(
         eventValues
     )
 
-    // If adding event and to new person.
-    if (!entityId)
-        return {
-            amrId: amrId,
-            entityId: await addPersonWithEvent(entityValues, event),
-        }
-
     // Enrolling if not already enrolled.
     let enrollments = []
     enrollments = (await get(
@@ -1061,10 +1079,7 @@ export async function addEvent(
             entityId +
             '.json?fields=enrollments[program]'
     )).enrollments
-    const isEnrolled = enrollments.find(
-        enrollment => enrollment.program === programId
-    )
-    if (!isEnrolled) {
+    if (!enrollments.find(enrollment => enrollment.program === programId)) {
         await postData('enrollments', {
             trackedEntityInstance: entityId,
             orgUnit: orgUnitId,
@@ -1075,7 +1090,7 @@ export async function addEvent(
     }
 
     await postData('events', event)
-    return { amrId: amrId, entityId: entityId }
+    return amrId
 }
 
 /**

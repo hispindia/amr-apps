@@ -36,7 +36,7 @@ export class EventPanel extends Component {
     }
 
     componentDidUpdate = prevProps => {
-        if (this.props.reset && !prevProps.reset)
+        if (this.props.resetSwitch !== prevProps.resetSwitch)
             this.setState({
                 values: {
                     programId: '',
@@ -74,7 +74,7 @@ export class EventPanel extends Component {
         let values = { ...this.state.values }
         values[name] = value
         this.setState({ values: values })
-        if (!Object.values(values).includes('')) this.props.onPanel(values)
+        this.props.passValues(values, !Object.values(values).includes(''))
     }
 
     /**

@@ -4,19 +4,22 @@ import EntityInformation from '../EntityInformation'
 import TitleRow from '../TitleRow'
 import EventInformation from '../EventInformation'
 import { EventPanel } from '../EventPanel'
-import { addEvent } from '../../api/api'
+import { addEvent, addPersonWithEvent } from '../../api/api'
 import { ButtonRow } from '../../inputs'
 
 export class Record extends Component {
     state = {
         entityValues: null,
+        entityValid: false,
         panelValues: null,
+        panelValid: false,
         eventValues: null,
+        eventValid: false,
         entityId: null,
         eventId: null,
         buttonDisabled: true,
         initialized: false,
-        resetPanelValues: false,
+        resetSwitch: false,
     }
 
     componentDidMount = () => {
@@ -28,70 +31,99 @@ export class Record extends Component {
         })
     }
 
-    onValidEntityValues = (values, entityId) =>
+    onEntityValues = (values, entityId, valid) =>
         this.setState({
             entityValues: values,
             entityId: entityId ? entityId : null,
+            entityValid: valid,
         })
 
-    onPanel = values => this.setState({ panelValues: values })
+    onPanelValues = (values, valid) =>
+        this.setState({ panelValues: values, panelValid: valid })
 
-    onValidEventValues = values =>
-        this.setState({ eventValues: values, buttonDisabled: false })
+    onEventValues = (values, valid) =>
+        this.setState({
+            eventValues: values,
+            eventValid: valid,
+            buttonDisabled: false,
+        })
 
     onSubmitClick = async addMore => {
         this.setState({ buttonDisabled: true })
-        const { entityValues, panelValues, eventValues, entityId } = this.state
-        const { amrId, newEntityId } = await addEvent(
-            eventValues,
-            panelValues.programId,
-            panelValues.programStageId,
-            this.props.match.params.orgUnit,
+        const {
             entityValues,
-            entityId
-        )
+            panelValues,
+            eventValues,
+            entityId,
+            resetSwitch,
+        } = this.state
+        const orgUnitId = this.props.match.params.orgUnit
+        let amrId
+        let newEntityId
+        if (entityId)
+            amrId = await addEvent(
+                eventValues,
+                panelValues.programId,
+                panelValues.programStageId,
+                orgUnitId,
+                entityId
+            )
+        else {
+            const values = await addPersonWithEvent(
+                eventValues,
+                panelValues.programId,
+                panelValues.programStageId,
+                orgUnitId,
+                entityValues
+            )
+            amrId = values.amrId
+            newEntityId = values.entityId
+        }
         window.alert(`AMR Id: ${amrId}`)
-        console.log(newEntityId)
 
         if (addMore)
             this.setState({
-                entityId: newEntityId,
-                panelValues: null,
-                eventValues: null,
-                resetPanelValues: true,
+                entityId: newEntityId ? newEntityId : entityId,
+                panelValid: false,
+                eventValid: false,
+                resetSwitch: !resetSwitch,
             })
         else this.props.history.push('/')
     }
 
     sections = () => {
         const {
-            entityValues,
             entityId,
+            entityValid,
             panelValues,
+            panelValid,
             eventId,
+            eventValid,
             buttonDisabled,
-            resetPanelValues,
+            resetSwitch,
         } = this.state
+        const disabled =
+            buttonDisabled || !entityValid || !panelValid || !eventValid
 
         return (
             <div>
                 {!eventId && (
                     <EntityInformation
-                        onValidValues={this.onValidEntityValues}
+                        passValues={this.onEntityValues}
                         entityId={entityId}
                     />
                 )}
-                {entityValues && (
+                {entityValid && (
                     <EventPanel
-                        reset={resetPanelValues}
-                        onPanel={this.onPanel}
+                        resetSwitch={resetSwitch}
+                        passValues={this.onPanelValues}
                     />
                 )}
-                {(eventId || panelValues) && (
+                {(eventId || panelValid) && (
                     <EventInformation
                         eventId={eventId}
                         panelValues={panelValues}
-                        onValidValues={this.onValidEventValues}
+                        passValues={this.onEventValues}
                     />
                 )}
                 {!eventId && (
@@ -109,7 +141,7 @@ export class Record extends Component {
                             {
                                 label: 'Submit and add new',
                                 onClick: () => this.onSubmitClick(true),
-                                disabled: buttonDisabled,
+                                disabled: disabled,
                                 icon: 'add',
                                 kind: 'primary',
                                 tooltip:
@@ -119,7 +151,7 @@ export class Record extends Component {
                             {
                                 label: 'Submit',
                                 onClick: () => this.onSubmitClick(false),
-                                disabled: buttonDisabled,
+                                disabled: disabled,
                                 icon: 'done',
                                 kind: 'primary',
                                 tooltip: 'Submit record.',

@@ -68,8 +68,11 @@ class EntityInformation extends Component {
             attributes: attributes,
             entityId: entityId ? entityId : null,
         })
-        if (this.validate(attributes, values, uniques))
-            this.props.onValidValues(values, entityId)
+        this.props.passValues(
+            values,
+            entityId,
+            this.validate(attributes, values, uniques)
+        )
     }
 
     /**

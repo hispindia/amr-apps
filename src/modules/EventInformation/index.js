@@ -14,14 +14,7 @@ import {
     MarginBottom,
     ProgressSection,
 } from '../../helpers/helpers'
-import {
-    getProgramStage,
-    //getOrganisms,
-    updateEvent,
-    //getTestFields,
-    addEvent,
-    getOrganismsDataElementId,
-} from '../../api/api'
+import { getProgramStage } from '../../api/api'
 import {
     TextInput,
     RadioInput,
@@ -43,23 +36,11 @@ class EventInformation extends Component {
         values: {},
     }
 
-    componentDidMount = async () => {
-        await this.getProgramStage()
-    }
+    componentDidMount = async () => await this.getProgramStage()
 
     componentDidUpdate = async prevProps => {
-        if (prevProps) {
-            if (
-                prevProps.programStageId !== this.props.programStageId ||
-                prevProps.programId !== this.props.programId
-            )
-                await this.getProgramStage()
-            else if (prevProps.organismCode !== this.props.organismCode) {
-                let values = { ...this.state.values }
-                values[getOrganismsDataElementId()] = this.props.organismCode
-                this.setState({ values: values })
-            }
-        }
+        if (prevProps.panelValues !== this.props.panelValues)
+            await this.getProgramStage()
     }
 
     getProgramStage = async () => {
@@ -96,8 +77,10 @@ class EventInformation extends Component {
             values: values,
             programStage: programStage,
         })
-        if (this.validateValues(programStage.programStageSections, values))
-            this.props.onValidValues(values)
+        this.props.passValues(
+            values,
+            this.validateValues(programStage.programStageSections, values)
+        )
     }
 
     validateValues = (sections, values) => {
@@ -225,59 +208,6 @@ class EventInformation extends Component {
                 }
             })
         })
-    }
-
-    /*getTestFieldColor = elementId => {
-        try {
-            const value = parseInt(this.state.values[elementId])
-            const testField = this.state.testFields[elementId]
-
-            if (value >= testField.Resistant) return 'red'
-            else if (value >= testField.Intermediate_Low) return 'orange'
-            else if (value < testField.Intermediate_High) return 'green'
-        } catch {
-            return ''
-        }
-    }*/
-
-    /**
-     * On submit button click.
-     */
-    onSubmitClick = async () => {
-        //const { programStage, values } = this.state
-        /*const sections = programStage.programStageSections.filter(
-            section => !['Name', 'Approval status'].includes(section.name)
-        )*/
-
-        // Removing hidden values.
-        /*programStage.programStageSections.forEach(section => {
-            const removeValues = dataElements => {
-                dataElements
-                    .filter(
-                        dataElement =>
-                            dataElement.hide && values[dataElement.id] !== ''
-                    )
-                    .forEach(dataElement => (values[dataElement.id] = ''))
-            }
-            removeValues(section.dataElements)
-            if (section.childSections)
-                section.childSections.forEach(childSection =>
-                    removeValues(childSection.dataElements)
-                )
-        })*/
-
-        this.props.match.params.event
-            ? await updateEvent(
-                  this.state.values,
-                  this.props.match.params.event
-              )
-            : await addEvent(
-                  this.state.values,
-                  this.props.programId,
-                  this.props.programStageId,
-                  this.props.match.params.orgUnit,
-                  this.props.match.params.entity
-              )
     }
 
     /**
