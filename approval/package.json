@@ -1,12 +1,12 @@
 {
   "name": "amr",
   "version": "0.1.0",
-  "description": "AMR record capture app for DHIS2",
+  "description": "AMR record approval app for DHIS2",
   "main": "index.js",
   "license": "BSD-3-Clause",
   "homepage": ".",
   "manifest.webapp": {
-    "name": "AMR Record Capture",
+    "name": "AMR Record Approval",
     "appType": "APP",
     "icons": {
       "48": "icon.png"
@@ -45,7 +45,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "webpack -p --config webpack/webpack.prod.js",
-    "zip": "cd build && zip -r -X ../amr-record-capture.zip .",
+    "zip": "cd build && zip -r -X ../amr-record-approval.zip .",
     "postbuild": "npm run manifest && npm run zip",
     "manifest": "d2-manifest package.json build/manifest.webapp",
     "test": "react-scripts test",
