@@ -25,5 +25,8 @@ package-lock.json
 .prettierrc.js
 *.zip
 
-approval/node_modules
-capture/node_modules
+/approval/node_modules
+/approval/build
+/capture/node_modules
+/capture/build
+/build

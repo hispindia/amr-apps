@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import * as serviceWorker from './serviceWorker'
-import { init } from 'api/api'
+import { init } from 'api'
 
 const developmentServer = 'http://apps.hispindia.org/amr'
 const rootElement = document.getElementById('root')
