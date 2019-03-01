@@ -4,38 +4,29 @@ const path = require('path')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-//const manifest = require('build/manifest.webapp')
-//const fs = require('json-loader')
 
-//const manifest = JSON.parse(
-//    fs.readFileSync('./build/manifest.webapp', 'utf8')
-//);
-//const globals = Object.assign(
-//    {},
-//    {
-//        manifest: manifest
-//    }
-//);
-
-// Webpack configuration used in production (yarn build/npm run-script build)
 module.exports = merge(common, {
     mode: 'production',
     devtool: 'source-map',
     output: {
-        path: path.join(__dirname, 'build'),
+        path: path.join(__dirname, '../build'),
         filename: `[name].[contentHash].js`,
     },
     optimization: {
         minimizer: [new UglifyJsPlugin()],
     },
     plugins: [
-        new CleanWebpackPlugin('build'),
+        new CleanWebpackPlugin(['build'], {
+            root: __dirname + '/..'
+        }),
         new CopyWebpackPlugin([
             {
                 from: 'public/icon.png',
                 to: '.',
             },
         ]),
-        //new webpack.DefinePlugin(globals),
     ],
+    resolve: {
+        modules: [path.resolve('../src'), 'node_modules'],
+    }
 })

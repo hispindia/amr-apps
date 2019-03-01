@@ -2,9 +2,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import * as serviceWorker from './serviceWorker'
 //import { App } from './App'
-import { setBaseUrl } from './api/crud'
-import { initUser } from './api/api'
-import { getBaseUrl } from '../../src/api/crud';
+import { setBaseUrl } from 'api/crud'
+import { initUser } from 'api/api'
+import { getOrganismsDataElementId } from 'api/api';
 
 const developmentServer = 'http://apps.hispindia.org/amr'
 const rootElement = document.getElementById('root')
@@ -14,7 +14,7 @@ const withBaseUrl = async baseUrl => {
     setBaseUrl(baseUrl)
     await initUser()
 
-    ReactDOM.render(<p>{getBaseUrl()}</p>, rootElement)
+    ReactDOM.render(<p>{getOrganismsDataElementId()}</p>, rootElement)
     serviceWorker.unregister()
 }
 

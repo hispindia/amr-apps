@@ -9,7 +9,18 @@ module.exports = {
         rules: [
             {
                 test: /\.jsx?$/,
-                use: [{ loader: 'babel-loader' }],
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        plugins: ["@babel/plugin-proposal-class-properties"],
+                        presets: ["@babel/preset-env", "@babel/react"],
+                        env: {
+                            production: {
+                                presets: ["react-optimize"]
+                            }
+                        }
+                    }
+                },
                 exclude: /node_modules/,
             },
             {
