@@ -27,6 +27,6 @@ module.exports = merge(common, {
         ]),
     ],
     resolve: {
-        modules: [path.resolve('../src'), 'node_modules'],
+        modules: [path.resolve('../lib'), 'node_modules'],
     }
 })

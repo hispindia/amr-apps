@@ -1,17 +1,23 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import * as serviceWorker from './serviceWorker'
-import { App } from './App'
-import { setBaseUrl } from './api/crud'
-import { initUser } from './api/api'
+import { App } from 'App'
+//import { setBaseUrl } from './api/crud'
+//import { initUser } from './api/api'
+import { init } from 'api/api'
+import { getBaseUrl } from 'api/crud'
+require("@babel/register")({
+    rootMode: "upward"
+  })
 
 const developmentServer = 'http://apps.hispindia.org/amr'
 const rootElement = document.getElementById('root')
 
 const withBaseUrl = async baseUrl => {
     baseUrl = `${baseUrl}/api`
-    setBaseUrl(baseUrl)
-    await initUser()
+    await init(baseUrl)
+    console.log(baseUrl)
+    console.log(getBaseUrl())
 
     ReactDOM.render(<App />, rootElement)
     serviceWorker.unregister()
