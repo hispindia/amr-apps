@@ -16,12 +16,6 @@
     "build:capture": "node scripts/build.js",
     "build": "NODE_ENV=production npm run clean && npm run build:modules"
   },
-  "husky": {
-    "hooks": {
-      "commit-msg": "packages commit-style",
-      "pre-commit": "packages code-style"
-    }
-  },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
