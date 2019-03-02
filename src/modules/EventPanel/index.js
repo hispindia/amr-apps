@@ -10,6 +10,7 @@ import { SelectInput, RadioInput } from '../../inputs'
 import { Card } from '@dhis2/ui/core/Card'
 import { getPrograms, getOrganisms } from '../../api/api'
 import { Grid } from '@material-ui/core'
+import { ProgressSection } from '../ProgressSection'
 
 /**
  * Contains event panal and/or event information.
@@ -32,6 +33,17 @@ export class EventPanel extends Component {
             programs: programs,
             programStages: programStages,
         })
+    }
+
+    componentDidUpdate = prevProps => {
+        if (this.props.resetSwitch !== prevProps.resetSwitch)
+            this.setState({
+                values: {
+                    programId: '',
+                    programStageId: '',
+                    organismCode: '',
+                },
+            })
     }
 
     /**
@@ -62,7 +74,7 @@ export class EventPanel extends Component {
         let values = { ...this.state.values }
         values[name] = value
         this.setState({ values: values })
-        if (!Object.values(values).includes('')) this.props.onPanel(values)
+        this.props.passValues(values, !Object.values(values).includes(''))
     }
 
     /**
@@ -132,6 +144,8 @@ export class EventPanel extends Component {
     render() {
         const dataElements = this.getDataElements()
         const half = Math.ceil(dataElements.length / 2)
+
+        if (!this.state.programs) return <ProgressSection />
 
         return !this.state.programs ? null : (
             <MarginBottom>

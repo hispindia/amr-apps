@@ -1,6 +1,6 @@
-import * as moment from 'moment'
+import moment from 'moment'
 import _ from 'lodash'
-import { get, postData, del, put } from './crud'
+import { get, postData, del, put, setBaseUrl } from './crud'
 import { removeTime } from '../helpers/date'
 
 const _l1ApprovalStatus = 'tAyVrNUTVHX'
@@ -19,6 +19,7 @@ const _l1ApprovalGroup = 'O7EtwlwnAYq'
 const _l2ApprovalGroup = 'XigjUyZB8UE'
 
 const _organismsDataElementId = 'SaQe2REkGVw'
+const _organismsOptionSet = 'TUCsBvqwTUV'
 const _amrDataElement = 'lIkk661BLpG'
 const _sampleDateElementId = 'JRUa0qYKQDF'
 
@@ -26,6 +27,7 @@ let _isDeoUser
 let _isL1User
 let _isL2User
 
+let _username = ''
 let _orgUnitNames = {}
 
 /**
@@ -45,12 +47,19 @@ export function getUserAccess() {
 }
 
 /**
- * Sets user access.
+ * Sets the base URL, username, and user groups.
+ * @param {String} url
  */
-export async function initUserAccess() {
-    const userGroups = (await get('me.json?fields=userGroups')).userGroups.map(
-        userGroup => userGroup.id
+export async function init(baseUrl) {
+    setBaseUrl(baseUrl)
+
+    const user = await get(
+        'me.json?fields=userGroups,userCredentials[username]'
     )
+
+    _username = user.userCredentials.username
+
+    const userGroups = user.userGroups.map(userGroup => userGroup.id)
     _isDeoUser = userGroups.includes(_deoGroup)
     _isL1User = userGroups.includes(_l1ApprovalGroup)
     _isL2User = userGroups.includes(_l2ApprovalGroup)
@@ -124,8 +133,8 @@ export async function getEntityAttributes(entityId) {
     const attributes = (await get(
         'trackedEntityTypes/' +
             _personTypeId +
-            `.json?fields=trackedEntityTypeAttributes[mandatory,trackedEntityAttribute[name,
-        id,displayName,valueType,unique,optionSetValue,optionSet[id,options[displayName,code]]]]`
+            '.json?fields=trackedEntityTypeAttributes[mandatory,trackedEntityAttribute[name,' +
+            'id,displayName,valueType,unique,optionSetValue,optionSet[id,options[displayName,code]]]]'
     )).trackedEntityTypeAttributes
 
     // Contains attribute values.
@@ -167,18 +176,16 @@ export async function getEntityAttributes(entityId) {
  * Checks if any tracked entity instance has property with value.
  * @param {string} property - Property.
  * @param {string} value - Value.
- * @returns {boolean} - True if unique.
+ * @returns {boolean} - False if unique, tracked entity instance ID otherwise.
  */
-export async function isUnique(property, value) {
-    return (
-        (await get(
-            `trackedEntityInstances.json?ouMode=ALL&fields=
-            attributes[code,displayName,valueType,attribute,value]&filter=` +
-                property +
-                ':eq:' +
-                value
-        )).trackedEntityInstances.length === 0
-    )
+export async function checkUnique(property, value) {
+    const entities = (await get(
+        'trackedEntityInstances.json?ouMode=ALL&fields=trackedEntityInstance&filter=' +
+            property +
+            ':eq:' +
+            value
+    )).trackedEntityInstances
+    return entities.length > 0 ? entities[0].trackedEntityInstance : false
 }
 
 /**
@@ -212,8 +219,8 @@ export async function getPersonsEvents(entityId) {
     const enrollments = (await get(
         'trackedEntityInstances/' +
             entityId +
-            `.json?ouMode=ALL&fields=enrollments[events[event,lastUpdated,created,
-            orgUnitName,storedBy,dataValues[dataElement,value]]]`
+            '.json?ouMode=ALL&fields=enrollments[events[event,lastUpdated,created,' +
+            'orgUnitName,storedBy,dataValues[dataElement,value]]]'
     )).enrollments
 
     let data = {
@@ -333,9 +340,9 @@ export async function getPersons(orgUnit) {
     const values = (await get(
         'trackedEntityInstances.json?ou=' +
             orgUnit +
-            `&ouMode=DESCENDANTS&order=created:desc&paging=false&
-            fields=orgUnit,trackedEntityInstance,created,lastUpdated,
-            attributes[displayName,valueType,attribute,value],enrollments[orgUnitName]`
+            '&ouMode=DESCENDANTS&order=created:desc&paging=false&' +
+            'fields=orgUnit,trackedEntityInstance,created,lastUpdated,' +
+            'attributes[displayName,valueType,attribute,value],enrollments[orgUnitName]'
     )).trackedEntityInstances
     const metaData = (await get(
         'trackedEntityTypes/' +
@@ -532,56 +539,40 @@ export async function getEventCounts(orgUnit) {
     return counts
 }
 
+export async function getEventsByStatus(orgUnit, approvalStatus) {
+    return false
+}
+
 /**
- * Gets all events from the AMR program with the provided approval status.
- * @param {string} approvalStatus - Approval status.
- * @returns {Object[]} All AMR events.
+ * Gets all events created by the user.
+ * @param {string} orgUnit - Organisation unit to look within.
+ * @returns {Object[]} All events.
  */
-export async function getEvents(orgUnit, approvalStatus) {
-    // If looking for approved events, both levels needs to be approved.
-    // Otherwise, just one of the levels needs to be approved.
-    let events = []
-    switch (approvalStatus) {
-        case 'Approved':
-            events = (await get(
-                'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,' +
-                    'lastUpdated,created,storedBy,dataValues[dataElement,value]&orgUnit=' +
-                    orgUnit +
-                    '&ouMode=DESCENDANTS' +
-                    '&filter=' +
-                    _l1ApprovalStatus +
-                    ':eq:Approved,' +
-                    _l2ApprovalStatus +
-                    ':eq:Approved'
-            )).events
-            break
-        default:
-            events = (await get(
-                'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,' +
-                    'lastUpdated,created,storedBy,dataValues[dataElement,value]&orgUnit=' +
-                    orgUnit +
-                    '&ouMode=DESCENDANTS' +
-                    '&filter=' +
-                    _l1ApprovalStatus +
-                    ':eq:' +
-                    approvalStatus
-            )).events
-            const events2 = (await get(
-                'events.json?paging=false&fields=orgUnit,trackedEntityInstance,event,orgUnitName,' +
-                    'lastUpdated,created,storedBy,dataValues[dataElement,value]&orgUnit=' +
-                    orgUnit +
-                    '&ouMode=DESCENDANTS' +
-                    '&filter=' +
-                    _l2ApprovalStatus +
-                    ':eq:' +
-                    approvalStatus
-            )).events
-            // In order to avoid duplicates.
-            events2.forEach(event2 => {
-                if (!events.find(event => event.event === event2.event))
-                    events.push(event2)
-            })
-    }
+export async function getEvents(orgUnit, userOnly) {
+    let programNames = {}
+    const programs = (await get('programs.json?paging=false&fields=id,name'))
+        .programs
+    programs.forEach(program => (programNames[program.id] = program.name))
+
+    let organismNames = {}
+    const organisms = (await get(
+        'optionSets/' +
+            _organismsOptionSet +
+            '.json?fields=options[code,displayName]'
+    )).options
+    organisms.forEach(
+        organism => (organismNames[organism.code] = organism.displayName)
+    )
+
+    let events = (await get(
+        'events.json?paging=false&fields=program,storedBy,orgUnit,event,' +
+            'lastUpdated,created,dataValues[dataElement,value]&orgUnit=' +
+            orgUnit +
+            '&ouMode=DESCENDANTS&order=updated:desc'
+    )).events
+
+    // Does not seem to be possible to filter by storedBy with the API.
+    if (userOnly) events = events.filter(event => event.storedBy === _username)
 
     let data = {
         headers: [
@@ -590,12 +581,12 @@ export async function getEvents(orgUnit, approvalStatus) {
                 column: 'Amr Id',
             },
             {
-                name: 'Organisation unit',
-                column: 'Organisation unit',
+                name: 'Organism group',
+                column: 'Organism group',
             },
             {
-                name: 'Stored by',
-                column: 'Stored by',
+                name: 'Organism',
+                column: 'Organism',
             },
             {
                 name: 'Created',
@@ -611,11 +602,6 @@ export async function getEvents(orgUnit, approvalStatus) {
                 options: { display: false },
             },
             {
-                name: 'Entity',
-                column: 'Entity',
-                options: { display: false },
-            },
-            {
                 name: 'Event',
                 column: 'Event',
                 options: { display: false },
@@ -624,25 +610,35 @@ export async function getEvents(orgUnit, approvalStatus) {
         rows: [],
     }
 
-    const getAmrId = event => {
-        const dataElement = event.dataValues.find(
-            dataValue => dataValue.dataElement === _amrDataElement
-        )
-        return dataElement ? dataElement.value : ''
+    const getValues = event => {
+        const getValue = dataElement =>
+            event.dataValues.find(
+                dataValue => dataValue.dataElement === dataElement
+            )
+        const amrDataElement = getValue(_amrDataElement)
+        const organismDataElement = getValue(_organismsDataElementId)
+        return {
+            amrValue: amrDataElement ? amrDataElement.value : '',
+            organism: organismDataElement
+                ? organismNames[organismDataElement.value]
+                    ? organismNames[organismDataElement.value]
+                    : ''
+                : '',
+        }
     }
 
-    events.forEach(event =>
+    events.forEach(event => {
+        const { amrValue, organism } = getValues(event)
         data.rows.push([
-            getAmrId(event),
-            event.orgUnitName,
-            event.storedBy,
+            amrValue,
+            programNames[event.program],
+            organism,
             removeTime(event.created),
             removeTime(event.lastUpdated),
             event.orgUnit,
-            event.trackedEntityInstance,
             event.event,
         ])
-    )
+    })
 
     return data
 }
@@ -652,12 +648,7 @@ export async function getEvents(orgUnit, approvalStatus) {
  * @param {string} eventId - Event ID.
  * @returns {Object} AMR program stage, values, and organism data element ID.
  */
-export async function getProgramStage(
-    programId,
-    programStageId,
-    organismCode,
-    eventId
-) {
+export async function getProgramStage(panelValues, eventId) {
     const isDisabled = element => {
         switch (element.id) {
             /*case _l1ApprovalStatus:
@@ -692,22 +683,26 @@ export async function getProgramStage(
     }
 
     let values = {}
+    let programId = {}
+    let programStageId = {}
     if (eventId) {
         let eventData = await getEventValues(eventId)
         programId = eventData.programId
         programStageId = eventData.programStageId
         values = eventData.values
+    } else {
+        programId = panelValues.programId
+        programStageId = panelValues.programStageId
+        values[_organismsDataElementId] = panelValues.organismCode
     }
 
     let programStage = await get(
         'programStages/' +
             programStageId +
-            `.json?fields=displayName,programStageDataElements[dataElement[id,formName],compulsory],
-            programStageSections[id,name,displayName,dataElements[id,displayFormName,code,valueType,optionSetValue,
-                optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]`
+            '.json?fields=displayName,programStageDataElements[dataElement[id,formName],compulsory],' +
+            'programStageSections[id,name,displayName,renderType,dataElements[id,displayFormName,code,valueType,optionSetValue,' +
+            'optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
     )
-
-    values[_organismsDataElementId] = organismCode
 
     programStage.programStageSections.forEach(section => {
         section.hide = false
@@ -735,6 +730,7 @@ export async function getProgramStage(
         })
     })
 
+    let remove = []
     // Adding child sections and removing child sections from main sections.
     programStage.programStageSections.forEach(programStageSection => {
         let childSections = []
@@ -745,14 +741,7 @@ export async function getProgramStage(
                 )
             )
             .forEach(childSection => {
-                programStage.programStageSections.splice(
-                    programStage.programStageSections.indexOf(
-                        programStage.programStageSections.find(
-                            section => section.name === childSection.name
-                        )
-                    ),
-                    1
-                )
+                remove.push(childSection.id)
                 childSection.name = childSection.name.replace(
                     new RegExp('{' + programStageSection.name + '}'),
                     ''
@@ -761,6 +750,10 @@ export async function getProgramStage(
             })
         programStageSection.childSections = childSections
     })
+
+    programStage.programStageSections = programStage.programStageSections.filter(
+        section => !remove.includes(section.id)
+    )
 
     return {
         programStage: programStage,
@@ -780,38 +773,44 @@ export async function getProgramStage(
 export async function getProgramRules(programId, programStageId) {
     // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
     const getCondition = condition => {
-        const variableDuplicated = condition.match(/#\{.*?\}/g)
-        let variables = []
-        if (!variableDuplicated) return condition
-        variableDuplicated.forEach(duplicated => {
-            if (variables.indexOf(duplicated) === -1) variables.push(duplicated)
-        })
-
-        variables.forEach(variable => {
-            const id = programRuleVariables.find(
-                ruleVariable =>
-                    ruleVariable.name ===
-                    variable.substring(2, variable.length - 1)
-            ).dataElement.id
-            condition = condition.replace(/#\{.*?\}/g, "values['" + id + "']")
-        })
-
+        const original = condition
+        try {
+            const variableDuplicated = condition.match(/#\{.*?\}/g)
+            let variables = []
+            if (!variableDuplicated) return condition
+            variableDuplicated.forEach(duplicated => {
+                if (variables.indexOf(duplicated) === -1)
+                    variables.push(duplicated)
+            })
+            variables.forEach(variable => {
+                const name = variable.substring(2, variable.length - 1)
+                const id = programRuleVariables.find(
+                    ruleVariable => ruleVariable.name === name
+                ).dataElement.id
+                condition = condition.replace(
+                    new RegExp('#{' + name + '}', 'g'),
+                    "values['" + id + "']"
+                )
+            })
+        } catch {
+            console.warn('Improper condition:', original)
+        }
         return condition
     }
 
     // Program specific dataElement rules.
     let dataElementRules = (await get(
-        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],programRuleActionType,optionGroup[id,options[' +
-            'code,displayName]]&filter=programRuleActions.dataElement:!null&filter=programStage:null&' +
-            'filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD]&filter=program.id:eq:' +
+        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],data,programRuleActionType,optionGroup[id,options[' +
+            'code,displayName]]&filter=programRuleActions.dataElement:!null&filter=programStage:null&order=priority:asc&' +
+            'filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD,ASSIGN]&filter=program.id:eq:' +
             programId
     )).programRules
 
     // ProgramStage specific dataElement rules.
     let dataElementRulesStage = (await get(
-        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],programRuleActionType,optionGroup[id,options[' +
+        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],data,programRuleActionType,optionGroup[id,options[' +
             'code,displayName]]&filter=programRuleActions.dataElement:!null&filter=programRuleActions.programRuleActionType:in:[' +
-            'SHOWOPTIONGROUP,HIDEFIELD]&filter=programStage.id:eq:' +
+            'SHOWOPTIONGROUP,HIDEFIELD,ASSIGN]&order=priority:asc&&filter=programStage.id:eq:' +
             programStageId
     )).programRules
 
@@ -819,7 +818,7 @@ export async function getProgramRules(programId, programStageId) {
     let sectionRules = (await get(
         'programRules.json?paging=false&fields=condition,programRuleActions[programStageSection[name,id],programRuleActionType]' +
             '&filter=programRuleActions.programStageSection:!null&filter=programStage:null&filter=' +
-            'programRuleActions.programRuleActionType:eq:HIDESECTION&filter=program.id:eq:' +
+            'programRuleActions.programRuleActionType:eq:HIDESECTION&order=priority:asc&&filter=program.id:eq:' +
             programId
     )).programRules
 
@@ -827,7 +826,7 @@ export async function getProgramRules(programId, programStageId) {
     let sectionRulesStage = (await get(
         'programRules.json?paging=false&fields=condition,programRuleActions[programStageSection[name,id],programRuleActionType]' +
             '&filter=programRuleActions.programStageSection:!null&programRuleActions.programRuleActionType:eq:' +
-            'HIDESECTION&filter=programStage.id:eq:' +
+            'HIDESECTION&order=priority:asc&&filter=programStage.id:eq:' +
             programStageId
     )).programRules
 
@@ -1013,38 +1012,99 @@ async function setEventValues(event, values) {
             : (dataE.value = values[dataElement])
     }
 
-    return event
+    return {
+        event: event,
+        amrId: values[_amrDataElement],
+    }
+}
+
+export async function addPersonWithEvent(
+    eventValues,
+    programId,
+    programStageId,
+    orgUnitId,
+    entityValues
+) {
+    const date = eventValues[_sampleDateElementId]
+        ? eventValues[_sampleDateElementId]
+        : moment()
+
+    let { event, amrId } = await setEventValues(
+        {
+            dataValues: [],
+            eventDate: date,
+            orgUnit: orgUnitId,
+            program: programId,
+            programStage: programStageId,
+        },
+        eventValues
+    )
+
+    let data = {
+        trackedEntityType: _personTypeId,
+        orgUnit: event.orgUnit,
+        attributes: Object.keys(entityValues).map(key => {
+            return { attribute: key, value: entityValues[key] }
+        }),
+        enrollments: [
+            {
+                orgUnit: event.orgUnit,
+                program: event.program,
+                enrollmentDate: event.eventDate,
+                incidentDate: event.eventDate,
+                events: [event],
+            },
+        ],
+    }
+
+    return {
+        amrId: amrId,
+        entityId: (await (await postData(
+            'trackedEntityInstances/',
+            data
+        )).json()).response.importSummaries[0].reference,
+    }
 }
 
 /**
  * Adds a new event. Enrolls person if not already enrolled.
- * @param {Object[]} values - Values.
+ * @param {Object[]} eventValues - Values.
  * @param {string} programId - Program ID.
  * @param {string} programStageId - Program stage ID.
  * @param {string} orgUnitId - Organisation unit ID.
  * @param {string} entityId - Tracked entity instance ID.
  */
 export async function addEvent(
-    values,
+    eventValues,
     programId,
     programStageId,
     orgUnitId,
     entityId
 ) {
-    const date = values[_sampleDateElementId]
-        ? values[_sampleDateElementId]
+    const date = eventValues[_sampleDateElementId]
+        ? eventValues[_sampleDateElementId]
         : moment()
 
-    const enrollments = (await get(
+    let { event, amrId } = await setEventValues(
+        {
+            dataValues: [],
+            eventDate: date,
+            orgUnit: orgUnitId,
+            program: programId,
+            programStage: programStageId,
+            trackedEntityInstance: entityId,
+        },
+        eventValues
+    )
+
+    // Enrolling if not already enrolled.
+    let enrollments = []
+    enrollments = (await get(
         'trackedEntityInstances/' +
             entityId +
             '.json?fields=enrollments[program]'
     )).enrollments
-
-    const isEnrolled = enrollments.find(
-        enrollment => enrollment.program === programId
-    )
-    if (!isEnrolled) {
+    if (!enrollments.find(enrollment => enrollment.program === programId)) {
         await postData('enrollments', {
             trackedEntityInstance: entityId,
             orgUnit: orgUnitId,
@@ -1054,39 +1114,8 @@ export async function addEvent(
         })
     }
 
-    /*enrollments: [
-            {
-                orgUnit: orgUnit,
-                program: _amrProgramId,
-                enrollmentDate: now,
-                incidentDate: now,
-            },
-        ],*/
-
-    /*values[_l1ApprovalStatus] =
-        values[_l1ApprovalStatus] === ''
-            ? 'Validate'
-            : values[_l1ApprovalStatus]
-    values[_l2ApprovalStatus] =
-        values[_l2ApprovalStatus] === ''
-            ? 'Validate'
-            : values[_l2ApprovalStatus]*/
-
-    let event = await setEventValues(
-        {
-            dataValues: [],
-            //enrollment: enrollment,
-            eventDate: date,
-            orgUnit: orgUnitId,
-            program: programId,
-            programStage: programStageId,
-            trackedEntityInstance: entityId,
-        },
-        values
-        //testFields
-    )
-
     await postData('events', event)
+    return amrId
 }
 
 /**

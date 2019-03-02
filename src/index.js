@@ -1,34 +1,5 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import * as serviceWorker from './serviceWorker'
-import { App } from './App'
-import { setBaseUrl } from './api/crud'
-import { initUserAccess } from './api/api'
-
-const developmentServer = 'http://apps.hispindia.org/amr'
-const rootElement = document.getElementById('root')
-
-const withBaseUrl = async baseUrl => {
-    baseUrl = `${baseUrl}/api`
-    setBaseUrl(baseUrl)
-    await initUserAccess()
-
-    ReactDOM.render(<App />, rootElement)
-    serviceWorker.unregister()
-}
-
-if (process.env.NODE_ENV === 'production') {
-    fetch('./manifest.webapp')
-        .then(response => response.json())
-        .then(manifest => {
-            withBaseUrl(`${manifest.activities.dhis.href}`)
-        })
-        .catch(e => {
-            console.error('Could not read manifest:', e)
-            ReactDOM.render(<code>No manifest found</code>, rootElement)
-        })
-} else withBaseUrl(developmentServer)
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
+export * from './api'
+export * from './css'
+export * from './helpers'
+export * from './inputs'
+export * from './modules'

@@ -1,7 +1,7 @@
 import React from 'react'
 import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
 import MomentUtils from '@date-io/moment'
-import * as moment from 'moment'
+import moment from 'moment'
 import InputField from '@dhis2/ui/core/InputField'
 import styled from 'styled-components'
 import { RowW, Label, Input, MarginTop } from '../../helpers/helpers'

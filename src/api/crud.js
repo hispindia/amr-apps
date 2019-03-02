@@ -5,7 +5,7 @@ let baseUrl = ''
  * @returns {string} Base URL.
  */
 export function getBaseUrl() {
-    return { ...baseUrl }
+    return baseUrl
 }
 
 /**

@@ -13,14 +13,7 @@ import {
     MarginSides,
     MarginBottom,
 } from '../../helpers/helpers'
-import {
-    getProgramStage,
-    //getOrganisms,
-    updateEvent,
-    //getTestFields,
-    addEvent,
-    getOrganismsDataElementId,
-} from '../../api/api'
+import { getProgramStage } from '../../api/api'
 import {
     TextInput,
     RadioInput,
@@ -29,7 +22,7 @@ import {
     CheckboxInput,
     DateInput,
 } from '../../inputs'
-import { EntityButtons } from '../EntityButtons'
+import { ProgressSection } from '../ProgressSection'
 
 const ChildSectionLabel = styled.div`
     margin: 16px 16px -16px;
@@ -37,65 +30,72 @@ const ChildSectionLabel = styled.div`
 
 class EventInformation extends Component {
     state = {
+        loading: true,
         programStageId: null,
         programStage: null,
         values: {},
     }
 
-    componentDidMount = async () => {
-        await this.getProgramStage()
-    }
+    componentDidMount = async () => await this.getProgramStage()
 
     componentDidUpdate = async prevProps => {
-        if (prevProps) {
-            if (
-                prevProps.programStageId !== this.props.programStageId ||
-                prevProps.programId !== this.props.programId
-            )
-                await this.getProgramStage()
-            else if (prevProps.organismCode !== this.props.organismCode) {
-                let values = { ...this.state.values }
-                values[getOrganismsDataElementId()] = this.props.organismCode
-                this.setState({ values: values })
-            }
-        }
+        if (prevProps.panelValues !== this.props.panelValues)
+            await this.getProgramStage()
     }
 
     getProgramStage = async () => {
-        const { programId, programStageId, organismCode } = this.props
+        this.setState({ loading: true })
+        const { panelValues, eventId } = this.props
         let { programStage, values, rules, isResend } = await getProgramStage(
-            programId,
-            programStageId,
-            organismCode,
-            this.props.match.params.event
-                ? this.props.match.params.event
-                : undefined
+            panelValues,
+            eventId
         )
 
         this.checkRules(values, programStage.programStageSections, rules)
 
         this.setState({
+            loading: false,
             programStage: programStage,
-            //organisms: await getOrganisms(),
             values: values,
             isResend: isResend,
-            programStageId: programStageId,
+            programStageId: panelValues ? panelValues.programStageId : null,
             rules: rules,
         })
     }
 
     onChange = async (name, value) => {
         let values = { ...this.state.values }
-        let programStage = { ...this.state.programStage }
         values[name] = value
+        this.onNewValues(values)
+    }
 
-        this.checkRules(
+    onNewValues = values => {
+        let programStage = { ...this.state.programStage }
+        const rules = this.state.rules
+        this.checkRules(values, programStage.programStageSections, rules)
+        this.setState({
+            values: values,
+            programStage: programStage,
+        })
+        this.props.passValues(
             values,
-            programStage.programStageSections,
-            this.state.rules
+            this.validateValues(programStage.programStageSections, values)
         )
+    }
 
-        this.setState({ values: values })
+    validateValues = (sections, values) => {
+        for (let section of sections) {
+            if (section.childSections)
+                this.validateValues(section.childSections, values)
+            if (
+                section.dataElements.find(
+                    dataElement =>
+                        dataElement.required && values[dataElement.id] === ''
+                )
+            )
+                return false
+        }
+        return true
     }
 
     checkRules = (values, sections, rules) => {
@@ -191,6 +191,15 @@ class EventInformation extends Component {
                                 if (hideS !== affectedSection.hide)
                                     affectedSection.hide = hideS
                             break
+                        case 'ASSIGN':
+                            if (eval(rule.condition)) {
+                                let affectedDataElement = getAffectedDataElement(
+                                    r.dataElement.id
+                                )
+                                // Assigning value.
+                                values[affectedDataElement.id] = r.data
+                            }
+                            break
                         default:
                             break
                     }
@@ -199,100 +208,6 @@ class EventInformation extends Component {
                 }
             })
         })
-    }
-
-    /*getTestFieldColor = elementId => {
-        try {
-            const value = parseInt(this.state.values[elementId])
-            const testField = this.state.testFields[elementId]
-
-            if (value >= testField.Resistant) return 'red'
-            else if (value >= testField.Intermediate_Low) return 'orange'
-            else if (value < testField.Intermediate_High) return 'green'
-        } catch {
-            return ''
-        }
-    }*/
-
-    onBackClicked = () => {
-        this.props.history.push(
-            '/orgUnit/' +
-                this.props.match.params.orgUnit +
-                '/entity/' +
-                this.props.match.params.entity
-        )
-    }
-
-    /**
-     * Returns buttons based on adding new person or editing.
-     */
-    getButtonProps = () => {
-        return true
-            ? [
-                  {
-                      label: 'Submit',
-                      onClick: this.onSubmitClick,
-                      disabled: false, //!this.validate() || this.state.unchanged,
-                      icon: 'done',
-                      kind: 'primary',
-                  },
-              ]
-            : [
-                  {
-                      label: 'Edit',
-                      onClick: this.onSubmitClick,
-                      disabled: false,
-                      icon: 'edit',
-                      kind: 'primary',
-                  },
-                  {
-                      label: 'Delete',
-                      onClick: this.onSubmitClick,
-                      disabled: false,
-                      icon: 'delete',
-                      kind: 'destructive',
-                  },
-              ]
-    }
-
-    /**
-     * On submit button click.
-     */
-    onSubmitClick = async () => {
-        //const { programStage, values } = this.state
-        /*const sections = programStage.programStageSections.filter(
-            section => !['Name', 'Approval status'].includes(section.name)
-        )*/
-
-        // Removing hidden values.
-        /*programStage.programStageSections.forEach(section => {
-            const removeValues = dataElements => {
-                dataElements
-                    .filter(
-                        dataElement =>
-                            dataElement.hide && values[dataElement.id] !== ''
-                    )
-                    .forEach(dataElement => (values[dataElement.id] = ''))
-            }
-            removeValues(section.dataElements)
-            if (section.childSections)
-                section.childSections.forEach(childSection =>
-                    removeValues(childSection.dataElements)
-                )
-        })*/
-
-        this.props.match.params.event
-            ? await updateEvent(
-                  this.state.values,
-                  this.props.match.params.event
-              )
-            : await addEvent(
-                  this.state.values,
-                  this.props.programId,
-                  this.props.programStageId,
-                  this.props.match.params.orgUnit,
-                  this.props.match.params.entity
-              )
     }
 
     /**
@@ -340,6 +255,7 @@ class EventInformation extends Component {
                 </div>
             )
         }
+
         return (
             <div key={childSection.name}>
                 <ChildSectionLabel>
@@ -422,9 +338,9 @@ class EventInformation extends Component {
     }
 
     render() {
-        const { programStage } = this.state
+        const { programStage, loading } = this.state
 
-        if (!programStage) return null
+        if (loading) return <ProgressSection />
 
         const sections = programStage.programStageSections.filter(
             section => !section.hide
@@ -449,6 +365,7 @@ class EventInformation extends Component {
                         childSections = section.childSections.filter(
                             childSection => !childSection.hide
                         )
+
                     return (
                         <MarginBottom key={section.id}>
                             <Card>
@@ -457,68 +374,86 @@ class EventInformation extends Component {
                                         <Heading>{section.displayName}</Heading>
                                     </MarginSides>
                                     {dataElements.length > 0 ? (
-                                        <Grid container spacing={0}>
-                                            <Grid item xs>
-                                                {dataElements
-                                                    .slice(0, half)
-                                                    .map(dataElement =>
-                                                        this.getDataElement(
-                                                            dataElement
-                                                        )
-                                                    )}
+                                        section.renderType.DESKTOP.type ===
+                                        'MATRIX' ? (
+                                            <Grid container spacing={0}>
+                                                {section.dataElements
+                                                    .filter(
+                                                        dataElement =>
+                                                            !dataElement.hide
+                                                    )
+                                                    .map(dataElement => (
+                                                        <Grid
+                                                            item
+                                                            key={dataElement.id}
+                                                        >
+                                                            {this.getDataElement(
+                                                                dataElement
+                                                            )}
+                                                        </Grid>
+                                                    ))}
                                             </Grid>
-                                            <Grid item xs>
-                                                {dataElements
-                                                    .slice(half)
-                                                    .map(dataElement =>
-                                                        this.getDataElement(
-                                                            dataElement
-                                                        )
-                                                    )}
-                                                {childSections
-                                                    ? childSections.map(
-                                                          childSection =>
-                                                              this.getChildSection(
-                                                                  childSection
-                                                              )
-                                                      )
-                                                    : null}
+                                        ) : (
+                                            <Grid container spacing={0}>
+                                                <Grid item xs>
+                                                    {dataElements
+                                                        .slice(0, half)
+                                                        .map(dataElement =>
+                                                            this.getDataElement(
+                                                                dataElement
+                                                            )
+                                                        )}
+                                                </Grid>
+                                                <Grid item xs>
+                                                    {dataElements
+                                                        .slice(half)
+                                                        .map(dataElement =>
+                                                            this.getDataElement(
+                                                                dataElement
+                                                            )
+                                                        )}
+                                                    {childSections &&
+                                                        childSections.map(
+                                                            childSection =>
+                                                                this.getChildSection(
+                                                                    childSection
+                                                                )
+                                                        )}
+                                                </Grid>
                                             </Grid>
-                                        </Grid>
+                                        )
                                     ) : (
                                         <Grid container spacing={0}>
                                             <Grid item xs>
-                                                {childSections
-                                                    ? childSections
-                                                          .slice(
-                                                              0,
-                                                              Math.ceil(
-                                                                  childSections.length /
-                                                                      2
-                                                              )
-                                                          )
-                                                          .map(childSection =>
-                                                              this.getChildSection(
-                                                                  childSection
-                                                              )
-                                                          )
-                                                    : null}
+                                                {childSections &&
+                                                    childSections
+                                                        .slice(
+                                                            0,
+                                                            Math.ceil(
+                                                                childSections.length /
+                                                                    2
+                                                            )
+                                                        )
+                                                        .map(childSection =>
+                                                            this.getChildSection(
+                                                                childSection
+                                                            )
+                                                        )}
                                             </Grid>
                                             <Grid item xs>
-                                                {childSections
-                                                    ? childSections
-                                                          .slice(
-                                                              Math.ceil(
-                                                                  childSections.length /
-                                                                      2
-                                                              )
-                                                          )
-                                                          .map(childSection =>
-                                                              this.getChildSection(
-                                                                  childSection
-                                                              )
-                                                          )
-                                                    : null}
+                                                {childSections &&
+                                                    childSections
+                                                        .slice(
+                                                            Math.ceil(
+                                                                childSections.length /
+                                                                    2
+                                                            )
+                                                        )
+                                                        .map(childSection =>
+                                                            this.getChildSection(
+                                                                childSection
+                                                            )
+                                                        )}
                                             </Grid>
                                         </Grid>
                                     )}
@@ -527,7 +462,6 @@ class EventInformation extends Component {
                         </MarginBottom>
                     )
                 })}
-                <EntityButtons buttons={this.getButtonProps()} />
             </MarginBottom>
         )
     }

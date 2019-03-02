@@ -8,42 +8,13 @@ import { getEventCounts } from '../../../api/api'
  */
 class SidebarMenu extends Component {
     state = {
-        menuItems: [
-            {
-                label: 'Persons',
-                value: '/',
-                icon: 'people',
-            },
-            {
-                label: 'Records for revision (0)',
-                value: '/events/Resend/',
-                icon: 'error_outline',
-                status: 'Resend',
-            },
-            {
-                label: 'Rejected records (0)',
-                value: '/events/Rejected/',
-                icon: 'highlight_off',
-                status: 'Rejected',
-            },
-            {
-                label: 'Accepted records (0)',
-                value: '/events/Approved/',
-                icon: 'check_circle_outline',
-                status: 'Approved',
-            },
-            {
-                label: 'Records for validation (0)',
-                value: '/events/Validate/',
-                icon: 'help_outline',
-                status: 'Validate',
-            },
-        ],
+        menuItems: null,
         selected: null,
     }
 
     componentDidMount = async () => {
-        await this.updateCounts()
+        this.setState({ menuItems: this.props.menuItems })
+        await this.updateCounts(this.props.menuItems)
     }
 
     componentDidUpdate = async () => {
@@ -52,14 +23,13 @@ class SidebarMenu extends Component {
             this.props.selected !== this.state.selected ||
             this.props.history.location.pathname !== this.state.pathname
         )
-            await this.updateCounts()
+            await this.updateCounts([...this.state.menuItems])
     }
 
     /**
      * Updates count number in menu.
      */
-    updateCounts = async () => {
-        let menuItems = [...this.state.menuItems]
+    updateCounts = async menuItems => {
         let counts = await getEventCounts(this.props.selected.id)
 
         // Updating count number in menu.
@@ -85,6 +55,9 @@ class SidebarMenu extends Component {
     }
 
     render() {
+        const { menuItems } = this.state
+        if (!menuItems) return null
+
         return (
             <div id="sidebar_menu">
                 <Menu

@@ -1,7 +1,6 @@
 import React from 'react'
 import InputField from '@dhis2/ui/core/InputField'
 import _ from 'lodash'
-import { isUnique } from '../../api/api'
 
 /**
  * Textfield input.
@@ -10,7 +9,6 @@ export class TextInput extends React.Component {
     state = {
         value: '',
         errorText: '',
-        validating: false,
     }
 
     constructor(props) {
@@ -47,25 +45,12 @@ export class TextInput extends React.Component {
      * @returns Appropriate error text. Empty if valid.
      */
     validate = async value => {
-        let errorText = this.state.errorText
-        if (this.props.required) {
-            if (value === '' || value === null)
-                errorText = 'This field is required'
-            else errorText = ''
-        }
-        if (this.props.unique) {
-            if (value !== '') {
-                this.setState({ validating: true })
-                if (!(await isUnique(this.props.name, value))) {
-                    errorText = 'This field requires a unique value'
-                    this.props.onUnique(this.props.name, false)
-                } else {
-                    errorText = ''
-                    this.props.onUnique(this.props.name, true)
-                }
-                this.setState({ validating: false })
-            }
-        }
+        const { name, label, required, unique } = this.props
+        let errorText = ''
+        if (required && !value) errorText = 'This field is required'
+        if (unique && value)
+            if (!(await this.props.validateUnique(name, value, label)))
+                errorText = 'This field requires a unique value'
         return errorText
     }
 
