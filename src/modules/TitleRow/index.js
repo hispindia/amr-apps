@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { Row, Title } from '../../helpers/helpers'
 import IconButton from '../../inputs/IconButton'
 
-const TitleRow = props => (
+export const TitleRow = props => (
     <Row>
         {props.backPath && (
             <IconButton

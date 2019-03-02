@@ -19,6 +19,7 @@ const _l1ApprovalGroup = 'O7EtwlwnAYq'
 const _l2ApprovalGroup = 'XigjUyZB8UE'
 
 const _organismsDataElementId = 'SaQe2REkGVw'
+const _organismsOptionSet = 'TUCsBvqwTUV'
 const _amrDataElement = 'lIkk661BLpG'
 const _sampleDateElementId = 'JRUa0qYKQDF'
 
@@ -132,8 +133,8 @@ export async function getEntityAttributes(entityId) {
     const attributes = (await get(
         'trackedEntityTypes/' +
             _personTypeId +
-            `.json?fields=trackedEntityTypeAttributes[mandatory,trackedEntityAttribute[name,
-        id,displayName,valueType,unique,optionSetValue,optionSet[id,options[displayName,code]]]]`
+            '.json?fields=trackedEntityTypeAttributes[mandatory,trackedEntityAttribute[name,' +
+            'id,displayName,valueType,unique,optionSetValue,optionSet[id,options[displayName,code]]]]'
     )).trackedEntityTypeAttributes
 
     // Contains attribute values.
@@ -218,8 +219,8 @@ export async function getPersonsEvents(entityId) {
     const enrollments = (await get(
         'trackedEntityInstances/' +
             entityId +
-            `.json?ouMode=ALL&fields=enrollments[events[event,lastUpdated,created,
-            orgUnitName,storedBy,dataValues[dataElement,value]]]`
+            '.json?ouMode=ALL&fields=enrollments[events[event,lastUpdated,created,' +
+            'orgUnitName,storedBy,dataValues[dataElement,value]]]'
     )).enrollments
 
     let data = {
@@ -339,9 +340,9 @@ export async function getPersons(orgUnit) {
     const values = (await get(
         'trackedEntityInstances.json?ou=' +
             orgUnit +
-            `&ouMode=DESCENDANTS&order=created:desc&paging=false&
-            fields=orgUnit,trackedEntityInstance,created,lastUpdated,
-            attributes[displayName,valueType,attribute,value],enrollments[orgUnitName]`
+            '&ouMode=DESCENDANTS&order=created:desc&paging=false&' +
+            'fields=orgUnit,trackedEntityInstance,created,lastUpdated,' +
+            'attributes[displayName,valueType,attribute,value],enrollments[orgUnitName]'
     )).trackedEntityInstances
     const metaData = (await get(
         'trackedEntityTypes/' +
@@ -538,21 +539,40 @@ export async function getEventCounts(orgUnit) {
     return counts
 }
 
+export async function getEventsByStatus(orgUnit, approvalStatus) {
+    return false
+}
+
 /**
  * Gets all events created by the user.
  * @param {string} orgUnit - Organisation unit to look within.
  * @returns {Object[]} All events.
  */
-export async function getEvents(orgUnit) {
-    const allEvents = (await get(
-        'events.json?paging=false&fields=storedBy,orgUnit,event,' +
+export async function getEvents(orgUnit, userOnly) {
+    let programNames = {}
+    const programs = (await get('programs.json?paging=false&fields=id,name'))
+        .programs
+    programs.forEach(program => (programNames[program.id] = program.name))
+
+    let organismNames = {}
+    const organisms = (await get(
+        'optionSets/' +
+            _organismsOptionSet +
+            '.json?fields=options[code,displayName]'
+    )).options
+    organisms.forEach(
+        organism => (organismNames[organism.code] = organism.displayName)
+    )
+
+    let events = (await get(
+        'events.json?paging=false&fields=program,storedBy,orgUnit,event,' +
             'lastUpdated,created,dataValues[dataElement,value]&orgUnit=' +
             orgUnit +
             '&ouMode=DESCENDANTS&order=updated:desc'
     )).events
 
     // Does not seem to be possible to filter by storedBy with the API.
-    const events = allEvents.filter(event => event.storedBy === _username)
+    if (userOnly) events = events.filter(event => event.storedBy === _username)
 
     let data = {
         headers: [
@@ -561,12 +581,12 @@ export async function getEvents(orgUnit) {
                 column: 'Amr Id',
             },
             {
-                name: 'Approval level 1',
-                column: 'Approval level 1',
+                name: 'Organism group',
+                column: 'Organism group',
             },
             {
-                name: 'Approval level 2',
-                column: 'Approval level 2',
+                name: 'Organism',
+                column: 'Organism',
             },
             {
                 name: 'Created',
@@ -596,21 +616,23 @@ export async function getEvents(orgUnit) {
                 dataValue => dataValue.dataElement === dataElement
             )
         const amrDataElement = getValue(_amrDataElement)
-        const l1DataElement = getValue(_l1ApprovalStatus)
-        const l2DataElement = getValue(_l2ApprovalStatus)
+        const organismDataElement = getValue(_organismsDataElementId)
         return {
             amrValue: amrDataElement ? amrDataElement.value : '',
-            l1Value: l1DataElement ? l1DataElement.value : '',
-            l2Value: l2DataElement ? l2DataElement.value : '',
+            organism: organismDataElement
+                ? organismNames[organismDataElement.value]
+                    ? organismNames[organismDataElement.value]
+                    : ''
+                : '',
         }
     }
 
     events.forEach(event => {
-        const { amrValue, l1Value, l2Value } = getValues(event)
+        const { amrValue, organism } = getValues(event)
         data.rows.push([
             amrValue,
-            l1Value,
-            l2Value,
+            programNames[event.program],
+            organism,
             removeTime(event.created),
             removeTime(event.lastUpdated),
             event.orgUnit,
@@ -677,9 +699,9 @@ export async function getProgramStage(panelValues, eventId) {
     let programStage = await get(
         'programStages/' +
             programStageId +
-            `.json?fields=displayName,programStageDataElements[dataElement[id,formName],compulsory],
-            programStageSections[id,name,displayName,renderType,dataElements[id,displayFormName,code,valueType,optionSetValue,
-                optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]`
+            '.json?fields=displayName,programStageDataElements[dataElement[id,formName],compulsory],' +
+            'programStageSections[id,name,displayName,renderType,dataElements[id,displayFormName,code,valueType,optionSetValue,' +
+            'optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
     )
 
     programStage.programStageSections.forEach(section => {

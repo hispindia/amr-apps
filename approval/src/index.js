@@ -2,6 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import * as serviceWorker from './serviceWorker'
 import { init } from 'api'
+import { AppSkeleton } from 'modules'
+import { AppContent } from './modules'
 
 const developmentServer = 'http://apps.hispindia.org/amr'
 const rootElement = document.getElementById('root')
@@ -10,7 +12,12 @@ const withBaseUrl = async baseUrl => {
     baseUrl = `${baseUrl}/api`
     await init(baseUrl)
 
-    ReactDOM.render(<p>HELLO WORLD</p>, rootElement)
+    ReactDOM.render(
+        <AppSkeleton appName="Record Approval">
+            <AppContent />
+        </AppSkeleton>,
+        rootElement
+    )
     serviceWorker.unregister()
 }
 
