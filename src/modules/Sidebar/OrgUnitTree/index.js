@@ -13,26 +13,22 @@ const OrgUnitTreeStyle = styled.ul`
 /**
  * Organisation unit tree.
  */
-export class OrgUnitTree extends React.Component {
-    render() {
-        return (
-            <MarginTopSmall>
-                <Card>
-                    <MarginSmall>
-                        <OrgUnitTreeStyle>
-                            {this.props.orgUnits.map(orgUnit => (
-                                <OrgUnitNode
-                                    orgUnit={orgUnit}
-                                    key={orgUnit.id}
-                                    show={true}
-                                    onSelect={this.props.onSelect}
-                                    selected={this.props.selected}
-                                />
-                            ))}
-                        </OrgUnitTreeStyle>
-                    </MarginSmall>
-                </Card>
-            </MarginTopSmall>
-        )
-    }
-}
+export const OrgUnitTree = props => (
+    <MarginTopSmall>
+        <Card>
+            <MarginSmall>
+                <OrgUnitTreeStyle>
+                    {props.orgUnits.map(orgUnit => (
+                        <OrgUnitNode
+                            orgUnit={orgUnit}
+                            key={orgUnit.id}
+                            show={true}
+                            onSelect={props.onSelect}
+                            selected={props.selected}
+                        />
+                    ))}
+                </OrgUnitTreeStyle>
+            </MarginSmall>
+        </Card>
+    </MarginTopSmall>
+)

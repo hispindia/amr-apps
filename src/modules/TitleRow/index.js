@@ -1,5 +1,4 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import { Row, Title } from '../../helpers/helpers'
 import IconButton from '../../inputs/IconButton'
 
@@ -15,5 +14,3 @@ export const TitleRow = props => (
         <Title>{props.title}</Title>
     </Row>
 )
-
-export default withRouter(TitleRow)

@@ -1,8 +1,8 @@
 import React from 'react'
 import { getEvents } from 'api'
 import { Margin } from 'helpers'
-import { ProgressSection, EventTable } from 'modules'
-import { TitleRow } from 'modules/TitleRow'
+import { ProgressSection, RecordTable, TitleRow } from 'modules'
+//import { TitleRow } from 'modules/TitleRow'
 
 /**
  * Shows all events created by user.
@@ -41,7 +41,7 @@ export class MyRecords extends React.Component {
                 {!this.state.data ? (
                     <ProgressSection />
                 ) : (
-                    <EventTable
+                    <RecordTable
                         data={this.state.data}
                         onEventClick={this.onEventClick}
                         onAddClick={this.onAddClick}

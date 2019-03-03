@@ -1,44 +1,34 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
-import { Record } from 'modules'
+import { RecordSections } from 'modules/RecordSections'
 import { Records } from '../'
 
 const MainSection = styled.main`
     width: 100%;
 `
 
-export class Main extends Component {
-    render() {
-        return (
-            <MainSection>
-                <Switch>
+export const Main = props => (
+    <MainSection>
+        <Switch>
+            <Route
+                exact
+                path="/approval/:status"
+                render={componentProps => (
+                    <Records {...componentProps} selected={props.selected} />
+                )}
+            />
+            {['/orgUnit/:orgUnit/event', '/orgUnit/:orgUnit/event/:event'].map(
+                path => (
                     <Route
+                        key={path}
                         exact
-                        path="/approval/:status"
-                        render={props => (
-                            <Records
-                                {...props}
-                                selected={this.props.selected}
-                            />
-                        )}
+                        path={path}
+                        rcomponent={RecordSections}
                     />
-                    {[
-                        '/orgUnit/:orgUnit/event',
-                        '/orgUnit/:orgUnit/event/:event',
-                    ].map(path => (
-                        <Route
-                            key={path}
-                            exact
-                            path={path}
-                            component={Record}
-                        />
-                    ))}
-                    <Route
-                        render={() => <Redirect to="/approval/Validate" />}
-                    />
-                </Switch>
-            </MainSection>
-        )
-    }
-}
+                )
+            )}
+            <Route render={() => <Redirect to="/approval/Validate" />} />
+        </Switch>
+    </MainSection>
+)

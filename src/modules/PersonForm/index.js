@@ -1,7 +1,6 @@
 /* eslint no-eval: 0 */
 
 import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
 import { Grid } from '@material-ui/core'
 import { Card } from '@dhis2/ui/core'
 import {
@@ -22,7 +21,7 @@ import { ProgressSection } from '../ProgressSection'
 /**
  * Entity information section.
  */
-class EntityInformation extends Component {
+export class PersonForm extends Component {
     state = {
         values: {}, // Current or new values.
         uniques: [], // Unique textfield values are validated.
@@ -268,5 +267,3 @@ class EntityInformation extends Component {
         )
     }
 }
-
-export default withRouter(EntityInformation)
