@@ -1,13 +1,14 @@
 import React, { Component } from 'react'
+import { withRouter } from 'react-router-dom'
 import { Margin } from '../../helpers/helpers'
-import EntityInformation from '../EntityInformation'
-import TitleRow from '../TitleRow'
-import EventInformation from '../EventInformation'
-import { EventPanel } from '../EventPanel'
+//import PersonForm from '../PersonForm'
+//import TitleRow from '../TitleRow'
+//import RecordForm from '../RecordForm'
+import { PersonForm, TitleRow, RecordForm } from '../'
 import { addEvent, addPersonWithEvent } from '../../api/api'
 import { ButtonRow } from '../../inputs'
 
-export class Record extends Component {
+class RecordSections extends Component {
     state = {
         entityValues: null,
         entityValid: false,
@@ -108,19 +109,19 @@ export class Record extends Component {
         return (
             <div>
                 {!eventId && (
-                    <EntityInformation
+                    <PersonForm
                         passValues={this.onEntityValues}
                         entityId={entityId}
                     />
                 )}
                 {entityValid && (
-                    <EventPanel
+                    <RecordPanel
                         resetSwitch={resetSwitch}
                         passValues={this.onPanelValues}
                     />
                 )}
                 {(eventId || panelValid) && (
-                    <EventInformation
+                    <RecordForm
                         eventId={eventId}
                         panelValues={panelValues}
                         passValues={this.onEventValues}
@@ -173,3 +174,5 @@ export class Record extends Component {
         )
     }
 }
+
+export default withRouter(RecordSections)

@@ -21,19 +21,15 @@ const IconContainer = styled(IconButton)`
 /**
  * Adds an extra add button to the table toolbar.
  */
-class TableToolbar extends React.Component {
-    render() {
-        return (
-            <React.Fragment>
-                <Tooltip title={'Add'}>
-                    <IconContainer onClick={this.props.onAddClick}>
-                        <AddIcon />
-                    </IconContainer>
-                </Tooltip>
-            </React.Fragment>
-        )
-    }
-}
+const TableToolbar = props => (
+    <React.Fragment>
+        <Tooltip title={'Add'}>
+            <IconContainer onClick={props.onAddClick}>
+                <AddIcon />
+            </IconContainer>
+        </Tooltip>
+    </React.Fragment>
+)
 
 export default withStyles(defaultToolbarStyles, { name: 'TableToolbar' })(
     TableToolbar

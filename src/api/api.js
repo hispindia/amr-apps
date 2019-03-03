@@ -4,19 +4,19 @@ import { get, postData, del, put, setBaseUrl } from './crud'
 import { removeTime } from '../helpers/date'
 
 const _l1ApprovalStatus = 'tAyVrNUTVHX'
-//const _l1RejectionReason = 'NLmLwjdSHMv'
-//const _l1RevisionReason = 'wCNQtIHJRON'
+const _l1RejectionReason = 'NLmLwjdSHMv'
+const _l1RevisionReason = 'wCNQtIHJRON'
 const _l2ApprovalStatus = 'sXDQT6Yaf77'
-//const _l2RejectionReason = 'pz8SoHBO6RL'
-//const _l2RevisionReason = 'fEnFVvEFKVc'
+const _l2RejectionReason = 'pz8SoHBO6RL'
+const _l2RevisionReason = 'fEnFVvEFKVc'
 
 //const _amrProgramId = 'dzizG8i1cmP'
 const _personTypeId = 'tOJvIFXsB5V'
 const _programStageId = 'UW26ioWbKzv'
 
 const _deoGroup = 'mYdK5QT4ndl'
-const _l1ApprovalGroup = 'O7EtwlwnAYq'
-const _l2ApprovalGroup = 'XigjUyZB8UE'
+const _l1ApprovalGroup = 'jVK9RNKNLus'
+const _l2ApprovalGroup = 'TFmNnLn06Rd'
 
 const _organismsDataElementId = 'SaQe2REkGVw'
 const _organismsOptionSet = 'TUCsBvqwTUV'
@@ -643,6 +643,92 @@ export async function getEvents(orgUnit, userOnly) {
     return data
 }
 
+export async function getRecordForApproval(eventId) {
+    // Approval fields are enabled if user has group, and status is not approved.
+    const isDisabled = element => {
+        switch (element.id) {
+            case _l1ApprovalStatus:
+            case _l1RejectionReason:
+            case _l1RevisionReason:
+                if (_isL1User && values[_l1ApprovalStatus] !== 'Approved')
+                    element.disabled = false
+                return
+            case _l2ApprovalStatus:
+            case _l2RejectionReason:
+            case _l2RevisionReason:
+                if (_isL2User || values[_l2ApprovalStatus] !== 'Approved')
+                    element.disabled = false
+                return
+            default:
+                element.disabled = true
+                return
+        }
+    }
+
+    let eventData = await getEventValues(eventId)
+    let values = eventData.values
+    const programId = eventData.programId
+    const programStageId = eventData.programStageId
+
+    let programStage = await get(
+        'programStages/' +
+            programStageId +
+            '.json?fields=displayName,programStageDataElements[dataElement[id,formName],compulsory],' +
+            'programStageSections[id,name,displayName,renderType,dataElements[id,displayFormName,code,valueType,optionSetValue,' +
+            'optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
+    )
+
+    programStage.programStageSections.forEach(section => {
+        section.hide = false
+        section.dataElements.forEach(dataElement => {
+            dataElement.hide = false
+            // Adding options.
+            if (dataElement.optionSetValue) {
+                let options = []
+                dataElement.optionSet.options.forEach(option =>
+                    options.push({
+                        value: option.code,
+                        label: option.displayName,
+                    })
+                )
+                dataElement.optionSet.options = options
+            }
+            isDisabled(dataElement)
+        })
+    })
+
+    let remove = []
+    // Adding child sections and removing child sections from main sections.
+    programStage.programStageSections.forEach(programStageSection => {
+        let childSections = []
+        programStage.programStageSections
+            .filter(childSection =>
+                childSection.name.match(
+                    new RegExp('{' + programStageSection.name + '}.*')
+                )
+            )
+            .forEach(childSection => {
+                remove.push(childSection.id)
+                childSection.name = childSection.name.replace(
+                    new RegExp('{' + programStageSection.name + '}'),
+                    ''
+                )
+                childSections.push(childSection)
+            })
+        programStageSection.childSections = childSections
+    })
+
+    programStage.programStageSections = programStage.programStageSections.filter(
+        section => !remove.includes(section.id)
+    )
+
+    return {
+        programStage: programStage,
+        values: values,
+        rules: await getProgramRules(programId, programStageId),
+    }
+}
+
 /**
  * Gets AMR program stage, values, and organism data element ID.
  * @param {string} eventId - Event ID.
@@ -651,19 +737,8 @@ export async function getEvents(orgUnit, userOnly) {
 export async function getProgramStage(panelValues, eventId) {
     const isDisabled = element => {
         switch (element.id) {
-            /*case _l1ApprovalStatus:
-            case _l1RejectionReason:
-            case _l1RevisionReason:
-                if (!_isL1User || values[_l1ApprovalStatus] === 'Approved')
-                    element.disabled = true
-                return
-            case _l2ApprovalStatus:
-            case _l2RejectionReason:
-            case _l2RevisionReason:
-                if (!_isL2User || values[_l2ApprovalStatus] === 'Approved')
-                    element.disabled = true
-                return*/
             case _amrDataElement:
+            case _organismsDataElementId:
                 element.disabled = true
                 return
             default:

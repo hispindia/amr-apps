@@ -22,13 +22,13 @@ import {
     CheckboxInput,
     DateInput,
 } from '../../inputs'
-import { ProgressSection } from '../ProgressSection'
+import { ProgressSection } from '../'
 
 const ChildSectionLabel = styled.div`
     margin: 16px 16px -16px;
 `
 
-class EventInformation extends Component {
+export class RecordForm extends Component {
     state = {
         loading: true,
         programStageId: null,
@@ -466,5 +466,3 @@ class EventInformation extends Component {
         )
     }
 }
-
-export default withRouter(EventInformation)

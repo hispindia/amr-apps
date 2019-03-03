@@ -10,12 +10,12 @@ import { SelectInput, RadioInput } from '../../inputs'
 import { Card } from '@dhis2/ui/core/Card'
 import { getPrograms, getOrganisms } from '../../api/api'
 import { Grid } from '@material-ui/core'
-import { ProgressSection } from '../ProgressSection'
+import { ProgressSection } from '../'
 
 /**
  * Contains event panal and/or event information.
  */
-export class EventPanel extends Component {
+export class RecordPanel extends Component {
     state = {
         programs: null,
         programStages: null,
