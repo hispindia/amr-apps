@@ -1,8 +1,7 @@
 import React from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
-import { RecordSections } from 'modules/RecordSections'
-import { Records } from '../'
+import { Records, RecordApproval } from '../'
 
 const MainSection = styled.main`
     width: 100%;
@@ -24,7 +23,9 @@ export const Main = props => (
                         key={path}
                         exact
                         path={path}
-                        rcomponent={RecordSections}
+                        render={componentProps => (
+                            <RecordApproval {...componentProps} />
+                        )}
                     />
                 )
             )}

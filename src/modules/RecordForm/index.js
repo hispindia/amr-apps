@@ -1,7 +1,6 @@
 /* eslint no-eval: 0 */
 
 import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
 import { Card } from '@dhis2/ui/core'
 import { Grid } from '@material-ui/core'
 import styled from 'styled-components'
@@ -13,7 +12,6 @@ import {
     MarginSides,
     MarginBottom,
 } from '../../helpers/helpers'
-import { getProgramStage } from '../../api/api'
 import {
     TextInput,
     RadioInput,
@@ -29,36 +27,25 @@ const ChildSectionLabel = styled.div`
 `
 
 export class RecordForm extends Component {
-    state = {
-        loading: true,
-        programStageId: null,
-        programStage: null,
-        values: {},
-    }
+    state = { loading: true }
 
-    componentDidMount = async () => await this.getProgramStage()
+    componentDidMount = async () => await this.init()
 
     componentDidUpdate = async prevProps => {
-        if (prevProps.panelValues !== this.props.panelValues)
-            await this.getProgramStage()
+        if (prevProps.programStage !== this.props.programStage)
+            await this.init()
     }
 
-    getProgramStage = async () => {
+    init = async () => {
         this.setState({ loading: true })
-        const { panelValues, eventId } = this.props
-        let { programStage, values, rules, isResend } = await getProgramStage(
-            panelValues,
-            eventId
-        )
 
+        let { programStage, values, rules } = this.props
         this.checkRules(values, programStage.programStageSections, rules)
 
         this.setState({
             loading: false,
             programStage: programStage,
             values: values,
-            isResend: isResend,
-            programStageId: panelValues ? panelValues.programStageId : null,
             rules: rules,
         })
     }

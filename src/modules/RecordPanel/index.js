@@ -74,7 +74,12 @@ export class RecordPanel extends Component {
         let values = { ...this.state.values }
         values[name] = value
         this.setState({ values: values })
-        this.props.passValues(values, !Object.values(values).includes(''))
+        this.props.passValues(
+            values.programId,
+            values.programStageId,
+            values.organismCode,
+            !Object.values(values).includes('')
+        )
     }
 
     /**

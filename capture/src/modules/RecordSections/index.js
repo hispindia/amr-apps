@@ -1,7 +1,18 @@
 import React, { Component } from 'react'
 import { Margin } from 'helpers'
-import { PersonForm, RecordForm, RecordPanel, TitleRow } from 'modules'
-import { addEvent, addPersonWithEvent } from 'api'
+import {
+    PersonForm,
+    RecordForm,
+    RecordPanel,
+    TitleRow,
+    ProgressSection,
+} from 'modules'
+import {
+    addEvent,
+    addPersonWithEvent,
+    getProgramStageNew,
+    getProgramStageExisting,
+} from 'api'
 import { ButtonRow } from 'inputs'
 
 export class RecordSections extends Component {
@@ -16,15 +27,22 @@ export class RecordSections extends Component {
         eventId: null,
         buttonDisabled: true,
         initialized: false,
+        loading: true,
         resetSwitch: false,
+        recordProps: null,
     }
 
-    componentDidMount = () => {
+    componentDidMount = async () => {
+        const eventId = this.props.match.params.event
+            ? this.props.match.params.event
+            : null
         this.setState({
-            eventId: this.props.match.params.event
-                ? this.props.match.params.event
+            recordProps: eventId
+                ? await getProgramStageExisting(eventId)
                 : null,
+            eventId: eventId,
             initialized: true,
+            loading: false,
         })
     }
 
@@ -35,8 +53,23 @@ export class RecordSections extends Component {
             entityValid: valid,
         })
 
-    onPanelValues = (values, valid) =>
-        this.setState({ panelValues: values, panelValid: valid })
+    onPanelValues = async (programId, programStageId, organismCode, valid) => {
+        if (valid) this.setState({ loading: true, recordProps: null })
+        this.setState({
+            programId: programId,
+            programStageId: programStageId,
+            organismCode: organismCode,
+            panelValid: valid,
+            recordProps: valid
+                ? await getProgramStageNew(
+                      programId,
+                      programStageId,
+                      organismCode
+                  )
+                : null,
+            loading: false,
+        })
+    }
 
     onEventValues = (values, valid) =>
         this.setState({
@@ -92,12 +125,13 @@ export class RecordSections extends Component {
         const {
             entityId,
             entityValid,
-            panelValues,
             panelValid,
             eventId,
             eventValid,
             buttonDisabled,
             resetSwitch,
+            recordProps,
+            loading,
         } = this.state
         const disabled =
             buttonDisabled || !entityValid || !panelValid || !eventValid
@@ -116,13 +150,15 @@ export class RecordSections extends Component {
                         passValues={this.onPanelValues}
                     />
                 )}
-                {(eventId || panelValid) && (
+                {recordProps && (
                     <RecordForm
-                        eventId={eventId}
-                        panelValues={panelValues}
                         passValues={this.onEventValues}
+                        programStage={recordProps.programStage}
+                        rules={recordProps.rules}
+                        values={recordProps.values}
                     />
                 )}
+                {loading && <ProgressSection />}
                 {!eventId && (
                     <ButtonRow
                         buttons={[
@@ -162,6 +198,7 @@ export class RecordSections extends Component {
     }
 
     render() {
+        const { initialized } = this.state
         return (
             <Margin>
                 <TitleRow
@@ -169,7 +206,7 @@ export class RecordSections extends Component {
                     backPath="/"
                     history={this.props.history}
                 />
-                {this.state.initialized && this.sections()}
+                {initialized ? this.sections() : <ProgressSection />}
             </Margin>
         )
     }

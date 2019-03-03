@@ -32,7 +32,6 @@
         "eject": "react-scripts eject"
     },
     "dependencies": {
-        "d2-manifest": "^1.0.0",
         "react": "^16",
         "react-dom": "^16",
         "react-scripts": "^2.1.3",
