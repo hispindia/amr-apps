@@ -1,12 +1,12 @@
 {
     "name": "amr-record-approval",
     "version": "0.1.0",
-    "description": "AMR record approval app for DHIS2",
+    "description": "AMR approval app for DHIS2",
     "main": "index.js",
     "license": "BSD-3-Clause",
     "homepage": ".",
     "manifest.webapp": {
-        "name": "AMR Record Approval",
+        "name": "AMR Approval",
         "appType": "APP",
         "icons": {
             "48": "icon.png"

@@ -1,31 +1,31 @@
 import React, { Component } from 'react'
 import { Margin } from 'helpers'
-import { RecordForm, TitleRow } from 'modules'
-import { addEvent, addPersonWithEvent } from 'api'
+import { RecordForm, TitleRow, ProgressSection } from 'modules'
+import { getRecordForApproval, updateEvent } from 'api'
 import { ButtonRow } from 'inputs'
 
 export class RecordApproval extends Component {
     state = {
-        entityValues: null,
-        entityValid: false,
-        panelValues: null,
-        panelValid: false,
         eventValues: null,
         eventValid: false,
-        entityId: null,
         eventId: null,
         buttonDisabled: true,
         initialized: false,
-        resetSwitch: false,
+        loading: true,
+        recordProps: null,
     }
 
-    componentDidMount = () =>
+    componentDidMount = async () => {
+        const eventId = this.props.match.params.event
+            ? this.props.match.params.event
+            : null
         this.setState({
-            eventId: this.props.match.params.event
-                ? this.props.match.params.event
-                : null,
+            recordProps: eventId ? await getRecordForApproval(eventId) : null,
+            eventId: eventId,
             initialized: true,
+            loading: false,
         })
+    }
 
     onEventValues = (values, valid) =>
         this.setState({
@@ -34,56 +34,28 @@ export class RecordApproval extends Component {
             buttonDisabled: false,
         })
 
-    onSubmitClick = async addMore => {
+    onSubmitClick = async () => {
         this.setState({ buttonDisabled: true })
-        const {
-            entityValues,
-            panelValues,
-            eventValues,
-            entityId,
-            resetSwitch,
-        } = this.state
-        const orgUnitId = this.props.match.params.orgUnit
-        let amrId
-        let newEntityId
-        if (entityId)
-            amrId = await addEvent(
-                eventValues,
-                panelValues.programId,
-                panelValues.programStageId,
-                orgUnitId,
-                entityId
-            )
-        else {
-            const values = await addPersonWithEvent(
-                eventValues,
-                panelValues.programId,
-                panelValues.programStageId,
-                orgUnitId,
-                entityValues
-            )
-            amrId = values.amrId
-            newEntityId = values.entityId
-        }
-        window.alert(`AMR Id: ${amrId}`)
-
-        if (addMore)
-            this.setState({
-                entityId: newEntityId ? newEntityId : entityId,
-                panelValid: false,
-                eventValid: false,
-                resetSwitch: !resetSwitch,
-            })
-        else this.props.history.push('/')
+        const { eventId, eventValues } = this.state
+        await updateEvent(eventValues, eventId)
+        this.props.history.push('/')
     }
 
     sections = () => {
-        const { eventId, eventValid, buttonDisabled } = this.state
+        const { eventValid, buttonDisabled, recordProps, loading } = this.state
         const disabled = buttonDisabled || !eventValid
 
         return (
             <div>
-                <RecordForm eventId={eventId} passValues={this.onEventValues} />
+                {recordProps && (
+                    <RecordForm
+                        passValues={this.onEventValues}
+                        programStage={recordProps.programStage}
+                        rules={recordProps.rules}
+                        values={recordProps.values}
+                    />
+                )}
+                {loading && <ProgressSection />}
                 <ButtonRow
                     buttons={[
                         {
@@ -97,12 +69,12 @@ export class RecordApproval extends Component {
                         },
                         {
                             label: 'Submit',
-                            onClick: () => this.onSubmitClick(false),
+                            onClick: this.onSubmitClick,
                             disabled: disabled,
                             icon: 'done',
                             kind: 'primary',
-                            tooltip: 'Submit record.',
-                            disabledTooltip: 'A required field is empty.',
+                            tooltip: 'Submit changes.',
+                            disabledTooltip: 'Record is unchanged.',
                         },
                     ]}
                 />
@@ -111,6 +83,7 @@ export class RecordApproval extends Component {
     }
 
     render() {
+        const { initialized } = this.state
         return (
             <Margin>
                 <TitleRow
@@ -118,7 +91,7 @@ export class RecordApproval extends Component {
                     backPath="/"
                     history={this.props.history}
                 />
-                {this.state.initialized && this.sections()}
+                {initialized ? this.sections() : <ProgressSection />}
             </Margin>
         )
     }

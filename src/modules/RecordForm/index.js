@@ -334,7 +334,7 @@ export class RecordForm extends Component {
         if (loading) return <ProgressSection />
 
         const sections = programStage.programStageSections.filter(
-            section => !section.hide
+            section => !section.hide && !section.hideWithValues
         )
 
         return (

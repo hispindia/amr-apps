@@ -1,24 +1,36 @@
 import React from 'react'
-import { getEvents } from 'api'
+import { getEventsByStatus } from 'api'
 import { Margin } from 'helpers'
 import { ProgressSection, RecordTable, TitleRow } from 'modules'
-//import { TitleRow } from 'modules/TitleRow'
 
 /**
  * Shows all events created by user.
  */
-export class MyRecords extends React.Component {
-    state = { data: null }
+export class RecordsOverview extends React.Component {
+    state = { loading: true }
 
-    componentDidMount = async () =>
-        this.setState({ data: await this.getData() })
+    componentDidMount = async () => this.init()
 
     componentDidUpdate = async prevProps => {
-        if (prevProps.selected !== this.props.selected)
-            this.setState({ data: await this.getData() })
+        if (this.state.data !== null)
+            if (
+                prevProps.selected !== this.props.selected ||
+                prevProps.match.params.status !== this.props.match.params.status
+            )
+                await this.init()
     }
 
-    getData = async () => await getEvents(this.props.selected, true)
+    init = async () => {
+        this.setState({ loading: true })
+        this.setState({
+            data: await getEventsByStatus(
+                this.props.selected,
+                this.props.match.params.status,
+                true
+            ),
+            loading: false,
+        })
+    }
 
     /**
      * Called when table row is clicked.
@@ -38,7 +50,7 @@ export class MyRecords extends React.Component {
         return (
             <Margin>
                 <TitleRow title="My records" />
-                {!this.state.data ? (
+                {this.state.loading ? (
                     <ProgressSection />
                 ) : (
                     <RecordTable

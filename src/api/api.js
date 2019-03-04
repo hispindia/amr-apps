@@ -1,17 +1,13 @@
 import moment from 'moment'
 import _ from 'lodash'
 import { get, postData, del, put, setBaseUrl } from './crud'
-import { removeTime } from '../helpers/date'
-import { getProgramStage, getProgramRules } from './helpers'
+import {
+    getProgramStage,
+    getProgramRules,
+    toTable,
+    getRecords,
+} from './helpers'
 
-const _l1ApprovalStatus = 'tAyVrNUTVHX'
-const _l1RejectionReason = 'NLmLwjdSHMv'
-const _l1RevisionReason = 'wCNQtIHJRON'
-const _l2ApprovalStatus = 'sXDQT6Yaf77'
-const _l2RejectionReason = 'pz8SoHBO6RL'
-const _l2RevisionReason = 'fEnFVvEFKVc'
-
-//const _amrProgramId = 'dzizG8i1cmP'
 const _personTypeId = 'tOJvIFXsB5V'
 const _programStageId = 'UW26ioWbKzv'
 
@@ -20,7 +16,6 @@ const _l1ApprovalGroup = 'jVK9RNKNLus'
 const _l2ApprovalGroup = 'TFmNnLn06Rd'
 
 const _organismsDataElementId = 'SaQe2REkGVw'
-const _organismsOptionSet = 'TUCsBvqwTUV'
 const _amrDataElement = 'lIkk661BLpG'
 const _sampleDateElementId = 'JRUa0qYKQDF'
 
@@ -340,158 +335,62 @@ export async function getEventValues(eventId) {
  * @param {string[]} approvalStatuses - Approval statuses.
  * @returns {Object} Counts of events.
  */
-export async function getEventCounts(orgUnit) {
+export async function getEventCounts(orgUnit, approvalStatuses, userOnly) {
     let counts = {}
-    for (const approvalStatus of ['Resend', 'Rejected', 'Validate']) {
-        let events = (await get(
-            'events.json?paging=false&fields=event&orgUnit=' +
-                orgUnit +
-                '&ouMode=DESCENDANTS' +
-                '&filter=' +
-                _l1ApprovalStatus +
-                ':eq:' +
-                approvalStatus
-        )).events
-        const events2 = (await get(
-            'events.json?paging=false&fields=event&orgUnit=' +
-                orgUnit +
-                '&ouMode=DESCENDANTS' +
-                '&filter=' +
-                _l2ApprovalStatus +
-                ':eq:' +
-                approvalStatus
-        )).events
-        // In order to avoid duplicates.
-        events2.forEach(event2 => {
-            if (!events.find(event => event.event === event2.event))
-                events.push(event2)
-        })
+    for (const approvalStatus of approvalStatuses) {
+        const events = await getRecords(
+            orgUnit,
+            false,
+            approvalStatus,
+            userOnly ? _username : false
+        )
         counts[approvalStatus] = events.length
     }
-
-    // Only looking for events where approved at both levels.
-    counts['Approved'] = (await get(
-        'events.json?paging=false&fields=event&orgUnit=' +
-            orgUnit +
-            '&ouMode=DESCENDANTS' +
-            '&filter=' +
-            _l1ApprovalStatus +
-            ':eq:Approved,' +
-            _l2ApprovalStatus +
-            ':eq:Approved'
-    )).events.length
 
     return counts
 }
 
-export async function getEventsByStatus(orgUnit, approvalStatus) {
-    return false
+export async function getEventsByStatus(orgUnit, approvalStatus, userOnly) {
+    const events = await getRecords(
+        orgUnit,
+        true,
+        approvalStatus,
+        userOnly ? _username : false
+    )
+    return await toTable(events)
 }
 
 /**
- * Gets all events created by the user.
+ * Gets all events within organisation unit and it's descendants.
  * @param {string} orgUnit - Organisation unit to look within.
+ * @param {string} userOnly - If true, will only get events created by user (optional).
  * @returns {Object[]} All events.
  */
 export async function getEvents(orgUnit, userOnly) {
-    let programNames = {}
-    const programs = (await get('programs.json?paging=false&fields=id,name'))
-        .programs
-    programs.forEach(program => (programNames[program.id] = program.name))
-
-    let organismNames = {}
-    const organisms = (await get(
-        'optionSets/' +
-            _organismsOptionSet +
-            '.json?fields=options[code,displayName]'
-    )).options
-    organisms.forEach(
-        organism => (organismNames[organism.code] = organism.displayName)
+    const events = await getRecords(
+        orgUnit,
+        true,
+        '',
+        userOnly ? _username : false
     )
-
-    let events = (await get(
-        'events.json?paging=false&fields=program,storedBy,orgUnit,event,' +
-            'lastUpdated,created,dataValues[dataElement,value]&orgUnit=' +
-            orgUnit +
-            '&ouMode=DESCENDANTS&order=updated:desc'
-    )).events
-
-    // Does not seem to be possible to filter by storedBy with the API.
-    if (userOnly) events = events.filter(event => event.storedBy === _username)
-
-    let data = {
-        headers: [
-            {
-                name: 'Amr Id',
-                column: 'Amr Id',
-            },
-            {
-                name: 'Organism group',
-                column: 'Organism group',
-            },
-            {
-                name: 'Organism',
-                column: 'Organism',
-            },
-            {
-                name: 'Created',
-                column: 'Created',
-            },
-            {
-                name: 'Updated',
-                column: 'Updated',
-            },
-            {
-                name: 'Organisation unit ID',
-                column: 'Organisation unit ID',
-                options: { display: false },
-            },
-            {
-                name: 'Event',
-                column: 'Event',
-                options: { display: false },
-            },
-        ],
-        rows: [],
-    }
-
-    const getValues = event => {
-        const getValue = dataElement =>
-            event.dataValues.find(
-                dataValue => dataValue.dataElement === dataElement
-            )
-        const amrDataElement = getValue(_amrDataElement)
-        const organismDataElement = getValue(_organismsDataElementId)
-        return {
-            amrValue: amrDataElement ? amrDataElement.value : '',
-            organism: organismDataElement
-                ? organismNames[organismDataElement.value]
-                    ? organismNames[organismDataElement.value]
-                    : ''
-                : '',
-        }
-    }
-
-    events.forEach(event => {
-        const { amrValue, organism } = getValues(event)
-        data.rows.push([
-            amrValue,
-            programNames[event.program],
-            organism,
-            removeTime(event.created),
-            removeTime(event.lastUpdated),
-            event.orgUnit,
-            event.event,
-        ])
-    })
-
-    return data
+    return await toTable(events)
 }
 
 export async function getRecordForApproval(eventId) {
-    let values = (await getEventValues(eventId)).values
+    let { values, programId, programStageId } = await getEventValues(eventId)
+    let programStage = await getProgramStage(
+        programStageId,
+        values,
+        false,
+        _isL1User,
+        _isL2User
+    )
+    programStage.programStageSections
+        .filter(section => section.name === 'Institute / Hospital Information')
+        .forEach(section => (section.hideWithValues = true))
+
     return {
-        programStage: await getProgramStage(programStageId, values),
+        programStage: programStage,
         values: values,
         rules: await getProgramRules(programId, programStageId),
     }
@@ -504,8 +403,12 @@ export async function getProgramStageNew(
 ) {
     let values = { [_organismsDataElementId]: organismCode }
     values[_organismsDataElementId] = organismCode
+    let programStage = await getProgramStage(programStageId, values, true)
+    programStage.programStageSections
+        .filter(section => section.name === 'Approval')
+        .forEach(section => (section.hideWithValues = true))
     return {
-        programStage: await getProgramStage(programStageId, values),
+        programStage: programStage,
         values: values,
         rules: await getProgramRules(programId, programStageId),
     }
@@ -519,7 +422,7 @@ export async function getProgramStageNew(
 export async function getProgramStageExisting(eventId) {
     let { values, programId, programStageId } = await getEventValues(eventId)
     return {
-        programStage: await getProgramStage(programStageId, values),
+        programStage: await getProgramStage(programStageId, values, false),
         values: values,
         rules: await getProgramRules(programId, programStageId),
     }
@@ -619,48 +522,6 @@ export async function generateAmrId(orgUnitId) {
  * @returns {Object} Event.
  */
 async function setEventValues(event, values) {
-    // Setting result values.
-    /*Object.keys(testFields)
-        .filter(testFieldId => testFields[testFieldId].name.endsWith('_Result'))
-        .forEach(testResultFieldId => {
-            const testValueFieldIds = Object.keys(testFields).filter(
-                testValueFieldId =>
-                    values[testValueFieldId] !== '' &&
-                    testFields[testValueFieldId].Resistant &&
-                    testFields[testValueFieldId].Intermediate_Low &&
-                    testFields[testValueFieldId].Susceptible &&
-                    (testFields[testResultFieldId].name ===
-                        testFields[testValueFieldId].name + '_Result' ||
-                        testFields[testResultFieldId].name.replace(
-                            '_Result',
-                            ''
-                        ) ===
-                            testFields[testValueFieldId].name.replace(
-                                /_(.*)/,
-                                ''
-                            ))
-            )
-            if (testValueFieldIds.length > 0) {
-                // Prioritising MIC over DD.
-                const testValueFieldId =
-                    testValueFieldIds.length > 1
-                        ? testValueFieldIds.find(id =>
-                              testFields[id].name.includes('MIC')
-                          )
-                        : testValueFieldIds[0]
-                const testValueField = testFields[testValueFieldId]
-                const intValue = parseInt(values[testValueFieldId])
-                values[testResultFieldId] =
-                    intValue >= testValueField.Resistant
-                        ? 'Resistant'
-                        : intValue >= testValueField.Intermediate_Low
-                        ? 'Intermediate'
-                        : intValue <= testValueField.Susceptible
-                        ? 'Susceptible'
-                        : ''
-            }
-        })*/
-
     if (!values[_amrDataElement])
         values[_amrDataElement] = await generateAmrId(event.orgUnit)
 

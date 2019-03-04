@@ -1,12 +1,12 @@
 {
     "name": "amr-record-capture",
     "version": "0.1.0",
-    "description": "AMR record capture app for DHIS2",
+    "description": "AMR capture app for DHIS2",
     "main": "index.js",
     "license": "BSD-3-Clause",
     "homepage": ".",
     "manifest.webapp": {
-        "name": "AMR Record Capture",
+        "name": "AMR Capture",
         "appType": "APP",
         "icons": {
             "48": "icon.png"

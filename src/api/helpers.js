@@ -1,26 +1,201 @@
 import { get } from './crud'
+import { removeTime } from '../helpers/date'
 
 const _organismsDataElementId = 'SaQe2REkGVw'
+const _organismsOptionSet = 'TUCsBvqwTUV'
 const _amrDataElement = 'lIkk661BLpG'
+const _l1ApprovalStatus = 'tAyVrNUTVHX'
+const _l1RejectionReason = 'NLmLwjdSHMv'
+const _l1RevisionReason = 'wCNQtIHJRON'
+const _l2ApprovalStatus = 'sXDQT6Yaf77'
+const _l2RejectionReason = 'pz8SoHBO6RL'
+const _l2RevisionReason = 'fEnFVvEFKVc'
 
-export const getProgramStage = async (programStageId, values) => {
+export const getRecords = async (
+    orgUnit,
+    getData,
+    approvalStatus,
+    username
+) => {
+    const fields = getData
+        ? 'program,storedBy,orgUnit,event,lastUpdated,created,dataValues[dataElement,value]'
+        : 'event,storedBy'
+
+    let events = []
+    switch (approvalStatus) {
+        case 'Resend':
+        case 'Rejected':
+        case 'Validate':
+            events = (await get(
+                'events.json?paging=false&fields=' +
+                    fields +
+                    '&orgUnit=' +
+                    orgUnit +
+                    '&ouMode=DESCENDANTS' +
+                    '&filter=' +
+                    _l1ApprovalStatus +
+                    ':eq:' +
+                    approvalStatus
+            )).events
+            const events2 = (await get(
+                'events.json?paging=false&fields=' +
+                    fields +
+                    '&orgUnit=' +
+                    orgUnit +
+                    '&ouMode=DESCENDANTS' +
+                    '&filter=' +
+                    _l2ApprovalStatus +
+                    ':eq:' +
+                    approvalStatus
+            )).events
+            // In order to avoid duplicates.
+            events2.forEach(event2 => {
+                if (!events.find(event => event.event === event2.event))
+                    events.push(event2)
+            })
+            break
+        case 'Approved':
+            events = (await get(
+                'events.json?paging=false&fields=' +
+                    fields +
+                    '&orgUnit=' +
+                    orgUnit +
+                    '&ouMode=DESCENDANTS' +
+                    '&filter=' +
+                    _l1ApprovalStatus +
+                    ':eq:Approved&filter=' +
+                    _l2ApprovalStatus +
+                    ':eq:Approved'
+            )).events
+            break
+        default:
+            events = (await get(
+                'events.json?paging=false&fields=' +
+                    fields +
+                    '&orgUnit=' +
+                    orgUnit +
+                    '&ouMode=DESCENDANTS&order=updated:desc'
+            )).events
+            break
+    }
+
+    if (username) events = events.filter(event => event.storedBy === username)
+
+    return events
+}
+
+export const toTable = async events => {
+    let programNames = {}
+    const programs = (await get('programs.json?paging=false&fields=id,name'))
+        .programs
+    programs.forEach(program => (programNames[program.id] = program.name))
+
+    let organismNames = {}
+    const organisms = (await get(
+        'optionSets/' +
+            _organismsOptionSet +
+            '.json?fields=options[code,displayName]'
+    )).options
+    organisms.forEach(
+        organism => (organismNames[organism.code] = organism.displayName)
+    )
+
+    let data = {
+        headers: [
+            {
+                name: 'Amr Id',
+                column: 'Amr Id',
+            },
+            {
+                name: 'Organism group',
+                column: 'Organism group',
+            },
+            {
+                name: 'Organism',
+                column: 'Organism',
+            },
+            {
+                name: 'Created',
+                column: 'Created',
+            },
+            {
+                name: 'Updated',
+                column: 'Updated',
+            },
+            {
+                name: 'Organisation unit ID',
+                column: 'Organisation unit ID',
+                options: { display: false },
+            },
+            {
+                name: 'Event',
+                column: 'Event',
+                options: { display: false },
+            },
+        ],
+        rows: [],
+    }
+
+    const getValues = event => {
+        const getValue = dataElement =>
+            event.dataValues.find(
+                dataValue => dataValue.dataElement === dataElement
+            )
+        const amrDataElement = getValue(_amrDataElement)
+        const organismDataElement = getValue(_organismsDataElementId)
+        return {
+            amrValue: amrDataElement ? amrDataElement.value : '',
+            organism: organismDataElement
+                ? organismNames[organismDataElement.value]
+                    ? organismNames[organismDataElement.value]
+                    : ''
+                : '',
+        }
+    }
+
+    events.forEach(event => {
+        const { amrValue, organism } = getValues(event)
+        data.rows.push([
+            amrValue,
+            programNames[event.program],
+            organism,
+            removeTime(event.created),
+            removeTime(event.lastUpdated),
+            event.orgUnit,
+            event.event,
+        ])
+    })
+
+    return data
+}
+
+export const getProgramStage = async (
+    programStageId,
+    values,
+    newRecord,
+    isL1User,
+    isL2User
+) => {
     const shouldDisable = element => {
         switch (element.id) {
             case _amrDataElement:
             case _organismsDataElementId:
                 return true
+            case _l1ApprovalStatus:
+            case _l1RejectionReason:
+            case _l1RevisionReason:
+                return !(isL1User && values[_l1ApprovalStatus] !== 'Approved')
+            case _l2ApprovalStatus:
+            case _l2RejectionReason:
+            case _l2RevisionReason:
+                return !(isL2User && values[_l2ApprovalStatus] !== 'Approved')
             default:
-                return false
-            /*typeof eventId === 'undefined'
-                        ? false
-                        : _isL2User && values[_l2ApprovalStatus] !== 'Approved'
-                        ? false
-                        : _isL1User && values[_l1ApprovalStatus] !== 'Approved'
-                        ? false
-                        : values[_l2ApprovalStatus] === 'Resend' ||
-                          values[_l1ApprovalStatus] === 'Resend'
-                        ? false
-                        : false*/
+                if (newRecord) return false
+                else
+                    return !(
+                        values[_l2ApprovalStatus] === 'Resend' ||
+                        values[_l1ApprovalStatus] === 'Resend'
+                    )
         }
     }
 

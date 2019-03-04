@@ -9,39 +9,57 @@ import { getEventCounts } from '../../../api/api'
 class SidebarMenu extends Component {
     state = {
         menuItems: null,
+        statuses: [],
         selected: null,
+        userOnly: false,
     }
 
     componentDidMount = async () => {
-        this.setState({ menuItems: this.props.menuItems })
-        await this.updateCounts(this.props.menuItems)
+        const { menuItems } = this.props
+        const statuses = menuItems.items.map(menuItem => {
+            return menuItem.status
+        })
+        this.setState({
+            menuItems: menuItems.items,
+            statuses: statuses,
+            userOnly: menuItems.userOnly,
+        })
+        await this.updateCounts(menuItems.items, statuses, menuItems.userOnly)
     }
 
     componentDidUpdate = async () => {
-        // Updates counts, if URL has changed.
-        if (
-            this.props.selected !== this.state.selected ||
-            this.props.history.location.pathname !== this.state.pathname
-        )
-            await this.updateCounts([...this.state.menuItems])
+        // Updates counts, if URL or selected OU has changed.
+        if (this.state.pathname)
+            if (
+                this.props.selected !== this.state.selected ||
+                (this.props.history.location.pathname !== this.state.pathname &&
+                    this.state.pathname)
+            )
+                await this.updateCounts(
+                    this.state.menuItems,
+                    this.state.statuses,
+                    this.state.userOnly
+                )
     }
 
     /**
      * Updates count number in menu.
      */
-    updateCounts = async menuItems => {
-        let counts = await getEventCounts(this.props.selected.id)
+    updateCounts = async (menuItems, statuses, userOnly) => {
+        let counts = await getEventCounts(
+            this.props.selected.id,
+            statuses,
+            userOnly
+        )
 
         // Updating count number in menu.
-        menuItems
-            .slice(1)
-            .forEach(
-                menuItem =>
-                    (menuItem.label = menuItem.label.replace(
-                        /\d/,
-                        counts[menuItem.status]
-                    ))
-            )
+        menuItems.forEach(
+            menuItem =>
+                (menuItem.label = menuItem.label.replace(
+                    /\(\d*\)/,
+                    `(${counts[menuItem.status]})`
+                ))
+        )
 
         this.setState({
             menuItems: menuItems,
