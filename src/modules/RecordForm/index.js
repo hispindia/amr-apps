@@ -32,7 +32,11 @@ export class RecordForm extends Component {
     componentDidMount = async () => await this.init()
 
     componentDidUpdate = async prevProps => {
-        if (prevProps.programStage !== this.props.programStage)
+        const { programStage, values } = this.props
+        if (
+            prevProps.programStage !== programStage ||
+            prevProps.values !== values
+        )
             await this.init()
     }
 

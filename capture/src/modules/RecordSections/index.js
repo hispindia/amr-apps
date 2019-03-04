@@ -19,7 +19,6 @@ export class RecordSections extends Component {
     state = {
         entityValues: null,
         entityValid: false,
-        panelValues: null,
         panelValid: false,
         eventValues: null,
         eventValid: false,
@@ -54,7 +53,12 @@ export class RecordSections extends Component {
         })
 
     onPanelValues = async (programId, programStageId, organismCode, valid) => {
-        if (valid) this.setState({ loading: true, recordProps: null })
+        if (valid)
+            this.setState({
+                loading: true,
+                recordProps: null,
+                disablePanel: true,
+            })
         this.setState({
             programId: programId,
             programStageId: programStageId,
@@ -68,6 +72,7 @@ export class RecordSections extends Component {
                   )
                 : null,
             loading: false,
+            disablePanel: false,
         })
     }
 
@@ -82,7 +87,8 @@ export class RecordSections extends Component {
         this.setState({ buttonDisabled: true })
         const {
             entityValues,
-            panelValues,
+            programId,
+            programStageId,
             eventValues,
             entityId,
             resetSwitch,
@@ -93,16 +99,16 @@ export class RecordSections extends Component {
         if (entityId)
             amrId = await addEvent(
                 eventValues,
-                panelValues.programId,
-                panelValues.programStageId,
+                programId,
+                programStageId,
                 orgUnitId,
                 entityId
             )
         else {
             const values = await addPersonWithEvent(
                 eventValues,
-                panelValues.programId,
-                panelValues.programStageId,
+                programId,
+                programStageId,
                 orgUnitId,
                 entityValues
             )
@@ -115,6 +121,7 @@ export class RecordSections extends Component {
             this.setState({
                 entityId: newEntityId ? newEntityId : entityId,
                 panelValid: false,
+                recordProps: null,
                 eventValid: false,
                 resetSwitch: !resetSwitch,
             })
@@ -126,6 +133,7 @@ export class RecordSections extends Component {
             entityId,
             entityValid,
             panelValid,
+            disablePanel,
             eventId,
             eventValid,
             buttonDisabled,
@@ -148,6 +156,7 @@ export class RecordSections extends Component {
                     <RecordPanel
                         resetSwitch={resetSwitch}
                         passValues={this.onPanelValues}
+                        disabled={disablePanel}
                     />
                 )}
                 {recordProps && (

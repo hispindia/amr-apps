@@ -130,6 +130,7 @@ export class RecordPanel extends Component {
                         label={dataElement.label}
                         value={this.state.values[dataElement.id]}
                         onChange={dataElement.onChange}
+                        disabled={this.props.disabled}
                         required
                     />
                 ) : (
@@ -139,6 +140,7 @@ export class RecordPanel extends Component {
                         label={dataElement.label}
                         value={this.state.values[dataElement.id]}
                         onChange={dataElement.onChange}
+                        disabled={this.props.disabled}
                         required
                     />
                 )}
