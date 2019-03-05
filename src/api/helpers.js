@@ -15,44 +15,72 @@ export const getRecords = async (
     orgUnit,
     getData,
     approvalStatus,
-    username
+    username,
+    isL1User,
+    isL2User
 ) => {
+    let approvalElements = []
+    if (username) approvalElements = [_l1ApprovalStatus, _l2ApprovalStatus]
+    else {
+        if (isL1User) approvalElements.push(_l1ApprovalStatus)
+        if (isL2User) approvalElements.push(_l2ApprovalStatus)
+    }
     const fields = getData
         ? 'program,storedBy,orgUnit,event,lastUpdated,created,dataValues[dataElement,value]'
         : 'event,storedBy'
 
     let events = []
+    let eventSets = []
     switch (approvalStatus) {
         case 'Resend':
         case 'Rejected':
-        case 'Validate':
-            events = (await get(
-                'events.json?paging=false&fields=' +
-                    fields +
-                    '&orgUnit=' +
-                    orgUnit +
-                    '&ouMode=DESCENDANTS' +
-                    '&filter=' +
-                    _l1ApprovalStatus +
-                    ':eq:' +
-                    approvalStatus
-            )).events
-            const events2 = (await get(
-                'events.json?paging=false&fields=' +
-                    fields +
-                    '&orgUnit=' +
-                    orgUnit +
-                    '&ouMode=DESCENDANTS' +
-                    '&filter=' +
-                    _l2ApprovalStatus +
-                    ':eq:' +
-                    approvalStatus
-            )).events
+            for (const element of approvalElements)
+                eventSets.push(
+                    (await get(
+                        'events.json?paging=false&fields=' +
+                            fields +
+                            '&orgUnit=' +
+                            orgUnit +
+                            '&ouMode=DESCENDANTS' +
+                            '&filter=' +
+                            element +
+                            ':eq:' +
+                            approvalStatus
+                    )).events
+                )
             // In order to avoid duplicates.
-            events2.forEach(event2 => {
-                if (!events.find(event => event.event === event2.event))
-                    events.push(event2)
-            })
+            eventSets.forEach(eventSet =>
+                eventSet.forEach(event2 => {
+                    if (!events.find(event => event.event === event2.event))
+                        events.push(event2)
+                })
+            )
+            break
+        case 'Validate':
+            for (const element of approvalElements)
+                eventSets.push(
+                    (await get(
+                        'events.json?paging=false&fields=' +
+                            fields +
+                            '&orgUnit=' +
+                            orgUnit +
+                            '&ouMode=DESCENDANTS' +
+                            '&filter=' +
+                            element +
+                            ':ne:Acccepted,' +
+                            element +
+                            ':ne:Rejected,' +
+                            element +
+                            ':ne:Resend'
+                    )).events
+                )
+            // In order to avoid duplicates.
+            eventSets.forEach(eventSet =>
+                eventSet.forEach(event2 => {
+                    if (!events.find(event => event.event === event2.event))
+                        events.push(event2)
+                })
+            )
             break
         case 'Approved':
             events = (await get(
@@ -295,17 +323,18 @@ export const getProgramRules = async (programId, programStageId) => {
 
     // Program specific dataElement rules.
     let dataElementRules = (await get(
-        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],data,programRuleActionType,optionGroup[id,options[' +
-            'code,displayName]]&filter=programRuleActions.dataElement:!null&filter=programStage:null&order=priority:asc&' +
-            'filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD,ASSIGN]&filter=program.id:eq:' +
+        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],data,programRuleActionType,' +
+            'optionGroup[id,options[code,displayName]]&filter=programRuleActions.dataElement:!null&filter=programStage:null&' +
+            'order=priority:asc&filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD,ASSIGN]' +
+            '&filter=program.id:eq:' +
             programId
     )).programRules
 
     // ProgramStage specific dataElement rules.
     let dataElementRulesStage = (await get(
-        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],data,programRuleActionType,optionGroup[id,options[' +
-            'code,displayName]]&filter=programRuleActions.dataElement:!null&filter=programRuleActions.programRuleActionType:in:[' +
-            'SHOWOPTIONGROUP,HIDEFIELD,ASSIGN]&order=priority:asc&&filter=programStage.id:eq:' +
+        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],data,programRuleActionType,' +
+            'optionGroup[id,options[code,displayName]]&filter=programRuleActions.dataElement:!null&filter=programRuleActions.' +
+            'programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD,ASSIGN]&order=priority:asc&&filter=programStage.id:eq:' +
             programStageId
     )).programRules
 

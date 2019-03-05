@@ -33,7 +33,9 @@ export const Main = props => (
                     />
                 )
             )}
-            <Route render={() => <Redirect to="/approval/Validate" />} />
+            <Route
+                render={() => <Redirect from="/" to="/approval/Validate" />}
+            />
         </Switch>
     </MainSection>
 )

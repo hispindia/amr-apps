@@ -8,19 +8,19 @@ export const menuItems = {
         },
         {
             label: 'Records for revision (0)',
-            value: '/events/Resend/',
+            value: '/approval/Resend/',
             icon: 'error_outline',
             status: 'Resend',
         },
         {
             label: 'Rejected records (0)',
-            value: '/events/Rejected/',
+            value: '/approval/Rejected/',
             icon: 'highlight_off',
             status: 'Rejected',
         },
         {
             label: 'Accepted records (0)',
-            value: '/events/Approved/',
+            value: '/approval/Approved/',
             icon: 'check_circle_outline',
             status: 'Approved',
         },

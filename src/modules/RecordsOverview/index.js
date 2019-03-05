@@ -62,7 +62,7 @@ export class RecordsOverview extends React.Component {
                 ) : (
                     <RecordTable
                         data={this.state.data}
-                        onEventClick={this.props.userOnly && this.onEventClick}
+                        onEventClick={this.onEventClick}
                         title=""
                         onAddClick={this.onAddClick}
                         addButton={this.props.userOnly}

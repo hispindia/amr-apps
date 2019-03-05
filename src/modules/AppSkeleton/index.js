@@ -7,10 +7,7 @@ import '../../css'
 const theme = createMuiTheme({
     palette: {
         primary: {
-            main: '#0d47a1',
-        },
-        secondary: {
-            main: '#4db6ac',
+            main: '#1565c0',
         },
     },
     typography: {

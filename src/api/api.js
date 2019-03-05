@@ -342,7 +342,9 @@ export async function getEventCounts(orgUnit, approvalStatuses, userOnly) {
             orgUnit,
             false,
             approvalStatus,
-            userOnly ? _username : false
+            userOnly ? _username : false,
+            _isL1User,
+            _isL2User
         )
         counts[approvalStatus] = events.length
     }
@@ -355,7 +357,9 @@ export async function getEventsByStatus(orgUnit, approvalStatus, userOnly) {
         orgUnit,
         true,
         approvalStatus,
-        userOnly ? _username : false
+        userOnly ? _username : false,
+        _isL1User,
+        _isL2User
     )
     return await toTable(events)
 }
