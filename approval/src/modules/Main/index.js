@@ -1,7 +1,8 @@
 import React from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
-import { Records, RecordApproval } from '../'
+import { RecordsOverview } from 'modules'
+import { RecordApproval } from '../'
 
 const MainSection = styled.main`
     width: 100%;
@@ -14,7 +15,10 @@ export const Main = props => (
                 exact
                 path="/approval/:status"
                 render={componentProps => (
-                    <Records {...componentProps} selected={props.selected} />
+                    <RecordsOverview
+                        {...componentProps}
+                        selected={props.selected}
+                    />
                 )}
             />
             {['/orgUnit/:orgUnit/event', '/orgUnit/:orgUnit/event/:event'].map(

@@ -1,7 +1,14 @@
 import React from 'react'
-import { getEventsByStatus } from 'api'
-import { Margin } from 'helpers'
-import { ProgressSection, RecordTable, TitleRow } from 'modules'
+import { getEventsByStatus, Margin } from '../..'
+import { RecordTable, ProgressSection, TitleRow } from '../'
+
+const titles = {
+    undefined: 'My records',
+    Resend: 'Records for revision',
+    Rejected: 'Rejected records',
+    Approved: 'Approved records',
+    Validate: 'Records for validation',
+}
 
 /**
  * Shows all events created by user.
@@ -26,7 +33,7 @@ export class RecordsOverview extends React.Component {
             data: await getEventsByStatus(
                 this.props.selected,
                 this.props.match.params.status,
-                true
+                this.props.userOnly
             ),
             loading: false,
         })
@@ -49,16 +56,16 @@ export class RecordsOverview extends React.Component {
     render() {
         return (
             <Margin>
-                <TitleRow title="My records" />
+                <TitleRow title={titles[this.props.match.params.status]} />
                 {this.state.loading ? (
                     <ProgressSection />
                 ) : (
                     <RecordTable
                         data={this.state.data}
-                        onEventClick={this.onEventClick}
-                        onAddClick={this.onAddClick}
+                        onEventClick={this.props.userOnly && this.onEventClick}
                         title=""
-                        addButton
+                        onAddClick={this.onAddClick}
+                        addButton={this.props.userOnly}
                     />
                 )}
             </Margin>

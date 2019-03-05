@@ -13,7 +13,7 @@ const withBaseUrl = async baseUrl => {
     await init(baseUrl)
 
     ReactDOM.render(
-        <AppSkeleton appName="Record Approval">
+        <AppSkeleton appName="AMR Approval">
             <AppContent />
         </AppSkeleton>,
         rootElement

@@ -1,7 +1,8 @@
 import React from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
-import { RecordsOverview, RecordSections } from '../'
+import { RecordsOverview } from 'modules'
+import { RecordSections } from '../'
 
 const MainSection = styled.main`
     width: 100%;
@@ -19,6 +20,7 @@ export const Main = props => (
                         <RecordsOverview
                             {...componentProps}
                             selected={props.selected}
+                            userOnly
                         />
                     )}
                 />
