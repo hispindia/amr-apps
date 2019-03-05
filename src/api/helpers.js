@@ -1,8 +1,7 @@
 import { get } from './crud'
-import { removeTime } from '../helpers/date'
 
 const _organismsDataElementId = 'SaQe2REkGVw'
-const _organismsOptionSet = 'TUCsBvqwTUV'
+
 const _amrDataElement = 'lIkk661BLpG'
 const _l1ApprovalStatus = 'tAyVrNUTVHX'
 const _l1RejectionReason = 'NLmLwjdSHMv'
@@ -11,190 +10,45 @@ const _l2ApprovalStatus = 'sXDQT6Yaf77'
 const _l2RejectionReason = 'pz8SoHBO6RL'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
-export const getRecords = async (
-    orgUnit,
-    getData,
-    approvalStatus,
-    username,
-    isL1User,
-    isL2User
-) => {
-    let approvalElements = []
-    if (username) approvalElements = [_l1ApprovalStatus, _l2ApprovalStatus]
-    else {
-        if (isL1User) approvalElements.push(_l1ApprovalStatus)
-        if (isL2User) approvalElements.push(_l2ApprovalStatus)
+// This may look a dumb way of doing it, but it is not possible to filter for events
+// without any value in a particular dataElement.
+export const getRecords = async (orgUnit, username, isL1User, isL2User) => {
+    const getValue = (dataValues, id, status) => {
+        const dataValue = dataValues.find(
+            dataValue => dataValue.dataElement === id
+        )
+        return dataValue ? dataValue.value === status : false
     }
-    const fields = getData
-        ? 'program,storedBy,orgUnit,event,lastUpdated,created,dataValues[dataElement,value]'
-        : 'event,storedBy'
 
-    let events = []
-    let eventSets = []
-    switch (approvalStatus) {
-        case 'Resend':
-        case 'Rejected':
-            for (const element of approvalElements)
-                eventSets.push(
-                    (await get(
-                        'events.json?paging=false&fields=' +
-                            fields +
-                            '&orgUnit=' +
-                            orgUnit +
-                            '&ouMode=DESCENDANTS' +
-                            '&filter=' +
-                            element +
-                            ':eq:' +
-                            approvalStatus
-                    )).events
-                )
-            // In order to avoid duplicates.
-            eventSets.forEach(eventSet =>
-                eventSet.forEach(event2 => {
-                    if (!events.find(event => event.event === event2.event))
-                        events.push(event2)
-                })
+    let events = (await get(
+        'events.json?paging=false&fields=program,storedBy,orgUnit,event,lastUpdated,created,dataValues[dataElement,value]&orgUnit=' +
+            orgUnit +
+            '&ouMode=DESCENDANTS'
+    )).events
+
+    let byStatus = {}
+
+    if (username) {
+        events = events.filter(event => event.storedBy === username)
+        byStatus.ALL = events
+    }
+
+    for (let status of ['Rejected', 'Approved', 'Resend']) {
+        byStatus[status] = events.filter(event =>
+            username || isL1User
+                ? getValue(event.dataValues, _l1ApprovalStatus, status)
+                : false || (username || isL2User)
+                ? getValue(event.dataValues, _l2ApprovalStatus, status)
+                : false
+        )
+        if (byStatus[status].length > 0)
+            events = [events, byStatus[status]].reduce((a, b) =>
+                a.filter(c => !b.includes(c))
             )
-            break
-        case 'Validate':
-            for (const element of approvalElements)
-                eventSets.push(
-                    (await get(
-                        'events.json?paging=false&fields=' +
-                            fields +
-                            '&orgUnit=' +
-                            orgUnit +
-                            '&ouMode=DESCENDANTS' +
-                            '&filter=' +
-                            element +
-                            ':ne:Acccepted,' +
-                            element +
-                            ':ne:Rejected,' +
-                            element +
-                            ':ne:Resend'
-                    )).events
-                )
-            // In order to avoid duplicates.
-            eventSets.forEach(eventSet =>
-                eventSet.forEach(event2 => {
-                    if (!events.find(event => event.event === event2.event))
-                        events.push(event2)
-                })
-            )
-            break
-        case 'Approved':
-            events = (await get(
-                'events.json?paging=false&fields=' +
-                    fields +
-                    '&orgUnit=' +
-                    orgUnit +
-                    '&ouMode=DESCENDANTS' +
-                    '&filter=' +
-                    _l1ApprovalStatus +
-                    ':eq:Approved&filter=' +
-                    _l2ApprovalStatus +
-                    ':eq:Approved'
-            )).events
-            break
-        default:
-            events = (await get(
-                'events.json?paging=false&fields=' +
-                    fields +
-                    '&orgUnit=' +
-                    orgUnit +
-                    '&ouMode=DESCENDANTS&order=updated:desc'
-            )).events
-            break
     }
+    byStatus['Validate'] = events
 
-    if (username) events = events.filter(event => event.storedBy === username)
-
-    return events
-}
-
-export const toTable = async events => {
-    let programNames = {}
-    const programs = (await get('programs.json?paging=false&fields=id,name'))
-        .programs
-    programs.forEach(program => (programNames[program.id] = program.name))
-
-    let organismNames = {}
-    const organisms = (await get(
-        'optionSets/' +
-            _organismsOptionSet +
-            '.json?fields=options[code,displayName]'
-    )).options
-    organisms.forEach(
-        organism => (organismNames[organism.code] = organism.displayName)
-    )
-
-    let data = {
-        headers: [
-            {
-                name: 'Amr Id',
-                column: 'Amr Id',
-            },
-            {
-                name: 'Organism group',
-                column: 'Organism group',
-            },
-            {
-                name: 'Organism',
-                column: 'Organism',
-            },
-            {
-                name: 'Created',
-                column: 'Created',
-            },
-            {
-                name: 'Updated',
-                column: 'Updated',
-            },
-            {
-                name: 'Organisation unit ID',
-                column: 'Organisation unit ID',
-                options: { display: false },
-            },
-            {
-                name: 'Event',
-                column: 'Event',
-                options: { display: false },
-            },
-        ],
-        rows: [],
-    }
-
-    const getValues = event => {
-        const getValue = dataElement =>
-            event.dataValues.find(
-                dataValue => dataValue.dataElement === dataElement
-            )
-        const amrDataElement = getValue(_amrDataElement)
-        const organismDataElement = getValue(_organismsDataElementId)
-        return {
-            amrValue: amrDataElement ? amrDataElement.value : '',
-            organism: organismDataElement
-                ? organismNames[organismDataElement.value]
-                    ? organismNames[organismDataElement.value]
-                    : ''
-                : '',
-        }
-    }
-
-    events.forEach(event => {
-        const { amrValue, organism } = getValues(event)
-        data.rows.push([
-            amrValue,
-            programNames[event.program],
-            organism,
-            removeTime(event.created),
-            removeTime(event.lastUpdated),
-            event.orgUnit,
-            event.event,
-        ])
-    })
-
-    return data
+    return byStatus
 }
 
 export const getProgramStage = async (

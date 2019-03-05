@@ -20,6 +20,8 @@ export const Main = props => (
                         <RecordsOverview
                             {...componentProps}
                             selected={props.selected}
+                            eventLists={props.eventLists}
+                            loading={props.loading}
                             userOnly
                         />
                     )}

@@ -13,6 +13,7 @@ export const Sidebar = props => (
             <SidebarMenu
                 selected={props.selected}
                 menuItems={props.menuItems}
+                counts={props.counts}
             />
             <Route
                 exact

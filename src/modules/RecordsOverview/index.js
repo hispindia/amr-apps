@@ -1,5 +1,5 @@
 import React from 'react'
-import { getEventsByStatus, Margin } from '../..'
+import { toTable, Margin } from '../..'
 import { RecordTable, ProgressSection, TitleRow } from '../'
 
 const titles = {
@@ -22,7 +22,9 @@ export class RecordsOverview extends React.Component {
         if (this.state.data !== null)
             if (
                 prevProps.selected !== this.props.selected ||
-                prevProps.match.params.status !== this.props.match.params.status
+                prevProps.match.params.status !==
+                    this.props.match.params.status ||
+                prevProps.eventLists !== this.props.eventLists
             )
                 await this.init()
     }
@@ -30,10 +32,12 @@ export class RecordsOverview extends React.Component {
     init = async () => {
         this.setState({ loading: true })
         this.setState({
-            data: await getEventsByStatus(
-                this.props.selected,
-                this.props.match.params.status,
-                this.props.userOnly
+            data: await toTable(
+                this.props.eventLists[
+                    this.props.match.params.status
+                        ? this.props.match.params.status
+                        : 'ALL'
+                ]
             ),
             loading: false,
         })
@@ -57,7 +61,7 @@ export class RecordsOverview extends React.Component {
         return (
             <Margin>
                 <TitleRow title={titles[this.props.match.params.status]} />
-                {this.state.loading ? (
+                {this.state.loading || this.props.loading ? (
                     <ProgressSection />
                 ) : (
                     <RecordTable

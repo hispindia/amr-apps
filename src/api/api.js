@@ -1,12 +1,8 @@
 import moment from 'moment'
 import _ from 'lodash'
 import { get, postData, del, put, setBaseUrl } from './crud'
-import {
-    getProgramStage,
-    getProgramRules,
-    toTable,
-    getRecords,
-} from './helpers'
+import { getProgramStage, getProgramRules, getRecords } from './helpers'
+import { removeTime } from '../helpers/date'
 
 const _personTypeId = 'tOJvIFXsB5V'
 const _programStageId = 'UW26ioWbKzv'
@@ -16,6 +12,7 @@ const _l1ApprovalGroup = 'jVK9RNKNLus'
 const _l2ApprovalGroup = 'TFmNnLn06Rd'
 
 const _organismsDataElementId = 'SaQe2REkGVw'
+const _organismsOptionSet = 'TUCsBvqwTUV'
 const _amrDataElement = 'lIkk661BLpG'
 const _sampleDateElementId = 'JRUa0qYKQDF'
 
@@ -329,55 +326,98 @@ export async function getEventValues(eventId) {
     }
 }
 
-/**
- * Gets the amount of events by approval status.
- * @param {string} orgUnit - Organisation unit ID.
- * @param {string[]} approvalStatuses - Approval statuses.
- * @returns {Object} Counts of events.
- */
-export async function getEventCounts(orgUnit, approvalStatuses, userOnly) {
-    let counts = {}
-    for (const approvalStatus of approvalStatuses) {
-        const events = await getRecords(
-            orgUnit,
-            false,
-            approvalStatus,
-            userOnly ? _username : false,
-            _isL1User,
-            _isL2User
-        )
-        counts[approvalStatus] = events.length
-    }
-
-    return counts
-}
-
-export async function getEventsByStatus(orgUnit, approvalStatus, userOnly) {
-    const events = await getRecords(
+export async function getEvents(orgUnit, userOnly) {
+    return await getRecords(
         orgUnit,
-        true,
-        approvalStatus,
         userOnly ? _username : false,
         _isL1User,
         _isL2User
     )
-    return await toTable(events)
 }
 
-/**
- * Gets all events within organisation unit and it's descendants.
- * @param {string} orgUnit - Organisation unit to look within.
- * @param {string} userOnly - If true, will only get events created by user (optional).
- * @returns {Object[]} All events.
- */
-export async function getEvents(orgUnit, userOnly) {
-    const events = await getRecords(
-        orgUnit,
-        true,
-        '',
-        userOnly ? _username : false
+export async function toTable(events) {
+    let programNames = {}
+    const programs = (await get('programs.json?paging=false&fields=id,name'))
+        .programs
+    programs.forEach(program => (programNames[program.id] = program.name))
+
+    let organismNames = {}
+    const organisms = (await get(
+        'optionSets/' +
+            _organismsOptionSet +
+            '.json?fields=options[code,displayName]'
+    )).options
+    organisms.forEach(
+        organism => (organismNames[organism.code] = organism.displayName)
     )
-    return await toTable(events)
+
+    let data = {
+        headers: [
+            {
+                name: 'Amr Id',
+                column: 'Amr Id',
+            },
+            {
+                name: 'Organism group',
+                column: 'Organism group',
+            },
+            {
+                name: 'Organism',
+                column: 'Organism',
+            },
+            {
+                name: 'Created',
+                column: 'Created',
+            },
+            {
+                name: 'Updated',
+                column: 'Updated',
+            },
+            {
+                name: 'Organisation unit ID',
+                column: 'Organisation unit ID',
+                options: { display: false },
+            },
+            {
+                name: 'Event',
+                column: 'Event',
+                options: { display: false },
+            },
+        ],
+        rows: [],
+    }
+
+    const getValues = event => {
+        const getValue = dataElement =>
+            event.dataValues.find(
+                dataValue => dataValue.dataElement === dataElement
+            )
+        const amrDataElement = getValue(_amrDataElement)
+        const organismDataElement = getValue(_organismsDataElementId)
+        return {
+            amrValue: amrDataElement ? amrDataElement.value : '',
+            organism: organismDataElement
+                ? organismNames[organismDataElement.value]
+                    ? organismNames[organismDataElement.value]
+                    : ''
+                : '',
+        }
+    }
+
+    events.forEach(event => {
+        const { amrValue, organism } = getValues(event)
+        data.rows.push([
+            amrValue,
+            programNames[event.program],
+            organism,
+            removeTime(event.created),
+            removeTime(event.lastUpdated),
+            event.orgUnit,
+            event.event,
+        ])
+    })
+
+    return data
 }
 
 export async function getRecordForApproval(eventId) {
