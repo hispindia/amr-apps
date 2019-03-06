@@ -12,6 +12,7 @@ import {
     addPersonWithEvent,
     getProgramStageNew,
     getProgramStageExisting,
+    updateEvent
 } from 'api'
 import { ButtonRow } from 'inputs'
 
@@ -128,6 +129,16 @@ export class RecordSections extends Component {
         else this.props.history.push('/')
     }
 
+    onUpdateClick = async () => {
+        this.setState({ buttonDisabled: true })
+        const {
+            eventValues,
+            eventId
+        } = this.state
+        await updateEvent(eventValues, eventId)
+        this.props.history.push('/')
+    }
+
     sections = () => {
         const {
             entityId,
@@ -142,7 +153,7 @@ export class RecordSections extends Component {
             loading,
         } = this.state
         const disabled =
-            buttonDisabled || !entityValid || !panelValid || !eventValid
+            (!eventId && (buttonDisabled || !entityValid || !panelValid || !eventValid)) || (eventId && !eventValid)
 
         return (
             <div>
@@ -168,9 +179,9 @@ export class RecordSections extends Component {
                     />
                 )}
                 {loading && <ProgressSection />}
-                {!eventId && (
-                    <ButtonRow
-                        buttons={[
+                <ButtonRow
+                    buttons={eventId ?
+                        [
                             {
                                 label: 'Cancel',
                                 onClick: () => this.props.history.push('/'),
@@ -178,7 +189,28 @@ export class RecordSections extends Component {
                                 icon: 'clear',
                                 kind: 'destructive',
                                 tooltip: 'Cancel and go back.',
-                                disabledTooltip: 'A required field is empty.',
+                                disabledTooltip: 'Cancel and go back.',
+                            },
+                            {
+                                label: 'Submit',
+                                onClick: () => this.onUpdateClick(false),
+                                disabled: disabled,
+                                icon: 'done',
+                                kind: 'primary',
+                                tooltip: 'Submit record.',
+                                disabledTooltip: 'Record is unchanged.',
+                            },
+                        ]
+                    :
+                        [
+                            {
+                                label: 'Cancel',
+                                onClick: () => this.props.history.push('/'),
+                                disabled: false,
+                                icon: 'clear',
+                                kind: 'destructive',
+                                tooltip: 'Cancel and go back.',
+                                disabledTooltip: 'Cancel and go back.',
                             },
                             {
                                 label: 'Submit and add new',
@@ -199,9 +231,8 @@ export class RecordSections extends Component {
                                 tooltip: 'Submit record.',
                                 disabledTooltip: 'A required field is empty.',
                             },
-                        ]}
-                    />
-                )}
+                    ]}
+                />
             </div>
         )
     }

@@ -37,7 +37,7 @@ export class RecordApproval extends Component {
     onSubmitClick = async () => {
         this.setState({ buttonDisabled: true })
         const { eventId, eventValues } = this.state
-        await updateEvent(eventValues, eventId)
+        await updateEvent(eventValues, eventId, true)
         this.props.history.push('/')
     }
 

@@ -66,17 +66,18 @@ export const getProgramStage = async (
             case _l1ApprovalStatus:
             case _l1RejectionReason:
             case _l1RevisionReason:
-                return !(isL1User && values[_l1ApprovalStatus] !== 'Approved')
+                return !isL1User || values[_l1ApprovalStatus] === 'Approved' || values[_l1ApprovalStatus] === 'Rejected' || values[_l2ApprovalStatus] === 'Rejected'
             case _l2ApprovalStatus:
             case _l2RejectionReason:
             case _l2RevisionReason:
-                return !(isL2User && values[_l2ApprovalStatus] !== 'Approved')
+                return !isL2User || values[_l2ApprovalStatus] === 'Approved' || values[_l2ApprovalStatus] === 'Rejected' || values[_l1ApprovalStatus] === 'Rejected'
             default:
                 if (newRecord) return false
+                else if (isL1User || isL2User) return true
                 else
-                    return !(
-                        values[_l2ApprovalStatus] === 'Resend' ||
-                        values[_l1ApprovalStatus] === 'Resend'
+                    return (
+                        values[_l2ApprovalStatus] !== 'Resend' && values[_l2ApprovalStatus] &&
+                        values[_l1ApprovalStatus] !== 'Resend' && values[_l1ApprovalStatus]
                     )
         }
     }

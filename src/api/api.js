@@ -16,6 +16,13 @@ const _organismsOptionSet = 'TUCsBvqwTUV'
 const _amrDataElement = 'lIkk661BLpG'
 const _sampleDateElementId = 'JRUa0qYKQDF'
 
+const _l1ApprovalStatus = 'tAyVrNUTVHX'
+const _l1RejectionReason = 'NLmLwjdSHMv'
+const _l1RevisionReason = 'wCNQtIHJRON'
+const _l2ApprovalStatus = 'sXDQT6Yaf77'
+const _l2RejectionReason = 'pz8SoHBO6RL'
+const _l2RevisionReason = 'fEnFVvEFKVc'
+
 let _isDeoUser
 let _isL1User
 let _isL2User
@@ -692,14 +699,21 @@ export async function addEvent(
  * @param {Object} values - New values.
  * @param {Object} testFields - Test fields meta data.
  */
-export async function updateEvent(values, eventId) {
+export async function updateEvent(newValues, eventId, isApproval) {
     let event = await get('events/' + eventId + '.json')
 
-    /*if (isResend)
-        values[_l1ApprovalStatus] === 'Resend'
-            ? (values[_l1ApprovalStatus] = values[_l1RevisionReason] = '')
-            : (values[_l2ApprovalStatus] = values[_l2RevisionReason] = '')*/
+    if (!isApproval) {
+        const { values } = await getEventValues(eventId)
+        if (values[_l1ApprovalStatus] === 'Resend') {
+            newValues[_l1ApprovalStatus] = ''
+            newValues[_l1RevisionReason] = ''
+        }
+        if (values[_l2ApprovalStatus] === 'Resend') {
+            newValues[_l2ApprovalStatus] = ''
+            newValues[_l2RevisionReason] = ''
+        }
+    }
 
-    event = await setEventValues(event, values)
+    event = await setEventValues(event, newValues)
     await put('events/' + eventId, event)
 }

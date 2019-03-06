@@ -3,7 +3,7 @@ import { toTable, Margin } from '../..'
 import { RecordTable, ProgressSection, TitleRow } from '../'
 
 const titles = {
-    undefined: 'My records',
+    ALL: 'My records',
     Resend: 'Records for revision',
     Rejected: 'Rejected records',
     Approved: 'Approved records',
@@ -16,8 +16,12 @@ const titles = {
 export class RecordsOverview extends React.Component {
     state = { loading: true }
 
+    componentDidMount = async () => {
+        if (this.props.eventLists)
+            await this.init()
+    }
+
     componentDidUpdate = async prevProps => {
-        console.log(prevProps.location.pathname, this.props.location.pathname)
         if (
             prevProps.location.pathname !== this.props.location.pathname ||
             prevProps.eventLists !== this.props.eventLists
@@ -28,7 +32,6 @@ export class RecordsOverview extends React.Component {
     }
 
     init = async () => {
-        console.log('getting')
         this.setState({ loading: true })
         this.setState({
             data: await toTable(

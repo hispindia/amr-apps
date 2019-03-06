@@ -37,9 +37,10 @@ export class AppContent extends React.Component {
     }
 
     onSelect = async selected => {
-        this.setState({ selected: selected, loading: this.props.userOnly })
+        this.setState({ selected: selected })
         await this.setEvents(selected)
     }
+
     render() {
         const { selected, eventLists, counts, orgUnits, loading } = this.state
         const { menuItems, children } = this.props
