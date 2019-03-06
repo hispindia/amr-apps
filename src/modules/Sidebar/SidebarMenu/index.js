@@ -12,16 +12,16 @@ class SidebarMenu extends Component {
         userOnly: false,
     }
 
-    componentDidMount = async () => {
+    componentDidMount = () => {
         const { menuItems } = this.props
         this.setState({
             menuItems: menuItems.items,
             userOnly: menuItems.userOnly,
         })
-        await this.updateCounts(menuItems.items)
+        this.updateCounts(menuItems.items)
     }
 
-    componentDidUpdate = async prevProps => {
+    componentDidUpdate = prevProps => {
         // Updates counts, if URL or selected OU has changed.
         if (
             prevProps.counts !== this.props.counts ||
@@ -33,13 +33,15 @@ class SidebarMenu extends Component {
     /**
      * Updates count number in menu.
      */
-    updateCounts = async menuItems => {
+    updateCounts = menuItems => {
+        const counts = this.props.counts
+        if (!counts) return
         // Updating count number in menu.
         menuItems.forEach(
             menuItem =>
                 (menuItem.label = menuItem.label.replace(
                     /\(\d*\)/,
-                    `(${this.props.counts[menuItem.status]})`
+                    `(${counts[menuItem.status]})`
                 ))
         )
 

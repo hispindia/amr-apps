@@ -2,7 +2,7 @@ export const menuItems = {
     items: [
         {
             label: 'My records (0)',
-            value: '/',
+            value: '/approval/ALL',
             icon: 'home',
             status: 'ALL',
         },

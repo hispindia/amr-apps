@@ -2,6 +2,7 @@ import React from 'react'
 import { BrowserRouter, HashRouter } from 'react-router-dom'
 import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
+import { AppContent } from '../AppContent'
 import '../../css'
 
 const theme = createMuiTheme({
@@ -33,7 +34,12 @@ export const AppSkeleton = props => (
             <MuiThemeProvider theme={theme}>
                 <div>
                     <HeaderBar appName={props.appName} />
-                    {props.children}
+                    <AppContent
+                        userOnly={props.userOnly}
+                        menuItems={props.menuItems}
+                    >
+                        {props.children}
+                    </AppContent>
                 </div>
             </MuiThemeProvider>
         </HashRouter>

@@ -16,20 +16,19 @@ const titles = {
 export class RecordsOverview extends React.Component {
     state = { loading: true }
 
-    componentDidMount = async () => this.init()
-
     componentDidUpdate = async prevProps => {
-        if (this.state.data !== null)
-            if (
-                prevProps.selected !== this.props.selected ||
-                prevProps.match.params.status !==
-                    this.props.match.params.status ||
-                prevProps.eventLists !== this.props.eventLists
-            )
-                await this.init()
+        console.log(prevProps.location.pathname, this.props.location.pathname)
+        if (
+            prevProps.location.pathname !== this.props.location.pathname ||
+            prevProps.eventLists !== this.props.eventLists
+        )
+            await this.init()
+        else if (prevProps.selected !== this.props.selected)
+            this.setState({ loading: true })
     }
 
     init = async () => {
+        console.log('getting')
         this.setState({ loading: true })
         this.setState({
             data: await toTable(

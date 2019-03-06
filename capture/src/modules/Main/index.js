@@ -11,22 +11,19 @@ const MainSection = styled.main`
 export const Main = props => (
     <MainSection>
         <Switch>
-            {['/', '/approval/:status'].map(path => (
-                <Route
-                    key={path}
-                    exact
-                    path={path}
-                    render={componentProps => (
-                        <RecordsOverview
-                            {...componentProps}
-                            selected={props.selected}
-                            eventLists={props.eventLists}
-                            loading={props.loading}
-                            userOnly
-                        />
-                    )}
-                />
-            ))}
+            <Route
+                exact
+                path={'/approval/:status'}
+                render={componentProps => (
+                    <RecordsOverview
+                        {...componentProps}
+                        selected={props.selected}
+                        eventLists={props.eventLists}
+                        loading={props.loading}
+                        userOnly
+                    />
+                )}
+            />
             {['/orgUnit/:orgUnit/event', '/orgUnit/:orgUnit/event/:event'].map(
                 path => (
                     <Route
@@ -39,7 +36,7 @@ export const Main = props => (
                     />
                 )
             )}
-            <Route render={() => <Redirect to="/" />} />
+            <Route render={() => <Redirect from="/" to="/approval/ALL" />} />
         </Switch>
     </MainSection>
 )
