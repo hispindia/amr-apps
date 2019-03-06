@@ -75,10 +75,7 @@ export const getProgramStage = async (
                 if (newRecord) return false
                 else if (isL1User || isL2User) return true
                 else
-                    return (
-                        values[_l2ApprovalStatus] !== 'Resend' && values[_l2ApprovalStatus] &&
-                        values[_l1ApprovalStatus] !== 'Resend' && values[_l1ApprovalStatus]
-                    )
+                    return (!(values[_l2ApprovalStatus] === 'Resend' || values[_l2ApprovalStatus] === '') && values[_l2ApprovalStatus]) || (!(values[_l1ApprovalStatus] === 'Resend' || values[_l1ApprovalStatus] === '') && values[_l1ApprovalStatus])
         }
     }
 
