@@ -354,7 +354,7 @@ export class RecordForm extends Component {
                     let childSections = section.childSections
                     if (section.childSections)
                         childSections = section.childSections.filter(
-                            childSection => !childSection.hide
+                            childSection => !childSection.hide && !childSection.hideWithValues
                         )
 
                     return (

@@ -436,9 +436,17 @@ export async function getRecordForApproval(eventId) {
         _isL1User,
         _isL2User
     )
+
+    let hideWithValues = ['Institute / Hospital Information']
+    if (!_isL1User) hideWithValues.push('Level 1')
+    if (!_isL2User) hideWithValues.push('Level 2')
     programStage.programStageSections
-        .filter(section => section.name === 'Institute / Hospital Information')
+        .filter(section => hideWithValues.includes(section.name))
         .forEach(section => (section.hideWithValues = true))
+    programStage.programStageSections.forEach(section =>
+        section.childSections.filter(childSection => hideWithValues.includes(childSection.name))
+        .forEach(childSection => (childSection.hideWithValues = true))
+    )
 
     return {
         programStage: programStage,
