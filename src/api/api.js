@@ -444,8 +444,9 @@ export async function getRecordForApproval(eventId) {
         .filter(section => hideWithValues.includes(section.name))
         .forEach(section => (section.hideWithValues = true))
     programStage.programStageSections.forEach(section =>
-        section.childSections.filter(childSection => hideWithValues.includes(childSection.name))
-        .forEach(childSection => (childSection.hideWithValues = true))
+        section.childSections
+            .filter(childSection => hideWithValues.includes(childSection.name))
+            .forEach(childSection => (childSection.hideWithValues = true))
     )
 
     return {
@@ -724,4 +725,28 @@ export async function updateEvent(newValues, eventId, isApproval) {
 
     event = await setEventValues(event, newValues)
     await put('events/' + eventId, event)
+}
+
+export async function getCounts(items, orgUnit, userOnly) {
+    if (userOnly)
+        for (let item of items)
+            item.count = (await get(
+                'sqlViews/' +
+                    item.sqlView +
+                    '/data.json?paging=false&var=orgunit:' +
+                    orgUnit +
+                    (item.param ? '&var=status:' + item.status : '') +
+                    (userOnly ? '&var=username:' + _username : '')
+            )).listGrid.rows[0][0]
+    else
+        for (let item of items)
+            item.count = (await get(
+                'sqlViews/' +
+                    (_isL2User ? item.sqlView.l2 : item.sqlView.l1) +
+                    '/data.json?paging=false&var=orgunit:' +
+                    orgUnit +
+                    (item.param ? '&var=status:' + item.status : '') +
+                    (userOnly ? '&var=username:' + _username : '')
+            )).listGrid.rows[0][0]
+    return items
 }
