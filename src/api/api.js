@@ -309,9 +309,10 @@ export async function getEventValues(eventId) {
     const data = await get('events/' + eventId + '.json')
     let values = {}
 
-    data.dataValues.forEach(
-        dataValue => (values[dataValue.dataElement] = dataValue.value)
-    )
+    if (data.dataValues)
+        data.dataValues.forEach(
+            dataValue => (values[dataValue.dataElement] = dataValue.value)
+        )
 
     return {
         programId: data.program,
@@ -478,6 +479,8 @@ async function setEventValues(event, values) {
     if (!values[_amrDataElement])
         values[_amrDataElement] = await generateAmrId(event.orgUnit)
 
+    if (!event.dataValues) event.dataValues = []
+
     for (let dataElement in values) {
         const dataE = event.dataValues.find(
             dataValue => dataValue.dataElement === dataElement
@@ -633,7 +636,7 @@ export async function getEvents(config, orgUnit, userOnly) {
     else
         return (await get(
             'sqlViews/' +
-                (_isL2User ? config.sqlView.l2 : config.sqlView) +
+                (_isL2User ? config.sqlView.l2 : config.sqlView.l1) +
                 '/data.json?paging=false&var=orgunit:' +
                 orgUnit +
                 (config.param ? '&var=status:' + config.status : '') +
