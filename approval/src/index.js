@@ -4,7 +4,7 @@ import * as serviceWorker from './serviceWorker'
 import { init } from 'api'
 import { AppSkeleton } from 'modules'
 import { Main } from './modules'
-import { menuItems } from './config'
+import { menuItems, tables } from './config'
 
 const developmentServer = 'http://apps.hispindia.org/amr'
 const rootElement = document.getElementById('root')
@@ -15,7 +15,7 @@ const withBaseUrl = async baseUrl => {
 
     ReactDOM.render(
         <AppSkeleton appName="AMR Approval" menuItems={menuItems}>
-            <Main />
+            <Main tables={tables} />
         </AppSkeleton>,
         rootElement
     )

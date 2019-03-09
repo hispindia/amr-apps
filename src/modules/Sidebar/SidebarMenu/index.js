@@ -34,7 +34,6 @@ class SidebarMenu extends Component {
      * Updates count number in menu.
      */
     updateCounts = async (menuItems, userOnly) => {
-        console.log(menuItems)
         menuItems = await getCounts(menuItems, this.props.selected.id, userOnly)
         menuItems.forEach(
             item =>

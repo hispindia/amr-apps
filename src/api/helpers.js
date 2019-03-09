@@ -10,47 +10,6 @@ const _l2ApprovalStatus = 'sXDQT6Yaf77'
 const _l2RejectionReason = 'pz8SoHBO6RL'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
-// This may look a dumb way of doing it, but it is not possible to filter for events
-// without any value in a particular dataElement.
-export const getRecords = async (orgUnit, username, isL1User, isL2User) => {
-    const getValue = (dataValues, id, status) => {
-        const dataValue = dataValues.find(
-            dataValue => dataValue.dataElement === id
-        )
-        return dataValue ? dataValue.value === status : false
-    }
-
-    let events = (await get(
-        'events.json?paging=false&fields=program,storedBy,orgUnit,event,lastUpdated,created,dataValues[dataElement,value]&orgUnit=' +
-            orgUnit +
-            '&ouMode=DESCENDANTS'
-    )).events
-
-    let byStatus = {}
-
-    if (username) {
-        events = events.filter(event => event.storedBy === username)
-        byStatus.ALL = events
-    }
-
-    for (let status of ['Rejected', 'Approved', 'Resend']) {
-        byStatus[status] = events.filter(event =>
-            username || isL1User
-                ? getValue(event.dataValues, _l1ApprovalStatus, status)
-                : false || (username || isL2User)
-                ? getValue(event.dataValues, _l2ApprovalStatus, status)
-                : false
-        )
-        if (byStatus[status].length > 0)
-            events = [events, byStatus[status]].reduce((a, b) =>
-                a.filter(c => !b.includes(c))
-            )
-    }
-    byStatus['Validate'] = events
-
-    return byStatus
-}
-
 export const getProgramStage = async (
     programStageId,
     values,
@@ -66,16 +25,37 @@ export const getProgramStage = async (
             case _l1ApprovalStatus:
             case _l1RejectionReason:
             case _l1RevisionReason:
-                return !isL1User || values[_l1ApprovalStatus] === 'Approved' || values[_l1ApprovalStatus] === 'Rejected' || values[_l2ApprovalStatus] === 'Rejected'
+                return (
+                    !isL1User ||
+                    values[_l1ApprovalStatus] === 'Approved' ||
+                    values[_l1ApprovalStatus] === 'Rejected' ||
+                    values[_l2ApprovalStatus] === 'Rejected'
+                )
             case _l2ApprovalStatus:
             case _l2RejectionReason:
             case _l2RevisionReason:
-                return !isL2User || values[_l2ApprovalStatus] === 'Approved' || values[_l2ApprovalStatus] === 'Rejected' || values[_l1ApprovalStatus] === 'Rejected'
+                return (
+                    !isL2User ||
+                    values[_l2ApprovalStatus] === 'Approved' ||
+                    values[_l2ApprovalStatus] === 'Rejected' ||
+                    values[_l1ApprovalStatus] === 'Rejected'
+                )
             default:
                 if (newRecord) return false
                 else if (isL1User || isL2User) return true
                 else
-                    return (!(values[_l2ApprovalStatus] === 'Resend' || values[_l2ApprovalStatus] === '') && values[_l2ApprovalStatus]) || (!(values[_l1ApprovalStatus] === 'Resend' || values[_l1ApprovalStatus] === '') && values[_l1ApprovalStatus])
+                    return (
+                        (!(
+                            values[_l2ApprovalStatus] === 'Resend' ||
+                            values[_l2ApprovalStatus] === ''
+                        ) &&
+                            values[_l2ApprovalStatus]) ||
+                        (!(
+                            values[_l1ApprovalStatus] === 'Resend' ||
+                            values[_l1ApprovalStatus] === ''
+                        ) &&
+                            values[_l1ApprovalStatus])
+                    )
         }
     }
 

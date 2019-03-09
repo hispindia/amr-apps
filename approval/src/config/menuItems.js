@@ -5,9 +5,13 @@ export const menuItems = {
             value: '/approval/Validate',
             icon: 'home',
             status: 'Validate',
-            sqlView: {
+            countView: {
                 l1: 'RZAP9Bv1bAR',
                 l2: 'oxmXevSi4bN',
+            },
+            tableView: {
+                l1: 'd1gMq0frCpA',
+                l2: 'COjhfA8oF1s',
             },
             count: 0,
         },
@@ -16,9 +20,13 @@ export const menuItems = {
             value: '/approval/Resend',
             icon: 'error_outline',
             status: 'Resend',
-            sqlView: {
+            countView: {
                 l1: 'mt0ZHD3tRGm',
                 l2: 'GZIcSClZOBR',
+            },
+            tableView: {
+                l1: 'Zfd5ceEo2Pw',
+                l2: 'rszxQdl3Yve',
             },
             count: 0,
             param: true,
@@ -28,9 +36,13 @@ export const menuItems = {
             value: '/approval/Rejected',
             icon: 'highlight_off',
             status: 'Rejected',
-            sqlView: {
+            countView: {
                 l1: 'mt0ZHD3tRGm',
                 l2: 'GZIcSClZOBR',
+            },
+            tableView: {
+                l1: 'Zfd5ceEo2Pw',
+                l2: 'rszxQdl3Yve',
             },
             count: 0,
             param: true,
@@ -40,9 +52,13 @@ export const menuItems = {
             value: '/approval/Approved',
             icon: 'check_circle_outline',
             status: 'Approved',
-            sqlView: {
+            countView: {
                 l1: 'mt0ZHD3tRGm',
                 l2: 'GZIcSClZOBR',
+            },
+            tableView: {
+                l1: 'Zfd5ceEo2Pw',
+                l2: 'rszxQdl3Yve',
             },
             count: 0,
             param: true,

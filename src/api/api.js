@@ -1,8 +1,7 @@
 import moment from 'moment'
 import _ from 'lodash'
 import { get, postData, del, put, setBaseUrl } from './crud'
-import { getProgramStage, getProgramRules, getRecords } from './helpers'
-import { removeTime } from '../helpers/date'
+import { getProgramStage, getProgramRules } from './helpers'
 
 const _personTypeId = 'tOJvIFXsB5V'
 const _programStageId = 'UW26ioWbKzv'
@@ -12,15 +11,12 @@ const _l1ApprovalGroup = 'jVK9RNKNLus'
 const _l2ApprovalGroup = 'TFmNnLn06Rd'
 
 const _organismsDataElementId = 'SaQe2REkGVw'
-const _organismsOptionSet = 'TUCsBvqwTUV'
 const _amrDataElement = 'lIkk661BLpG'
 const _sampleDateElementId = 'JRUa0qYKQDF'
 
 const _l1ApprovalStatus = 'tAyVrNUTVHX'
-const _l1RejectionReason = 'NLmLwjdSHMv'
 const _l1RevisionReason = 'wCNQtIHJRON'
 const _l2ApprovalStatus = 'sXDQT6Yaf77'
-const _l2RejectionReason = 'pz8SoHBO6RL'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
 let _isDeoUser
@@ -216,19 +212,10 @@ export async function getPersonValues(entityId) {
  * @returns {string} Tracked entity instance ID.
  */
 export async function addPerson(values, orgUnit) {
-    //const now = moment().format('YYYY-MM-DD')
     let data = {
         trackedEntityType: _personTypeId,
         orgUnit: orgUnit,
         attributes: [],
-        /*enrollments: [
-            {
-                orgUnit: orgUnit,
-                program: _amrProgramId,
-                enrollmentDate: now,
-                incidentDate: now,
-            },
-        ],*/
     }
     for (let key in values)
         data.attributes.push({ attribute: key, value: values[key] })
@@ -331,100 +318,6 @@ export async function getEventValues(eventId) {
         programStageId: data.programStage,
         values: values,
     }
-}
-
-export async function getEvents(orgUnit, userOnly) {
-    return await getRecords(
-        orgUnit,
-        userOnly ? _username : false,
-        _isL1User,
-        _isL2User
-    )
-}
-
-export async function toTable(events) {
-    let programNames = {}
-    const programs = (await get('programs.json?paging=false&fields=id,name'))
-        .programs
-    programs.forEach(program => (programNames[program.id] = program.name))
-
-    let organismNames = {}
-    const organisms = (await get(
-        'optionSets/' +
-            _organismsOptionSet +
-            '.json?fields=options[code,displayName]'
-    )).options
-    organisms.forEach(
-        organism => (organismNames[organism.code] = organism.displayName)
-    )
-
-    let data = {
-        headers: [
-            {
-                name: 'Amr Id',
-                column: 'Amr Id',
-            },
-            {
-                name: 'Organism group',
-                column: 'Organism group',
-            },
-            {
-                name: 'Organism',
-                column: 'Organism',
-            },
-            {
-                name: 'Created',
-                column: 'Created',
-            },
-            {
-                name: 'Updated',
-                column: 'Updated',
-            },
-            {
-                name: 'Organisation unit ID',
-                column: 'Organisation unit ID',
-                options: { display: false },
-            },
-            {
-                name: 'Event',
-                column: 'Event',
-                options: { display: false },
-            },
-        ],
-        rows: [],
-    }
-
-    const getValues = event => {
-        const getValue = dataElement =>
-            event.dataValues.find(
-                dataValue => dataValue.dataElement === dataElement
-            )
-        const amrDataElement = getValue(_amrDataElement)
-        const organismDataElement = getValue(_organismsDataElementId)
-        return {
-            amrValue: amrDataElement ? amrDataElement.value : '',
-            organism: organismDataElement
-                ? organismNames[organismDataElement.value]
-                    ? organismNames[organismDataElement.value]
-                    : ''
-                : '',
-        }
-    }
-
-    events.forEach(event => {
-        const { amrValue, organism } = getValues(event)
-        data.rows.push([
-            amrValue,
-            programNames[event.program],
-            organism,
-            removeTime(event.created),
-            removeTime(event.lastUpdated),
-            event.orgUnit,
-            event.event,
-        ])
-    })
-
-    return data
 }
 
 export async function getRecordForApproval(eventId) {
@@ -727,12 +620,33 @@ export async function updateEvent(newValues, eventId, isApproval) {
     await put('events/' + eventId, event)
 }
 
+export async function getEvents(config, orgUnit, userOnly) {
+    if (userOnly)
+        return (await get(
+            'sqlViews/' +
+                config.sqlView +
+                '/data.json?paging=false&var=orgunit:' +
+                orgUnit +
+                (config.param ? '&var=status:' + config.status : '') +
+                (userOnly ? '&var=username:' + _username : '')
+        )).listGrid.rows
+    else
+        return (await get(
+            'sqlViews/' +
+                (_isL2User ? config.sqlView.l2 : config.sqlView) +
+                '/data.json?paging=false&var=orgunit:' +
+                orgUnit +
+                (config.param ? '&var=status:' + config.status : '') +
+                (userOnly ? '&var=username:' + _username : '')
+        )).listGrid.rows
+}
+
 export async function getCounts(items, orgUnit, userOnly) {
     if (userOnly)
         for (let item of items)
             item.count = (await get(
                 'sqlViews/' +
-                    item.sqlView +
+                    item.countView +
                     '/data.json?paging=false&var=orgunit:' +
                     orgUnit +
                     (item.param ? '&var=status:' + item.status : '') +
@@ -742,7 +656,7 @@ export async function getCounts(items, orgUnit, userOnly) {
         for (let item of items)
             item.count = (await get(
                 'sqlViews/' +
-                    (_isL2User ? item.sqlView.l2 : item.sqlView.l1) +
+                    (_isL2User ? item.countView.l2 : item.countView.l1) +
                     '/data.json?paging=false&var=orgunit:' +
                     orgUnit +
                     (item.param ? '&var=status:' + item.status : '') +
