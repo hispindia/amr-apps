@@ -315,13 +315,7 @@ export class RecordForm extends Component {
                         required={dataElement.required}
                         onChange={this.onChange}
                         disabled={dataElement.disabled}
-                        /*backgroundColor={
-                            this.state.testFields
-                                ? this.state.testFields[dataElement.id]
-                                    ? this.getTestFieldColor(dataElement.id)
-                                    : ''
-                                : ''
-                        }*/
+                        /*backgroundColor={dataElement.color}*/
                     />
                 )}
             </Padding>
