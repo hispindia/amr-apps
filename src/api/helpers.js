@@ -10,6 +10,8 @@ const _l2RejectionReason = 'pz8SoHBO6RL'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
 export const getProgramStageApproval = async (programId, programStageId, values, isL1User, isL2User) => {
+    let programStage = await getProgramStage(programStageId, values)
+
     let hideWithValues = ['Institute / Hospital Information']
     if (!isL1User) hideWithValues.push('Level 1')
     if (!isL2User) hideWithValues.push('Level 2')
@@ -32,6 +34,7 @@ export const getProgramStageApproval = async (programId, programStageId, values,
 
 export const getProgramStageDeo = async (programId, programStageId, values) => {
     let programStage = await getProgramStage(programStageId, values, true)
+
     programStage.programStageSections
         .filter(section => section.name === 'Approval')
         .forEach(section => (section.hideWithValues = true))
