@@ -1,10 +1,9 @@
 import moment from 'moment'
 import _ from 'lodash'
 import { get, postData, del, put, setBaseUrl } from './crud'
-import { getProgramStage, getProgramRules } from './helpers'
+import { getProgramStageDeo, getEventValues, getEntityRules, generateAmrId } from './helpers'
 
 const _personTypeId = 'tOJvIFXsB5V'
-const _programStageId = 'UW26ioWbKzv'
 
 const _deoGroup = 'mYdK5QT4ndl'
 const _l1ApprovalGroup = 'jVK9RNKNLus'
@@ -59,65 +58,6 @@ export async function init(baseUrl) {
     _isDeoUser = userGroups.includes(_deoGroup)
     _isL1User = userGroups.includes(_l1ApprovalGroup)
     _isL2User = userGroups.includes(_l2ApprovalGroup)
-}
-
-/**
- * Gets all tracked entity program rules.
- * @param {Object} attributeIds - Object with attribute name as key and id as value.
- * @returns {Object} Tracked entity program rules.
- */
-export async function getEntityRules(attributeIds) {
-    // Replaces 'A{xxx}' with 'this.state.values['id of xxx']'
-    const getCondition = condition => {
-        const variableDuplicated = condition.match(/A\{.*?\}/g)
-        let variables = []
-        if (!variableDuplicated) return condition
-        variableDuplicated.forEach(duplicated => {
-            if (variables.indexOf(duplicated) === -1) variables.push(duplicated)
-        })
-
-        variables.forEach(variable => {
-            const id = attributeIds[variable.substring(2, variable.length - 1)]
-            condition = condition.replace(/A\{.*?\}/g, "values['" + id + "']")
-        })
-
-        return condition
-    }
-
-    let data = (await get(
-        'programRules.json?paging=false&fields=name,programRuleActions[' +
-            'programRuleActionType,optionGroup[id,options[code,displayName]],trackedEntityAttribute[name,id]' +
-            ',programRule[condition]]&filter=programRuleActions.trackedEntityAttribute:!null' +
-            '&filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD]'
-    )).programRules
-
-    let rules = []
-    data.forEach(d => {
-        if (!rules.find(rule => rule.name === d.name)) {
-            d.programRuleActions.forEach(programRuleAction => {
-                programRuleAction.programRule.condition = getCondition(
-                    programRuleAction.programRule.condition
-                )
-                if (
-                    programRuleAction.programRuleActionType ===
-                    'SHOWOPTIONGROUP'
-                ) {
-                    let options = []
-
-                    programRuleAction.optionGroup.options.forEach(option =>
-                        options.push({
-                            value: option.code,
-                            label: option.displayName,
-                        })
-                    )
-                    programRuleAction.optionGroup.options = options
-                }
-            })
-            rules.push(d)
-        }
-    })
-
-    return rules
 }
 
 /**
@@ -300,72 +240,10 @@ export async function getOrganisms(organismGroup) {
     return organisms
 }
 
-/**
- * Gets values for a single event.
- * @param {string} eventId - AMR Id.
- * @returns {Object} Event values.
- */
-export async function getEventValues(eventId) {
-    const data = await get('events/' + eventId + '.json')
-    let values = {}
-
-    if (data.dataValues)
-        data.dataValues.forEach(
-            dataValue => (values[dataValue.dataElement] = dataValue.value)
-        )
-
-    return {
-        programId: data.program,
-        programStageId: data.programStage,
-        values: values,
-    }
-}
-
-export async function getRecordForApproval(eventId) {
-    let { values, programId, programStageId } = await getEventValues(eventId)
-    let programStage = await getProgramStage(
-        programStageId,
-        values,
-        false,
-        _isL1User,
-        _isL2User
-    )
-
-    let hideWithValues = ['Institute / Hospital Information']
-    if (!_isL1User) hideWithValues.push('Level 1')
-    if (!_isL2User) hideWithValues.push('Level 2')
-    programStage.programStageSections
-        .filter(section => hideWithValues.includes(section.name))
-        .forEach(section => (section.hideWithValues = true))
-    programStage.programStageSections.forEach(section =>
-        section.childSections
-            .filter(childSection => hideWithValues.includes(childSection.name))
-            .forEach(childSection => (childSection.hideWithValues = true))
-    )
-
-    return {
-        programStage: programStage,
-        values: values,
-        rules: await getProgramRules(programId, programStageId),
-    }
-}
-
-export async function getProgramStageNew(
-    programId,
-    programStageId,
-    organismCode
-) {
+export async function getProgramStageNew(programId, programStageId, organismCode) {
     let values = { [_organismsDataElementId]: organismCode }
     values[_organismsDataElementId] = organismCode
-    let programStage = await getProgramStage(programStageId, values, true)
-    programStage.programStageSections
-        .filter(section => section.name === 'Approval')
-        .forEach(section => (section.hideWithValues = true))
-    return {
-        programStage: programStage,
-        values: values,
-        rules: await getProgramRules(programId, programStageId),
-    }
+    return await getProgramStageDeo(programId, programStageId, values)
 }
 
 /**
@@ -375,11 +253,13 @@ export async function getProgramStageNew(
  */
 export async function getProgramStageExisting(eventId) {
     let { values, programId, programStageId } = await getEventValues(eventId)
-    return {
-        programStage: await getProgramStage(programStageId, values, false),
-        values: values,
-        rules: await getProgramRules(programId, programStageId),
-    }
+    return await getProgramStageDeo(programId, programStageId, values)
+}
+
+export async function getRecordForApproval(eventId) {
+    let { values, programId, programStageId } = await getEventValues(eventId)
+    return await getProgramStageApproval(programId, programStageId, values, _isL1User, _isL2User)
+
 }
 
 /**
@@ -437,35 +317,6 @@ export async function getOrgUnits() {
     data.forEach(d => sortChildren(d))
 
     return data
-}
-
-/**
- * Generates AMR Id consisting of OU code and a random integer.
- * @param {string} orgUnitId - Organisation unit ID.
- * @returns {string} AMR Id.
- */
-export async function generateAmrId(orgUnitId) {
-    const orgUnitCode = (await get(
-        'organisationUnits/' + orgUnitId + '.json?fields=code'
-    )).code
-
-    const newCode = () =>
-        orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
-
-    let amrId = newCode()
-    while (
-        (await get(
-            'events/query.json?programStage=' +
-                _programStageId +
-                '&filter=' +
-                _amrDataElement +
-                ':eq:' +
-                amrId
-        )).height !== 0
-    )
-        amrId = newCode()
-
-    return amrId
 }
 
 /**
