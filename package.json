@@ -15,8 +15,8 @@
     "build:approval": "node scripts/approval.js",
     "build:capture": "node scripts/capture.js",
     "build": "NODE_ENV=production npm run clean && npm run build:modules",
-    "postbuild:approval": "d2-manifest approval/package.json build/approval/manifest.json && yarn zip:approval",
-    "postbuild:capture": "d2-manifest capture/package.json build/capture/manifest.json && yarn zip:capture",
+    "postbuild:approval": "cp approval/manifest.webapp build/approval/ && yarn zip:approval",
+    "postbuild:capture": "cp capture/manifest.webapp build/capture/ && yarn zip:capture",
     "zip:approval": "cd build/approval && zip -r -X ../../amr-record-approval.zip .",
     "zip:capture": "cd build/capture && zip -r -X ../../amr-record-capture.zip ."
   },
