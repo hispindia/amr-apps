@@ -26,7 +26,7 @@ class SidebarMenu extends Component {
 
     componentDidUpdate = prevProps => {
         // Updates counts, if URL or selected OU has changed.
-        if (prevProps.selected !== this.props.selected)
+        if (prevProps.selected !== this.props.selected || prevProps.location !== this.props.location)
             this.updateCounts(this.state.menuItems, this.state.userOnly)
     }
 

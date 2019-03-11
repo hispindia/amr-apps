@@ -10,18 +10,14 @@ const _l2RejectionReason = 'pz8SoHBO6RL'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
 export const getProgramStageApproval = async (programId, programStageId, values, isL1User, isL2User) => {
-    let programStage = await getProgramStage(programStageId, values)
-
-    let hideWithValues = ['Institute / Hospital Information']
-    if (!isL1User) hideWithValues.push('Level 1')
-    if (!isL2User) hideWithValues.push('Level 2')
+    let programStage = await getProgramStage(programStageId, values, false, isL1User, isL2User)
 
     programStage.programStageSections
-        .filter(section => hideWithValues.includes(section.name))
+        .filter(section => section.name === 'Institute / Hospital Information')
         .forEach(section => (section.hideWithValues = true))
     programStage.programStageSections.forEach(section =>
         section.childSections
-            .filter(childSection => hideWithValues.includes(childSection.name))
+            .filter(childSection => childSection.name === 'Institute / Hospital Information')
             .forEach(childSection => (childSection.hideWithValues = true))
     )
 
@@ -35,6 +31,7 @@ export const getProgramStageApproval = async (programId, programStageId, values,
 export const getProgramStageDeo = async (programId, programStageId, values) => {
     let programStage = await getProgramStage(programStageId, values, true)
 
+    if (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
     programStage.programStageSections
         .filter(section => section.name === 'Approval')
         .forEach(section => (section.hideWithValues = true))
@@ -142,13 +139,13 @@ export const generateAmrId = async orgUnitId => {
     let amrId = newCode()
     while (
         (await get(
-            'api/events.json?paging=false&fields=event&orgUnit=' +
+            'events.json?paging=false&fields=event&orgUnit=' +
                 orgUnitId +
                 '&filter=' +
                 _amrDataElement +
                 ':eq:' +
                 amrId
-        )).height !== 0
+        )).events.length !== 0
     )
         amrId = newCode()
 

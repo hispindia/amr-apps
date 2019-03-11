@@ -116,10 +116,9 @@ export async function getEntityAttributes(entityId) {
  */
 export async function checkUnique(property, value) {
     const entities = (await get(
-        'trackedEntityInstances.json?ouMode=ALL&fields=trackedEntityInstance&filter=' +
-            property +
-            ':eq:' +
-            value
+        'trackedEntityInstances.json?ouMode=ACCESSIBLE&paging=false&fields=trackedEntityInstance&trackedEntityType=' +
+        _personTypeId + '&filter=' +
+        property+ ':eq:' + value
     )).trackedEntityInstances
     return entities.length > 0 ? entities[0].trackedEntityInstance : false
 }
@@ -389,12 +388,11 @@ export async function addPersonWithEvent(
         ],
     }
 
+    const r = await postData('trackedEntityInstances/', data)
+
     return {
         amrId: amrId,
-        entityId: (await (await postData(
-            'trackedEntityInstances/',
-            data
-        )).json()).response.importSummaries[0].reference,
+        entityId: r.response.importSummaries[0].reference,
     }
 }
 

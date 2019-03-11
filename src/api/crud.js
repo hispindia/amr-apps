@@ -101,7 +101,7 @@ export async function postData(endpoint, data) {
             'Content-type': 'application/json',
         },
     })
-    return await response
+    return await response.json()
 }
 
 /**
