@@ -2,7 +2,8 @@
 
 import React, { Component } from 'react'
 import { Grid } from '@material-ui/core'
-import { Card } from '@dhis2/ui/core'
+import { Card, Button } from '@dhis2/ui/core'
+import styled from 'styled-components'
 import {
     Heading,
     Padding,
@@ -18,6 +19,11 @@ import {
 import { TextInput, AgeInput, RadioInput, SelectInput } from '../../inputs'
 import { ProgressSection } from '../ProgressSection'
 
+const ButtonPositioned = styled.div`
+    float: right;
+    margin-right: 16px;
+`
+
 /**
  * Entity information section.
  */
@@ -26,6 +32,7 @@ export class PersonForm extends Component {
         values: {}, // Current or new values.
         uniques: [], // Unique textfield values are validated.
         entityId: null,
+        editing: false
     }
 
     componentDidMount = async () => {
@@ -72,6 +79,10 @@ export class PersonForm extends Component {
             entityId,
             this.validate(attributes, values, uniques)
         )
+    }
+
+    onEdit = () => {
+        this.setState({ editing: true })
     }
 
     /**
@@ -177,8 +188,8 @@ export class PersonForm extends Component {
     getInput = attribute => {
         if (attribute.hide) return null
 
-        const { values, entityId } = this.state
-        const disabled = entityId ? true : false
+        const { values, entityId, editing } = this.state
+        const disabled = entityId && !editing ? true : false
 
         return (
             <Padding key={attribute.trackedEntityAttribute.id}>
@@ -238,7 +249,7 @@ export class PersonForm extends Component {
     }
 
     render() {
-        const { attributes, half } = this.state
+        const { attributes, half, entityId, editing } = this.state
 
         if (!attributes) return <ProgressSection />
 
@@ -246,6 +257,16 @@ export class PersonForm extends Component {
             <MarginBottom>
                 <Card>
                     <Margin>
+                        {entityId && !editing && <ButtonPositioned>
+                            <Button
+                                kind='secondary'
+                                onClick={this.onEdit}
+                                icon='edit'
+                                size='small'
+                            >
+                                Edit
+                            </Button>
+                        </ButtonPositioned>}
                         <MarginSides>
                             <Heading>Person</Heading>
                         </MarginSides>
@@ -261,6 +282,7 @@ export class PersonForm extends Component {
                                     .map(attribute => this.getInput(attribute))}
                             </Grid>
                         </Grid>
+                        
                     </Margin>
                 </Card>
             </MarginBottom>

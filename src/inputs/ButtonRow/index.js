@@ -24,7 +24,6 @@ export const ButtonRow = props => (
                     }
                 >
                     <Button
-                        variant="contained"
                         kind={button.kind}
                         onClick={button.onClick}
                         disabled={button.disabled}
