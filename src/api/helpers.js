@@ -1,7 +1,6 @@
 import { get } from './crud'
 
 const _organismsDataElementId = 'SaQe2REkGVw'
-
 const _amrDataElement = 'lIkk661BLpG'
 const _l1ApprovalStatus = 'tAyVrNUTVHX'
 const _l1RejectionReason = 'NLmLwjdSHMv'
@@ -10,142 +9,154 @@ const _l2ApprovalStatus = 'sXDQT6Yaf77'
 const _l2RejectionReason = 'pz8SoHBO6RL'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
-// This may look a dumb way of doing it, but it is not possible to filter for events
-// without any value in a particular dataElement.
-export const getRecords = async (orgUnit, username, isL1User, isL2User) => {
-    const getValue = (dataValues, id, status) => {
-        const dataValue = dataValues.find(
-            dataValue => dataValue.dataElement === id
-        )
-        return dataValue ? dataValue.value === status : false
+export const getProgramStageApproval = async (programId, programStageId, values, isL1User, isL2User) => {
+    let programStage = await getProgramStage(programStageId, values, false, isL1User, isL2User)
+
+    programStage.programStageSections
+        .filter(section => section.name === 'Institute / Hospital Information')
+        .forEach(section => (section.hideWithValues = true))
+    programStage.programStageSections.forEach(section =>
+        section.childSections
+            .filter(childSection => childSection.name === 'Institute / Hospital Information')
+            .forEach(childSection => (childSection.hideWithValues = true))
+    )
+
+    return {
+        programStage: programStage,
+        values: values,
+        rules: await getProgramRules(programId, programStageId),
     }
-
-    let events = (await get(
-        'events.json?paging=false&fields=program,storedBy,orgUnit,event,lastUpdated,created,dataValues[dataElement,value]&orgUnit=' +
-            orgUnit +
-            '&ouMode=DESCENDANTS'
-    )).events
-
-    let byStatus = {}
-
-    if (username) {
-        events = events.filter(event => event.storedBy === username)
-        byStatus.ALL = events
-    }
-
-    for (let status of ['Rejected', 'Approved', 'Resend']) {
-        byStatus[status] = events.filter(event =>
-            username || isL1User
-                ? getValue(event.dataValues, _l1ApprovalStatus, status)
-                : false || (username || isL2User)
-                ? getValue(event.dataValues, _l2ApprovalStatus, status)
-                : false
-        )
-        if (byStatus[status].length > 0)
-            events = [events, byStatus[status]].reduce((a, b) =>
-                a.filter(c => !b.includes(c))
-            )
-    }
-    byStatus['Validate'] = events
-
-    return byStatus
 }
 
-export const getProgramStage = async (
-    programStageId,
-    values,
-    newRecord,
-    isL1User,
-    isL2User
-) => {
-    const shouldDisable = element => {
-        switch (element.id) {
-            case _amrDataElement:
-            case _organismsDataElementId:
-                return true
-            case _l1ApprovalStatus:
-            case _l1RejectionReason:
-            case _l1RevisionReason:
-                return !isL1User || values[_l1ApprovalStatus] === 'Approved' || values[_l1ApprovalStatus] === 'Rejected' || values[_l2ApprovalStatus] === 'Rejected'
-            case _l2ApprovalStatus:
-            case _l2RejectionReason:
-            case _l2RevisionReason:
-                return !isL2User || values[_l2ApprovalStatus] === 'Approved' || values[_l2ApprovalStatus] === 'Rejected' || values[_l1ApprovalStatus] === 'Rejected'
-            default:
-                if (newRecord) return false
-                else if (isL1User || isL2User) return true
-                else
-                    return (!(values[_l2ApprovalStatus] === 'Resend' || values[_l2ApprovalStatus] === '') && values[_l2ApprovalStatus]) || (!(values[_l1ApprovalStatus] === 'Resend' || values[_l1ApprovalStatus] === '') && values[_l1ApprovalStatus])
-        }
+export const getProgramStageDeo = async (programId, programStageId, values) => {
+    let programStage = await getProgramStage(programStageId, values, true)
+
+    if (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
+    programStage.programStageSections
+        .filter(section => section.name === 'Approval')
+        .forEach(section => (section.hideWithValues = true))
+
+    return {
+        programStage: programStage,
+        values: values,
+        rules: await getProgramRules(programId, programStageId)
+    }
+}
+
+/**
+ * Gets values for a single event.
+ * @param {string} eventId - AMR Id.
+ * @returns {Object} Event values.
+ */
+export const getEventValues = async (eventId) => {
+    const data = await get('events/' + eventId + '.json')
+    let values = {}
+
+    if (data.dataValues)
+        data.dataValues.forEach(
+            dataValue => (values[dataValue.dataElement] = dataValue.value)
+        )
+
+    return {
+        programId: data.program,
+        programStageId: data.programStage,
+        values: values,
+    }
+}
+
+/**
+ * Gets all tracked entity program rules.
+ * @param {Object} attributeIds - Object with attribute name as key and id as value.
+ * @returns {Object} Tracked entity program rules.
+ */
+export const getEntityRules = async attributeIds => {
+    // Replaces 'A{xxx}' with 'this.state.values['id of xxx']'
+    const getCondition = condition => {
+        const variableDuplicated = condition.match(/A\{.*?\}/g)
+        let variables = []
+        if (!variableDuplicated) return condition
+        variableDuplicated.forEach(duplicated => {
+            if (variables.indexOf(duplicated) === -1) variables.push(duplicated)
+        })
+
+        variables.forEach(variable => {
+            const id = attributeIds[variable.substring(2, variable.length - 1)]
+            condition = condition.replace(/A\{.*?\}/g, "values['" + id + "']")
+        })
+
+        return condition
     }
 
-    let programStage = await get(
-        'programStages/' +
-            programStageId +
-            '.json?fields=displayName,programStageDataElements[dataElement[id,formName],compulsory],' +
-            'programStageSections[id,name,displayName,renderType,dataElements[id,displayFormName,code,valueType,optionSetValue,' +
-            'optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
-    )
+    let data = (await get(
+        'programRules.json?paging=false&fields=name,programRuleActions[' +
+            'programRuleActionType,optionGroup[id,options[code,displayName]],trackedEntityAttribute[name,id]' +
+            ',programRule[condition]]&filter=programRuleActions.trackedEntityAttribute:!null' +
+            '&filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD]'
+    )).programRules
 
-    programStage.programStageSections.forEach(section => {
-        section.hide = false
-        section.dataElements.forEach(dataElement => {
-            // Adding required property.
-            dataElement.required = programStage.programStageDataElements.find(
-                programStageDataElement =>
-                    programStageDataElement.dataElement.id === dataElement.id
-            ).compulsory
-            dataElement.hide = false
-            // Adding options.
-            if (dataElement.optionSetValue) {
-                let options = []
-                dataElement.optionSet.options.forEach(option =>
-                    options.push({
-                        value: option.code,
-                        label: option.displayName,
-                    })
+    let rules = []
+    data.forEach(d => {
+        if (!rules.find(rule => rule.name === d.name)) {
+            d.programRuleActions.forEach(programRuleAction => {
+                programRuleAction.programRule.condition = getCondition(
+                    programRuleAction.programRule.condition
                 )
-                dataElement.optionSet.options = options
-            }
-            dataElement.disabled = shouldDisable(dataElement)
-            // Adding missing values.
-            if (!values[dataElement.id]) values[dataElement.id] = ''
-        })
-    })
+                if (
+                    programRuleAction.programRuleActionType ===
+                    'SHOWOPTIONGROUP'
+                ) {
+                    let options = []
 
-    let remove = []
-    // Adding child sections and removing child sections from main sections.
-    programStage.programStageSections.forEach(programStageSection => {
-        let childSections = []
-        programStage.programStageSections
-            .filter(childSection =>
-                childSection.name.match(
-                    new RegExp('{' + programStageSection.name + '}.*')
-                )
-            )
-            .forEach(childSection => {
-                remove.push(childSection.id)
-                childSection.name = childSection.name.replace(
-                    new RegExp('{' + programStageSection.name + '}'),
-                    ''
-                )
-                childSections.push(childSection)
+                    programRuleAction.optionGroup.options.forEach(option =>
+                        options.push({
+                            value: option.code,
+                            label: option.displayName,
+                        })
+                    )
+                    programRuleAction.optionGroup.options = options
+                }
             })
-        programStageSection.childSections = childSections
+            rules.push(d)
+        }
     })
 
-    programStage.programStageSections = programStage.programStageSections.filter(
-        section => !remove.includes(section.id)
-    )
+    return rules
+}
 
-    return programStage
+/**
+ * Generates AMR Id consisting of OU code and a random integer.
+ * @param {string} orgUnitId - Organisation unit ID.
+ * @returns {string} AMR Id.
+ */
+export const generateAmrId = async orgUnitId => {
+    const orgUnitCode = (await get(
+        'organisationUnits/' + orgUnitId + '.json?fields=code'
+    )).code
+
+    const newCode = () =>
+        orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
+
+    let amrId = newCode()
+    while (
+        (await get(
+            'events.json?paging=false&fields=event&orgUnit=' +
+                orgUnitId +
+                '&filter=' +
+                _amrDataElement +
+                ':eq:' +
+                amrId
+        )).events.length !== 0
+    )
+        amrId = newCode()
+
+    return amrId
 }
 
 /**
  * Gets AMR program rules.
  * @returns {Object} Object with data element and section rules.
  */
-export const getProgramRules = async (programId, programStageId) => {
+const getProgramRules = async (programId, programStageId) => {
     // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
     const getCondition = condition => {
         const original = condition
@@ -235,4 +246,108 @@ export const getProgramRules = async (programId, programStageId) => {
     })
 
     return rules
+}
+
+const getProgramStage = async (
+    programStageId,
+    values,
+    newRecord,
+    isL1User,
+    isL2User
+) => {
+    const shouldDisable = element => {
+        switch (element.id) {
+            case _amrDataElement:
+            case _organismsDataElementId:
+                return true
+            case _l1ApprovalStatus:
+            case _l1RejectionReason:
+            case _l1RevisionReason:
+                return (
+                    !isL1User ||
+                    values[_l1ApprovalStatus] === 'Approved' ||
+                    values[_l1ApprovalStatus] === 'Rejected' ||
+                    values[_l2ApprovalStatus] === 'Rejected'
+                )
+            case _l2ApprovalStatus:
+            case _l2RejectionReason:
+            case _l2RevisionReason:
+                return (
+                    !isL2User ||
+                    values[_l2ApprovalStatus] === 'Approved' ||
+                    values[_l2ApprovalStatus] === 'Rejected' ||
+                    values[_l1ApprovalStatus] === 'Rejected'
+                )
+            default:
+                if (newRecord) return false
+                else if (isL1User || isL2User) return true
+                else
+                    return !(
+                        (values[_l2ApprovalStatus] === 'Resend' && values[_l1ApprovalStatus] !== 'Rejected')
+                        ||
+                        (values[_l1ApprovalStatus] === 'Resend' || values[_l1ApprovalStatus] === '' || !values[_l1ApprovalStatus])
+                    )
+        }
+    }
+
+    let programStage = await get(
+        'programStages/' +
+            programStageId +
+            '.json?fields=displayName,programStageDataElements[dataElement[id,formName],compulsory],' +
+            'programStageSections[id,name,displayName,renderType,dataElements[id,displayFormName,code,valueType,optionSetValue,' +
+            'optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
+    )
+
+    programStage.programStageSections.forEach(section => {
+        section.hide = false
+        section.dataElements.forEach(dataElement => {
+            // Adding required property.
+            dataElement.required = programStage.programStageDataElements.find(
+                programStageDataElement =>
+                    programStageDataElement.dataElement.id === dataElement.id
+            ).compulsory
+            dataElement.hide = false
+            // Adding options.
+            if (dataElement.optionSetValue) {
+                let options = []
+                dataElement.optionSet.options.forEach(option =>
+                    options.push({
+                        value: option.code,
+                        label: option.displayName,
+                    })
+                )
+                dataElement.optionSet.options = options
+            }
+            dataElement.disabled = shouldDisable(dataElement)
+            // Adding missing values.
+            if (!values[dataElement.id]) values[dataElement.id] = ''
+        })
+    })
+
+    let remove = []
+    // Adding child sections and removing child sections from main sections.
+    programStage.programStageSections.forEach(programStageSection => {
+        let childSections = []
+        programStage.programStageSections
+            .filter(childSection =>
+                childSection.name.match(
+                    new RegExp('{' + programStageSection.name + '}.*')
+                )
+            )
+            .forEach(childSection => {
+                remove.push(childSection.id)
+                childSection.name = childSection.name.replace(
+                    new RegExp('{' + programStageSection.name + '}'),
+                    ''
+                )
+                childSections.push(childSection)
+            })
+        programStageSection.childSections = childSections
+    })
+
+    programStage.programStageSections = programStage.programStageSections.filter(
+        section => !remove.includes(section.id)
+    )
+
+    return programStage
 }

@@ -1,26 +1,21 @@
 import moment from 'moment'
 import _ from 'lodash'
 import { get, postData, del, put, setBaseUrl } from './crud'
-import { getProgramStage, getProgramRules, getRecords } from './helpers'
-import { removeTime } from '../helpers/date'
+import { getProgramStageDeo, getProgramStageApproval, getEventValues, getEntityRules, generateAmrId } from './helpers'
 
 const _personTypeId = 'tOJvIFXsB5V'
-const _programStageId = 'UW26ioWbKzv'
 
 const _deoGroup = 'mYdK5QT4ndl'
 const _l1ApprovalGroup = 'jVK9RNKNLus'
 const _l2ApprovalGroup = 'TFmNnLn06Rd'
 
 const _organismsDataElementId = 'SaQe2REkGVw'
-const _organismsOptionSet = 'TUCsBvqwTUV'
 const _amrDataElement = 'lIkk661BLpG'
 const _sampleDateElementId = 'JRUa0qYKQDF'
 
 const _l1ApprovalStatus = 'tAyVrNUTVHX'
-const _l1RejectionReason = 'NLmLwjdSHMv'
 const _l1RevisionReason = 'wCNQtIHJRON'
 const _l2ApprovalStatus = 'sXDQT6Yaf77'
-const _l2RejectionReason = 'pz8SoHBO6RL'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
 let _isDeoUser
@@ -38,6 +33,10 @@ export function getOrganismsDataElementId() {
     return _organismsDataElementId
 }
 
+/**
+ * Gets user accesses.
+ * @returns {Object} User accesses.
+ */
 export function getUserAccess() {
     return {
         isDeoUser: _isDeoUser,
@@ -48,7 +47,7 @@ export function getUserAccess() {
 
 /**
  * Sets the base URL, username, and user groups.
- * @param {String} url
+ * @param {String} baseUrl - Base URL.
  */
 export async function init(baseUrl) {
     setBaseUrl(baseUrl)
@@ -63,65 +62,6 @@ export async function init(baseUrl) {
     _isDeoUser = userGroups.includes(_deoGroup)
     _isL1User = userGroups.includes(_l1ApprovalGroup)
     _isL2User = userGroups.includes(_l2ApprovalGroup)
-}
-
-/**
- * Gets all tracked entity program rules.
- * @param {Object} attributeIds - Object with attribute name as key and id as value.
- * @returns {Object} Tracked entity program rules.
- */
-export async function getEntityRules(attributeIds) {
-    // Replaces 'A{xxx}' with 'this.state.values['id of xxx']'
-    const getCondition = condition => {
-        const variableDuplicated = condition.match(/A\{.*?\}/g)
-        let variables = []
-        if (!variableDuplicated) return condition
-        variableDuplicated.forEach(duplicated => {
-            if (variables.indexOf(duplicated) === -1) variables.push(duplicated)
-        })
-
-        variables.forEach(variable => {
-            const id = attributeIds[variable.substring(2, variable.length - 1)]
-            condition = condition.replace(/A\{.*?\}/g, "values['" + id + "']")
-        })
-
-        return condition
-    }
-
-    let data = (await get(
-        'programRules.json?paging=false&fields=name,programRuleActions[' +
-            'programRuleActionType,optionGroup[id,options[code,displayName]],trackedEntityAttribute[name,id]' +
-            ',programRule[condition]]&filter=programRuleActions.trackedEntityAttribute:!null' +
-            '&filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD]'
-    )).programRules
-
-    let rules = []
-    data.forEach(d => {
-        if (!rules.find(rule => rule.name === d.name)) {
-            d.programRuleActions.forEach(programRuleAction => {
-                programRuleAction.programRule.condition = getCondition(
-                    programRuleAction.programRule.condition
-                )
-                if (
-                    programRuleAction.programRuleActionType ===
-                    'SHOWOPTIONGROUP'
-                ) {
-                    let options = []
-
-                    programRuleAction.optionGroup.options.forEach(option =>
-                        options.push({
-                            value: option.code,
-                            label: option.displayName,
-                        })
-                    )
-                    programRuleAction.optionGroup.options = options
-                }
-            })
-            rules.push(d)
-        }
-    })
-
-    return rules
 }
 
 /**
@@ -180,10 +120,9 @@ export async function getEntityAttributes(entityId) {
  */
 export async function checkUnique(property, value) {
     const entities = (await get(
-        'trackedEntityInstances.json?ouMode=ALL&fields=trackedEntityInstance&filter=' +
-            property +
-            ':eq:' +
-            value
+        'trackedEntityInstances.json?ouMode=ACCESSIBLE&paging=false&fields=trackedEntityInstance&trackedEntityType=' +
+        _personTypeId + '&filter=' +
+        property+ ':eq:' + value
     )).trackedEntityInstances
     return entities.length > 0 ? entities[0].trackedEntityInstance : false
 }
@@ -211,24 +150,15 @@ export async function getPersonValues(entityId) {
 }
 
 /**
- * Adds a new person tracked entity instance and enrolls to AMR program.
+ * Adds a new person..
  * @param {Object} values - Values
  * @returns {string} Tracked entity instance ID.
  */
 export async function addPerson(values, orgUnit) {
-    //const now = moment().format('YYYY-MM-DD')
     let data = {
         trackedEntityType: _personTypeId,
         orgUnit: orgUnit,
         attributes: [],
-        /*enrollments: [
-            {
-                orgUnit: orgUnit,
-                program: _amrProgramId,
-                enrollmentDate: now,
-                incidentDate: now,
-            },
-        ],*/
     }
     for (let key in values)
         data.attributes.push({ attribute: key, value: values[key] })
@@ -238,9 +168,9 @@ export async function addPerson(values, orgUnit) {
 }
 
 /**
- * Updates a tracked entity instance.
+ * Updates a person.
  * @param {string} id - Tracked entity instance id.
- * @param {*} values - Values.
+ * @param {Object} values - Values.
  */
 export async function updatePerson(id, values) {
     let data = await get(
@@ -314,163 +244,16 @@ export async function getOrganisms(organismGroup) {
 }
 
 /**
- * Gets values for a single event.
- * @param {string} eventId - AMR Id.
- * @returns {Object} Event values.
+ * Gets the program stage for a new event.
+ * @param {string} programId 
+ * @param {string} programStageId 
+ * @param {string} organismCode
+ * @returns {Object} Program stage, values, 
  */
-export async function getEventValues(eventId) {
-    const data = await get('events/' + eventId + '.json')
-    let values = {}
-
-    data.dataValues.forEach(
-        dataValue => (values[dataValue.dataElement] = dataValue.value)
-    )
-
-    return {
-        programId: data.program,
-        programStageId: data.programStage,
-        values: values,
-    }
-}
-
-export async function getEvents(orgUnit, userOnly) {
-    return await getRecords(
-        orgUnit,
-        userOnly ? _username : false,
-        _isL1User,
-        _isL2User
-    )
-}
-
-export async function toTable(events) {
-    let programNames = {}
-    const programs = (await get('programs.json?paging=false&fields=id,name'))
-        .programs
-    programs.forEach(program => (programNames[program.id] = program.name))
-
-    let organismNames = {}
-    const organisms = (await get(
-        'optionSets/' +
-            _organismsOptionSet +
-            '.json?fields=options[code,displayName]'
-    )).options
-    organisms.forEach(
-        organism => (organismNames[organism.code] = organism.displayName)
-    )
-
-    let data = {
-        headers: [
-            {
-                name: 'Amr Id',
-                column: 'Amr Id',
-            },
-            {
-                name: 'Organism group',
-                column: 'Organism group',
-            },
-            {
-                name: 'Organism',
-                column: 'Organism',
-            },
-            {
-                name: 'Created',
-                column: 'Created',
-            },
-            {
-                name: 'Updated',
-                column: 'Updated',
-            },
-            {
-                name: 'Organisation unit ID',
-                column: 'Organisation unit ID',
-                options: { display: false },
-            },
-            {
-                name: 'Event',
-                column: 'Event',
-                options: { display: false },
-            },
-        ],
-        rows: [],
-    }
-
-    const getValues = event => {
-        const getValue = dataElement =>
-            event.dataValues.find(
-                dataValue => dataValue.dataElement === dataElement
-            )
-        const amrDataElement = getValue(_amrDataElement)
-        const organismDataElement = getValue(_organismsDataElementId)
-        return {
-            amrValue: amrDataElement ? amrDataElement.value : '',
-            organism: organismDataElement
-                ? organismNames[organismDataElement.value]
-                    ? organismNames[organismDataElement.value]
-                    : ''
-                : '',
-        }
-    }
-
-    events.forEach(event => {
-        const { amrValue, organism } = getValues(event)
-        data.rows.push([
-            amrValue,
-            programNames[event.program],
-            organism,
-            removeTime(event.created),
-            removeTime(event.lastUpdated),
-            event.orgUnit,
-            event.event,
-        ])
-    })
-
-    return data
-}
-
-export async function getRecordForApproval(eventId) {
-    let { values, programId, programStageId } = await getEventValues(eventId)
-    let programStage = await getProgramStage(
-        programStageId,
-        values,
-        false,
-        _isL1User,
-        _isL2User
-    )
-
-    let hideWithValues = ['Institute / Hospital Information']
-    if (!_isL1User) hideWithValues.push('Level 1')
-    if (!_isL2User) hideWithValues.push('Level 2')
-    programStage.programStageSections
-        .filter(section => hideWithValues.includes(section.name))
-        .forEach(section => (section.hideWithValues = true))
-    programStage.programStageSections.forEach(section =>
-        section.childSections.filter(childSection => hideWithValues.includes(childSection.name))
-        .forEach(childSection => (childSection.hideWithValues = true))
-    )
-
-    return {
-        programStage: programStage,
-        values: values,
-        rules: await getProgramRules(programId, programStageId),
-    }
-}
-
-export async function getProgramStageNew(
-    programId,
-    programStageId,
-    organismCode
-) {
+export async function getProgramStageNew(programId, programStageId, organismCode) {
     let values = { [_organismsDataElementId]: organismCode }
     values[_organismsDataElementId] = organismCode
-    let programStage = await getProgramStage(programStageId, values, true)
-    programStage.programStageSections
-        .filter(section => section.name === 'Approval')
-        .forEach(section => (section.hideWithValues = true))
-    return {
-        programStage: programStage,
-        values: values,
-        rules: await getProgramRules(programId, programStageId),
-    }
+    return await getProgramStageDeo(programId, programStageId, values)
 }
 
 /**
@@ -480,11 +263,13 @@ export async function getProgramStageNew(
  */
 export async function getProgramStageExisting(eventId) {
     let { values, programId, programStageId } = await getEventValues(eventId)
-    return {
-        programStage: await getProgramStage(programStageId, values, false),
-        values: values,
-        rules: await getProgramRules(programId, programStageId),
-    }
+    return await getProgramStageDeo(programId, programStageId, values)
+}
+
+export async function getRecordForApproval(eventId) {
+    let { values, programId, programStageId } = await getEventValues(eventId)
+    return await getProgramStageApproval(programId, programStageId, values, _isL1User, _isL2User)
+
 }
 
 /**
@@ -545,35 +330,6 @@ export async function getOrgUnits() {
 }
 
 /**
- * Generates AMR Id consisting of OU code and a random integer.
- * @param {string} orgUnitId - Organisation unit ID.
- * @returns {string} AMR Id.
- */
-export async function generateAmrId(orgUnitId) {
-    const orgUnitCode = (await get(
-        'organisationUnits/' + orgUnitId + '.json?fields=code'
-    )).code
-
-    const newCode = () =>
-        orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
-
-    let amrId = newCode()
-    while (
-        (await get(
-            'events/query.json?programStage=' +
-                _programStageId +
-                '&filter=' +
-                _amrDataElement +
-                ':eq:' +
-                amrId
-        )).height !== 0
-    )
-        amrId = newCode()
-
-    return amrId
-}
-
-/**
  * Adds values to event.
  * @param {Object} event - Event.
  * @param {Object} values - New values.
@@ -583,6 +339,8 @@ export async function generateAmrId(orgUnitId) {
 async function setEventValues(event, values) {
     if (!values[_amrDataElement])
         values[_amrDataElement] = await generateAmrId(event.orgUnit)
+
+    if (!event.dataValues) event.dataValues = []
 
     for (let dataElement in values) {
         const dataE = event.dataValues.find(
@@ -641,12 +399,11 @@ export async function addPersonWithEvent(
         ],
     }
 
+    const r = await postData('trackedEntityInstances/', data)
+
     return {
         amrId: amrId,
-        entityId: (await (await postData(
-            'trackedEntityInstances/',
-            data
-        )).json()).response.importSummaries[0].reference,
+        entityId: r.response.importSummaries[0].reference,
     }
 }
 
@@ -724,4 +481,49 @@ export async function updateEvent(newValues, eventId, isApproval) {
 
     event = await setEventValues(event, newValues)
     await put('events/' + eventId, event)
+}
+
+export async function getEvents(config, orgUnit, userOnly) {
+    if (userOnly)
+        return (await get(
+            'sqlViews/' +
+                config.sqlView +
+                '/data.json?paging=false&var=orgunit:' +
+                orgUnit +
+                (config.param ? '&var=status:' + config.status : '') +
+                (userOnly ? '&var=username:' + _username : '')
+        )).listGrid.rows
+    else
+        return (await get(
+            'sqlViews/' +
+                (_isL2User ? config.sqlView.l2 : config.sqlView.l1) +
+                '/data.json?paging=false&var=orgunit:' +
+                orgUnit +
+                (config.param ? '&var=status:' + config.status : '') +
+                (userOnly ? '&var=username:' + _username : '')
+        )).listGrid.rows
+}
+
+export async function getCounts(items, orgUnit, userOnly) {
+    if (userOnly)
+        for (let item of items)
+            item.count = (await get(
+                'sqlViews/' +
+                    item.countView +
+                    '/data.json?paging=false&var=orgunit:' +
+                    orgUnit +
+                    (item.param ? '&var=status:' + item.status : '') +
+                    (userOnly ? '&var=username:' + _username : '')
+            )).listGrid.rows[0][0]
+    else
+        for (let item of items)
+            item.count = (await get(
+                'sqlViews/' +
+                    (_isL2User ? item.countView.l2 : item.countView.l1) +
+                    '/data.json?paging=false&var=orgunit:' +
+                    orgUnit +
+                    (item.param ? '&var=status:' + item.status : '') +
+                    (userOnly ? '&var=username:' + _username : '')
+            )).listGrid.rows[0][0]
+    return items
 }

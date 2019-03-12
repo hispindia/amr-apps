@@ -1,6 +1,14 @@
 # AMR Record Approval and Capture
 
-## Usage
+### TODO
+- [ ] Automatic possible duplation check
+- [ ] Manual duplication confirmation
+- [ ] Deleting records which do have an approval status
+- [ ] Editing person values
+- [ ] Using local storage for versioned meta data
+- [ ] Numbers only text fields
+- [ ] Susceptibility colors based on result
+- [ ] Modals
 
 ### Installation
 

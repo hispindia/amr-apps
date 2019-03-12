@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Menu } from '@dhis2/ui/core'
+import { getCounts } from '../../../api'
 
 /**
  * Sidebar menu.
@@ -8,47 +9,37 @@ import { Menu } from '@dhis2/ui/core'
 class SidebarMenu extends Component {
     state = {
         menuItems: null,
-        selected: null,
         userOnly: false,
     }
 
     componentDidMount = () => {
         const { menuItems } = this.props
+        const statuses = menuItems.items.map(item => item.status)
+        const userOnly = menuItems.userOnly
         this.setState({
             menuItems: menuItems.items,
-            userOnly: menuItems.userOnly,
+            userOnly: userOnly,
+            statuses: statuses,
         })
-        this.updateCounts(menuItems.items)
+        this.updateCounts(menuItems.items, userOnly)
     }
 
     componentDidUpdate = prevProps => {
         // Updates counts, if URL or selected OU has changed.
-        if (
-            prevProps.counts !== this.props.counts ||
-            prevProps.selected !== this.props.selected
-        )
-            this.updateCounts(this.state.menuItems)
+        if (prevProps.selected !== this.props.selected || prevProps.location !== this.props.location)
+            this.updateCounts(this.state.menuItems, this.state.userOnly)
     }
 
     /**
      * Updates count number in menu.
      */
-    updateCounts = menuItems => {
-        const counts = this.props.counts
-        if (!counts) return
-        // Updating count number in menu.
+    updateCounts = async (menuItems, userOnly) => {
+        menuItems = await getCounts(menuItems, this.props.selected.id, userOnly)
         menuItems.forEach(
-            menuItem =>
-                (menuItem.label = menuItem.label.replace(
-                    /\(\d*\)/,
-                    `(${counts[menuItem.status]})`
-                ))
+            item =>
+                (item.label = item.label.replace(/\(\d*\)/, `(${item.count})`))
         )
-
-        this.setState({
-            menuItems: menuItems,
-            selected: this.props.selected,
-        })
+        this.setState({ menuItems: menuItems })
     }
 
     onClick = path => {

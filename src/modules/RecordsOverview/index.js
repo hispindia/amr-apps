@@ -1,46 +1,37 @@
 import React from 'react'
-import { toTable, Margin } from '../..'
+import { getEvents, Margin } from '../..'
 import { RecordTable, ProgressSection, TitleRow } from '../'
-
-const titles = {
-    ALL: 'My records',
-    Resend: 'Records for revision',
-    Rejected: 'Rejected records',
-    Approved: 'Approved records',
-    Validate: 'Records for validation',
-}
+import { titles, headers } from './config'
 
 /**
- * Shows all events created by user.
+ * Shows events by status.
  */
 export class RecordsOverview extends React.Component {
     state = { loading: true }
 
-    componentDidMount = async () => {
-        if (this.props.eventLists)
-            await this.init()
-    }
+    componentDidMount = async () => await this.init()
 
     componentDidUpdate = async prevProps => {
         if (
-            prevProps.location.pathname !== this.props.location.pathname ||
-            prevProps.eventLists !== this.props.eventLists
-        )
-            await this.init()
-        else if (prevProps.selected !== this.props.selected)
+            prevProps.selected !== this.props.selected ||
+            prevProps.match.params.status !== this.props.match.params.status
+        ) {
             this.setState({ loading: true })
+            await this.init()
+        }
     }
 
     init = async () => {
-        this.setState({ loading: true })
-        this.setState({
-            data: await toTable(
-                this.props.eventLists[
-                    this.props.match.params.status
-                        ? this.props.match.params.status
-                        : 'ALL'
-                ]
+        let data = {
+            rows: await getEvents(
+                this.props.tables[this.props.match.params.status],
+                this.props.selected,
+                this.props.userOnly
             ),
+            headers: headers,
+        }
+        this.setState({
+            data: data,
             loading: false,
         })
     }

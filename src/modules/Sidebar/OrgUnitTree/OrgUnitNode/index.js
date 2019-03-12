@@ -23,6 +23,15 @@ const Caret = styled.span`
         `}
 `
 
+const NoCaret = styled.span`
+    user-select: none;
+    &::before {
+        content: '\\2007';
+        display: inline-block;
+        margin-right: 5px;
+    }
+`
+
 const OrgUnitText = styled.span`
     cursor: pointer;
     user-select: none;
@@ -38,6 +47,7 @@ const OrgUnitText = styled.span`
 
 const ChildTree = styled.ul`
     list-style-type: none;
+    padding-left: 20px;
     ${props =>
         !props.opened &&
         css`
@@ -50,6 +60,11 @@ const ChildTree = styled.ul`
  */
 export class OrgUnitNode extends React.Component {
     state = { opened: false }
+
+    componentDidMount = () => {
+        if (this.props.selected.id === this.props.orgUnit.id)
+            this.setState({ opened: true })
+    }
 
     onCarretClick = () => {
         this.setState({ opened: !this.state.opened })
@@ -64,7 +79,7 @@ export class OrgUnitNode extends React.Component {
                 <Row>
                     {orgUnit.children.length > 0 ? (
                         <Caret opened={opened} onClick={this.onCarretClick} />
-                    ) : null}
+                    ) : <NoCaret/>}
                     <OrgUnitText
                         isSelected={selected.id === orgUnit.id}
                         onClick={() =>
