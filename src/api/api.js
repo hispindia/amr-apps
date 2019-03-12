@@ -432,13 +432,15 @@ export async function addPersonWithEvent(
  * @param {string} programStageId - Program stage ID.
  * @param {string} orgUnitId - Organisation unit ID.
  * @param {string} entityId - Tracked entity instance ID.
+ * @param {string} entityValues - Entity values.
  */
 export async function addEvent(
     eventValues,
     programId,
     programStageId,
     orgUnitId,
-    entityId
+    entityId,
+    entityValues
 ) {
     const date = eventValues[_sampleDateElementId]
         ? eventValues[_sampleDateElementId]
@@ -455,6 +457,8 @@ export async function addEvent(
         },
         eventValues
     )
+
+    if (entityValues) await updatePerson(entityId, entityValues)
 
     // Enrolling if not already enrolled.
     let enrollments = []

@@ -32,7 +32,7 @@ export class PersonForm extends Component {
         values: {}, // Current or new values.
         uniques: [], // Unique textfield values are validated.
         entityId: null,
-        editing: false
+        editing: false,
     }
 
     componentDidMount = async () => {
@@ -81,9 +81,7 @@ export class PersonForm extends Component {
         )
     }
 
-    onEdit = () => {
-        this.setState({ editing: true })
-    }
+    onEdit = () => this.setState({ editing: true })
 
     /**
      * Checks that no required field is empty and that uniques are validated.
@@ -257,16 +255,18 @@ export class PersonForm extends Component {
             <MarginBottom>
                 <Card>
                     <Margin>
-                        {entityId && !editing && <ButtonPositioned>
-                            <Button
-                                kind='secondary'
-                                onClick={this.onEdit}
-                                icon='edit'
-                                size='small'
-                            >
-                                Edit
-                            </Button>
-                        </ButtonPositioned>}
+                        {entityId && !editing && (
+                            <ButtonPositioned>
+                                <Button
+                                    kind="secondary"
+                                    onClick={this.onEdit}
+                                    icon="edit"
+                                    size="small"
+                                >
+                                    Edit
+                                </Button>
+                            </ButtonPositioned>
+                        )}
                         <MarginSides>
                             <Heading>Person</Heading>
                         </MarginSides>
@@ -282,7 +282,6 @@ export class PersonForm extends Component {
                                     .map(attribute => this.getInput(attribute))}
                             </Grid>
                         </Grid>
-                        
                     </Margin>
                 </Card>
             </MarginBottom>

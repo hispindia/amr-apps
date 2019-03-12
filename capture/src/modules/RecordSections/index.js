@@ -106,7 +106,8 @@ export class RecordSections extends Component {
                 programId,
                 programStageId,
                 orgUnitId,
-                entityId
+                entityId,
+                entityValues
             )
         else {
             const values = await addPersonWithEvent(
