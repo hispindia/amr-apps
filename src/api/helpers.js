@@ -9,15 +9,30 @@ const _l2ApprovalStatus = 'sXDQT6Yaf77'
 const _l2RejectionReason = 'pz8SoHBO6RL'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
-export const getProgramStageApproval = async (programId, programStageId, values, isL1User, isL2User) => {
-    let programStage = await getProgramStage(programStageId, values, false, isL1User, isL2User)
+export const getProgramStageApproval = async (
+    programId,
+    programStageId,
+    values,
+    isL1User,
+    isL2User
+) => {
+    let programStage = await getProgramStage(
+        programStageId,
+        values,
+        false,
+        isL1User,
+        isL2User
+    )
 
     programStage.programStageSections
         .filter(section => section.name === 'Institute / Hospital Information')
         .forEach(section => (section.hideWithValues = true))
     programStage.programStageSections.forEach(section =>
         section.childSections
-            .filter(childSection => childSection.name === 'Institute / Hospital Information')
+            .filter(
+                childSection =>
+                    childSection.name === 'Institute / Hospital Information'
+            )
             .forEach(childSection => (childSection.hideWithValues = true))
     )
 
@@ -32,14 +47,14 @@ export const getProgramStageDeo = async (programId, programStageId, values) => {
     let programStage = await getProgramStage(programStageId, values, true)
 
     if (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
-    programStage.programStageSections
-        .filter(section => section.name === 'Approval')
-        .forEach(section => (section.hideWithValues = true))
+        programStage.programStageSections
+            .filter(section => section.name === 'Approval')
+            .forEach(section => (section.hideWithValues = true))
 
     return {
         programStage: programStage,
         values: values,
-        rules: await getProgramRules(programId, programStageId)
+        rules: await getProgramRules(programId, programStageId),
     }
 }
 
@@ -48,7 +63,7 @@ export const getProgramStageDeo = async (programId, programStageId, values) => {
  * @param {string} eventId - AMR Id.
  * @returns {Object} Event values.
  */
-export const getEventValues = async (eventId) => {
+export const getEventValues = async eventId => {
     const data = await get('events/' + eventId + '.json')
     let values = {}
 
@@ -283,9 +298,11 @@ const getProgramStage = async (
                 else if (isL1User || isL2User) return true
                 else
                     return !(
-                        (values[_l2ApprovalStatus] === 'Resend' && values[_l1ApprovalStatus] !== 'Rejected')
-                        ||
-                        (values[_l1ApprovalStatus] === 'Resend' || values[_l1ApprovalStatus] === '' || !values[_l1ApprovalStatus])
+                        (values[_l2ApprovalStatus] === 'Resend' &&
+                            values[_l1ApprovalStatus] !== 'Rejected') ||
+                        (values[_l1ApprovalStatus] === 'Resend' ||
+                            values[_l1ApprovalStatus] === '' ||
+                            !values[_l1ApprovalStatus])
                     )
         }
     }
@@ -297,6 +314,10 @@ const getProgramStage = async (
             'programStageSections[id,name,displayName,renderType,dataElements[id,displayFormName,code,valueType,optionSetValue,' +
             'optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
     )
+
+    programStage.deletable =
+        values === {} ||
+        (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
 
     programStage.programStageSections.forEach(section => {
         section.hide = false

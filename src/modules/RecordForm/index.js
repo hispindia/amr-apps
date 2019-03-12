@@ -70,7 +70,8 @@ export class RecordForm extends Component {
         })
         this.props.passValues(
             values,
-            this.validateValues(programStage.programStageSections, values)
+            this.validateValues(programStage.programStageSections, values),
+            programStage.deletable
         )
     }
 
@@ -348,7 +349,9 @@ export class RecordForm extends Component {
                     let childSections = section.childSections
                     if (section.childSections)
                         childSections = section.childSections.filter(
-                            childSection => !childSection.hide && !childSection.hideWithValues
+                            childSection =>
+                                !childSection.hide &&
+                                !childSection.hideWithValues
                         )
 
                     return (

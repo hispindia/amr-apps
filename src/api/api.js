@@ -1,7 +1,13 @@
 import moment from 'moment'
 import _ from 'lodash'
 import { get, postData, del, put, setBaseUrl } from './crud'
-import { getProgramStageDeo, getProgramStageApproval, getEventValues, getEntityRules, generateAmrId } from './helpers'
+import {
+    getProgramStageDeo,
+    getProgramStageApproval,
+    getEventValues,
+    getEntityRules,
+    generateAmrId,
+} from './helpers'
 
 const _personTypeId = 'tOJvIFXsB5V'
 
@@ -121,8 +127,11 @@ export async function getEntityAttributes(entityId) {
 export async function checkUnique(property, value) {
     const entities = (await get(
         'trackedEntityInstances.json?ouMode=ACCESSIBLE&paging=false&fields=trackedEntityInstance&trackedEntityType=' +
-        _personTypeId + '&filter=' +
-        property+ ':eq:' + value
+            _personTypeId +
+            '&filter=' +
+            property +
+            ':eq:' +
+            value
     )).trackedEntityInstances
     return entities.length > 0 ? entities[0].trackedEntityInstance : false
 }
@@ -245,12 +254,16 @@ export async function getOrganisms(organismGroup) {
 
 /**
  * Gets the program stage for a new event.
- * @param {string} programId 
- * @param {string} programStageId 
+ * @param {string} programId
+ * @param {string} programStageId
  * @param {string} organismCode
- * @returns {Object} Program stage, values, 
+ * @returns {Object} Program stage, values,
  */
-export async function getProgramStageNew(programId, programStageId, organismCode) {
+export async function getProgramStageNew(
+    programId,
+    programStageId,
+    organismCode
+) {
     let values = { [_organismsDataElementId]: organismCode }
     values[_organismsDataElementId] = organismCode
     return await getProgramStageDeo(programId, programStageId, values)
@@ -268,8 +281,13 @@ export async function getProgramStageExisting(eventId) {
 
 export async function getRecordForApproval(eventId) {
     let { values, programId, programStageId } = await getEventValues(eventId)
-    return await getProgramStageApproval(programId, programStageId, values, _isL1User, _isL2User)
-
+    return await getProgramStageApproval(
+        programId,
+        programStageId,
+        values,
+        _isL1User,
+        _isL2User
+    )
 }
 
 /**
@@ -481,6 +499,14 @@ export async function updateEvent(newValues, eventId, isApproval) {
 
     event = await setEventValues(event, newValues)
     await put('events/' + eventId, event)
+}
+
+/**
+ * Deletes event.
+ * @param {string} eventId - Event ID.
+ */
+export async function deleteEvent(eventId) {
+    await del('events/' + eventId)
 }
 
 export async function getEvents(config, orgUnit, userOnly) {

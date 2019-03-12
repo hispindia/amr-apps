@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Margin } from 'helpers'
 import { RecordForm, TitleRow, ProgressSection } from 'modules'
-import { getRecordForApproval, updateEvent } from 'api'
+import { getRecordForApproval, updateEvent, deleteEvent } from 'api'
 import { ButtonRow } from 'inputs'
 
 export class RecordApproval extends Component {
@@ -13,6 +13,7 @@ export class RecordApproval extends Component {
         initialized: false,
         loading: true,
         recordProps: null,
+        deletable: false,
     }
 
     componentDidMount = async () => {
@@ -27,11 +28,12 @@ export class RecordApproval extends Component {
         })
     }
 
-    onEventValues = (values, valid) =>
+    onEventValues = (values, valid, deletable) =>
         this.setState({
             eventValues: values,
             eventValid: valid,
             buttonDisabled: false,
+            deletable: deletable,
         })
 
     onSubmitClick = async () => {
@@ -41,8 +43,19 @@ export class RecordApproval extends Component {
         this.props.history.push('/')
     }
 
+    onDelete = async () => {
+        await deleteEvent(this.state.eventId)
+        this.props.history.push('/')
+    }
+
     sections = () => {
-        const { eventValid, buttonDisabled, recordProps, loading } = this.state
+        const {
+            eventValid,
+            buttonDisabled,
+            recordProps,
+            loading,
+            deletable,
+        } = this.state
         const disabled = buttonDisabled || !eventValid
 
         return (
@@ -59,13 +72,14 @@ export class RecordApproval extends Component {
                 <ButtonRow
                     buttons={[
                         {
-                            label: 'Cancel',
-                            onClick: () => this.props.history.push('/'),
-                            disabled: false,
-                            icon: 'clear',
+                            label: 'Delete',
+                            onClick: this.onDelete,
+                            disabled: !deletable,
+                            icon: 'delete',
                             kind: 'destructive',
-                            tooltip: 'Cancel and go back.',
-                            disabledTooltip: 'A required field is empty.',
+                            tooltip: 'Permanently delete record.',
+                            disabledTooltip:
+                                'You cannot delete records with an approval status.',
                         },
                         {
                             label: 'Submit',

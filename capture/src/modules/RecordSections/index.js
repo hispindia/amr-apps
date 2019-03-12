@@ -12,7 +12,8 @@ import {
     addPersonWithEvent,
     getProgramStageNew,
     getProgramStageExisting,
-    updateEvent
+    updateEvent,
+    deleteEvent,
 } from 'api'
 import { ButtonRow } from 'inputs'
 
@@ -30,6 +31,7 @@ export class RecordSections extends Component {
         loading: true,
         resetSwitch: false,
         recordProps: null,
+        deletable: false,
     }
 
     componentDidMount = async () => {
@@ -77,11 +79,12 @@ export class RecordSections extends Component {
         })
     }
 
-    onEventValues = (values, valid) =>
+    onEventValues = (values, valid, deletable) =>
         this.setState({
             eventValues: values,
             eventValid: valid,
             buttonDisabled: false,
+            deletable: deletable,
         })
 
     onSubmitClick = async addMore => {
@@ -131,11 +134,13 @@ export class RecordSections extends Component {
 
     onUpdateClick = async () => {
         this.setState({ buttonDisabled: true })
-        const {
-            eventValues,
-            eventId
-        } = this.state
+        const { eventValues, eventId } = this.state
         await updateEvent(eventValues, eventId)
+        this.props.history.push('/')
+    }
+
+    onDelete = async () => {
+        await deleteEvent(this.state.eventId)
         this.props.history.push('/')
     }
 
@@ -151,9 +156,15 @@ export class RecordSections extends Component {
             resetSwitch,
             recordProps,
             loading,
+            deletable,
         } = this.state
         const disabled =
-            (!eventId && (buttonDisabled || !entityValid || !panelValid || !eventValid)) || (eventId && !eventValid)
+            (!eventId &&
+                (buttonDisabled ||
+                    !entityValid ||
+                    !panelValid ||
+                    !eventValid)) ||
+            (eventId && !eventValid)
 
         return (
             <div>
@@ -180,58 +191,53 @@ export class RecordSections extends Component {
                 )}
                 {loading && <ProgressSection />}
                 <ButtonRow
-                    buttons={eventId ?
-                        [
-                            {
-                                label: 'Cancel',
-                                onClick: () => this.props.history.push('/'),
-                                disabled: false,
-                                icon: 'clear',
-                                kind: 'destructive',
-                                tooltip: 'Cancel and go back.',
-                                disabledTooltip: 'Cancel and go back.',
-                            },
-                            {
-                                label: 'Submit',
-                                onClick: () => this.onUpdateClick(false),
-                                disabled: disabled,
-                                icon: 'done',
-                                kind: 'primary',
-                                tooltip: 'Submit record.',
-                                disabledTooltip: 'Record is unchanged.',
-                            },
-                        ]
-                    :
-                        [
-                            {
-                                label: 'Cancel',
-                                onClick: () => this.props.history.push('/'),
-                                disabled: false,
-                                icon: 'clear',
-                                kind: 'destructive',
-                                tooltip: 'Cancel and go back.',
-                                disabledTooltip: 'Cancel and go back.',
-                            },
-                            {
-                                label: 'Submit and add new',
-                                onClick: () => this.onSubmitClick(true),
-                                disabled: disabled,
-                                icon: 'add',
-                                kind: 'primary',
-                                tooltip:
-                                    'Submit record and add new record for the same person.',
-                                disabledTooltip: 'A required field is empty.',
-                            },
-                            {
-                                label: 'Submit',
-                                onClick: () => this.onSubmitClick(false),
-                                disabled: disabled,
-                                icon: 'done',
-                                kind: 'primary',
-                                tooltip: 'Submit record.',
-                                disabledTooltip: 'A required field is empty.',
-                            },
-                    ]}
+                    buttons={
+                        eventId
+                            ? [
+                                  {
+                                      label: 'Delete',
+                                      onClick: this.onDelete,
+                                      disabled: !deletable,
+                                      icon: 'delete',
+                                      kind: 'destructive',
+                                      tooltip: 'Permanently delete record.',
+                                      disabledTooltip:
+                                          'You cannot delete records with an approval status.',
+                                  },
+                                  {
+                                      label: 'Submit',
+                                      onClick: () => this.onUpdateClick(false),
+                                      disabled: disabled,
+                                      icon: 'done',
+                                      kind: 'primary',
+                                      tooltip: 'Submit record.',
+                                      disabledTooltip: 'Record is unchanged.',
+                                  },
+                              ]
+                            : [
+                                  {
+                                      label: 'Submit and add new',
+                                      onClick: () => this.onSubmitClick(true),
+                                      disabled: disabled,
+                                      icon: 'add',
+                                      kind: 'primary',
+                                      tooltip:
+                                          'Submit record and add new record for the same person.',
+                                      disabledTooltip:
+                                          'A required field is empty.',
+                                  },
+                                  {
+                                      label: 'Submit',
+                                      onClick: () => this.onSubmitClick(false),
+                                      disabled: disabled,
+                                      icon: 'done',
+                                      kind: 'primary',
+                                      tooltip: 'Submit record.',
+                                      disabledTooltip:
+                                          'A required field is empty.',
+                                  },
+                              ]
+                    }
                 />
             </div>
         )
