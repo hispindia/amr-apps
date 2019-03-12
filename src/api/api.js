@@ -33,6 +33,10 @@ export function getOrganismsDataElementId() {
     return _organismsDataElementId
 }
 
+/**
+ * Gets user accesses.
+ * @returns {Object} User accesses.
+ */
 export function getUserAccess() {
     return {
         isDeoUser: _isDeoUser,
@@ -43,7 +47,7 @@ export function getUserAccess() {
 
 /**
  * Sets the base URL, username, and user groups.
- * @param {String} url
+ * @param {String} baseUrl - Base URL.
  */
 export async function init(baseUrl) {
     setBaseUrl(baseUrl)
@@ -147,7 +151,7 @@ export async function getPersonValues(entityId) {
 }
 
 /**
- * Adds a new person tracked entity instance and enrolls to AMR program.
+ * Adds a new person..
  * @param {Object} values - Values
  * @returns {string} Tracked entity instance ID.
  */
@@ -165,9 +169,9 @@ export async function addPerson(values, orgUnit) {
 }
 
 /**
- * Updates a tracked entity instance.
+ * Updates a person.
  * @param {string} id - Tracked entity instance id.
- * @param {*} values - Values.
+ * @param {Object} values - Values.
  */
 export async function updatePerson(id, values) {
     let data = await get(
@@ -240,6 +244,13 @@ export async function getOrganisms(organismGroup) {
     return organisms
 }
 
+/**
+ * Gets the program stage for a new event.
+ * @param {string} programId 
+ * @param {string} programStageId 
+ * @param {string} organismCode
+ * @returns {Object} Program stage, values, 
+ */
 export async function getProgramStageNew(programId, programStageId, organismCode) {
     let values = { [_organismsDataElementId]: organismCode }
     values[_organismsDataElementId] = organismCode
