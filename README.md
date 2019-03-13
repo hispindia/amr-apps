@@ -10,6 +10,8 @@
 - [ ] Susceptibility colors based on result
 - [ ] Modals
 - [ ] Hashing patient registration number
+- [ ] Deselectable radio buttons
+- [ ] Disabling field after ASSIGN rule action
 
 ### Installation
 
