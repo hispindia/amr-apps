@@ -190,6 +190,7 @@ export class RecordForm extends Component {
                                 )
                                 // Assigning value.
                                 values[affectedDataElement.id] = r.data
+                                affectedDataElement.disabled = true
                             }
                             break
                         default:
