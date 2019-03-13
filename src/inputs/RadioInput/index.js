@@ -28,13 +28,20 @@ export class RadioInput extends React.Component {
         this.props.onChange(this.props.name, value)
     }
 
+    /**
+     * Used to make radio deselectable.
+     */
+    onClick = event => {
+        if (this.state.value === event.target.value) this.setState({ value: '' })
+    }
+
     render() {
         return (
             <Input>
                 <Label required={this.props.required}>{this.props.label}</Label>
                 <RowW>
                     {this.props.objects.map(object => (
-                        <OptionSpacer key={object.value}>
+                        <OptionSpacer key={object.value} onClick={this.onClick}>
                             <Radio
                                 key={object.value}
                                 name={object.value}
