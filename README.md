@@ -6,7 +6,7 @@
 - [x] Deleting records
 - [x] Editing person values
 - [ ] Using local storage for versioned meta data
-- [ ] Numbers only text fields
+- [x] Numbers only text fields
 - [ ] Susceptibility colors based on result
 - [ ] Modals
 - [ ] Hashing patient registration number
@@ -42,6 +42,5 @@ yarn start
 
 ```
 cd [root_dir]
-yarn build:approval
-yarn build:capture
+yarn build
 ```

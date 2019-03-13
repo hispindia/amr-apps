@@ -317,6 +317,7 @@ export class RecordForm extends Component {
                         required={dataElement.required}
                         onChange={this.onChange}
                         disabled={dataElement.disabled}
+                        type={dataElement.valueType === 'NUMBER' ? 'number' : 'text'}
                         /*backgroundColor={dataElement.color}*/
                     />
                 )}

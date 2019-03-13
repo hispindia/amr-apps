@@ -73,6 +73,7 @@ export class TextInput extends React.Component {
                     status={this.state.errorText === '' ? 'default' : 'error'}
                     help={this.state.errorText}
                     disabled={this.props.disabled}
+                    type={this.props.type}
                     size="dense"
                 />
             </div>

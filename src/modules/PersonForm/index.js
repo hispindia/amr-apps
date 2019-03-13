@@ -240,6 +240,7 @@ export class PersonForm extends Component {
                         value={values[attribute.trackedEntityAttribute.id]}
                         onChange={this.onChange}
                         disabled={disabled}
+                        type={attribute.trackedEntityAttribute.valueType === 'NUMBER' ? 'number' : 'text'}
                     />
                 )}
             </Padding>
