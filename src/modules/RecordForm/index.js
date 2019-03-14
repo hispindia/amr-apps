@@ -11,7 +11,8 @@ import {
     Padding,
     MarginSides,
     MarginBottom,
-} from '../../helpers/helpers'
+    updateEventValue
+} from '../../'
 import {
     TextInput,
     RadioInput,
@@ -43,33 +44,32 @@ export class RecordForm extends Component {
     init = async () => {
         this.setState({ loading: true })
 
-        let { programStage, values, rules } = this.props
-        this.checkRules(values, programStage.programStageSections, rules)
+        let { programStage, values } = this.props
+        this.checkRules(values, programStage.programStageSections)
 
         this.setState({
             loading: false,
             programStage: programStage,
             values: values,
-            rules: rules,
         })
     }
 
     onChange = async (name, value) => {
         let values = { ...this.state.values }
+        if (values[name] === value) return
+        await updateEventValue(this.props.eventId, name, value)
         values[name] = value
         this.onNewValues(values)
     }
 
     onNewValues = values => {
         let programStage = { ...this.state.programStage }
-        const rules = this.state.rules
-        this.checkRules(values, programStage.programStageSections, rules)
+        this.checkRules(values, programStage.programStageSections)
         this.setState({
             values: values,
             programStage: programStage,
         })
         this.props.passValues(
-            values,
             this.validateValues(programStage.programStageSections, values),
             programStage.deletable
         )
@@ -84,13 +84,18 @@ export class RecordForm extends Component {
                     dataElement =>
                         dataElement.required && values[dataElement.id] === ''
                 )
-            )
+            ) {
+                console.log(section.dataElements.find(
+                    dataElement =>
+                        dataElement.required && values[dataElement.id] === ''
+                ))
                 return false
+            }
         }
         return true
     }
 
-    checkRules = (values, sections, rules) => {
+    checkRules = (values, sections) => {
         /**
          * Gets the data element that is affected by rule.
          * @param {string} id - Data element id.
@@ -133,7 +138,7 @@ export class RecordForm extends Component {
             return null
         }
 
-        rules.forEach(rule => {
+        this.props.rules.forEach(rule => {
             rule.programRuleActions.forEach(r => {
                 try {
                     switch (r.programRuleActionType) {

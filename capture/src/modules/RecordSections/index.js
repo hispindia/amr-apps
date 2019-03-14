@@ -40,10 +40,12 @@ export class RecordSections extends Component {
         const eventId = this.props.match.params.event
             ? this.props.match.params.event
             : null
+        let recordProps = eventId
+            ? await getProgramStageExisting(eventId)
+            : null
+        if (recordProps) recordProps.eventId = eventId
         this.setState({
-            recordProps: eventId
-                ? await getProgramStageExisting(eventId)
-                : null,
+            recordProps: recordProps,
             eventId: eventId,
             initialized: true,
             loading: false,
@@ -71,19 +73,21 @@ export class RecordSections extends Component {
             panelValid: valid,
             recordProps: valid
                 ? await getProgramStageNew(
-                      programId,
-                      programStageId,
-                      organismCode
-                  )
+                    programId,
+                    programStageId,
+                    organismCode,
+                    this.props.match.params.orgUnit,
+                    this.state.entityId,
+                    this.state.entityValues
+                )
                 : null,
             loading: false,
             disablePanel: false,
         })
     }
 
-    onEventValues = (values, valid, deletable) =>
+    onEventValues = (valid, deletable) =>
         this.setState({
-            eventValues: values,
             eventValid: valid,
             buttonDisabled: false,
             deletable: deletable,
@@ -91,55 +95,17 @@ export class RecordSections extends Component {
 
     onSubmitClick = async addMore => {
         this.setState({ buttonDisabled: true })
-        const {
-            entityValues,
-            programId,
-            programStageId,
-            eventValues,
-            entityId,
-            resetSwitch,
-        } = this.state
-        const orgUnitId = this.props.match.params.orgUnit
-        let amrId
-        let newEntityId
-        if (entityId)
-            amrId = await addEvent(
-                eventValues,
-                programId,
-                programStageId,
-                orgUnitId,
-                entityId,
-                entityValues
-            )
-        else {
-            const values = await addPersonWithEvent(
-                eventValues,
-                programId,
-                programStageId,
-                orgUnitId,
-                entityValues
-            )
-            amrId = values.amrId
-            newEntityId = values.entityId
-        }
-        window.alert(`AMR Id: ${amrId}`)
+        const { recordProps, resetSwitch } = this.state
+        await setEventStatus(recordProps.eventId, true)
 
         if (addMore)
             this.setState({
-                entityId: newEntityId ? newEntityId : entityId,
                 panelValid: false,
                 recordProps: null,
                 eventValid: false,
                 resetSwitch: !resetSwitch,
             })
         else this.props.history.push('/')
-    }
-
-    onUpdateClick = async () => {
-        this.setState({ buttonDisabled: true })
-        const { eventValues, eventId } = this.state
-        await updateEvent(eventValues, eventId)
-        this.props.history.push('/')
     }
 
     onDelete = async () => {
@@ -190,6 +156,7 @@ export class RecordSections extends Component {
                         programStage={recordProps.programStage}
                         rules={recordProps.rules}
                         values={recordProps.values}
+                        eventId={recordProps.eventId}
                     />
                 )}
                 {loading && <ProgressSection />}
@@ -209,12 +176,12 @@ export class RecordSections extends Component {
                                   },
                                   {
                                       label: 'Submit',
-                                      onClick: () => this.onUpdateClick(false),
+                                      onClick: () => this.onSubmitClick(false),
                                       disabled: disabled,
                                       icon: 'done',
                                       kind: 'primary',
                                       tooltip: 'Submit record.',
-                                      disabledTooltip: 'Record is unchanged.',
+                                      disabledTooltip: 'A required field is empty.',
                                   },
                               ]
                             : [

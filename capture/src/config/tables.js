@@ -22,4 +22,8 @@ export const tables = {
         title: 'Accepted records',
         sqlView: 'k4Or0pHTmPN',
     },
+    Incomplete: {
+        title: 'Incomplete records',
+        sqlView: 'nwO7eOjAqmu',
+    },
 }

@@ -271,25 +271,11 @@ export async function getProgramStageNew(
     eventValues[_organismsDataElementId] = organismCode
     eventValues[_amrDataElement] = await generateAmrId(orgUnit)
 
-    if (entityId)
-        await addEvent(
-            eventValues,
-            programId,
-            programStageId,
-            orgUnit,
-            entityId,
-            entityValues
-        )   
-    else
-        await addPersonWithEvent(
-            eventValues,
-            programId,
-            programStageId,
-            orgUnitId,
-            entityValues
-        )
+    const eventId = entityId ? await addEvent(eventValues, programId, programStageId, orgUnit, entityId, entityValues) : await addPersonWithEvent(eventValues, programId, programStageId, orgUnitId, entityValues)
 
-    return await getProgramStageDeo(programId, programStageId, values)
+    const { programStage, values, rules } = await getProgramStageDeo(programId, programStageId, eventValues)
+
+    return { programStage, values, rules, eventId }
 }
 
 /**
@@ -502,8 +488,10 @@ export async function addEvent(
         })
     }
 
-    await postData('events', event)
-    return amrId
+    const r = await postData('events', event)
+
+
+    return r.response.importSummaries[0].reference
 }
 
 export async function setEventStatus(eventId, completed) {
@@ -518,7 +506,7 @@ export async function updateEventValue(eventId, dataElementId, value) {
     await put('events/' + eventId + '/' + dataElementId, { dataValues: [{ dataElement: dataElementId, value: value }] })
     if (dataElementId === _sampleDateElementId) {
         let event = await get('events/' + eventId + '.json')
-        event.eventDate = dateElement.value
+        event.eventDate = value
         await put('events/' + eventId, event)
     }
 }
