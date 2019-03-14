@@ -262,10 +262,33 @@ export async function getOrganisms(organismGroup) {
 export async function getProgramStageNew(
     programId,
     programStageId,
-    organismCode
+    organismCode,
+    orgUnit,
+    entityId,
+    entityValues
 ) {
-    let values = { [_organismsDataElementId]: organismCode }
-    values[_organismsDataElementId] = organismCode
+    let eventValues = { [_organismsDataElementId]: organismCode }
+    eventValues[_organismsDataElementId] = organismCode
+    eventValues[_amrDataElement] = await generateAmrId(orgUnit)
+
+    if (entityId)
+        await addEvent(
+            eventValues,
+            programId,
+            programStageId,
+            orgUnit,
+            entityId,
+            entityValues
+        )   
+    else
+        await addPersonWithEvent(
+            eventValues,
+            programId,
+            programStageId,
+            orgUnitId,
+            entityValues
+        )
+
     return await getProgramStageDeo(programId, programStageId, values)
 }
 
@@ -396,6 +419,7 @@ export async function addPersonWithEvent(
             orgUnit: orgUnitId,
             program: programId,
             programStage: programStageId,
+            status: 'ACTIVE'
         },
         eventValues
     )
@@ -454,6 +478,7 @@ export async function addEvent(
             program: programId,
             programStage: programStageId,
             trackedEntityInstance: entityId,
+            status: 'ACTIVE'
         },
         eventValues
     )
@@ -479,6 +504,23 @@ export async function addEvent(
 
     await postData('events', event)
     return amrId
+}
+
+export async function setEventStatus(eventId, completed) {
+    let event = await get('events/' + eventId + '.json')
+    let dateElement = event.dataValues.find(dv => dv.dataElement === _sampleDateElementId)
+    if (dateElement) event.eventDate = dateElement.value
+    event.status = completed ? 'COMPLETED' : 'ACTIVE'
+    await put('events/' + eventId, event)
+}
+
+export async function updateEventValue(eventId, dataElementId, value) {
+    await put('events/' + eventId + '/' + dataElementId, { dataValues: [{ dataElement: dataElementId, value: value }] })
+    if (dataElementId === _sampleDateElementId) {
+        let event = await get('events/' + eventId + '.json')
+        event.eventDate = dateElement.value
+        await put('events/' + eventId, event)
+    }
 }
 
 /**
