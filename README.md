@@ -12,6 +12,7 @@
 - [ ] Hashing patient registration number
 - [x] Deselectable radio buttons
 - [x] Disabling field after ASSIGN rule action
+- [ ] Storing incomplete records
 
 ### Installation
 
