@@ -183,11 +183,11 @@ export class RecordSections extends Component {
                                   {
                                       label: recordProps.completed ? 'Edit' : 'Submit',
                                       onClick: () => recordProps.completed ? this.onEditClick() : this.onSubmitClick(false),
-                                      disabled: recordProps.completed ? !recordProps.programStage.deletable : disabled,
+                                      disabled: recordProps.completed ? !recordProps.programStage.editable : disabled,
                                       icon: recordProps.completed ? 'edit' : 'done',
                                       kind: 'primary',
                                       tooltip: recordProps.completed ? 'Edit record' : 'Submit record.',
-                                      disabledTooltip: 'A required field is empty.',
+                                      disabledTooltip: recordProps.completed ? 'Records with this approval cannot be edited.' : 'A required field is empty.',
                                   },
                               ]
                             : [

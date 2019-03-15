@@ -316,9 +316,9 @@ const getProgramStage = async (
             'optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
     )
 
-    programStage.deletable =
-        values === {} ||
-        (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
+    programStage.deletable = values === {} || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
+
+    programStage.editable = values === {} || [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes('Resend')
 
     programStage.programStageSections.forEach(section => {
         section.hide = false
