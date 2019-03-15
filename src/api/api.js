@@ -290,14 +290,9 @@ export async function getProgramStageExisting(eventId) {
 }
 
 export async function getRecordForApproval(eventId) {
-    let { eventValues, programId, programStageId } = await getEventValues(eventId)
-    return await getProgramStageApproval(
-        programId,
-        programStageId,
-        eventValues,
-        _isL1User,
-        _isL2User
-    )
+    let { eventValues: initialValues, programId, programStageId, completed, storedBy } = await getEventValues(eventId)
+    const { programStage, eventValues, rules } = await getProgramStageApproval(programId, programStageId, initialValues, _isL1User, _isL2User)
+    return { programStage, eventValues, rules, eventId, completed, storedBy }
 }
 
 /**
@@ -503,11 +498,12 @@ export async function setEventStatus(eventId, completed) {
     await put('events/' + eventId, event)
 }
 
-export async function updateEventValue(eventId, dataElementId, value) {
-    await put('events/' + eventId + '/' + dataElementId, { dataValues: [{ dataElement: dataElementId, value: value }] })
-    if (dataElementId === _sampleDateElementId) {
+export async function updateEventValue(eventId, dataElementId, value, storedBy) {
+    await put('events/' + eventId + '/' + dataElementId, { dataValues: [{ dataElement: dataElementId, value: value, storedBy: storedBy ? storedBy : _username }] })
+    if (storedBy || dataElementId === _sampleDateElementId) {
         let event = await get('events/' + eventId + '.json')
-        event.eventDate = value
+        if (storedBy) event.storedBy = storedBy
+        if (dataElementId === _sampleDateElementId) event.eventDate = value
         await put('events/' + eventId, event)
     }
 }

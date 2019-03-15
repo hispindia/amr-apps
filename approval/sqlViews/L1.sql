@@ -19,8 +19,8 @@ INNER JOIN program pr ON pi.programid = pr.programid
 INNER JOIN organisationunit o ON e.organisationunitid = o.organisationunitid
 INNER JOIN (trackedentitydatavalue v
 INNER JOIN dataelement d ON v.dataelementid = d.dataelementid AND d.uid = 'lIkk661BLpG') ON e.programstageinstanceid = v.programstageinstanceid
-AND e.status = 'COMPLETED'
 WHERE o.path LIKE '%${orgunit}%'
+AND e.status = 'COMPLETED'
 
 -- L1 incomplete:
 SELECT v.value AS amrid, pr.name AS organismgroup, ov.name AS organism, e.created::date, e.lastupdated::date, o.uid AS ouid, e.uid AS eventid FROM programstageinstance e
@@ -32,8 +32,7 @@ INNER JOIN dataelement d ON v.dataelementid = d.dataelementid AND d.uid = 'lIkk6
 LEFT JOIN (trackedentitydatavalue v2
 INNER JOIN dataelement d2 ON v2.dataelementid = d2.dataelementid AND d2.uid = 'SaQe2REkGVw'
 INNER JOIN optionvalue ov ON d2.optionsetid = ov.optionsetid AND v2.value = ov.code) ON e.programstageinstanceid = v2.programstageinstanceid
-WHERE e.storedby = '${username}'
-AND o.path LIKE '%${orgunit}%'
+WHERE o.path LIKE '%${orgunit}%'
 AND e.status = 'ACTIVE'
 ORDER BY e.lastupdated DESC
 
@@ -44,8 +43,8 @@ INNER JOIN program pr ON pi.programid = pr.programid
 INNER JOIN organisationunit o ON e.organisationunitid = o.organisationunitid
 INNER JOIN (trackedentitydatavalue v
 INNER JOIN dataelement d ON v.dataelementid = d.dataelementid AND d.uid = 'lIkk661BLpG') ON e.programstageinstanceid = v.programstageinstanceid
-AND e.status = 'ACTIVE'
 WHERE o.path LIKE '%${orgunit}%'
+AND e.status = 'ACTIVE'
 
 -- L1 status:
 SELECT v.value AS amrid, pr.name AS organismgroup, ov.name AS organism, e.created::date, e.lastupdated::date, o.uid AS ouid, e.uid AS eventid FROM programstageinstance e

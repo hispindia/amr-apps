@@ -6,7 +6,6 @@ import { ButtonRow } from 'inputs'
 
 export class RecordApproval extends Component {
     state = {
-        eventValid: false,
         eventId: null,
         buttonDisabled: true,
         initialized: false,
@@ -19,38 +18,23 @@ export class RecordApproval extends Component {
         const eventId = this.props.match.params.event
             ? this.props.match.params.event
             : null
-         let recordProps = eventId
+        let recordProps = eventId
             ? await getRecordForApproval(eventId)
             : null
+        if (recordProps) recordProps.eventId = eventId
         this.setState({
             recordProps: recordProps,
             eventId: eventId,
             initialized: true,
             loading: false,
-        })
-    }
-
-    onEventValues = valid =>
-        this.setState({
-            eventValid: valid,
             buttonDisabled: false
         })
+    }
 
     onSubmitClick = async () => {
         this.setState({ buttonDisabled: true })
         await setEventStatus(this.state.recordProps.eventId, true)
         this.props.history.push('/')
-    }
-
-    onEditClick = async () => {
-        this.setState({ buttonDisabled: true })
-        await setEventStatus(this.state.recordProps.eventId)
-        let recordProps = {...this.state.recordProps}
-        recordProps.completed = false
-        this.setState({
-            buttonDisabled: false,
-            recordProps: recordProps
-        })
     }
 
     onDelete = async () => {
@@ -62,24 +46,21 @@ export class RecordApproval extends Component {
 
     sections = () => {
         const {
-            eventValid,
             buttonDisabled,
             recordProps,
             loading,
             deletable,
         } = this.state
-        const disabled = buttonDisabled || !eventValid
 
         return (
             <div>
                 {recordProps && (
                     <RecordForm
-                        passValues={this.onEventValues}
                         programStage={recordProps.programStage}
                         rules={recordProps.rules}
                         values={recordProps.eventValues}
                         eventId={recordProps.eventId}
-                        completed={recordProps.completed}
+                        storedBy={recordProps.storedBy}
                     />
                 )}
                 {loading && <ProgressSection />}
@@ -96,13 +77,13 @@ export class RecordApproval extends Component {
                                 'You cannot delete records with an approval status.',
                         },
                         {
-                            label: recordProps.completed ? 'Edit' : 'Submit',
-                            onClick: () => recordProps.completed ? this.onEditClick() : this.onSubmitClick(false),
-                            disabled: recordProps.completed ? !recordProps.programStage.deletable : disabled,
-                            icon: recordProps.completed ? 'edit' : 'done',
+                            label: 'Submit',
+                            onClick: () => this.onSubmitClick(false),
+                            disabled: buttonDisabled,
+                            icon: 'done',
                             kind: 'primary',
-                            tooltip: recordProps.completed ? 'Edit record' : 'Submit record.',
-                            disabledTooltip: 'A required field is empty.',
+                            tooltip: 'Submit record.',
+                            disabledTooltip: 'Submit record.',
                         },
                     ]}
                 />

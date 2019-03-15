@@ -44,7 +44,7 @@ export class RecordForm extends Component {
     init = async () => {
         this.setState({ loading: true })
 
-        let { programStage, values } = this.props
+        let { programStage, values, passValues } = this.props
         this.checkRules(values, programStage.programStageSections)
 
         this.setState({
@@ -53,13 +53,14 @@ export class RecordForm extends Component {
             values: values,
         })
 
-        this.props.passValues(this.validateValues(programStage.programStageSections, values))
+        if (passValues)
+            passValues(this.validateValues(programStage.programStageSections, values))
     }
 
     onChange = async (name, value) => {
         let values = { ...this.state.values }
         if (values[name] === value) return
-        await updateEventValue(this.props.eventId, name, value)
+        await updateEventValue(this.props.eventId, name, value, this.props.storedBy)
         values[name] = value
         this.onNewValues(values)
     }
@@ -71,7 +72,8 @@ export class RecordForm extends Component {
             values: values,
             programStage: programStage,
         })
-        this.props.passValues(this.validateValues(programStage.programStageSections, values))
+        if (this.props.passValues)
+            this.props.passValues(this.validateValues(programStage.programStageSections, values))
     }
 
     validateValues = (sections, values) => {

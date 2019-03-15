@@ -24,15 +24,13 @@ export const getProgramStageApproval = async (
         isL2User
     )
 
+    const hideWithValues = ['Institute / Hospital Information', ... !isL2User ? ['Level 2'] : []]
     programStage.programStageSections
-        .filter(section => section.name === 'Institute / Hospital Information')
+        .filter(section => hideWithValues.includes(section.name))
         .forEach(section => (section.hideWithValues = true))
     programStage.programStageSections.forEach(section =>
         section.childSections
-            .filter(
-                childSection =>
-                    childSection.name === 'Institute / Hospital Information'
-            )
+            .filter(childSection => hideWithValues.includes(childSection.name))
             .forEach(childSection => (childSection.hideWithValues = true))
     )
 
@@ -76,7 +74,8 @@ export const getEventValues = async eventId => {
         programId: event.program,
         programStageId: event.programStage,
         eventValues: values,
-        completed: event.status === 'COMPLETED'
+        completed: event.status === 'COMPLETED',
+        storedBy: event.storedBy
     }
 }
 
@@ -274,8 +273,9 @@ const getProgramStage = async (
     const shouldDisable = element => {
         switch (element.id) {
             case _amrDataElement:
+                return values[_amrDataElement] && values[_amrDataElement] !== ''
             case _organismsDataElementId:
-                return true
+                return values[_organismsDataElementId] && values[_organismsDataElementId] !== ''
             case _l1ApprovalStatus:
             case _l1RejectionReason:
             case _l1RevisionReason:
@@ -319,7 +319,6 @@ const getProgramStage = async (
     programStage.deletable =
         values === {} ||
         (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
-    console.log(!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
 
     programStage.programStageSections.forEach(section => {
         section.hide = false
