@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
 import { Margin } from 'helpers'
 import { RecordForm, TitleRow, ProgressSection } from 'modules'
-import { getRecordForApproval, updateEvent, deleteEvent } from 'api'
+import { getRecordForApproval, setEventStatus, deleteEvent } from 'api'
 import { ButtonRow } from 'inputs'
 
 export class RecordApproval extends Component {
     state = {
-        eventValues: null,
         eventValid: false,
         eventId: null,
         buttonDisabled: true,
@@ -20,32 +19,45 @@ export class RecordApproval extends Component {
         const eventId = this.props.match.params.event
             ? this.props.match.params.event
             : null
+         let recordProps = eventId
+            ? await getRecordForApproval(eventId)
+            : null
         this.setState({
-            recordProps: eventId ? await getRecordForApproval(eventId) : null,
+            recordProps: recordProps,
             eventId: eventId,
             initialized: true,
             loading: false,
         })
     }
 
-    onEventValues = (values, valid, deletable) =>
+    onEventValues = valid =>
         this.setState({
-            eventValues: values,
             eventValid: valid,
-            buttonDisabled: false,
-            deletable: deletable,
+            buttonDisabled: false
         })
 
     onSubmitClick = async () => {
         this.setState({ buttonDisabled: true })
-        const { eventId, eventValues } = this.state
-        await updateEvent(eventValues, eventId, true)
+        await setEventStatus(this.state.recordProps.eventId, true)
         this.props.history.push('/')
     }
 
+    onEditClick = async () => {
+        this.setState({ buttonDisabled: true })
+        await setEventStatus(this.state.recordProps.eventId)
+        let recordProps = {...this.state.recordProps}
+        recordProps.completed = false
+        this.setState({
+            buttonDisabled: false,
+            recordProps: recordProps
+        })
+    }
+
     onDelete = async () => {
-        await deleteEvent(this.state.eventId)
-        this.props.history.push('/')
+        if (window.confirm('Are you sure you want to permanently delete the record?')) {
+            await deleteEvent(this.state.eventId)
+            this.props.history.push('/')
+        }
     }
 
     sections = () => {
@@ -65,7 +77,9 @@ export class RecordApproval extends Component {
                         passValues={this.onEventValues}
                         programStage={recordProps.programStage}
                         rules={recordProps.rules}
-                        values={recordProps.values}
+                        values={recordProps.eventValues}
+                        eventId={recordProps.eventId}
+                        completed={recordProps.completed}
                     />
                 )}
                 {loading && <ProgressSection />}
@@ -82,13 +96,13 @@ export class RecordApproval extends Component {
                                 'You cannot delete records with an approval status.',
                         },
                         {
-                            label: 'Submit',
-                            onClick: this.onSubmitClick,
-                            disabled: disabled,
-                            icon: 'done',
+                            label: recordProps.completed ? 'Edit' : 'Submit',
+                            onClick: () => recordProps.completed ? this.onEditClick() : this.onSubmitClick(false),
+                            disabled: recordProps.completed ? !recordProps.programStage.deletable : disabled,
+                            icon: recordProps.completed ? 'edit' : 'done',
                             kind: 'primary',
-                            tooltip: 'Submit changes.',
-                            disabledTooltip: 'Record is unchanged.',
+                            tooltip: recordProps.completed ? 'Edit record' : 'Submit record.',
+                            disabledTooltip: 'A required field is empty.',
                         },
                     ]}
                 />
