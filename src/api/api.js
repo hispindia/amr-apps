@@ -267,15 +267,15 @@ export async function getProgramStageNew(
     entityId,
     entityValues
 ) {
-    let eventValues = { [_organismsDataElementId]: organismCode }
-    eventValues[_organismsDataElementId] = organismCode
-    eventValues[_amrDataElement] = await generateAmrId(orgUnit)
+    let initialValues = { [_organismsDataElementId]: organismCode }
+    initialValues[_organismsDataElementId] = organismCode
+    initialValues[_amrDataElement] = await generateAmrId(orgUnit)
 
-    const eventId = entityId ? await addEvent(eventValues, programId, programStageId, orgUnit, entityId, entityValues) : await addPersonWithEvent(eventValues, programId, programStageId, orgUnitId, entityValues)
+    const eventId = entityId ? await addEvent(initialValues, programId, programStageId, orgUnit, entityId, entityValues) : await addPersonWithEvent(initialValues, programId, programStageId, orgUnitId, entityValues)
 
-    const { programStage, values, rules } = await getProgramStageDeo(programId, programStageId, eventValues)
+    const { programStage, eventValues, rules } = await getProgramStageDeo(programId, programStageId, initialValues)
 
-    return { programStage, values, rules, eventId }
+    return { programStage, eventValues, rules, eventId }
 }
 
 /**
@@ -284,16 +284,17 @@ export async function getProgramStageNew(
  * @returns {Object} AMR program stage, values, and organism data element ID.
  */
 export async function getProgramStageExisting(eventId) {
-    let { values, programId, programStageId } = await getEventValues(eventId)
-    return await getProgramStageDeo(programId, programStageId, values)
+    let { eventValues: initialValues, programId, programStageId, completed } = await getEventValues(eventId)
+    const { programStage, eventValues, rules } = await getProgramStageDeo(programId, programStageId, initialValues)
+    return { programStage, eventValues, rules, eventId, completed }
 }
 
 export async function getRecordForApproval(eventId) {
-    let { values, programId, programStageId } = await getEventValues(eventId)
+    let { eventValues, programId, programStageId } = await getEventValues(eventId)
     return await getProgramStageApproval(
         programId,
         programStageId,
-        values,
+        eventValues,
         _isL1User,
         _isL2User
     )

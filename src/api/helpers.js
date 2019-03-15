@@ -12,13 +12,13 @@ const _l2RevisionReason = 'fEnFVvEFKVc'
 export const getProgramStageApproval = async (
     programId,
     programStageId,
-    values,
+    eventValues,
     isL1User,
     isL2User
 ) => {
     let programStage = await getProgramStage(
         programStageId,
-        values,
+        eventValues,
         false,
         isL1User,
         isL2User
@@ -38,22 +38,22 @@ export const getProgramStageApproval = async (
 
     return {
         programStage: programStage,
-        values: values,
+        eventValues: eventValues,
         rules: await getProgramRules(programId, programStageId),
     }
 }
 
-export const getProgramStageDeo = async (programId, programStageId, values) => {
-    let programStage = await getProgramStage(programStageId, values, true)
+export const getProgramStageDeo = async (programId, programStageId, eventValues) => {
+    let programStage = await getProgramStage(programStageId, eventValues, true)
 
-    if (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
+    if (!eventValues[_l1ApprovalStatus] && !eventValues[_l2ApprovalStatus])
         programStage.programStageSections
             .filter(section => section.name === 'Approval')
             .forEach(section => (section.hideWithValues = true))
 
     return {
         programStage: programStage,
-        values: values,
+        eventValues: eventValues,
         rules: await getProgramRules(programId, programStageId),
     }
 }
@@ -64,18 +64,19 @@ export const getProgramStageDeo = async (programId, programStageId, values) => {
  * @returns {Object} Event values.
  */
 export const getEventValues = async eventId => {
-    const data = await get('events/' + eventId + '.json')
+    const event = await get('events/' + eventId + '.json')
     let values = {}
 
-    if (data.dataValues)
-        data.dataValues.forEach(
+    if (event.dataValues)
+        event.dataValues.forEach(
             dataValue => (values[dataValue.dataElement] = dataValue.value)
         )
 
     return {
-        programId: data.program,
-        programStageId: data.programStage,
-        values: values,
+        programId: event.program,
+        programStageId: event.programStage,
+        eventValues: values,
+        completed: event.status === 'COMPLETED'
     }
 }
 
@@ -318,6 +319,7 @@ const getProgramStage = async (
     programStage.deletable =
         values === {} ||
         (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
+    console.log(!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
 
     programStage.programStageSections.forEach(section => {
         section.hide = false

@@ -52,6 +52,8 @@ export class RecordForm extends Component {
             programStage: programStage,
             values: values,
         })
+
+        this.props.passValues(this.validateValues(programStage.programStageSections, values))
     }
 
     onChange = async (name, value) => {
@@ -69,10 +71,7 @@ export class RecordForm extends Component {
             values: values,
             programStage: programStage,
         })
-        this.props.passValues(
-            this.validateValues(programStage.programStageSections, values),
-            programStage.deletable
-        )
+        this.props.passValues(this.validateValues(programStage.programStageSections, values))
     }
 
     validateValues = (sections, values) => {
@@ -228,7 +227,7 @@ export class RecordForm extends Component {
                 .forEach(dataElement => {
                     objects[dataElement.id] = {
                         label: dataElement.displayFormName,
-                        disabled: dataElement.disabled,
+                        disabled: dataElement.disabled || this.props.completed,
                     }
                     values[dataElement.id] = this.state.values[dataElement.id]
                 })
@@ -272,6 +271,7 @@ export class RecordForm extends Component {
      * @returns {Component} Date element component.
      */
     getDataElement = dataElement => {
+        const completed = this.props.completed
         return (
             <Padding key={dataElement.id}>
                 {dataElement.optionSetValue ? (
@@ -283,7 +283,7 @@ export class RecordForm extends Component {
                             value={this.state.values[dataElement.id]}
                             onChange={this.onChange}
                             required={dataElement.required}
-                            disabled={dataElement.disabled}
+                            disabled={dataElement.disabled || completed}
                         />
                     ) : (
                         <SelectInput
@@ -293,7 +293,7 @@ export class RecordForm extends Component {
                             value={this.state.values[dataElement.id]}
                             onChange={this.onChange}
                             required={dataElement.required}
-                            disabled={dataElement.disabled}
+                            disabled={dataElement.disabled || completed}
                         />
                     )
                 ) : dataElement.valueType === 'TRUE_ONLY' ? (
@@ -303,7 +303,7 @@ export class RecordForm extends Component {
                         checked={this.state.values[dataElement.id]}
                         onChange={this.onChange}
                         required={dataElement.required}
-                        disabled={dataElement.disabled}
+                        disabled={dataElement.disabled || completed}
                     />
                 ) : dataElement.valueType === 'DATE' ? (
                     <DateInput
@@ -312,7 +312,7 @@ export class RecordForm extends Component {
                         value={this.state.values[dataElement.id]}
                         required={dataElement.required}
                         onChange={this.onChange}
-                        disabled={dataElement.disabled}
+                        disabled={dataElement.disabled || completed}
                     />
                 ) : (
                     <TextInput
@@ -321,7 +321,7 @@ export class RecordForm extends Component {
                         value={this.state.values[dataElement.id]}
                         required={dataElement.required}
                         onChange={this.onChange}
-                        disabled={dataElement.disabled}
+                        disabled={dataElement.disabled || completed}
                         type={dataElement.valueType === 'NUMBER' ? 'number' : 'text'}
                         /*backgroundColor={dataElement.color}*/
                     />

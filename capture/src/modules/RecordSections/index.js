@@ -8,13 +8,9 @@ import {
     ProgressSection,
 } from 'modules'
 import {
-    addEvent,
-    addPersonWithEvent,
     getProgramStageNew,
     getProgramStageExisting,
-    updateEvent,
     deleteEvent,
-    updateEventValue,
     setEventStatus
 } from 'api'
 import { ButtonRow } from 'inputs'
@@ -24,7 +20,6 @@ export class RecordSections extends Component {
         entityValues: null,
         entityValid: false,
         panelValid: false,
-        eventValues: null,
         eventValid: false,
         entityId: null,
         eventId: null,
@@ -33,7 +28,6 @@ export class RecordSections extends Component {
         loading: true,
         resetSwitch: false,
         recordProps: null,
-        deletable: false,
     }
 
     componentDidMount = async () => {
@@ -86,11 +80,10 @@ export class RecordSections extends Component {
         })
     }
 
-    onEventValues = (valid, deletable) =>
+    onEventValues = valid =>
         this.setState({
             eventValid: valid,
-            buttonDisabled: false,
-            deletable: deletable,
+            buttonDisabled: false
         })
 
     onSubmitClick = async addMore => {
@@ -108,9 +101,22 @@ export class RecordSections extends Component {
         else this.props.history.push('/')
     }
 
+    onEditClick = async () => {
+        this.setState({ buttonDisabled: true })
+        await setEventStatus(this.state.recordProps.eventId)
+        let recordProps = {...this.state.recordProps}
+        recordProps.completed = false
+        this.setState({
+            buttonDisabled: false,
+            recordProps: recordProps
+        })
+    }
+
     onDelete = async () => {
-        await deleteEvent(this.state.eventId)
-        this.props.history.push('/')
+        if (window.confirm('Are you sure you want to permanently delete the record?')) {
+            await deleteEvent(this.state.eventId)
+            this.props.history.push('/')
+        }
     }
 
     sections = () => {
@@ -125,7 +131,6 @@ export class RecordSections extends Component {
             resetSwitch,
             recordProps,
             loading,
-            deletable,
         } = this.state
         const disabled =
             (!eventId &&
@@ -155,8 +160,9 @@ export class RecordSections extends Component {
                         passValues={this.onEventValues}
                         programStage={recordProps.programStage}
                         rules={recordProps.rules}
-                        values={recordProps.values}
+                        values={recordProps.eventValues}
                         eventId={recordProps.eventId}
+                        completed={recordProps.completed}
                     />
                 )}
                 {loading && <ProgressSection />}
@@ -167,7 +173,7 @@ export class RecordSections extends Component {
                                   {
                                       label: 'Delete',
                                       onClick: this.onDelete,
-                                      disabled: !deletable,
+                                      disabled: !recordProps.programStage.deletable,
                                       icon: 'delete',
                                       kind: 'destructive',
                                       tooltip: 'Permanently delete record.',
@@ -175,12 +181,12 @@ export class RecordSections extends Component {
                                           'You cannot delete records with an approval status.',
                                   },
                                   {
-                                      label: 'Submit',
-                                      onClick: () => this.onSubmitClick(false),
-                                      disabled: disabled,
-                                      icon: 'done',
+                                      label: recordProps.completed ? 'Edit' : 'Submit',
+                                      onClick: () => recordProps.completed ? this.onEditClick() : this.onSubmitClick(false),
+                                      disabled: recordProps.completed ? !recordProps.programStage.deletable : disabled,
+                                      icon: recordProps.completed ? 'edit' : 'done',
                                       kind: 'primary',
-                                      tooltip: 'Submit record.',
+                                      tooltip: recordProps.completed ? 'Edit record' : 'Submit record.',
                                       disabledTooltip: 'A required field is empty.',
                                   },
                               ]
