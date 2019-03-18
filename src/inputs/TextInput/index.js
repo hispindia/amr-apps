@@ -13,8 +13,8 @@ export class TextInput extends React.Component {
 
     constructor(props) {
         super(props)
-        // Will start searching after user has stopped typing for 1 second.
-        this.passValue = _.debounce(this.passValue, 1000)
+        // Will start searching after user has stopped typing for 3 seconds.
+        this.passValue = _.debounce(this.passValue, 3000)
     }
 
     componentDidMount = () => {

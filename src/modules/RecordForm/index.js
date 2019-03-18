@@ -11,7 +11,8 @@ import {
     Padding,
     MarginSides,
     MarginBottom,
-} from '../../helpers/helpers'
+    updateEventValue
+} from '../../'
 import {
     TextInput,
     RadioInput,
@@ -43,36 +44,36 @@ export class RecordForm extends Component {
     init = async () => {
         this.setState({ loading: true })
 
-        let { programStage, values, rules } = this.props
-        this.checkRules(values, programStage.programStageSections, rules)
+        let { programStage, values, passValues } = this.props
+        this.checkRules(values, programStage.programStageSections)
 
         this.setState({
             loading: false,
             programStage: programStage,
             values: values,
-            rules: rules,
         })
+
+        if (passValues)
+            passValues(this.validateValues(programStage.programStageSections, values))
     }
 
     onChange = async (name, value) => {
         let values = { ...this.state.values }
+        if (values[name] === value) return
+        updateEventValue(this.props.eventId, name, value, this.props.storedBy)
         values[name] = value
         this.onNewValues(values)
     }
 
     onNewValues = values => {
         let programStage = { ...this.state.programStage }
-        const rules = this.state.rules
-        this.checkRules(values, programStage.programStageSections, rules)
+        this.checkRules(values, programStage.programStageSections)
         this.setState({
             values: values,
             programStage: programStage,
         })
-        this.props.passValues(
-            values,
-            this.validateValues(programStage.programStageSections, values),
-            programStage.deletable
-        )
+        if (this.props.passValues)
+            this.props.passValues(this.validateValues(programStage.programStageSections, values))
     }
 
     validateValues = (sections, values) => {
@@ -84,13 +85,18 @@ export class RecordForm extends Component {
                     dataElement =>
                         dataElement.required && values[dataElement.id] === ''
                 )
-            )
+            ) {
+                console.log(section.dataElements.find(
+                    dataElement =>
+                        dataElement.required && values[dataElement.id] === ''
+                ))
                 return false
+            }
         }
         return true
     }
 
-    checkRules = (values, sections, rules) => {
+    checkRules = (values, sections) => {
         /**
          * Gets the data element that is affected by rule.
          * @param {string} id - Data element id.
@@ -133,7 +139,7 @@ export class RecordForm extends Component {
             return null
         }
 
-        rules.forEach(rule => {
+        this.props.rules.forEach(rule => {
             rule.programRuleActions.forEach(r => {
                 try {
                     switch (r.programRuleActionType) {
@@ -223,7 +229,7 @@ export class RecordForm extends Component {
                 .forEach(dataElement => {
                     objects[dataElement.id] = {
                         label: dataElement.displayFormName,
-                        disabled: dataElement.disabled,
+                        disabled: dataElement.disabled || this.props.completed,
                     }
                     values[dataElement.id] = this.state.values[dataElement.id]
                 })
@@ -267,6 +273,7 @@ export class RecordForm extends Component {
      * @returns {Component} Date element component.
      */
     getDataElement = dataElement => {
+        const completed = this.props.completed
         return (
             <Padding key={dataElement.id}>
                 {dataElement.optionSetValue ? (
@@ -278,7 +285,7 @@ export class RecordForm extends Component {
                             value={this.state.values[dataElement.id]}
                             onChange={this.onChange}
                             required={dataElement.required}
-                            disabled={dataElement.disabled}
+                            disabled={dataElement.disabled || completed}
                         />
                     ) : (
                         <SelectInput
@@ -288,7 +295,7 @@ export class RecordForm extends Component {
                             value={this.state.values[dataElement.id]}
                             onChange={this.onChange}
                             required={dataElement.required}
-                            disabled={dataElement.disabled}
+                            disabled={dataElement.disabled || completed}
                         />
                     )
                 ) : dataElement.valueType === 'TRUE_ONLY' ? (
@@ -298,7 +305,7 @@ export class RecordForm extends Component {
                         checked={this.state.values[dataElement.id]}
                         onChange={this.onChange}
                         required={dataElement.required}
-                        disabled={dataElement.disabled}
+                        disabled={dataElement.disabled || completed}
                     />
                 ) : dataElement.valueType === 'DATE' ? (
                     <DateInput
@@ -307,7 +314,7 @@ export class RecordForm extends Component {
                         value={this.state.values[dataElement.id]}
                         required={dataElement.required}
                         onChange={this.onChange}
-                        disabled={dataElement.disabled}
+                        disabled={dataElement.disabled || completed}
                     />
                 ) : (
                     <TextInput
@@ -316,7 +323,7 @@ export class RecordForm extends Component {
                         value={this.state.values[dataElement.id]}
                         required={dataElement.required}
                         onChange={this.onChange}
-                        disabled={dataElement.disabled}
+                        disabled={dataElement.disabled || completed}
                         type={dataElement.valueType === 'NUMBER' ? 'number' : 'text'}
                         /*backgroundColor={dataElement.color}*/
                     />

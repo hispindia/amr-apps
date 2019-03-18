@@ -8,7 +8,7 @@
   },
   "appType": "APP",
   "name": "AMR Capture",
-  "version": "0.1.0",
+  "version": "0.0.4",
   "description": "AMR capture app for DHIS2",
   "icons": {
     "48": "icon.png"

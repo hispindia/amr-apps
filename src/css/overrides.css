@@ -48,6 +48,9 @@
 #sidebar_menu .ui_menu_item_4jpdr:nth-child(5) :first-child {
     color: var(--teal600);
 }
+#sidebar_menu .ui_menu_item_4jpdr:last-child :first-child {
+    color: black;
+}
 
 /* Required star color and spacing. */
 .ui_selectfield_label_1a3v8.ui_selectfield_required_1a3v8::after,

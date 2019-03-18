@@ -9,10 +9,6 @@ export const menuItems = {
                 l1: 'RZAP9Bv1bAR',
                 l2: 'oxmXevSi4bN',
             },
-            tableView: {
-                l1: 'd1gMq0frCpA',
-                l2: 'COjhfA8oF1s',
-            },
             count: 0,
         },
         {
@@ -23,10 +19,6 @@ export const menuItems = {
             countView: {
                 l1: 'mt0ZHD3tRGm',
                 l2: 'GZIcSClZOBR',
-            },
-            tableView: {
-                l1: 'Zfd5ceEo2Pw',
-                l2: 'rszxQdl3Yve',
             },
             count: 0,
             param: true,
@@ -40,10 +32,6 @@ export const menuItems = {
                 l1: 'mt0ZHD3tRGm',
                 l2: 'GZIcSClZOBR',
             },
-            tableView: {
-                l1: 'Zfd5ceEo2Pw',
-                l2: 'rszxQdl3Yve',
-            },
             count: 0,
             param: true,
         },
@@ -56,12 +44,19 @@ export const menuItems = {
                 l1: 'mt0ZHD3tRGm',
                 l2: 'GZIcSClZOBR',
             },
-            tableView: {
-                l1: 'Zfd5ceEo2Pw',
-                l2: 'rszxQdl3Yve',
-            },
             count: 0,
             param: true,
+        },
+        {
+            label: 'Incomplete records (0)',
+            value: '/approval/Incomplete',
+            icon: 'pause_circle_outline',
+            status: 'Incomplete',
+            countView: {
+                l1: 'BysSuraaLB4',
+                l2: 'vc0KxMgXdHT',
+            },
+            count: 0,
         },
     ],
     userOnly: false,

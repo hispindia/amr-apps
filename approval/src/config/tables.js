@@ -34,4 +34,11 @@ export const tables = {
         },
         param: true,
     },
+    Incomplete: {
+        title: 'Incomplete records',
+        sqlView: {
+            l1: 'vgwCVic3G4T',
+            l2: 'V0PVJtu2XZx',
+        },
+    },
 }

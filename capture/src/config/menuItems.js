@@ -6,7 +6,6 @@ export const menuItems = {
             icon: 'home',
             status: 'ALL',
             countView: 'odg5FpAc79x',
-            tableView: 'gPZgVJOeHk4',
             count: 0,
         },
         {
@@ -15,7 +14,6 @@ export const menuItems = {
             icon: 'error_outline',
             status: 'Resend',
             countView: 'xFyCgPnxGHg',
-            tableView: 'n5VaREaQ7aa',
             count: 0,
         },
         {
@@ -24,7 +22,6 @@ export const menuItems = {
             icon: 'highlight_off',
             status: 'Rejected',
             countView: 'UUTmMThacVx',
-            tableView: 'F5n8ZowsJB5',
             count: 0,
         },
         {
@@ -33,7 +30,6 @@ export const menuItems = {
             icon: 'check_circle_outline',
             status: 'Approved',
             countView: 'FHBxLVMynGb',
-            tableView: 'NpHoZ0PCGNY',
             count: 0,
         },
         {
@@ -42,7 +38,14 @@ export const menuItems = {
             icon: 'help_outline',
             status: 'Validate',
             countView: 'Xraki4mz5B8',
-            tableView: 'k4Or0pHTmPN',
+            count: 0,
+        },
+        {
+            label: 'Incomplete records (0)',
+            value: '/approval/Incomplete',
+            icon: 'pause_circle_outline',
+            status: 'Incomplete',
+            countView: 'NmiQ8wvL2fD',
             count: 0,
         },
     ],

@@ -1,13 +1,11 @@
 import React, { Component } from 'react'
 import { Margin } from 'helpers'
 import { RecordForm, TitleRow, ProgressSection } from 'modules'
-import { getRecordForApproval, updateEvent, deleteEvent } from 'api'
+import { getRecordForApproval, setEventStatus, deleteEvent } from 'api'
 import { ButtonRow } from 'inputs'
 
 export class RecordApproval extends Component {
     state = {
-        eventValues: null,
-        eventValid: false,
         eventId: null,
         buttonDisabled: true,
         initialized: false,
@@ -20,52 +18,49 @@ export class RecordApproval extends Component {
         const eventId = this.props.match.params.event
             ? this.props.match.params.event
             : null
+        let recordProps = eventId
+            ? await getRecordForApproval(eventId)
+            : null
+        if (recordProps) recordProps.eventId = eventId
         this.setState({
-            recordProps: eventId ? await getRecordForApproval(eventId) : null,
+            recordProps: recordProps,
             eventId: eventId,
             initialized: true,
             loading: false,
+            buttonDisabled: false
         })
     }
 
-    onEventValues = (values, valid, deletable) =>
-        this.setState({
-            eventValues: values,
-            eventValid: valid,
-            buttonDisabled: false,
-            deletable: deletable,
-        })
-
     onSubmitClick = async () => {
         this.setState({ buttonDisabled: true })
-        const { eventId, eventValues } = this.state
-        await updateEvent(eventValues, eventId, true)
+        await setEventStatus(this.state.recordProps.eventId, true)
         this.props.history.push('/')
     }
 
     onDelete = async () => {
-        await deleteEvent(this.state.eventId)
-        this.props.history.push('/')
+        if (window.confirm('Are you sure you want to permanently delete the record?')) {
+            await deleteEvent(this.state.eventId)
+            this.props.history.push('/')
+        }
     }
 
     sections = () => {
         const {
-            eventValid,
             buttonDisabled,
             recordProps,
             loading,
             deletable,
         } = this.state
-        const disabled = buttonDisabled || !eventValid
 
         return (
             <div>
                 {recordProps && (
                     <RecordForm
-                        passValues={this.onEventValues}
                         programStage={recordProps.programStage}
                         rules={recordProps.rules}
-                        values={recordProps.values}
+                        values={recordProps.eventValues}
+                        eventId={recordProps.eventId}
+                        storedBy={recordProps.storedBy}
                     />
                 )}
                 {loading && <ProgressSection />}
@@ -83,12 +78,12 @@ export class RecordApproval extends Component {
                         },
                         {
                             label: 'Submit',
-                            onClick: this.onSubmitClick,
-                            disabled: disabled,
+                            onClick: () => this.onSubmitClick(false),
+                            disabled: buttonDisabled,
                             icon: 'done',
                             kind: 'primary',
-                            tooltip: 'Submit changes.',
-                            disabledTooltip: 'Record is unchanged.',
+                            tooltip: 'Submit record.',
+                            disabledTooltip: 'Submit record.',
                         },
                     ]}
                 />

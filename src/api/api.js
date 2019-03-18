@@ -262,11 +262,20 @@ export async function getOrganisms(organismGroup) {
 export async function getProgramStageNew(
     programId,
     programStageId,
-    organismCode
+    organismCode,
+    orgUnit,
+    entityId,
+    entityValues
 ) {
-    let values = { [_organismsDataElementId]: organismCode }
-    values[_organismsDataElementId] = organismCode
-    return await getProgramStageDeo(programId, programStageId, values)
+    let initialValues = { [_organismsDataElementId]: organismCode }
+    initialValues[_organismsDataElementId] = organismCode
+    initialValues[_amrDataElement] = await generateAmrId(orgUnit)
+
+    const eventId = entityId ? await addEvent(initialValues, programId, programStageId, orgUnit, entityId, entityValues) : await addPersonWithEvent(initialValues, programId, programStageId, orgUnitId, entityValues)
+
+    const { programStage, eventValues, rules } = await getProgramStageDeo(programId, programStageId, initialValues)
+
+    return { programStage, eventValues, rules, eventId }
 }
 
 /**
@@ -275,19 +284,15 @@ export async function getProgramStageNew(
  * @returns {Object} AMR program stage, values, and organism data element ID.
  */
 export async function getProgramStageExisting(eventId) {
-    let { values, programId, programStageId } = await getEventValues(eventId)
-    return await getProgramStageDeo(programId, programStageId, values)
+    let { eventValues: initialValues, programId, programStageId, completed } = await getEventValues(eventId)
+    const { programStage, eventValues, rules } = await getProgramStageDeo(programId, programStageId, initialValues)
+    return { programStage, eventValues, rules, eventId, completed }
 }
 
 export async function getRecordForApproval(eventId) {
-    let { values, programId, programStageId } = await getEventValues(eventId)
-    return await getProgramStageApproval(
-        programId,
-        programStageId,
-        values,
-        _isL1User,
-        _isL2User
-    )
+    let { eventValues: initialValues, programId, programStageId, completed, storedBy } = await getEventValues(eventId)
+    const { programStage, eventValues, rules } = await getProgramStageApproval(programId, programStageId, initialValues, _isL1User, _isL2User)
+    return { programStage, eventValues, rules, eventId, completed, storedBy }
 }
 
 /**
@@ -396,6 +401,7 @@ export async function addPersonWithEvent(
             orgUnit: orgUnitId,
             program: programId,
             programStage: programStageId,
+            status: 'ACTIVE'
         },
         eventValues
     )
@@ -454,6 +460,7 @@ export async function addEvent(
             program: programId,
             programStage: programStageId,
             trackedEntityInstance: entityId,
+            status: 'ACTIVE'
         },
         eventValues
     )
@@ -477,8 +484,28 @@ export async function addEvent(
         })
     }
 
-    await postData('events', event)
-    return amrId
+    const r = await postData('events', event)
+
+
+    return r.response.importSummaries[0].reference
+}
+
+export async function setEventStatus(eventId, completed) {
+    let event = await get('events/' + eventId + '.json')
+    let dateElement = event.dataValues.find(dv => dv.dataElement === _sampleDateElementId)
+    if (dateElement) event.eventDate = dateElement.value
+    event.status = completed ? 'COMPLETED' : 'ACTIVE'
+    await put('events/' + eventId, event)
+}
+
+export async function updateEventValue(eventId, dataElementId, value, storedBy) {
+    await put('events/' + eventId + '/' + dataElementId, { dataValues: [{ dataElement: dataElementId, value: value, storedBy: storedBy ? storedBy : _username }] })
+    if (storedBy || dataElementId === _sampleDateElementId) {
+        let event = await get('events/' + eventId + '.json')
+        if (storedBy) event.storedBy = storedBy
+        if (dataElementId === _sampleDateElementId) event.eventDate = value
+        await put('events/' + eventId, event)
+    }
 }
 
 /**

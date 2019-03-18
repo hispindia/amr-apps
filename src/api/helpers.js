@@ -12,48 +12,46 @@ const _l2RevisionReason = 'fEnFVvEFKVc'
 export const getProgramStageApproval = async (
     programId,
     programStageId,
-    values,
+    eventValues,
     isL1User,
     isL2User
 ) => {
     let programStage = await getProgramStage(
         programStageId,
-        values,
+        eventValues,
         false,
         isL1User,
         isL2User
     )
 
+    const hideWithValues = ['Institute / Hospital Information', ... !isL2User ? ['Level 2'] : []]
     programStage.programStageSections
-        .filter(section => section.name === 'Institute / Hospital Information')
+        .filter(section => hideWithValues.includes(section.name))
         .forEach(section => (section.hideWithValues = true))
     programStage.programStageSections.forEach(section =>
         section.childSections
-            .filter(
-                childSection =>
-                    childSection.name === 'Institute / Hospital Information'
-            )
+            .filter(childSection => hideWithValues.includes(childSection.name))
             .forEach(childSection => (childSection.hideWithValues = true))
     )
 
     return {
         programStage: programStage,
-        values: values,
+        eventValues: eventValues,
         rules: await getProgramRules(programId, programStageId),
     }
 }
 
-export const getProgramStageDeo = async (programId, programStageId, values) => {
-    let programStage = await getProgramStage(programStageId, values, true)
+export const getProgramStageDeo = async (programId, programStageId, eventValues) => {
+    let programStage = await getProgramStage(programStageId, eventValues, true)
 
-    if (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
+    if (!eventValues[_l1ApprovalStatus] && !eventValues[_l2ApprovalStatus])
         programStage.programStageSections
             .filter(section => section.name === 'Approval')
             .forEach(section => (section.hideWithValues = true))
 
     return {
         programStage: programStage,
-        values: values,
+        eventValues: eventValues,
         rules: await getProgramRules(programId, programStageId),
     }
 }
@@ -64,18 +62,20 @@ export const getProgramStageDeo = async (programId, programStageId, values) => {
  * @returns {Object} Event values.
  */
 export const getEventValues = async eventId => {
-    const data = await get('events/' + eventId + '.json')
+    const event = await get('events/' + eventId + '.json')
     let values = {}
 
-    if (data.dataValues)
-        data.dataValues.forEach(
+    if (event.dataValues)
+        event.dataValues.forEach(
             dataValue => (values[dataValue.dataElement] = dataValue.value)
         )
 
     return {
-        programId: data.program,
-        programStageId: data.programStage,
-        values: values,
+        programId: event.program,
+        programStageId: event.programStage,
+        eventValues: values,
+        completed: event.status === 'COMPLETED',
+        storedBy: event.storedBy
     }
 }
 
@@ -273,8 +273,9 @@ const getProgramStage = async (
     const shouldDisable = element => {
         switch (element.id) {
             case _amrDataElement:
+                return values[_amrDataElement] && values[_amrDataElement] !== ''
             case _organismsDataElementId:
-                return true
+                return values[_organismsDataElementId] && values[_organismsDataElementId] !== ''
             case _l1ApprovalStatus:
             case _l1RejectionReason:
             case _l1RevisionReason:
@@ -315,9 +316,9 @@ const getProgramStage = async (
             'optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
     )
 
-    programStage.deletable =
-        values === {} ||
-        (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
+    programStage.deletable = values === {} || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
+
+    programStage.editable = values === {} || [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes('Resend')
 
     programStage.programStageSections.forEach(section => {
         section.hide = false

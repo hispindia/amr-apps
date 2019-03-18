@@ -8,12 +8,10 @@ import {
     ProgressSection,
 } from 'modules'
 import {
-    addEvent,
-    addPersonWithEvent,
     getProgramStageNew,
     getProgramStageExisting,
-    updateEvent,
     deleteEvent,
+    setEventStatus
 } from 'api'
 import { ButtonRow } from 'inputs'
 
@@ -22,7 +20,6 @@ export class RecordSections extends Component {
         entityValues: null,
         entityValid: false,
         panelValid: false,
-        eventValues: null,
         eventValid: false,
         entityId: null,
         eventId: null,
@@ -31,17 +28,18 @@ export class RecordSections extends Component {
         loading: true,
         resetSwitch: false,
         recordProps: null,
-        deletable: false,
     }
 
     componentDidMount = async () => {
         const eventId = this.props.match.params.event
             ? this.props.match.params.event
             : null
+        let recordProps = eventId
+            ? await getProgramStageExisting(eventId)
+            : null
+        if (recordProps) recordProps.eventId = eventId
         this.setState({
-            recordProps: eventId
-                ? await getProgramStageExisting(eventId)
-                : null,
+            recordProps: recordProps,
             eventId: eventId,
             initialized: true,
             loading: false,
@@ -69,62 +67,32 @@ export class RecordSections extends Component {
             panelValid: valid,
             recordProps: valid
                 ? await getProgramStageNew(
-                      programId,
-                      programStageId,
-                      organismCode
-                  )
+                    programId,
+                    programStageId,
+                    organismCode,
+                    this.props.match.params.orgUnit,
+                    this.state.entityId,
+                    this.state.entityValues
+                )
                 : null,
             loading: false,
             disablePanel: false,
         })
     }
 
-    onEventValues = (values, valid, deletable) =>
+    onEventValues = valid =>
         this.setState({
-            eventValues: values,
             eventValid: valid,
-            buttonDisabled: false,
-            deletable: deletable,
+            buttonDisabled: false
         })
 
     onSubmitClick = async addMore => {
         this.setState({ buttonDisabled: true })
-        const {
-            entityValues,
-            programId,
-            programStageId,
-            eventValues,
-            entityId,
-            resetSwitch,
-        } = this.state
-        const orgUnitId = this.props.match.params.orgUnit
-        let amrId
-        let newEntityId
-        if (entityId)
-            amrId = await addEvent(
-                eventValues,
-                programId,
-                programStageId,
-                orgUnitId,
-                entityId,
-                entityValues
-            )
-        else {
-            const values = await addPersonWithEvent(
-                eventValues,
-                programId,
-                programStageId,
-                orgUnitId,
-                entityValues
-            )
-            amrId = values.amrId
-            newEntityId = values.entityId
-        }
-        window.alert(`AMR Id: ${amrId}`)
+        const { recordProps, resetSwitch } = this.state
+        await setEventStatus(recordProps.eventId, true)
 
         if (addMore)
             this.setState({
-                entityId: newEntityId ? newEntityId : entityId,
                 panelValid: false,
                 recordProps: null,
                 eventValid: false,
@@ -133,16 +101,22 @@ export class RecordSections extends Component {
         else this.props.history.push('/')
     }
 
-    onUpdateClick = async () => {
+    onEditClick = async () => {
         this.setState({ buttonDisabled: true })
-        const { eventValues, eventId } = this.state
-        await updateEvent(eventValues, eventId)
-        this.props.history.push('/')
+        await setEventStatus(this.state.recordProps.eventId)
+        let recordProps = {...this.state.recordProps}
+        recordProps.completed = false
+        this.setState({
+            buttonDisabled: false,
+            recordProps: recordProps
+        })
     }
 
     onDelete = async () => {
-        await deleteEvent(this.state.eventId)
-        this.props.history.push('/')
+        if (window.confirm('Are you sure you want to permanently delete the record?')) {
+            await deleteEvent(this.state.eventId)
+            this.props.history.push('/')
+        }
     }
 
     sections = () => {
@@ -157,7 +131,6 @@ export class RecordSections extends Component {
             resetSwitch,
             recordProps,
             loading,
-            deletable,
         } = this.state
         const disabled =
             (!eventId &&
@@ -187,7 +160,9 @@ export class RecordSections extends Component {
                         passValues={this.onEventValues}
                         programStage={recordProps.programStage}
                         rules={recordProps.rules}
-                        values={recordProps.values}
+                        values={recordProps.eventValues}
+                        eventId={recordProps.eventId}
+                        completed={recordProps.completed}
                     />
                 )}
                 {loading && <ProgressSection />}
@@ -198,7 +173,7 @@ export class RecordSections extends Component {
                                   {
                                       label: 'Delete',
                                       onClick: this.onDelete,
-                                      disabled: !deletable,
+                                      disabled: !recordProps.programStage.deletable,
                                       icon: 'delete',
                                       kind: 'destructive',
                                       tooltip: 'Permanently delete record.',
@@ -206,13 +181,13 @@ export class RecordSections extends Component {
                                           'You cannot delete records with an approval status.',
                                   },
                                   {
-                                      label: 'Submit',
-                                      onClick: () => this.onUpdateClick(false),
-                                      disabled: disabled,
-                                      icon: 'done',
+                                      label: recordProps.completed ? 'Edit' : 'Submit',
+                                      onClick: () => recordProps.completed ? this.onEditClick() : this.onSubmitClick(false),
+                                      disabled: recordProps.completed ? !recordProps.programStage.editable : disabled,
+                                      icon: recordProps.completed ? 'edit' : 'done',
                                       kind: 'primary',
-                                      tooltip: 'Submit record.',
-                                      disabledTooltip: 'Record is unchanged.',
+                                      tooltip: recordProps.completed ? 'Edit record' : 'Submit record.',
+                                      disabledTooltip: recordProps.completed ? 'Records with this approval cannot be edited.' : 'A required field is empty.',
                                   },
                               ]
                             : [
