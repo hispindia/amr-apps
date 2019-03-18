@@ -60,7 +60,7 @@ export class RecordForm extends Component {
     onChange = async (name, value) => {
         let values = { ...this.state.values }
         if (values[name] === value) return
-        await updateEventValue(this.props.eventId, name, value, this.props.storedBy)
+        updateEventValue(this.props.eventId, name, value, this.props.storedBy)
         values[name] = value
         this.onNewValues(values)
     }
