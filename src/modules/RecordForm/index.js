@@ -11,7 +11,8 @@ import {
     Padding,
     MarginSides,
     MarginBottom,
-    updateEventValue
+    updateEventValue,
+    _testResultDataElementId
 } from '../../'
 import {
     TextInput,
@@ -57,10 +58,13 @@ export class RecordForm extends Component {
             passValues(this.validateValues(programStage.programStageSections, values))
     }
 
-    onChange = async (name, value) => {
+    onNewValue = (id, value) =>
+        updateEventValue(this.props.eventId, id, value, this.props.storedBy)
+
+    onChange = (name, value) => {
         let values = { ...this.state.values }
         if (values[name] === value) return
-        updateEventValue(this.props.eventId, name, value, this.props.storedBy)
+        this.onNewValue(name, value)
         values[name] = value
         this.onNewValues(values)
     }
@@ -102,20 +106,20 @@ export class RecordForm extends Component {
          * @param {string} id - Data element id.
          * @returns {Object} Data element.
          */
-        const getAffectedDataElement = id => {
-            let affectedDataElement
+        const findDataElement = id => {
+            let dataElement
             for (let section of sections) {
                 if (section.childSections)
                     for (let childSection of section.childSections) {
-                        affectedDataElement = childSection.dataElements.find(
-                            dataElement => dataElement.id === id
+                        dataElement = childSection.dataElements.find(
+                            element => element.id === id
                         )
-                        if (affectedDataElement) return affectedDataElement
+                        if (dataElement) return dataElement
                     }
-                affectedDataElement = section.dataElements.find(
+                dataElement = section.dataElements.find(
                     dataElement => dataElement.id === id
                 )
-                if (affectedDataElement) return affectedDataElement
+                if (dataElement) return dataElement
             }
             return null
         }
@@ -125,7 +129,7 @@ export class RecordForm extends Component {
          * @param {string} id - section id.
          * @returns {Object} Section.
          */
-        const getAffectedSection = id => {
+        const findSection = id => {
             let affectedSection
             for (let section of sections) {
                 if (section.id === id) return section
@@ -139,13 +143,48 @@ export class RecordForm extends Component {
             return null
         }
 
+        const getVariables = condition => {
+            const variableDuplicated = condition.match(/values\[\'.*?\'\]/g)
+            let variables = []
+            if (!variableDuplicated) return
+            variableDuplicated.forEach(duplicated => {
+                if (variables.indexOf(duplicated) === -1)
+                    variables.push(duplicated)
+            })
+            return variables.map(variable => variable.substring(8, variable.length - 2))
+        }
+
+        const getColor = value => {
+            console.log(value)
+            switch (value) {
+                case 'Resistant':
+                    return 'red'
+                case 'Intermediate':
+                    return 'yellow'
+                case 'Susceptible':
+                    return 'green'
+                default:
+                    return ''
+            }
+        }
+
+        const setColors = (condition, affectedDataElement, testValue) => {
+            if (!affectedDataElement.optionSetValue) return
+            if (affectedDataElement.optionSet.id !== _testResultDataElementId) return
+            const variables = getVariables(condition)
+            variables.forEach(variable => {
+                let dataElement = findDataElement(variable)
+                dataElement.color = values[variable] === '' || !testValue ? '' : getColor(testValue)
+            })
+        }
+
         this.props.rules.forEach(rule => {
             rule.programRuleActions.forEach(r => {
                 try {
                     switch (r.programRuleActionType) {
                         case 'SHOWOPTIONGROUP':
                             if (eval(rule.condition)) {
-                                let affectedDataElement = getAffectedDataElement(
+                                let affectedDataElement = findDataElement(
                                     r.dataElement.id
                                 )
                                 // Changing options if it is not the same.
@@ -158,31 +197,32 @@ export class RecordForm extends Component {
                                         options: r.optionGroup.options,
                                     }
                                     // Only reset selected value if the options do not include current value.
-                                    if (
-                                        !affectedDataElement.optionSet.options.find(
-                                            option =>
-                                                option.value ===
-                                                values[affectedDataElement.id]
-                                        )
-                                    )
+                                    if (!affectedDataElement.optionSet.options.find(option => option.value === values[affectedDataElement.id]) && values[affectedDataElement.id] !== '') {
                                         values[affectedDataElement.id] = ''
+                                        this.onNewValue(affectedDataElement.id, '')
+                                    }
                                 }
                             }
                             break
                         case 'HIDEFIELD':
                             const hide = eval(rule.condition)
-                            let affectedDataElement = getAffectedDataElement(
+                            let affectedDataElement = findDataElement(
                                 r.dataElement.id
                             )
-                            if (affectedDataElement)
+                            if (affectedDataElement) {
                                 if (hide !== affectedDataElement.hide) {
+                                    setColors(rule.condition, affectedDataElement)
                                     affectedDataElement.hide = hide
-                                    values[affectedDataElement.id] = ''
+                                    if (values[affectedDataElement.id] !== '') {
+                                        values[affectedDataElement.id] = ''
+                                        this.onNewValue(affectedDataElement.id, '')
+                                    }
                                 }
+                            }
                             break
                         case 'HIDESECTION':
                             const hideS = eval(rule.condition)
-                            let affectedSection = getAffectedSection(
+                            let affectedSection = findSection(
                                 r.programStageSection.id
                             )
                             if (affectedSection)
@@ -191,11 +231,15 @@ export class RecordForm extends Component {
                             break
                         case 'ASSIGN':
                             if (eval(rule.condition)) {
-                                let affectedDataElement = getAffectedDataElement(
+                                let affectedDataElement = findDataElement(
                                     r.dataElement.id
                                 )
+                                setColors(rule.condition, affectedDataElement, r.data)
                                 // Assigning value.
-                                values[affectedDataElement.id] = r.data
+                                if (values[affectedDataElement.id] !== r.data) {
+                                    values[affectedDataElement.id] = r.data
+                                    this.onNewValue(affectedDataElement.id, r.data)
+                                }
                                 affectedDataElement.disabled = true
                             }
                             break
@@ -325,7 +369,7 @@ export class RecordForm extends Component {
                         onChange={this.onChange}
                         disabled={dataElement.disabled || completed}
                         type={dataElement.valueType === 'NUMBER' ? 'number' : 'text'}
-                        /*backgroundColor={dataElement.color}*/
+                        backgroundColor={dataElement.color}
                     />
                 )}
             </Padding>

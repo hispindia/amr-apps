@@ -18,6 +18,7 @@ const _l2ApprovalGroup = 'TFmNnLn06Rd'
 const _organismsDataElementId = 'SaQe2REkGVw'
 const _amrDataElement = 'lIkk661BLpG'
 const _sampleDateElementId = 'JRUa0qYKQDF'
+export const _testResultDataElementId = 'bSgpKbkbVGL'
 
 const _l1ApprovalStatus = 'tAyVrNUTVHX'
 const _l1RevisionReason = 'wCNQtIHJRON'
