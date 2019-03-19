@@ -1,18 +1,24 @@
 # AMR Approval and Capture
 
 ### TODO
-- [ ] Automatic possible duplation check
-- [ ] Manual duplication confirmation
 - [x] Deleting records
 - [x] Editing person values
-- [ ] Using local storage for versioned meta data
 - [x] Numbers only text fields
-- [ ] Susceptibility colors based on result
-- [ ] Modals
-- [ ] Hashing patient registration number
 - [x] Deselectable radio buttons
 - [x] Disabling field after ASSIGN rule action
 - [x] Storing incomplete records
+- [x] Susceptibility colors based on result
+- [ ] Modals
+- [ ] Automatic possible duplation check
+- [ ] Manual duplication confirmation
+- [ ] Hashing patient registration number
+- [ ] Using local storage for versioned meta data
+- [ ] Special characters in test values
+- [ ] Hide result section
+- [ ] DD not have color when MIC has value
+- [ ] Yellow and red DD/MIC colors more distinguishable
+- [ ] Same sections on approval screen as on entry screen
+- [ ] Person overview
 
 ### Installation
 
