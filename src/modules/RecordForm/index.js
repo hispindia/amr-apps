@@ -155,7 +155,6 @@ export class RecordForm extends Component {
         }
 
         const getColor = value => {
-            console.log(value)
             switch (value) {
                 case 'Resistant':
                     return 'red'

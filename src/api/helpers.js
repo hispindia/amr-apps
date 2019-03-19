@@ -24,7 +24,7 @@ export const getProgramStageApproval = async (
         isL2User
     )
 
-    const hideWithValues = ['Institute / Hospital Information', ... !isL2User ? ['Level 2'] : []]
+    /*const hideWithValues = ['Institute / Hospital Information', ... !isL2User ? ['Level 2'] : []]
     programStage.programStageSections
         .filter(section => hideWithValues.includes(section.name))
         .forEach(section => (section.hideWithValues = true))
@@ -32,7 +32,7 @@ export const getProgramStageApproval = async (
         section.childSections
             .filter(childSection => hideWithValues.includes(childSection.name))
             .forEach(childSection => (childSection.hideWithValues = true))
-    )
+    )*/
 
     return {
         programStage: programStage,
@@ -319,6 +319,8 @@ const getProgramStage = async (
     programStage.deletable = values === {} || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
 
     programStage.editable = values === {} || [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes('Resend')
+
+    programStage.finished = values[_l1ApprovalStatus] === values[_l2ApprovalStatus] === 'Approved'
 
     programStage.programStageSections.forEach(section => {
         section.hide = false

@@ -8,6 +8,7 @@
 - [x] Disabling field after ASSIGN rule action
 - [x] Storing incomplete records
 - [x] Susceptibility colors based on result
+- [x] Yellow and red DD/MIC colors more distinguishable
 - [ ] Modals
 - [ ] Automatic possible duplation check
 - [ ] Manual duplication confirmation
@@ -16,7 +17,6 @@
 - [ ] Special characters in test values
 - [ ] Hide result section
 - [ ] DD not have color when MIC has value
-- [ ] Yellow and red DD/MIC colors more distinguishable
 - [ ] Same sections on approval screen as on entry screen
 - [ ] Person overview
 
