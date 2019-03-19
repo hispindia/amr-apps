@@ -7,7 +7,7 @@
 - [x] Editing person values
 - [ ] Using local storage for versioned meta data
 - [x] Numbers only text fields
-- [ ] Susceptibility colors based on result
+- [x] Susceptibility colors based on result
 - [ ] Modals
 - [ ] Hashing patient registration number
 - [x] Deselectable radio buttons
