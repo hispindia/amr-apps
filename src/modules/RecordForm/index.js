@@ -72,7 +72,7 @@ export class RecordForm extends Component {
 
     onNewValues = values => {
         let programStage = { ...this.state.programStage }
-        this.checkRules(values, programStage.programStageSections, this.props.completed)
+        this.checkRules(values, programStage.programStageSections, !this.props.completed)
         this.setState({
             values: values,
             programStage: programStage,

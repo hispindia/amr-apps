@@ -89,7 +89,7 @@ export class RecordSections extends Component {
     onSubmitClick = async addMore => {
         this.setState({ buttonDisabled: true })
         const { recordProps, resetSwitch } = this.state
-        await setEventStatus(recordProps.eventId, true)
+        await setEventStatus(recordProps.eventId, true, recordProps.programStage.editable)
 
         if (addMore)
             this.setState({
