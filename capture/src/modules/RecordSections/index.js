@@ -46,10 +46,10 @@ export class RecordSections extends Component {
         })
     }
 
-    onEntityValues = (values, entityId, valid) =>
+    onEntityValues = (values, entityId, valid) => 
         this.setState({
             entityValues: values,
-            entityId: entityId ? entityId : null,
+            entityId: entityId,
             entityValid: valid,
         })
 
@@ -146,6 +146,7 @@ export class RecordSections extends Component {
                     <PersonForm
                         passValues={this.onEntityValues}
                         entityId={entityId}
+                        showEdit={!recordProps}
                     />
                 )}
                 {entityValid && (

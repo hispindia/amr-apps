@@ -66,13 +66,14 @@ export class PersonForm extends Component {
     }
 
     onNewValues = (values, entityId) => {
+        const { rules, uniques, entityId: currentEntityId } = this.state
+        entityId = entityId ? entityId : currentEntityId
         let attributes = [...this.state.attributes]
-        const { rules, uniques } = this.state
         this.checkRules(values, attributes, rules)
         this.setState({
             values: values,
             attributes: attributes,
-            entityId: entityId ? entityId : null,
+            entityId: entityId,
         })
         this.props.passValues(
             values,
@@ -153,9 +154,7 @@ export class PersonForm extends Component {
                                             ]
                                     )
                                 )
-                                    values[
-                                        affectedAttribute.trackedEntityAttribute.id
-                                    ] = ''
+                                    values[affectedAttribute.trackedEntityAttribute.id] = ''
                             }
                         }
                         break
@@ -168,9 +167,7 @@ export class PersonForm extends Component {
                         )
                         if (hide !== affectedAttribute.hide) {
                             affectedAttribute.hide = hide
-                            values[
-                                affectedAttribute.trackedEntityAttribute.id
-                            ] = ''
+                            if (hide) values[affectedAttribute.trackedEntityAttribute.id] = ''
                         }
                         break
                     default:
@@ -256,7 +253,7 @@ export class PersonForm extends Component {
             <MarginBottom>
                 <Card>
                     <Margin>
-                        {entityId && !editing && (
+                        {entityId && !editing && this.props.showEdit && (
                             <ButtonPositioned>
                                 <Button
                                     kind="secondary"
