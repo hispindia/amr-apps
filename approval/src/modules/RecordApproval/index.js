@@ -37,6 +37,17 @@ export class RecordApproval extends Component {
         this.props.history.push('/')
     }
 
+    onEditClick = async () => {
+        this.setState({ buttonDisabled: true })
+        await setEventStatus(this.state.recordProps.eventId)
+        let recordProps = {...this.state.recordProps}
+        recordProps.completed = false
+        this.setState({
+            buttonDisabled: false,
+            recordProps: recordProps
+        })
+    }
+
     onDelete = async () => {
         if (window.confirm('Are you sure you want to permanently delete the record?')) {
             await deleteEvent(this.state.eventId)
@@ -61,6 +72,7 @@ export class RecordApproval extends Component {
                         values={recordProps.eventValues}
                         eventId={recordProps.eventId}
                         storedBy={recordProps.storedBy}
+                        completed={recordProps.completed}
                     />
                 )}
                 {loading && <ProgressSection />}
@@ -77,13 +89,13 @@ export class RecordApproval extends Component {
                                 'You cannot delete records with an approval status.',
                         },
                         {
-                            label: 'Submit',
-                            onClick: () => this.onSubmitClick(false),
+                            label: recordProps.completed ? 'Edit' : 'Submit',
+                            onClick: () => recordProps.completed ? this.onEditClick() : this.onSubmitClick(false),
                             disabled: buttonDisabled,
-                            icon: 'done',
+                            icon: recordProps.completed ? 'edit' : 'done',
                             kind: 'primary',
-                            tooltip: 'Submit record.',
-                            disabledTooltip: 'Submit record.',
+                            tooltip: recordProps.completed ? 'Edit record' : 'Submit record.',
+                            disabledTooltip: recordProps.completed ? 'Records with this approval status cannot be edited.' : 'A required field is empty.',
                         },
                     ]}
                 />

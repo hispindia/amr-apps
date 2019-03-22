@@ -34,10 +34,11 @@ export class RecordForm extends Component {
     componentDidMount = async () => await this.init()
 
     componentDidUpdate = async prevProps => {
-        const { programStage, values } = this.props
+        const { programStage, values, completed } = this.props
         if (
             prevProps.programStage !== programStage ||
-            prevProps.values !== values
+            prevProps.values !== values ||
+            prevProps.completed !== completed
         )
             await this.init()
     }
@@ -45,13 +46,13 @@ export class RecordForm extends Component {
     init = async () => {
         this.setState({ loading: true })
 
-        let { programStage, values, passValues } = this.props
-        this.checkRules(values, programStage.programStageSections)
+        let { programStage, values, passValues, completed } = this.props
+        this.checkRules(completed ? {...values} : values, programStage.programStageSections, !completed)
 
         this.setState({
             loading: false,
             programStage: programStage,
-            values: values,
+            values: values
         })
 
         if (passValues)
@@ -71,7 +72,7 @@ export class RecordForm extends Component {
 
     onNewValues = values => {
         let programStage = { ...this.state.programStage }
-        this.checkRules(values, programStage.programStageSections)
+        this.checkRules(values, programStage.programStageSections, !this.props.completed)
         this.setState({
             values: values,
             programStage: programStage,
@@ -89,18 +90,13 @@ export class RecordForm extends Component {
                     dataElement =>
                         dataElement.required && values[dataElement.id] === ''
                 )
-            ) {
-                console.log(section.dataElements.find(
-                    dataElement =>
-                        dataElement.required && values[dataElement.id] === ''
-                ))
+            )
                 return false
-            }
         }
         return true
     }
 
-    checkRules = (values, sections) => {
+    checkRules = (values, sections, pushChanges) => {
         /**
          * Gets the data element that is affected by rule.
          * @param {string} id - Data element id.
@@ -198,7 +194,8 @@ export class RecordForm extends Component {
                                     // Only reset selected value if the options do not include current value.
                                     if (!affectedDataElement.optionSet.options.find(option => option.value === values[affectedDataElement.id]) && values[affectedDataElement.id] !== '') {
                                         values[affectedDataElement.id] = ''
-                                        this.onNewValue(affectedDataElement.id, '')
+                                        if (pushChanges)
+                                            this.onNewValue(affectedDataElement.id, '')
                                     }
                                 }
                             }
@@ -214,7 +211,8 @@ export class RecordForm extends Component {
                                     affectedDataElement.hide = hide
                                     if (values[affectedDataElement.id] !== '') {
                                         values[affectedDataElement.id] = ''
-                                        this.onNewValue(affectedDataElement.id, '')
+                                        if (pushChanges)
+                                            this.onNewValue(affectedDataElement.id, '')
                                     }
                                 }
                             }
@@ -237,7 +235,8 @@ export class RecordForm extends Component {
                                 // Assigning value.
                                 if (values[affectedDataElement.id] !== r.data) {
                                     values[affectedDataElement.id] = r.data
-                                    this.onNewValue(affectedDataElement.id, r.data)
+                                    if (pushChanges)
+                                        this.onNewValue(affectedDataElement.id, r.data)
                                 }
                                 affectedDataElement.disabled = true
                             }

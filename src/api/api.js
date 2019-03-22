@@ -268,11 +268,10 @@ export async function getProgramStageNew(
     entityId,
     entityValues
 ) {
-    let initialValues = { [_organismsDataElementId]: organismCode }
-    initialValues[_organismsDataElementId] = organismCode
-    initialValues[_amrDataElement] = await generateAmrId(orgUnit)
-
-    const eventId = entityId ? await addEvent(initialValues, programId, programStageId, orgUnit, entityId, entityValues) : await addPersonWithEvent(initialValues, programId, programStageId, orgUnitId, entityValues)
+    let initialValues = { [_organismsDataElementId]: organismCode, [_amrDataElement]: await generateAmrId(orgUnit) }
+    const eventId = entityId ?
+        await addEvent(initialValues, programId, programStageId, orgUnit, entityId, entityValues) :
+        await addPersonWithEvent(initialValues, programId, programStageId, orgUnit, entityValues)
 
     const { programStage, eventValues, rules } = await getProgramStageDeo(programId, programStageId, initialValues)
 
@@ -378,10 +377,7 @@ async function setEventValues(event, values) {
             : (dataE.value = values[dataElement])
     }
 
-    return {
-        event: event,
-        amrId: values[_amrDataElement],
-    }
+    return event
 }
 
 export async function addPersonWithEvent(
@@ -395,7 +391,7 @@ export async function addPersonWithEvent(
         ? eventValues[_sampleDateElementId]
         : moment()
 
-    let { event, amrId } = await setEventValues(
+    let event = await setEventValues(
         {
             dataValues: [],
             eventDate: date,
@@ -426,10 +422,7 @@ export async function addPersonWithEvent(
 
     const r = await postData('trackedEntityInstances/', data)
 
-    return {
-        amrId: amrId,
-        entityId: r.response.importSummaries[0].reference,
-    }
+    return r.response.importSummaries[0].enrollments.importSummaries[0].events.importSummaries[0].reference
 }
 
 /**
@@ -453,7 +446,7 @@ export async function addEvent(
         ? eventValues[_sampleDateElementId]
         : moment()
 
-    let { event, amrId } = await setEventValues(
+    let event = await setEventValues(
         {
             dataValues: [],
             eventDate: date,
@@ -491,11 +484,24 @@ export async function addEvent(
     return r.response.importSummaries[0].reference
 }
 
-export async function setEventStatus(eventId, completed) {
+export async function setEventStatus(eventId, completed, resetApproval) {
     let event = await get('events/' + eventId + '.json')
     let dateElement = event.dataValues.find(dv => dv.dataElement === _sampleDateElementId)
     if (dateElement) event.eventDate = dateElement.value
     event.status = completed ? 'COMPLETED' : 'ACTIVE'
+    if (resetApproval) {
+        let values = {}
+        event.dataValues.forEach(dataValue => (values[dataValue.dataElement] = dataValue.value))
+        if (values[_l1ApprovalStatus] === 'Resend') {
+            values[_l1ApprovalStatus] = ''
+            values[_l1RevisionReason] = ''
+        }
+        if (values[_l2ApprovalStatus] === 'Resend') {
+            values[_l2ApprovalStatus] = ''
+            values[_l2RevisionReason] = ''
+        }
+        event = await setEventValues(event, values)
+    }
     await put('events/' + eventId, event)
 }
 
@@ -507,30 +513,6 @@ export async function updateEventValue(eventId, dataElementId, value, storedBy) 
         if (dataElementId === _sampleDateElementId) event.eventDate = value
         await put('events/' + eventId, event)
     }
-}
-
-/**
- * Updates event with new values.
- * @param {Object} values - New values.
- * @param {Object} testFields - Test fields meta data.
- */
-export async function updateEvent(newValues, eventId, isApproval) {
-    let event = await get('events/' + eventId + '.json')
-
-    if (!isApproval) {
-        const { values } = await getEventValues(eventId)
-        if (values[_l1ApprovalStatus] === 'Resend') {
-            newValues[_l1ApprovalStatus] = ''
-            newValues[_l1RevisionReason] = ''
-        }
-        if (values[_l2ApprovalStatus] === 'Resend') {
-            newValues[_l2ApprovalStatus] = ''
-            newValues[_l2RevisionReason] = ''
-        }
-    }
-
-    event = await setEventValues(event, newValues)
-    await put('events/' + eventId, event)
 }
 
 /**

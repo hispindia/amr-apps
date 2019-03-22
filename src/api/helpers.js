@@ -105,7 +105,7 @@ export const getEntityRules = async attributeIds => {
     let data = (await get(
         'programRules.json?paging=false&fields=name,programRuleActions[' +
             'programRuleActionType,optionGroup[id,options[code,displayName]],trackedEntityAttribute[name,id]' +
-            ',programRule[condition]]&filter=programRuleActions.trackedEntityAttribute:!null' +
+            ',programRule[condition]]&order=priority:asc&filter=programRuleActions.trackedEntityAttribute:!null' +
             '&filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD]'
     )).programRules
 
