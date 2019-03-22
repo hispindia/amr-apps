@@ -46,12 +46,12 @@ export class RecordForm extends Component {
         this.setState({ loading: true })
 
         let { programStage, values, passValues } = this.props
-        this.checkRules(values, programStage.programStageSections)
+        this.checkRules({...values}, programStage.programStageSections)
 
         this.setState({
             loading: false,
             programStage: programStage,
-            values: values,
+            values: values
         })
 
         if (passValues)
@@ -89,13 +89,8 @@ export class RecordForm extends Component {
                     dataElement =>
                         dataElement.required && values[dataElement.id] === ''
                 )
-            ) {
-                console.log(section.dataElements.find(
-                    dataElement =>
-                        dataElement.required && values[dataElement.id] === ''
-                ))
+            )
                 return false
-            }
         }
         return true
     }
