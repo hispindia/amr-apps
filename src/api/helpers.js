@@ -74,8 +74,7 @@ export const getEventValues = async eventId => {
         programId: event.program,
         programStageId: event.programStage,
         eventValues: values,
-        completed: event.status === 'COMPLETED',
-        storedBy: event.storedBy
+        completed: event.status === 'COMPLETED'
     }
 }
 
