@@ -505,13 +505,13 @@ export async function setEventStatus(eventId, completed, resetApproval) {
     await put('events/' + eventId, event)
 }
 
-export function updateEventValue(eventId, dataElementId, value) {
-    const updateValue =  (i, v) =>
-        put('events/' + eventId + '/' + dataElementId, { dataValues: [{ dataElement: i, value: v }] })
+export async function updateEventValue(eventId, dataElementId, value) {
+    const updateValue = async (i, v) =>
+        await put('events/' + eventId + '/' + dataElementId, { dataValues: [{ dataElement: i, value: v }] })
 
-    updateValue(dataElementId, value)
+    await updateValue(dataElementId, value)
     if (dataElementId === _sampleDateElementId)
-        updateValue(_sampleDateElementId, value)
+        await updateValue(_sampleDateElementId, value)
 }
 
 /**
