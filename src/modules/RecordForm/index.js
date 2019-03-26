@@ -60,7 +60,7 @@ export class RecordForm extends Component {
     }
 
     onNewValue = (id, value) =>
-        updateEventValue(this.props.eventId, id, value, this.props.storedBy)
+        updateEventValue(this.props.eventId, id, value)
 
     onChange = (name, value) => {
         let values = { ...this.state.values }

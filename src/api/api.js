@@ -290,9 +290,9 @@ export async function getProgramStageExisting(eventId) {
 }
 
 export async function getRecordForApproval(eventId) {
-    let { eventValues: initialValues, programId, programStageId, completed, storedBy } = await getEventValues(eventId)
+    let { eventValues: initialValues, programId, programStageId, completed } = await getEventValues(eventId)
     const { programStage, eventValues, rules } = await getProgramStageApproval(programId, programStageId, initialValues, _isL1User, _isL2User)
-    return { programStage, eventValues, rules, eventId, completed, storedBy }
+    return { programStage, eventValues, rules, eventId, completed }
 }
 
 /**
@@ -505,14 +505,13 @@ export async function setEventStatus(eventId, completed, resetApproval) {
     await put('events/' + eventId, event)
 }
 
-export async function updateEventValue(eventId, dataElementId, value, storedBy) {
-    await put('events/' + eventId + '/' + dataElementId, { dataValues: [{ dataElement: dataElementId, value: value, storedBy: storedBy ? storedBy : _username }] })
-    if (storedBy || dataElementId === _sampleDateElementId) {
-        let event = await get('events/' + eventId + '.json')
-        if (storedBy) event.storedBy = storedBy
-        if (dataElementId === _sampleDateElementId) event.eventDate = value
-        await put('events/' + eventId, event)
-    }
+export async function updateEventValue(eventId, dataElementId, value) {
+    const updateValue = async (i, v) =>
+        await put('events/' + eventId + '/' + dataElementId, { dataValues: [{ dataElement: i, value: v }] })
+
+    await updateValue(dataElementId, value)
+    if (dataElementId === _sampleDateElementId)
+        await updateValue(_sampleDateElementId, value)
 }
 
 /**

@@ -71,7 +71,6 @@ export class RecordApproval extends Component {
                         rules={recordProps.rules}
                         values={recordProps.eventValues}
                         eventId={recordProps.eventId}
-                        storedBy={recordProps.storedBy}
                         completed={recordProps.completed}
                     />
                 )}
