@@ -8,7 +8,7 @@
   },
   "appType": "APP",
   "name": "AMR Approval",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "AMR approval app for DHIS2",
   "icons": {
     "48": "icon.png"

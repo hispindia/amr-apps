@@ -317,7 +317,7 @@ const getProgramStage = async (
 
     programStage.deletable = values === {} || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
 
-    programStage.editable = values === {} || [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes('Resend')
+    programStage.editable = values === {} || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus]) || [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes('Resend')
 
     programStage.finished = values[_l1ApprovalStatus] === values[_l2ApprovalStatus] === 'Approved'
 

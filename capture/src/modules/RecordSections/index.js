@@ -113,10 +113,12 @@ export class RecordSections extends Component {
     }
 
     onDelete = async () => {
+        this.setState({ buttonDisabled: true })
         if (window.confirm('Are you sure you want to permanently delete the record?')) {
             await deleteEvent(this.state.eventId)
             this.props.history.push('/')
         }
+        this.setState({ buttonDisabled: false })
     }
 
     sections = () => {
@@ -139,6 +141,8 @@ export class RecordSections extends Component {
                     !panelValid ||
                     !eventValid)) ||
             (eventId && !eventValid)
+
+        console.log(!recordProps.programStage.editable, disabled)
 
         return (
             <div>
@@ -174,7 +178,7 @@ export class RecordSections extends Component {
                                   {
                                       label: 'Delete',
                                       onClick: this.onDelete,
-                                      disabled: !recordProps.programStage.deletable,
+                                      disabled: !recordProps.programStage.deletable || disabled,
                                       icon: 'delete',
                                       kind: 'destructive',
                                       tooltip: 'Permanently delete record.',
@@ -184,7 +188,7 @@ export class RecordSections extends Component {
                                   {
                                       label: recordProps.completed ? 'Edit' : 'Submit',
                                       onClick: () => recordProps.completed ? this.onEditClick() : this.onSubmitClick(false),
-                                      disabled: recordProps.editable ? !recordProps.programStage.editable : disabled,
+                                      disabled: !recordProps.programStage.editable || disabled,
                                       icon: recordProps.completed ? 'edit' : 'done',
                                       kind: 'primary',
                                       tooltip: recordProps.completed ? 'Edit record' : 'Submit record.',
