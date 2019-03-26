@@ -44,10 +44,10 @@ export const getProgramStageApproval = async (
 export const getProgramStageDeo = async (programId, programStageId, eventValues) => {
     let programStage = await getProgramStage(programStageId, eventValues, true)
 
-    if (!eventValues[_l1ApprovalStatus] && !eventValues[_l2ApprovalStatus])
-        programStage.programStageSections
-            .filter(section => section.name === 'Approval')
-            .forEach(section => (section.hideWithValues = true))
+    if (!eventValues[_l1ApprovalStatus] && !eventValues[_l2ApprovalStatus]) {
+        let approvalSection = programStage.programStageSections.find(section => section.name === 'Approval')
+        if (approvalSection) approvalSection.hideWithValues = true
+    }
 
     return {
         programStage: programStage,
@@ -371,6 +371,9 @@ const getProgramStage = async (
     programStage.programStageSections = programStage.programStageSections.filter(
         section => !remove.includes(section.id)
     )
+
+    let resultSection = programStage.programStageSections.find(section => section.name === 'Result')
+    if(resultSection) resultSection.hideWithValues = true
 
     return programStage
 }
