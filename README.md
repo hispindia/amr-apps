@@ -18,6 +18,8 @@
 - [ ] Hide result section
 - [ ] DD not have color when MIC has value
 - [ ] Same sections on approval screen as on entry screen
+- [ ] Increased program rule support
+- [ ] Validation support
 - [ ] Person overview
 
 ### Installation
