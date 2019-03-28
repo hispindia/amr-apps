@@ -71,11 +71,49 @@ export async function init(baseUrl) {
     _isL2User = userGroups.includes(_l2ApprovalGroup)
 }
 
+export async function initMetadata() {
+    let data = await get('metadata.json?' +
+        'options=true&programs=true&optionSets=true&optionGroups=true&' +
+        'programRules=true&trackedEntityTypes=true&fields=id,name,displayName,code,options,' +
+        'programStages[displayName,programStageDataElements[dataElement[id,formName],' +
+        'compulsory],programStageSections[id,name,displayName,renderType,' +
+        'dataElements[id,displayFormName,code,valueType,optionSetValue,optionSet]]],' +
+        'programRuleActions[programRuleActionType,dataElement,optionGroup,' +
+        'trackedEntityAttribute],condition,trackedEntityTypeAttributes[' +
+        'name,id,displayName,valueType,unique,optionSetValue,optionSet]' +
+        'trackedEntityTypeAttributes[mandatory,trackedEntityAttribute[' +
+        'name,id,displayName,valueType,unique,optionSetValue,optionSet')
+
+    let options = {}
+    data.options.forEach(o => options[o.id] = {
+        label: o.displayName,
+        value: o.code
+    })
+
+    let optionSets = {}
+    data.optionSets.forEach(os => optionSets[os.id] =
+        os.options.map(o => options[o.id])
+    )
+
+    let optionGroups = {}
+    data.optionGroups.forEach(os => optionGroups[os.id] =
+        os.options.map(o => options[o.id])
+    )
+
+    let person = data.trackedEntityTypes.find(type => type.id = _personTypeId)
+
+    let metadata = { optionSets, optionGroups, person }
+    console.log(data)
+    console.log(metadata)
+
+    return metadata
+}
+
 /**
  * Gets the attributes and values of the AMR program.
  * @param {string} entityId - Entity id.
  * @returns {Object} Attributes, values, uniques, districts.
- */
+ */''
 export async function getEntityAttributes(entityId) {
     const attributes = (await get(
         'trackedEntityTypes/' +

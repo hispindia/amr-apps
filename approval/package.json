@@ -32,9 +32,9 @@
         "eject": "react-scripts eject"
     },
     "dependencies": {
-        "react": "^16",
-        "react-dom": "^16",
-        "react-scripts": "^2.1.3",
+        "react": "^16.8.6",
+        "react-dom": "^16.8.6",
+        "react-scripts": "^2.1.8",
         "typeface-roboto": "0.0.54"
     }
 }
