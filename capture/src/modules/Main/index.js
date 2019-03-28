@@ -9,8 +9,6 @@ const MainSection = styled.main`
     width: 100%;
 `
 
-const getMetadata = async () => await initMetadata()
-
 export const Main = props => {
     const [metadata, setMetadata] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -24,6 +22,8 @@ export const Main = props => {
     }, [])
 
     if (loading) return <p>loading</p>
+
+    console.log(metadata)
 
     return (
         <MainSection>
@@ -47,7 +47,10 @@ export const Main = props => {
                             exact
                             path={path}
                             render={componentProps => (
-                                <RecordSections {...componentProps} />
+                                <RecordSections
+                                    {...componentProps}
+                                    metadata={metadata}
+                                />
                             )}
                         />
                     )

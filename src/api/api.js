@@ -72,6 +72,23 @@ export async function init(baseUrl) {
 }
 
 export async function initMetadata() {
+    // Replaces 'A{xxx}' with 'this.state.values['id of xxx']'
+    const getCondition = c => {
+        const variableDuplicated = c.match(/A\{.*?\}/g)
+        let variables = []
+        if (!variableDuplicated) return c
+        variableDuplicated.forEach(duplicated => {
+            if (variables.indexOf(duplicated) === -1) variables.push(duplicated)
+        })
+
+        variables.forEach(variable => {
+            const id = attributeIds[variable.substring(2, variable.length - 1)]
+            c = c.replace(/A\{.*?\}/g, "values['" + id + "']")
+        })
+
+        return c
+    }
+
     let data = await get('metadata.json?' +
         'options=true&programs=true&optionSets=true&optionGroups=true&' +
         'programRules=true&trackedEntityTypes=true&fields=id,name,displayName,code,options,' +
@@ -94,15 +111,32 @@ export async function initMetadata() {
     data.optionSets.forEach(os => optionSets[os.id] =
         os.options.map(o => options[o.id])
     )
-
-    let optionGroups = {}
-    data.optionGroups.forEach(os => optionGroups[os.id] =
+    data.optionGroups.forEach(os => optionSets[os.id] =
         os.options.map(o => options[o.id])
     )
 
     let person = data.trackedEntityTypes.find(type => type.id = _personTypeId)
 
-    let metadata = { optionSets, optionGroups, person }
+    person.uniques = {}
+    person.values = {}
+    let attributeIds = {}
+    person.trackedEntityTypeAttributes.forEach(a => {
+        person.uniques[a.trackedEntityAttribute.id] = a.trackedEntityAttribute.unique
+        person.values[a.trackedEntityAttribute.id] = ''
+        a.hide = false
+        attributeIds[a.trackedEntityAttribute.name] = a.trackedEntityAttribute.id
+    })
+
+    person.rules = []
+    data.programRules.filter(r => r.programRuleActions.find(a => a.trackedEntityAttribute))
+    .forEach(d => {
+        if (!person.rules.find(rule => rule.name === d.name)) {
+            d.condition = getCondition(d.condition)
+            person.rules.push(d)
+        }
+    })
+
+    let metadata = { optionSets, person }
     console.log(data)
     console.log(metadata)
 

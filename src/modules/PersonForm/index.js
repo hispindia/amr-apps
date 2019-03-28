@@ -36,16 +36,14 @@ export class PersonForm extends Component {
     }
 
     componentDidMount = async () => {
-        let { attributes, values, uniques, rules } = await getEntityAttributes(
-            this.props.id ? this.props.id : null
-        )
-        this.checkRules(values, attributes, rules)
+        let { trackedEntityTypeAttributes, values, uniques, rules } = this.props.metadata.person
+        this.checkRules(values, trackedEntityTypeAttributes, rules)
 
         this.setState({
-            attributes: attributes,
+            attributes: trackedEntityTypeAttributes,
             values: values,
             uniques: uniques,
-            half: Math.floor(attributes.length / 2),
+            half: Math.floor(trackedEntityTypeAttributes.length / 2),
             rules: rules,
         })
     }
@@ -75,11 +73,11 @@ export class PersonForm extends Component {
             attributes: attributes,
             entityId: entityId,
         })
-        this.props.passValues(
-            values,
-            entityId,
-            this.validate(attributes, values, uniques)
-        )
+        this.props.passValues({
+            values: values,
+            id: entityId,
+            valid: this.validate(attributes, values, uniques)
+        })
     }
 
     onEdit = () => this.setState({ editing: true })
@@ -129,7 +127,7 @@ export class PersonForm extends Component {
             rule.programRuleActions.forEach(r => {
                 switch (r.programRuleActionType) {
                     case 'SHOWOPTIONGROUP':
-                        if (eval(r.programRule.condition)) {
+                        if (eval(rule.condition)) {
                             let affectedAttribute = attributes.find(
                                 attribute =>
                                     attribute.trackedEntityAttribute.id ===
@@ -140,12 +138,11 @@ export class PersonForm extends Component {
                                     .optionSet.id !== r.optionGroup.id
                             ) {
                                 affectedAttribute.trackedEntityAttribute.optionSet = {
-                                    id: r.optionGroup.id,
-                                    options: r.optionGroup.options,
+                                    id: r.optionGroup.id
                                 }
                                 // Only reset selected value if the options do not include current value.
                                 if (
-                                    !affectedAttribute.trackedEntityAttribute.optionSet.options.find(
+                                    !this.props.metadata.optionSets[affectedAttribute.trackedEntityAttribute.optionSet.id].find(
                                         option =>
                                             option.value ===
                                             values[
@@ -159,7 +156,7 @@ export class PersonForm extends Component {
                         }
                         break
                     case 'HIDEFIELD':
-                        const hide = eval(r.programRule.condition)
+                        const hide = eval(rule.condition)
                         let affectedAttribute = attributes.find(
                             attribute =>
                                 attribute.trackedEntityAttribute.id ===
@@ -199,13 +196,13 @@ export class PersonForm extends Component {
                         disabled={disabled}
                     />
                 ) : attribute.trackedEntityAttribute.optionSetValue ? (
-                    attribute.trackedEntityAttribute.optionSet.options.length <
-                    4 ? (
+                    this.props.metadata.optionSets[attribute.trackedEntityAttribute.optionSet.id].length < 4 ?
+                    (
                         <RadioInput
                             required={attribute.mandatory}
                             objects={
-                                attribute.trackedEntityAttribute.optionSet
-                                    .options
+                                this.props.metadata.optionSets[attribute.trackedEntityAttribute.optionSet
+                                    .id]
                             }
                             name={attribute.trackedEntityAttribute.id}
                             label={attribute.trackedEntityAttribute.displayName}
@@ -217,8 +214,8 @@ export class PersonForm extends Component {
                         <SelectInput
                             required={attribute.mandatory}
                             objects={
-                                attribute.trackedEntityAttribute.optionSet
-                                    .options
+                                this.props.metadata.optionSets[attribute.trackedEntityAttribute.optionSet
+                                    .id]
                             }
                             name={attribute.trackedEntityAttribute.id}
                             label={attribute.trackedEntityAttribute.displayName}
