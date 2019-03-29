@@ -142,8 +142,6 @@ export class RecordSections extends Component {
                     !eventValid)) ||
             (eventId && !eventValid)
 
-        console.log(!recordProps.programStage.editable, disabled)
-
         return (
             <div>
                 {!eventId && (
