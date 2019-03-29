@@ -28,7 +28,7 @@ export class RecordPanel extends Component {
     }
 
     componentDidMount = async () => {
-        const { programs, programStages } = await getPrograms()
+        const { programs, programStages } = this.props
         this.setState({
             programs: programs,
             programStages: programStages,
@@ -74,12 +74,12 @@ export class RecordPanel extends Component {
         let values = { ...this.state.values }
         values[name] = value
         this.setState({ values: values })
-        this.props.passValues(
-            values.programId,
-            values.programStageId,
-            values.organismCode,
-            !Object.values(values).includes('')
-        )
+        this.props.passValues({
+            programId: values.programId,
+            programStageId: values.programStageId,
+            orgranism: values.organismCode,
+            valid: !Object.values(values).includes('')
+        })
     }
 
     /**

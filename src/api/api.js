@@ -136,7 +136,9 @@ export async function initMetadata() {
         }
     })
 
-    let metadata = { optionSets, person }
+
+
+    let metadata = { optionSets, person, programs: data.programs }
     console.log(data)
     console.log(metadata)
 
