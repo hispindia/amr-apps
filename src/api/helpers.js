@@ -9,40 +9,13 @@ const _l2ApprovalStatus = 'sXDQT6Yaf77'
 const _l2RejectionReason = 'pz8SoHBO6RL'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
-export const getProgramStageApproval = async (
-    programId,
-    programStageId,
-    eventValues,
-    isL1User,
-    isL2User
-) => {
-    let programStage = await getProgramStage(
-        programStageId,
-        eventValues,
-        false,
-        isL1User,
-        isL2User
-    )
-
-    /*const hideWithValues = ['Institute / Hospital Information', ... !isL2User ? ['Level 2'] : []]
-    programStage.programStageSections
-        .filter(section => hideWithValues.includes(section.name))
-        .forEach(section => (section.hideWithValues = true))
-    programStage.programStageSections.forEach(section =>
-        section.childSections
-            .filter(childSection => hideWithValues.includes(childSection.name))
-            .forEach(childSection => (childSection.hideWithValues = true))
-    )*/
-
-    return {
-        programStage: programStage,
-        eventValues: eventValues,
-        rules: await getProgramRules(programId, programStageId),
-    }
+export const getProgramStageApproval = async (pStage, values, completed, newRecord, isL1User, isL2User) => {
+    let { programStage, status, eventValues } = await getProgramStage(pStage, values, completed, newRecord, isL1User, isL2User)
+    return { programStage, eventValues, status }
 }
 
-export const getProgramStageDeo = async (pStage, values) => {
-    let { programStage, status, eventValues } = await getProgramStage(pStage, values, true)
+export const getProgramStageDeo = async (pStage, values, completed, newRecord) => {
+    let { programStage, status, eventValues } = await getProgramStage(pStage, values, completed, newRecord)
 
     if (!eventValues[_l1ApprovalStatus] && !eventValues[_l2ApprovalStatus]) {
         let approvalSection = programStage.programStageSections.find(section => section.name === 'Approval')
@@ -58,7 +31,7 @@ export const getProgramStageDeo = async (pStage, values) => {
  * @returns {Object} Event values.
  */
 export const getEventValues = async eventId => {
-    const event = await get('events/' + eventId + '.json')
+    const event = await get('events/' + eventId)
     let values = {}
 
     if (event.dataValues)
@@ -70,7 +43,8 @@ export const getEventValues = async eventId => {
         programId: event.program,
         programStageId: event.programStage,
         eventValues: values,
-        completed: event.status === 'COMPLETED'
+        completed: event.status === 'COMPLETED',
+        entityId: event.trackedEntityInstance
     }
 }
 
@@ -261,6 +235,7 @@ const getProgramRules = async (programId, programStageId) => {
 const getProgramStage = async (
     programStage,
     values,
+    completed,
     newRecord,
     isL1User,
     isL2User
@@ -329,7 +304,7 @@ const getProgramStage = async (
         deletable: values === {} || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus]),
         editable: values === {} || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus]) || [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes('Resend'),
         finished: values[_l1ApprovalStatus] === values[_l2ApprovalStatus] === 'Approved',
-        completed: false
+        completed: completed
     }
 
     return { programStage, status, eventValues: values }

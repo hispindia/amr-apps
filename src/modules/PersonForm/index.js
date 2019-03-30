@@ -33,24 +33,42 @@ export class PersonForm extends Component {
         uniques: [], // Unique textfield values are validated.
         entityId: null,
         editing: false,
+        loading: true
     }
 
     componentDidMount = async () => {
         let { trackedEntityTypeAttributes, values, uniques, rules } = this.props.metadata.person
-        this.checkRules(values, trackedEntityTypeAttributes, rules)
+        const entityId = this.props.entityId
 
-        this.setState({
-            attributes: trackedEntityTypeAttributes,
-            values: values,
-            uniques: uniques,
-            half: Math.floor(trackedEntityTypeAttributes.length / 2),
-            rules: rules,
-        })
+        if (entityId) {
+            this.onNewValues(await getPersonValues(entityId), entityId)
+            this.setState({
+                uniques: uniques,
+                half: Math.floor(trackedEntityTypeAttributes.length / 2),
+                rules: rules,
+                loading: false
+            })
+        }
+        else {
+            this.checkRules(values, trackedEntityTypeAttributes, rules)
+            this.setState({
+                uniques: uniques,
+                half: Math.floor(trackedEntityTypeAttributes.length / 2),
+                rules: rules,
+                attributes: trackedEntityTypeAttributes,
+                values: values,
+                loading: false
+            })
+        }
     }
 
-    componentDidUpdate = prevProps => {
-        if (this.props.entityId !== prevProps.entityId)
-            this.setState({ entityId: this.props.entityId })
+    componentDidUpdate = async prevProps => {
+        const entityId = this.props.entityId
+        if (entityId !== prevProps.entityId) {
+            this.setState({ loading: true })
+            this.onNewValues(await getPersonValues(entityId), entityId)
+            this.setState({ loading: false })
+        }
     }
 
     /**
@@ -242,9 +260,9 @@ export class PersonForm extends Component {
     }
 
     render() {
-        const { attributes, half, entityId, editing } = this.state
+        const { attributes, half, entityId, editing, loading } = this.state
 
-        if (!attributes) return <ProgressSection />
+        if (loading) return <ProgressSection />
 
         return (
             <MarginBottom>

@@ -12,7 +12,9 @@ import {
     getProgramStageExisting,
     deleteEvent,
     setEventStatus,
-    newRecord
+    newRecord,
+    existingRecord,
+    _organismsDataElementId
 } from 'api'
 import { ButtonRow } from 'inputs'
 
@@ -41,35 +43,40 @@ const getPanelMetadata = programs => {
 }
 
 export const RecordSections = props => {
+    const onSubmitClick = async addMore => {
+        setButtonDisabled(true)
+        await setEventStatus(eventData.eventId, true, eventData.status.editable)
+
+        if (addMore) {
+            setPanel(null)
+            setEventData(null)
+            setEventValid(false)
+            setResetSwitch(!resetSwitch)
+            setButtonDisabled(false)
+        }
+        else props.history.push('/')
+    }
+
     const { optionSets, person, programs, programOrganisms } = props.metadata
+    const event = props.match.params.event
 
+    const [lists] = useState(getPanelMetadata(programs))
     const [loading, setLoading] = useState(false) 
-
     const [entity, setEntity] = useState({
         values: person.values,
         id: null,
         valid: false,
     })
-
     const [panel, setPanel] = useState({
         programId: null,
         programStageId: null,
         organism: null,
         valid: false,
     })
-
-    const [event, setEvent] = useState({
-        valid: false,
-        buttonDisabled: false
-    })
-
     const [eventValid, setEventValid] = useState(false)
-
     const [eventData, setEventData] = useState(null)
-
-    const { programList, stageLists } = getPanelMetadata(programs)
-
     const [resetSwitch, setResetSwitch] = useState(false)
+    const [buttonDisabled, setButtonDisabled] = useState(true)
 
     useEffect(() => {
         const getNewRecord = async () => {
@@ -85,8 +92,26 @@ export const RecordSections = props => {
             ))
             setLoading(false)
         }
-        if (panel.valid) getNewRecord()
+        if (panel.valid && !event) getNewRecord()
     }, [panel.valid])
+
+    useEffect(() => {
+        const getExistingRecord = async () => {
+            const { programId, programStage, eventValues, status, eventId, entityId } = await existingRecord(programs, event)
+            setEntity({ id: entityId })
+            setPanel({
+                programId,
+                programStageId: programStage.id,
+                organism: eventValues[_organismsDataElementId],
+                valid: true,
+            })
+            setEventData({ programStage, eventValues, status, eventId })
+        }
+        
+        if (event) getExistingRecord()
+    }, [])
+
+    const disabled = buttonDisabled || !eventValid || !entity.valid || !panel.valid
 
     return (
         <Margin>
@@ -101,17 +126,18 @@ export const RecordSections = props => {
                     optionSets: optionSets
                 }}
                 passValues={setEntity}
-                entityId={null}
-                showEdit={true}
+                entityId={entity.id}
+                showEdit={!event && !panel.valid}
             />
             {entity.valid && <RecordPanel
-                programs={programList}
-                programStages={stageLists}
+                programs={lists.programList}
+                programStages={lists.stageLists}
                 programOrganisms={programOrganisms}
                 optionSets={optionSets}
                 resetSwitch={resetSwitch}
                 passValues={setPanel}
                 disabled={panel.valid}
+                values={panel}
             />}
             {eventData && <RecordForm
                 passValues={setEventValid}
@@ -129,16 +155,33 @@ export const RecordSections = props => {
                 status={eventData.status}
             />}
             {loading && <ProgressSection />}
+            <ButtonRow
+                buttons={
+                    [
+                        {
+                            label: 'Submit and add new',
+                            onClick: () => onSubmitClick(true),
+                            disabled: disabled,
+                            icon: 'add',
+                            kind: 'primary',
+                            tooltip:
+                                'Submit record and add new record for the same person.',
+                            disabledTooltip:
+                                'A required field is empty.',
+                        },
+                        {
+                            label: 'Submit',
+                            onClick: () => onSubmitClick(false),
+                            disabled: disabled,
+                            icon: 'done',
+                            kind: 'primary',
+                            tooltip: 'Submit record.',
+                            disabledTooltip:
+                                'A required field is empty.',
+                        },
+                    ]
+                }
+            />
         </Margin>
     )
 }
-
-/*
-<RecordForm
-                passValues={this.onEventValues}
-                programStage={recordProps.programStage}
-                rules={recordProps.rules}
-                values={recordProps.eventValues}
-                eventId={recordProps.eventId}
-                completed={recordProps.completed}
-            />*/

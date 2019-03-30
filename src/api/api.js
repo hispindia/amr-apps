@@ -15,7 +15,7 @@ const _deoGroup = 'mYdK5QT4ndl'
 const _l1ApprovalGroup = 'jVK9RNKNLus'
 const _l2ApprovalGroup = 'TFmNnLn06Rd'
 
-const _organismsDataElementId = 'SaQe2REkGVw'
+export const _organismsDataElementId = 'SaQe2REkGVw'
 const _amrDataElement = 'lIkk661BLpG'
 const _sampleDateElementId = 'JRUa0qYKQDF'
 export const _testResultDataElementId = 'bSgpKbkbVGL'
@@ -405,9 +405,19 @@ export async function newRecord(
         await addEvent(initialValues, programId, pStage.id, orgUnit, entityId, entityValues) :
         await addPersonWithEvent(initialValues, programId, pStage.id, orgUnit, entityValues)
 
-    const { programStage, eventValues, status } = await getProgramStageDeo(pStage, initialValues)
+    const { programStage, eventValues, status } = await getProgramStageDeo(pStage, initialValues, false, true)
 
     return { programStage, eventValues, status, eventId }
+}
+
+export async function existingRecord(programs, eventId, isApproval) {
+    let { eventValues: initialValues, programId, programStageId, completed, entityId } = await getEventValues(eventId)
+    const pStage = programs.find(p => p.id === programId)
+        .programStages.find(ps => ps.id = programStageId)
+    const { programStage, eventValues, status } = !isApproval ?
+        await getProgramStageDeo(pStage, initialValues, completed, false) :
+        await getProgramStageApproval(pStage, initialValues, completed, false, _isL1User, _isL2User)
+    return { programId, programStage, eventValues, status, eventId, entityId }
 }
 
 /**

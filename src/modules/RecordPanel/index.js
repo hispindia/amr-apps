@@ -8,9 +8,7 @@ import {
 } from '../../helpers/helpers'
 import { SelectInput, RadioInput } from '../../inputs'
 import { Card } from '@dhis2/ui/core/Card'
-import { getPrograms, getOrganisms } from '../../api/api'
 import { Grid } from '@material-ui/core'
-import { ProgressSection } from '../'
 
 /**
  * Contains event panal and/or event information.
@@ -18,11 +16,19 @@ import { ProgressSection } from '../'
 export class RecordPanel extends Component {
     state = {
         organisms: null,
-        values: {
-            programId: '',
-            programStageId: '',
-            organismCode: '',
-        },
+        values: {}
+    }
+
+    componentDidMount = () => {
+        const values = this.props.values
+        this.setState({
+            organisms: this.getOrganisms(values.programId),
+            values: {
+                programId: values.programId ? values.programId : '',
+                programStageId: values.programStageId ? values.programStageId : '',
+                organismCode: values.organism ? values.organism: ''
+            }
+        })
     }
 
     componentDidUpdate = prevProps => {
@@ -34,6 +40,15 @@ export class RecordPanel extends Component {
                     organismCode: '',
                 },
             })
+    }
+
+    getOrganisms = programId => {
+        let organisms = []
+        this.props.optionSets[this.props.programOrganisms[programId]].forEach(o => {
+            if (!organisms.find(org => org.value === o.value))
+                organisms.push(o)
+        })
+        return organisms
     }
 
     /**
@@ -50,14 +65,8 @@ export class RecordPanel extends Component {
             organismCode: '',
         }
 
-        let organisms = []
-        this.props.optionSets[this.props.programOrganisms[value]].forEach(o => {
-            if (!organisms.find(org => org.value === o.value))
-                organisms.push(o)
-        })
-
         this.setState({
-            organisms: organisms,
+            organisms: this.getOrganisms(value),
             values: values,
         })
     }
@@ -103,7 +112,7 @@ export class RecordPanel extends Component {
         if (organisms)
             dataElements.push({
                 id: 'organismCode',
-                label: 'Organisms',
+                label: 'Organism',
                 objects: organisms,
                 onChange: this.onChange,
             })
