@@ -72,8 +72,35 @@ export async function init(baseUrl) {
 }
 
 export async function initMetadata() {
+    // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
+    const programCondition = c => {
+        const original = c
+        try {
+            const variableDuplicated = c.match(/#\{.*?\}/g)
+            let variables = []
+            if (!variableDuplicated) return c
+            variableDuplicated.forEach(duplicated => {
+                if (variables.indexOf(duplicated) === -1)
+                    variables.push(duplicated)
+            })
+            variables.forEach(variable => {
+                const name = variable.substring(2, variable.length - 1)
+                const id = data.programRuleVariables.find(
+                    ruleVariable => ruleVariable.name === name
+                ).dataElement.id
+                c = c.replace(
+                    new RegExp('#{' + name + '}', 'g'),
+                    "values['" + id + "']"
+                )
+            })
+        } catch {
+            console.warn('Improper condition:', original)
+        }
+        return c
+    }
+
     // Replaces 'A{xxx}' with 'this.state.values['id of xxx']'
-    const getCondition = c => {
+    const entityCondition = c => {
         const variableDuplicated = c.match(/A\{.*?\}/g)
         let variables = []
         if (!variableDuplicated) return c
@@ -90,16 +117,16 @@ export async function initMetadata() {
     }
 
     let data = await get('metadata.json?' +
-        'options=true&programs=true&optionSets=true&optionGroups=true&' +
-        'programRules=true&trackedEntityTypes=true&fields=id,name,displayName,code,options,' +
-        'programStages[displayName,programStageDataElements[dataElement[id,formName],' +
+        'options=true&programs=true&optionSets=true&optionGroups=true&programRuleVariables=true&' +
+        'programRules=true&trackedEntityTypes=true&fields=id,name,displayName,code,options,dataElement,' +
+        'program,programStage,programStages[id,displayName,programStageDataElements[dataElement[id],' +
         'compulsory],programStageSections[id,name,displayName,renderType,' +
         'dataElements[id,displayFormName,code,valueType,optionSetValue,optionSet]]],' +
         'programRuleActions[programRuleActionType,dataElement,optionGroup,' +
-        'trackedEntityAttribute],condition,trackedEntityTypeAttributes[' +
+        'trackedEntityAttribute,programStageSection,data],condition,trackedEntityTypeAttributes[' +
         'name,id,displayName,valueType,unique,optionSetValue,optionSet]' +
         'trackedEntityTypeAttributes[mandatory,trackedEntityAttribute[' +
-        'name,id,displayName,valueType,unique,optionSetValue,optionSet')
+        'name,id,displayName,valueType,unique,optionSetValue,optionSet]],priority')
 
     let options = {}
     data.options.forEach(o => options[o.id] = {
@@ -121,7 +148,8 @@ export async function initMetadata() {
     person.values = {}
     let attributeIds = {}
     person.trackedEntityTypeAttributes.forEach(a => {
-        person.uniques[a.trackedEntityAttribute.id] = a.trackedEntityAttribute.unique
+        if (a.trackedEntityAttribute.unique)
+            person.uniques[a.trackedEntityAttribute.id] = true
         person.values[a.trackedEntityAttribute.id] = ''
         a.hide = false
         attributeIds[a.trackedEntityAttribute.name] = a.trackedEntityAttribute.id
@@ -131,14 +159,51 @@ export async function initMetadata() {
     data.programRules.filter(r => r.programRuleActions.find(a => a.trackedEntityAttribute))
     .forEach(d => {
         if (!person.rules.find(rule => rule.name === d.name)) {
-            d.condition = getCondition(d.condition)
+            d.condition = entityCondition(d.condition)
             person.rules.push(d)
         }
     })
 
+    let programs = data.programs
 
+    let programOrganisms = {}
+    programs.forEach(p => {
+        programOrganisms[p.id] = data.optionGroups.find(og => og.name === p.name).id
+        let remove = []
+        p.programStages.forEach(ps => {
+            ps.programStageSections.forEach(pss => {
+                let childSections = []
+                ps.programStageSections
+                    .filter(childSection =>
+                        childSection.name.match(new RegExp('{' + pss.name + '}.*'))
+                    )
+                    .forEach(childSection => {
+                        remove.push(childSection.id)
+                        childSection.name = childSection.name.replace(
+                            new RegExp('{' + pss.name + '}'),
+                            ''
+                        )
+                        childSections.push(childSection)
+                    })
+                pss.childSections = childSections
+            })
+            ps.programStageSections = ps.programStageSections.filter(
+                s => !remove.includes(s.id)
+            )
+            let resultSection = ps.programStageSections.find(s => s.name === 'Result')
+            if(resultSection) resultSection.hideWithValues = true
+        })
+    })
 
-    let metadata = { optionSets, person, programs: data.programs }
+    programs.rules = []
+    data.programRules.filter(r => r.programRuleActions.find(a => a.dataElement || a.programStageSection))
+    .forEach(d => {
+        d.condition = programCondition(d.condition)
+        programs.rules.push(d)
+    })
+    programs.rules = programs.rules.sort((a, b) => (a.priority > b.priority) || !a.priority ? 1 : -1)
+
+    let metadata = { optionSets, person, programs: data.programs, programOrganisms }
     console.log(data)
     console.log(metadata)
 
@@ -327,6 +392,24 @@ export async function getOrganisms(organismGroup) {
     return organisms
 }
 
+export async function newRecord(
+    programId,
+    pStage,
+    organismCode,
+    orgUnit,
+    entityId,
+    entityValues
+) {
+    let initialValues = { [_organismsDataElementId]: organismCode, [_amrDataElement]: await generateAmrId(orgUnit) }
+    const eventId = entityId ?
+        await addEvent(initialValues, programId, pStage.id, orgUnit, entityId, entityValues) :
+        await addPersonWithEvent(initialValues, programId, pStage.id, orgUnit, entityValues)
+
+    const { programStage, eventValues, status } = await getProgramStageDeo(pStage, initialValues)
+
+    return { programStage, eventValues, status, eventId }
+}
+
 /**
  * Gets the program stage for a new event.
  * @param {string} programId
@@ -347,7 +430,7 @@ export async function getProgramStageNew(
         await addEvent(initialValues, programId, programStageId, orgUnit, entityId, entityValues) :
         await addPersonWithEvent(initialValues, programId, programStageId, orgUnit, entityValues)
 
-    const { programStage, eventValues, rules } = await getProgramStageDeo(programId, programStageId, initialValues)
+    const { programStage, eventValues } = await getProgramStageDeo(programId, programStageId, initialValues)
 
     return { programStage, eventValues, rules, eventId }
 }

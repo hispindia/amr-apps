@@ -17,22 +17,12 @@ import { ProgressSection } from '../'
  */
 export class RecordPanel extends Component {
     state = {
-        programs: null,
-        programStages: null,
         organisms: null,
         values: {
             programId: '',
             programStageId: '',
             organismCode: '',
         },
-    }
-
-    componentDidMount = async () => {
-        const { programs, programStages } = this.props
-        this.setState({
-            programs: programs,
-            programStages: programStages,
-        })
     }
 
     componentDidUpdate = prevProps => {
@@ -50,7 +40,7 @@ export class RecordPanel extends Component {
      * Called when a new program is selected.
      */
     onProgramChange = async (name, value) => {
-        const { programs, programStages } = this.state
+        const { programStages } = this.props
         let values = {
             programId: value,
             programStageId:
@@ -59,10 +49,15 @@ export class RecordPanel extends Component {
                     : programStages[value][0].value,
             organismCode: '',
         }
+
+        let organisms = []
+        this.props.optionSets[this.props.programOrganisms[value]].forEach(o => {
+            if (!organisms.find(org => org.value === o.value))
+                organisms.push(o)
+        })
+
         this.setState({
-            organisms: await getOrganisms(
-                programs.find(program => program.value === value).label
-            ),
+            organisms: organisms,
             values: values,
         })
     }
@@ -77,7 +72,7 @@ export class RecordPanel extends Component {
         this.props.passValues({
             programId: values.programId,
             programStageId: values.programStageId,
-            orgranism: values.organismCode,
+            organism: values.organismCode,
             valid: !Object.values(values).includes('')
         })
     }
@@ -87,7 +82,8 @@ export class RecordPanel extends Component {
      * @returns {Object[]} Data elements.
      */
     getDataElements = () => {
-        const { programs, programStages, organisms, values } = this.state
+        const { programs, programStages } = this.props
+        const { organisms, values } = this.state
 
         let dataElements = [
             {
@@ -97,7 +93,7 @@ export class RecordPanel extends Component {
                 onChange: this.onProgramChange,
             },
         ]
-        if (values.programId && programStages[values.programId].length > 0)
+        if (values.programId && programStages[values.programId].length > 1)
             dataElements.push({
                 id: 'programStageId',
                 label: 'Type',
@@ -152,9 +148,7 @@ export class RecordPanel extends Component {
         const dataElements = this.getDataElements()
         const half = Math.ceil(dataElements.length / 2)
 
-        if (!this.state.programs) return <ProgressSection />
-
-        return !this.state.programs ? null : (
+        return (
             <MarginBottom>
                 <MarginBottom>
                     <Card>

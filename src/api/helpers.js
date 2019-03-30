@@ -41,19 +41,15 @@ export const getProgramStageApproval = async (
     }
 }
 
-export const getProgramStageDeo = async (programId, programStageId, eventValues) => {
-    let programStage = await getProgramStage(programStageId, eventValues, true)
+export const getProgramStageDeo = async (pStage, values) => {
+    let { programStage, status, eventValues } = await getProgramStage(pStage, values, true)
 
     if (!eventValues[_l1ApprovalStatus] && !eventValues[_l2ApprovalStatus]) {
         let approvalSection = programStage.programStageSections.find(section => section.name === 'Approval')
         if (approvalSection) approvalSection.hideWithValues = true
     }
 
-    return {
-        programStage: programStage,
-        eventValues: eventValues,
-        rules: await getProgramRules(programId, programStageId),
-    }
+    return { programStage, eventValues, status }
 }
 
 /**
@@ -263,7 +259,7 @@ const getProgramRules = async (programId, programStageId) => {
 }
 
 const getProgramStage = async (
-    programStageId,
+    programStage,
     values,
     newRecord,
     isL1User,
@@ -307,73 +303,34 @@ const getProgramStage = async (
         }
     }
 
-    let programStage = await get(
-        'programStages/' +
-            programStageId +
-            '.json?fields=displayName,programStageDataElements[dataElement[id,formName],compulsory],' +
-            'programStageSections[id,name,displayName,renderType,dataElements[id,displayFormName,code,valueType,optionSetValue,' +
-            'optionSet[name,displayName,id,code,options[name,displayName,id,code]]]]'
-    )
-
-    programStage.deletable = values === {} || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
-
-    programStage.editable = values === {} || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus]) || [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes('Resend')
-
-    programStage.finished = values[_l1ApprovalStatus] === values[_l2ApprovalStatus] === 'Approved'
-
-    programStage.programStageSections.forEach(section => {
-        section.hide = false
-        section.dataElements.forEach(dataElement => {
-            // Adding required property.
-            dataElement.required = programStage.programStageDataElements.find(
-                programStageDataElement =>
-                    programStageDataElement.dataElement.id === dataElement.id
-            ).compulsory
-            dataElement.hide = false
-            // Adding options.
-            if (dataElement.optionSetValue) {
-                let options = []
-                dataElement.optionSet.options.forEach(option =>
-                    options.push({
-                        value: option.code,
-                        label: option.displayName,
-                    })
-                )
-                dataElement.optionSet.options = options
-            }
-            dataElement.disabled = shouldDisable(dataElement)
+    const setDataElements = (dataElements, psDataElements) =>
+        dataElements.forEach(de => {
+            de.hide = false
             // Adding missing values.
-            if (!values[dataElement.id]) values[dataElement.id] = ''
+            if (!values[de.id]) values[de.id] = ''
+            // Adding required property.
+            de.required = psDataElements.find(psde =>
+                psde.dataElement.id === de.id
+            ).compulsory
+            de.disabled = shouldDisable(de)
+
+        })
+
+    programStage.programStageSections.forEach(s => {
+        s.hide = false
+        setDataElements(s.dataElements, programStage.programStageDataElements)
+        s.childSections.forEach(cs => {
+            cs.hide = false
+            setDataElements(cs.dataElements, programStage.programStageDataElements)
         })
     })
 
-    let remove = []
-    // Adding child sections and removing child sections from main sections.
-    programStage.programStageSections.forEach(programStageSection => {
-        let childSections = []
-        programStage.programStageSections
-            .filter(childSection =>
-                childSection.name.match(
-                    new RegExp('{' + programStageSection.name + '}.*')
-                )
-            )
-            .forEach(childSection => {
-                remove.push(childSection.id)
-                childSection.name = childSection.name.replace(
-                    new RegExp('{' + programStageSection.name + '}'),
-                    ''
-                )
-                childSections.push(childSection)
-            })
-        programStageSection.childSections = childSections
-    })
+    const status = {
+        deletable: values === {} || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus]),
+        editable: values === {} || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus]) || [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes('Resend'),
+        finished: values[_l1ApprovalStatus] === values[_l2ApprovalStatus] === 'Approved',
+        completed: false
+    }
 
-    programStage.programStageSections = programStage.programStageSections.filter(
-        section => !remove.includes(section.id)
-    )
-
-    let resultSection = programStage.programStageSections.find(section => section.name === 'Result')
-    if(resultSection) resultSection.hideWithValues = true
-
-    return programStage
+    return { programStage, status, eventValues: values }
 }

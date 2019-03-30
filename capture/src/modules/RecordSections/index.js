@@ -11,13 +11,15 @@ import {
     getProgramStageNew,
     getProgramStageExisting,
     deleteEvent,
-    setEventStatus
+    setEventStatus,
+    newRecord
 } from 'api'
 import { ButtonRow } from 'inputs'
 
 const getPanelMetadata = programs => {
     let programList = []
-    let stageList = {}
+    let stageLists = {}
+    let organismLists = {}
 
     programs.forEach(program => {
         programList.push({
@@ -31,14 +33,17 @@ const getPanelMetadata = programs => {
                 label: programStage.displayName,
             })
         )
-        stageList[program.id] = stages
+        stageLists[program.id] = stages
+        organismLists[program.id] = stages
     })
 
-    return { programList, stageList }
+    return { programList, stageLists }
 }
 
 export const RecordSections = props => {
-    const { optionSets, person, programs } = props.metadata
+    const { optionSets, person, programs, programOrganisms } = props.metadata
+
+    const [loading, setLoading] = useState(false) 
 
     const [entity, setEntity] = useState({
         values: person.values,
@@ -53,10 +58,35 @@ export const RecordSections = props => {
         valid: false,
     })
 
-    const { programList, stageList } = getPanelMetadata(programs)
-    console.log(programList)
+    const [event, setEvent] = useState({
+        valid: false,
+        buttonDisabled: false
+    })
+
+    const [eventValid, setEventValid] = useState(false)
+
+    const [eventData, setEventData] = useState(null)
+
+    const { programList, stageLists } = getPanelMetadata(programs)
 
     const [resetSwitch, setResetSwitch] = useState(false)
+
+    useEffect(() => {
+        const getNewRecord = async () => {
+            setLoading(true)
+            setEventData(await newRecord(
+                panel.programId,
+                programs.find(p => p.id === panel.programId).programStages
+                    .find(s => s.id === panel.programStageId),
+                panel.organism,
+                props.match.params.orgUnit,
+                entity.id,
+                entity.values
+            ))
+            setLoading(false)
+        }
+        if (panel.valid) getNewRecord()
+    }, [panel.valid])
 
     return (
         <Margin>
@@ -74,14 +104,31 @@ export const RecordSections = props => {
                 entityId={null}
                 showEdit={true}
             />
-            <RecordPanel
+            {entity.valid && <RecordPanel
                 programs={programList}
-                programStages={stageList}
+                programStages={stageLists}
+                programOrganisms={programOrganisms}
+                optionSets={optionSets}
                 resetSwitch={resetSwitch}
                 passValues={setPanel}
-                disabled={false}
-            />
-            
+                disabled={panel.valid}
+            />}
+            {eventData && <RecordForm
+                passValues={setEventValid}
+                programStage={eventData.programStage}
+                rules={
+                    programs.rules.filter(r =>
+                        (r.program.id === panel.programId &&
+                        (r.programStage ? r.programStage.id === panel.programStageId : true)) ||
+                        (r.programStage ? r.programStage.id === panel.programStageId : false)
+                    )
+                }
+                optionSets={optionSets}
+                values={eventData.eventValues}
+                eventId={eventData.eventId}
+                status={eventData.status}
+            />}
+            {loading && <ProgressSection />}
         </Margin>
     )
 }

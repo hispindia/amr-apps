@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
-import { RecordsOverview } from 'modules'
+import { RecordsOverview, ProgressSection } from 'modules'
 import { RecordSections } from '../'
 import { initMetadata } from 'api';
 
@@ -21,9 +21,7 @@ export const Main = props => {
         getMetaData()
     }, [])
 
-    if (loading) return <p>loading</p>
-
-    console.log(metadata)
+    if (loading) return <ProgressSection/>
 
     return (
         <MainSection>
