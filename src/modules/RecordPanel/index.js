@@ -22,7 +22,7 @@ export class RecordPanel extends Component {
     componentDidMount = () => {
         const values = this.props.values
         this.setState({
-            organisms: this.getOrganisms(values.programId),
+            organisms: values.programId ? this.getOrganisms(values.programId) : null,
             values: {
                 programId: values.programId ? values.programId : '',
                 programStageId: values.programStageId ? values.programStageId : '',
@@ -43,6 +43,7 @@ export class RecordPanel extends Component {
     }
 
     getOrganisms = programId => {
+        console.log(this.props)
         let organisms = []
         this.props.optionSets[this.props.programOrganisms[programId]].forEach(o => {
             if (!organisms.find(org => org.value === o.value))

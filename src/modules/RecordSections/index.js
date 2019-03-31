@@ -1,49 +1,23 @@
 import React, { useState, useEffect } from 'react'
-import { Margin } from 'helpers'
 import {
     PersonForm,
     RecordForm,
     RecordPanel,
     TitleRow,
     ProgressSection,
-} from 'modules'
+} from '../'
 import {
-    getProgramStageNew,
-    getProgramStageExisting,
     deleteEvent,
     setEventStatus,
     newRecord,
     existingRecord,
-    _organismsDataElementId
-} from 'api'
-import { ButtonRow } from 'inputs'
-
-const getPanelMetadata = programs => {
-    let programList = []
-    let stageLists = {}
-    let organismLists = {}
-
-    programs.forEach(program => {
-        programList.push({
-            value: program.id,
-            label: program.name,
-        })
-        let stages = []
-        program.programStages.forEach(programStage =>
-            stages.push({
-                value: programStage.id,
-                label: programStage.displayName,
-            })
-        )
-        stageLists[program.id] = stages
-        organismLists[program.id] = stages
-    })
-
-    return { programList, stageLists }
-}
+    _organismsDataElementId,
+    ButtonRow,
+    Margin
+} from '../../'
 
 export const RecordSections = props => {
-    const onSubmitClick = async addMore => {
+    const onSubmit = async addMore => {
         setButtonDisabled(true)
         await setEventStatus(eventData.eventId, true, eventData.status.editable)
 
@@ -54,13 +28,30 @@ export const RecordSections = props => {
             setResetSwitch(!resetSwitch)
             setButtonDisabled(false)
         }
-        else props.history.push('/')
+        else props.history.goBack()
     }
 
-    const { optionSets, person, programs, programOrganisms } = props.metadata
+    const onEdit = async() => {
+        setButtonDisabled(true)
+        await setEventStatus(eventData.eventId)
+        let newEventData = {...eventData}
+        newEventData.status.completed = false
+        setEventData(newEventData)
+        setButtonDisabled(false)
+    }
+
+    const onDelete = async () => {
+        setButtonDisabled(true)
+        if (window.confirm('Are you sure you want to permanently delete this record?')) {
+            await deleteEvent(eventData.eventId)
+            props.history.goBack()
+        }
+        setButtonDisabled(false)
+    }
+
+    const { optionSets, person, programs, programList, stageLists, programOrganisms } = props.metadata
     const event = props.match.params.event
 
-    const [lists] = useState(getPanelMetadata(programs))
     const [loading, setLoading] = useState(false) 
     const [entity, setEntity] = useState({
         values: person.values,
@@ -76,7 +67,7 @@ export const RecordSections = props => {
     const [eventValid, setEventValid] = useState(false)
     const [eventData, setEventData] = useState(null)
     const [resetSwitch, setResetSwitch] = useState(false)
-    const [buttonDisabled, setButtonDisabled] = useState(true)
+    const [buttonDisabled, setButtonDisabled] = useState(false)
 
     useEffect(() => {
         const getNewRecord = async () => {
@@ -97,7 +88,8 @@ export const RecordSections = props => {
 
     useEffect(() => {
         const getExistingRecord = async () => {
-            const { programId, programStage, eventValues, status, eventId, entityId } = await existingRecord(programs, event)
+            const { programId, programStage, eventValues, status, eventId, entityId }
+                = await existingRecord(programs, event)
             setEntity({ id: entityId })
             setPanel({
                 programId,
@@ -105,6 +97,7 @@ export const RecordSections = props => {
                 organism: eventValues[_organismsDataElementId],
                 valid: true,
             })
+            setButtonDisabled(false)
             setEventData({ programStage, eventValues, status, eventId })
         }
         
@@ -117,7 +110,6 @@ export const RecordSections = props => {
         <Margin>
             <TitleRow
                 title="Record"
-                backPath="/"
                 history={props.history}
             />
             <PersonForm
@@ -130,8 +122,8 @@ export const RecordSections = props => {
                 showEdit={!event && !panel.valid}
             />
             {entity.valid && <RecordPanel
-                programs={lists.programList}
-                programStages={lists.stageLists}
+                programs={programList}
+                programStages={stageLists}
                 programOrganisms={programOrganisms}
                 optionSets={optionSets}
                 resetSwitch={resetSwitch}
@@ -157,27 +149,45 @@ export const RecordSections = props => {
             {loading && <ProgressSection />}
             <ButtonRow
                 buttons={
-                    [
+                    event
+                    ? eventData ? [
+                        {
+                            label: 'Delete',
+                            onClick: onDelete,
+                            disabled: !eventData.status.deletable || buttonDisabled,
+                            icon: 'delete',
+                            kind: 'destructive',
+                            tooltip: 'Permanently delete record.',
+                            disabledTooltip: 'You cannot delete records with an approval status.',
+                        },
+                        {
+                            label: eventData.status.completed ? 'Edit' : 'Submit',
+                            onClick: () => eventData.status.completed ? onEdit() : onSubmit(false),
+                            disabled: !eventData.status.editable || disabled,
+                            icon: eventData.status.completed ? 'edit' : 'done',
+                            kind: 'primary',
+                            tooltip: eventData.status.completed ? 'Edit record' : 'Submit record.',
+                            disabledTooltip: eventData.status.completed ? 'Records with this approval status cannot be edited.' : 'A required field is empty.',
+                        },
+                    ] : []
+                    : [
                         {
                             label: 'Submit and add new',
-                            onClick: () => onSubmitClick(true),
+                            onClick: () => onSubmit(true),
                             disabled: disabled,
                             icon: 'add',
                             kind: 'primary',
-                            tooltip:
-                                'Submit record and add new record for the same person.',
-                            disabledTooltip:
-                                'A required field is empty.',
+                            tooltip: 'Submit record and add new record for the same person.',
+                            disabledTooltip: 'A required field is empty.',
                         },
                         {
                             label: 'Submit',
-                            onClick: () => onSubmitClick(false),
+                            onClick: () => onSubmit(false),
                             disabled: disabled,
                             icon: 'done',
                             kind: 'primary',
                             tooltip: 'Submit record.',
-                            disabledTooltip:
-                                'A required field is empty.',
+                            disabledTooltip: 'A required field is empty.',
                         },
                     ]
                 }

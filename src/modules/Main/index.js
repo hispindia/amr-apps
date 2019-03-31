@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
-import { RecordsOverview, ProgressSection } from 'modules'
-import { RecordSections } from '../'
-import { initMetadata } from 'api';
+import { RecordSections, RecordsOverview } from '../'
+import { initMetadata } from '../../'
 
 const MainSection = styled.main`
     width: 100%;
@@ -20,8 +19,8 @@ export const Main = props => {
         }
         getMetaData()
     }, [])
-
-    if (loading) return <ProgressSection/>
+    
+    if (loading) return null
 
     return (
         <MainSection>
@@ -34,7 +33,7 @@ export const Main = props => {
                             {...componentProps}
                             selected={props.selected}
                             tables={props.tables}
-                            userOnly
+                            userOnly={props.userOnly}
                         />
                     )}
                 />

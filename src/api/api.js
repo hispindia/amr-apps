@@ -166,11 +166,22 @@ export async function initMetadata() {
 
     let programs = data.programs
 
+    let programList = []
+    let stageLists = {}
     let programOrganisms = {}
     programs.forEach(p => {
+        programList.push({
+            value: p.id,
+            label: p.name,
+        })
+        let stages = []
         programOrganisms[p.id] = data.optionGroups.find(og => og.name === p.name).id
         let remove = []
         p.programStages.forEach(ps => {
+            stages.push({
+                value: ps.id,
+                label: ps.displayName,
+            })
             ps.programStageSections.forEach(pss => {
                 let childSections = []
                 ps.programStageSections
@@ -193,6 +204,7 @@ export async function initMetadata() {
             let resultSection = ps.programStageSections.find(s => s.name === 'Result')
             if(resultSection) resultSection.hideWithValues = true
         })
+        stageLists[p.id] = stages
     })
 
     programs.rules = []
@@ -203,7 +215,7 @@ export async function initMetadata() {
     })
     programs.rules = programs.rules.sort((a, b) => (a.priority > b.priority) || !a.priority ? 1 : -1)
 
-    let metadata = { optionSets, person, programs: data.programs, programOrganisms }
+    let metadata = { optionSets, person, programs: data.programs, programList, stageLists, programOrganisms }
     console.log(data)
     console.log(metadata)
 
@@ -340,58 +352,6 @@ export async function deletePerson(id) {
     await del('trackedEntityInstances/' + id)
 }
 
-/**
- * Gets all programs and their program stages.
- * @returns {Object} Programs and program stages.
- */
-export async function getPrograms() {
-    const data = (await get(
-        'programs.json?paging=false&fields=id,name,programStages[id,name]'
-    )).programs
-
-    let programs = []
-    let programStages = {}
-    data.forEach(program => {
-        programs.push({
-            value: program.id,
-            label: program.name,
-        })
-        let stages = []
-        program.programStages.forEach(programStage =>
-            stages.push({
-                value: programStage.id,
-                label: programStage.name,
-            })
-        )
-        programStages[program.id] = stages
-    })
-
-    return { programs, programStages }
-}
-
-/**
- * Gets organisms belonging to an organism group.
- * @param {string} organismGroup - Organism/program name.
- * @returns {Object[]} Organisms.
- */
-export async function getOrganisms(organismGroup) {
-    const options = (await get(
-        'optionGroups.json?paging=false&fields=name,options[code,displayName]&filter=name:eq:' +
-            organismGroup
-    )).optionGroups[0].options
-
-    let organisms = []
-    options.forEach(option => {
-        if (!organisms.find(organism => organism.value === option.code))
-            organisms.push({
-                value: option.code,
-                label: option.displayName,
-            })
-    })
-
-    return organisms
-}
-
 export async function newRecord(
     programId,
     pStage,
@@ -418,48 +378,6 @@ export async function existingRecord(programs, eventId, isApproval) {
         await getProgramStageDeo(pStage, initialValues, completed, false) :
         await getProgramStageApproval(pStage, initialValues, completed, false, _isL1User, _isL2User)
     return { programId, programStage, eventValues, status, eventId, entityId }
-}
-
-/**
- * Gets the program stage for a new event.
- * @param {string} programId
- * @param {string} programStageId
- * @param {string} organismCode
- * @returns {Object} Program stage, values,
- */
-export async function getProgramStageNew(
-    programId,
-    programStageId,
-    organismCode,
-    orgUnit,
-    entityId,
-    entityValues
-) {
-    let initialValues = { [_organismsDataElementId]: organismCode, [_amrDataElement]: await generateAmrId(orgUnit) }
-    const eventId = entityId ?
-        await addEvent(initialValues, programId, programStageId, orgUnit, entityId, entityValues) :
-        await addPersonWithEvent(initialValues, programId, programStageId, orgUnit, entityValues)
-
-    const { programStage, eventValues } = await getProgramStageDeo(programId, programStageId, initialValues)
-
-    return { programStage, eventValues, rules, eventId }
-}
-
-/**
- * Gets AMR program stage, values, and organism data element ID.
- * @param {string} eventId - Event ID.
- * @returns {Object} AMR program stage, values, and organism data element ID.
- */
-export async function getProgramStageExisting(eventId) {
-    let { eventValues: initialValues, programId, programStageId, completed } = await getEventValues(eventId)
-    const { programStage, eventValues, rules } = await getProgramStageDeo(programId, programStageId, initialValues)
-    return { programStage, eventValues, rules, eventId, completed }
-}
-
-export async function getRecordForApproval(eventId) {
-    let { eventValues: initialValues, programId, programStageId, completed } = await getEventValues(eventId)
-    const { programStage, eventValues, rules } = await getProgramStageApproval(programId, programStageId, initialValues, _isL1User, _isL2User)
-    return { programStage, eventValues, rules, eventId, completed }
 }
 
 /**
@@ -527,9 +445,6 @@ export async function getOrgUnits() {
  * @returns {Object} Event.
  */
 async function setEventValues(event, values) {
-    if (!values[_amrDataElement])
-        values[_amrDataElement] = await generateAmrId(event.orgUnit)
-
     if (!event.dataValues) event.dataValues = []
 
     for (let dataElement in values) {
@@ -652,7 +567,7 @@ export async function addEvent(
 }
 
 export async function setEventStatus(eventId, completed, resetApproval) {
-    let event = await get('events/' + eventId + '.json')
+    let event = await get('events/' + eventId)
     let dateElement = event.dataValues.find(dv => dv.dataElement === _sampleDateElementId)
     if (dateElement) event.eventDate = dateElement.value
     event.status = completed ? 'COMPLETED' : 'ACTIVE'

@@ -4,11 +4,11 @@ import IconButton from '../../inputs/IconButton'
 
 export const TitleRow = props => (
     <Row>
-        {props.backPath && (
+        {props.history && (
             <IconButton
                 name="arrow_back"
                 icon="arrow_back"
-                onClick={() => props.history.push(props.backPath)}
+                onClick={props.history.goBack}
             />
         )}
         <Title>{props.title}</Title>

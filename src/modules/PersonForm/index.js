@@ -65,7 +65,7 @@ export class PersonForm extends Component {
     componentDidUpdate = async prevProps => {
         const entityId = this.props.entityId
         if (entityId !== prevProps.entityId) {
-            this.setState({ loading: true })
+            //this.setState({ loading: true })
             this.onNewValues(await getPersonValues(entityId), entityId)
             this.setState({ loading: false })
         }
