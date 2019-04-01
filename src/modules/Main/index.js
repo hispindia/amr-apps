@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
 import { RecordSections, RecordsOverview } from '../'
-import { initMetadata } from '../../'
+import { ProgressSection } from '../ProgressSection'
+import { initMetadata, Margin } from '../../'
 
 const MainSection = styled.main`
     width: 100%;
@@ -20,7 +21,14 @@ export const Main = props => {
         getMetaData()
     }, [])
     
-    if (loading) return null
+    if (loading)
+        return (
+            <MainSection>
+                <Margin>
+                    <ProgressSection/>
+                </Margin>
+            </MainSection>
+        )
 
     return (
         <MainSection>
@@ -37,7 +45,9 @@ export const Main = props => {
                         />
                     )}
                 />
-                {['/orgUnit/:orgUnit/event', '/orgUnit/:orgUnit/event/:event'].map(
+                {(props.userOnly ?
+                    ['/orgUnit/:orgUnit/event', '/orgUnit/:orgUnit/event/:event'] :
+                    ['/orgUnit/:orgUnit/event/:event']).map(
                     path => (
                         <Route
                             key={path}
@@ -52,7 +62,12 @@ export const Main = props => {
                         />
                     )
                 )}
-                <Route render={() => <Redirect from="/" to="/approval/ALL" />} />
+                <Route render={() => 
+                    <Redirect
+                        from='/'
+                        to={props.userOnly ? '/approval/ALL' : '/approval/Validate'}
+                    />}
+                />
             </Switch>
         </MainSection>
     )

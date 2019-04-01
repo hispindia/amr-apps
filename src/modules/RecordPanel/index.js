@@ -43,7 +43,6 @@ export class RecordPanel extends Component {
     }
 
     getOrganisms = programId => {
-        console.log(this.props)
         let organisms = []
         this.props.optionSets[this.props.programOrganisms[programId]].forEach(o => {
             if (!organisms.find(org => org.value === o.value))

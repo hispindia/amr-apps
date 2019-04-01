@@ -1,9 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import * as serviceWorker from './serviceWorker'
+import { App } from 'modules'
 import { init } from 'api'
-import { AppSkeleton } from 'modules'
-import { Main } from './modules'
 import { menuItems, tables } from './config'
 
 const developmentServer = 'http://apps.hispindia.org/amr'
@@ -14,9 +13,12 @@ const withBaseUrl = async baseUrl => {
     await init(baseUrl)
 
     ReactDOM.render(
-        <AppSkeleton appName="AMR Approval" menuItems={menuItems}>
-            <Main tables={tables} />
-        </AppSkeleton>,
+        <App
+            appName="AMR Approval"
+            menuItems={menuItems}
+            tables={tables}
+            userOnly={false}
+        />,
         rootElement
     )
     serviceWorker.unregister()

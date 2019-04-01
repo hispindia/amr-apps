@@ -117,16 +117,19 @@ export async function initMetadata() {
     }
 
     let data = await get('metadata.json?' +
-        'options=true&programs=true&optionSets=true&optionGroups=true&programRuleVariables=true&' +
-        'programRules=true&trackedEntityTypes=true&fields=id,name,displayName,code,options,dataElement,' +
-        'program,programStage,programStages[id,displayName,programStageDataElements[dataElement[id],' +
-        'compulsory],programStageSections[id,name,displayName,renderType,' +
-        'dataElements[id,displayFormName,code,valueType,optionSetValue,optionSet]]],' +
-        'programRuleActions[programRuleActionType,dataElement,optionGroup,' +
-        'trackedEntityAttribute,programStageSection,data],condition,trackedEntityTypeAttributes[' +
-        'name,id,displayName,valueType,unique,optionSetValue,optionSet]' +
-        'trackedEntityTypeAttributes[mandatory,trackedEntityAttribute[' +
-        'name,id,displayName,valueType,unique,optionSetValue,optionSet]],priority')
+        'options=true&programs=true&optionSets=true&optionGroups=true&' +
+        'programRuleVariables=true&programRules=true&trackedEntityTypes=true' +
+        '&fields=id,name,displayName,code,options,dataElement,program,' +
+        'programStage,programStages[id,displayName,programStageDataElements[' +
+        'dataElement[id],compulsory],programStageSections[id,name,' +
+        'displayName,renderType,dataElements[id,displayFormName,code,' +
+        'valueType,optionSetValue,optionSet]]],programRuleActions[' +
+        'programRuleActionType,dataElement,optionGroup,' +
+        'trackedEntityAttribute,programStageSection,data],condition,' +
+        'trackedEntityTypeAttributes[name,id,displayName,valueType,unique,' +
+        'optionSetValue,optionSet]trackedEntityTypeAttributes[mandatory,' +
+        'trackedEntityAttribute[name,id,displayName,valueType,unique,' +
+        'optionSetValue,optionSet]],priority')
 
     let options = {}
     data.options.forEach(o => options[o.id] = {
@@ -215,7 +218,7 @@ export async function initMetadata() {
     })
     programs.rules = programs.rules.sort((a, b) => (a.priority > b.priority) || !a.priority ? 1 : -1)
 
-    let metadata = { optionSets, person, programs: data.programs, programList, stageLists, programOrganisms }
+    let metadata = { optionSets, person, programs, programList, stageLists, programOrganisms }
     console.log(data)
     console.log(metadata)
 
@@ -230,9 +233,10 @@ export async function initMetadata() {
 export async function getEntityAttributes(entityId) {
     const attributes = (await get(
         'trackedEntityTypes/' +
-            _personTypeId +
-            '.json?fields=trackedEntityTypeAttributes[mandatory,trackedEntityAttribute[name,' +
-            'id,displayName,valueType,unique,optionSetValue,optionSet[id,options[displayName,code]]]]'
+        _personTypeId +
+        '.json?fields=trackedEntityTypeAttributes[mandatory,' +
+        'trackedEntityAttribute[name,id,displayName,valueType,unique,' +
+        'optionSetValue,optionSet[id,options[displayName,code]]]]'
     )).trackedEntityTypeAttributes
 
     // Contains attribute values.
@@ -242,24 +246,24 @@ export async function getEntityAttributes(entityId) {
     // Attribute names as key and id as value.
     let attributeIds = {}
 
-    attributes.forEach(attribute => {
-        if (attribute.trackedEntityAttribute.unique)
-            uniques[attribute.trackedEntityAttribute.id] = true
-        if (!values[attribute.trackedEntityAttribute.id])
-            values[attribute.trackedEntityAttribute.id] = ''
-        if (attribute.trackedEntityAttribute.optionSetValue) {
+    attributes.forEach(a => {
+        if (a.trackedEntityAttribute.unique)
+            uniques[a.trackedEntityAttribute.id] = true
+        if (!values[a.trackedEntityAttribute.id])
+            values[a.trackedEntityAttribute.id] = ''
+        if (a.trackedEntityAttribute.optionSetValue) {
             let options = []
-            attribute.trackedEntityAttribute.optionSet.options.forEach(option =>
+            a.trackedEntityAttribute.optionSet.options.forEach(option =>
                 options.push({
                     value: option.code,
                     label: option.displayName,
                 })
             )
-            attribute.trackedEntityAttribute.optionSet.options = options
+            a.trackedEntityAttribute.optionSet.options = options
         }
-        attribute.hide = false
-        attributeIds[attribute.trackedEntityAttribute.name] =
-            attribute.trackedEntityAttribute.id
+        a.hide = false
+        attributeIds[a.trackedEntityAttribute.name] =
+            a.trackedEntityAttribute.id
     })
 
     return {
@@ -278,12 +282,13 @@ export async function getEntityAttributes(entityId) {
  */
 export async function checkUnique(property, value) {
     const entities = (await get(
-        'trackedEntityInstances.json?ouMode=ACCESSIBLE&paging=false&fields=trackedEntityInstance&trackedEntityType=' +
-            _personTypeId +
-            '&filter=' +
-            property +
-            ':eq:' +
-            value
+        'trackedEntityInstances.json?ouMode=ACCESSIBLE&paging=false&' +
+        'fields=trackedEntityInstance&trackedEntityType=' +
+        _personTypeId +
+        '&filter=' +
+        property +
+        ':eq:' +
+        value
     )).trackedEntityInstances
     return entities.length > 0 ? entities[0].trackedEntityInstance : false
 }
@@ -297,7 +302,8 @@ export async function getPersonValues(entityId) {
     const data = await get(
         'trackedEntityInstances/' +
             entityId +
-            '.json?ouMode=ALL&fields=attributes[code,displayName,valueType,attribute,value]'
+            '.json?ouMode=ALL&fields=attributes[code,displayName,' +
+            'valueType,attribute,value]'
     )
 
     if (!data) return null
@@ -352,18 +358,11 @@ export async function deletePerson(id) {
     await del('trackedEntityInstances/' + id)
 }
 
-export async function newRecord(
-    programId,
-    pStage,
-    organismCode,
-    orgUnit,
-    entityId,
-    entityValues
-) {
-    let initialValues = { [_organismsDataElementId]: organismCode, [_amrDataElement]: await generateAmrId(orgUnit) }
-    const eventId = entityId ?
-        await addEvent(initialValues, programId, pStage.id, orgUnit, entityId, entityValues) :
-        await addPersonWithEvent(initialValues, programId, pStage.id, orgUnit, entityValues)
+export async function newRecord( pId, pStage, orgaCode, ou, eId, eValues) {
+    let initialValues = { [_organismsDataElementId]: orgaCode, [_amrDataElement]: await generateAmrId(ou) }
+    const eventId = eId ?
+        await addEvent(initialValues, pId, pStage.id, ou, eId, eValues) :
+        await addPersonWithEvent(initialValues, pId, pStage.id, ou, eValues)
 
     const { programStage, eventValues, status } = await getProgramStageDeo(pStage, initialValues, false, true)
 

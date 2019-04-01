@@ -89,7 +89,7 @@ export const RecordSections = props => {
     useEffect(() => {
         const getExistingRecord = async () => {
             const { programId, programStage, eventValues, status, eventId, entityId }
-                = await existingRecord(programs, event)
+                = await existingRecord(programs, event, !props.userOnly)
             setEntity({ id: entityId })
             setPanel({
                 programId,
@@ -167,7 +167,9 @@ export const RecordSections = props => {
                             icon: eventData.status.completed ? 'edit' : 'done',
                             kind: 'primary',
                             tooltip: eventData.status.completed ? 'Edit record' : 'Submit record.',
-                            disabledTooltip: eventData.status.completed ? 'Records with this approval status cannot be edited.' : 'A required field is empty.',
+                            disabledTooltip: eventData.status.completed ?
+                                'Records with this approval status cannot be edited.' :
+                                'A required field is empty.',
                         },
                     ] : []
                     : [
