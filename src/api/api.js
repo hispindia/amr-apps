@@ -565,12 +565,12 @@ export async function addEvent(
     return r.response.importSummaries[0].reference
 }
 
-export async function setEventStatus(eventId, completed, resetApproval) {
+export async function setEventStatus(eventId, completed, isApproval) {
     let event = await get('events/' + eventId)
     let dateElement = event.dataValues.find(dv => dv.dataElement === _sampleDateElementId)
     if (dateElement) event.eventDate = dateElement.value
     event.status = completed ? 'COMPLETED' : 'ACTIVE'
-    if (resetApproval) {
+    if (!isApproval) {
         let values = {}
         event.dataValues.forEach(dataValue => (values[dataValue.dataElement] = dataValue.value))
         if (values[_l1ApprovalStatus] === 'Resend') {

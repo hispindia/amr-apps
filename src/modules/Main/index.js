@@ -41,13 +41,14 @@ export const Main = props => {
                             {...componentProps}
                             selected={props.selected}
                             tables={props.tables}
-                            userOnly={props.userOnly}
+                            isApproval={props.isApproval}
                         />
                     )}
                 />
-                {(props.userOnly ?
-                    ['/orgUnit/:orgUnit/event', '/orgUnit/:orgUnit/event/:event'] :
-                    ['/orgUnit/:orgUnit/event/:event']).map(
+                {(props.isApproval ?
+                    ['/orgUnit/:orgUnit/event/:event'] :
+                    ['/orgUnit/:orgUnit/event', '/orgUnit/:orgUnit/event/:event']
+                    ).map(
                     path => (
                         <Route
                             key={path}
@@ -65,7 +66,7 @@ export const Main = props => {
                 <Route render={() => 
                     <Redirect
                         from='/'
-                        to={props.userOnly ? '/approval/ALL' : '/approval/Validate'}
+                        to={props.isApproval ? '/approval/Validate': '/approval/ALL'}
                     />}
                 />
             </Switch>

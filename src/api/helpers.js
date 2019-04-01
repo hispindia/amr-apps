@@ -11,18 +11,25 @@ const _l2RevisionReason = 'fEnFVvEFKVc'
 
 export const getProgramStageApproval = async (pStage, values, completed, newRecord, isL1User, isL2User) => {
     let { programStage, status, eventValues } = await getProgramStage(pStage, values, completed, newRecord, isL1User, isL2User)
+
+    hideWithValues(programStage.programStageSections, 'Results')
+
     return { programStage, eventValues, status }
 }
 
 export const getProgramStageDeo = async (pStage, values, completed, newRecord) => {
     let { programStage, status, eventValues } = await getProgramStage(pStage, values, completed, newRecord)
 
-    if (!eventValues[_l1ApprovalStatus] && !eventValues[_l2ApprovalStatus]) {
-        let approvalSection = programStage.programStageSections.find(section => section.name === 'Approval')
-        if (approvalSection) approvalSection.hideWithValues = true
-    }
+    if (!eventValues[_l1ApprovalStatus] && !eventValues[_l2ApprovalStatus])
+        hideWithValues(programStage.programStageSections, 'Approval')
+    hideWithValues(programStage.programStageSections, 'Results')
 
     return { programStage, eventValues, status }
+}
+
+const hideWithValues = (sections, sectionName) => {
+    let toBeHidden = sections.find(s => s.name === sectionName)
+    if (toBeHidden) toBeHidden.hideWithValues = true
 }
 
 /**

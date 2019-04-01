@@ -19,7 +19,7 @@ import {
 export const RecordSections = props => {
     const onSubmit = async addMore => {
         setButtonDisabled(true)
-        await setEventStatus(eventData.eventId, true, eventData.status.editable)
+        await setEventStatus(eventData.eventId, true, props.isApproval)
 
         if (addMore) {
             setPanel(null)
@@ -89,7 +89,7 @@ export const RecordSections = props => {
     useEffect(() => {
         const getExistingRecord = async () => {
             const { programId, programStage, eventValues, status, eventId, entityId }
-                = await existingRecord(programs, event, !props.userOnly)
+                = await existingRecord(programs, event, props.isApproval)
             setEntity({ id: entityId })
             setPanel({
                 programId,

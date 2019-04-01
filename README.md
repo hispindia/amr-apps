@@ -9,18 +9,18 @@
 - [x] Storing incomplete records
 - [x] Susceptibility colors based on result
 - [x] Yellow and red DD/MIC colors more distinguishable
+- [x] Getting metadata at startup
+- [x] Hide result section
+- [x] Same sections on approval screen as on entry screen
 - [ ] Modals
 - [ ] Automatic possible duplation check
 - [ ] Manual duplication confirmation
 - [ ] Hashing patient registration number
-- [ ] Using local storage for versioned meta data
 - [ ] Special characters in test values
-- [ ] Hide result section
 - [ ] DD not have color when MIC has value
-- [ ] Same sections on approval screen as on entry screen
 - [ ] Increased program rule support
 - [ ] Validation support
-- [ ] Person overview
+- [ ] Person overview?
 
 ### Installation
 

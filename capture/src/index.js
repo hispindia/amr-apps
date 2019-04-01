@@ -17,7 +17,7 @@ const withBaseUrl = async baseUrl => {
             appName="AMR Capture"
             menuItems={menuItems}
             tables={tables}
-            userOnly
+            isApproval={false}
         />,
         rootElement
     )

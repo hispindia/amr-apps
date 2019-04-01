@@ -26,7 +26,7 @@ export class RecordsOverview extends React.Component {
             rows: await getEvents(
                 this.props.tables[this.props.match.params.status],
                 this.props.selected,
-                this.props.userOnly
+                !this.props.isApproval
             ),
             headers: headers,
         }

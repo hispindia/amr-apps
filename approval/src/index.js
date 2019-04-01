@@ -17,7 +17,7 @@ const withBaseUrl = async baseUrl => {
             appName="AMR Approval"
             menuItems={menuItems}
             tables={tables}
-            userOnly={false}
+            isApproval
         />,
         rootElement
     )

@@ -30,7 +30,7 @@ const theme = createMuiTheme({
 })
 
 export const App = props => {
-    const { menuItems, tables, userOnly } = props
+    const { menuItems, tables, isApproval } = props
     const [orgUnits, setOrgUnits] = useState(null)
     const [selected, setSelected] = useState(null)
 
@@ -65,7 +65,7 @@ export const App = props => {
                             <Main
                                 tables={tables}
                                 selected={selected.id}
-                                userOnly={userOnly}
+                                isApproval={isApproval}
                             />
                         </Row>
                     </div>
