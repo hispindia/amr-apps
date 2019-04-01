@@ -5,10 +5,6 @@ import AddIcon from '@material-ui/icons/Add'
 import { withStyles } from '@material-ui/core/styles'
 import styled from 'styled-components'
 
-const defaultToolbarStyles = {
-    iconButton: {},
-}
-
 const IconContainer = styled(IconButton)`
     color: white !important;
     background: linear-gradient(180deg, #1565c0, #0650a3);
@@ -23,7 +19,7 @@ const IconContainer = styled(IconButton)`
  */
 const TableToolbar = props => (
     <React.Fragment>
-        <Tooltip title={'Add'}>
+        <Tooltip title='Add new record'>
             <IconContainer onClick={props.onAddClick}>
                 <AddIcon />
             </IconContainer>
@@ -31,6 +27,6 @@ const TableToolbar = props => (
     </React.Fragment>
 )
 
-export default withStyles(defaultToolbarStyles, { name: 'TableToolbar' })(
+export default withStyles({ iconButton: {} }, { name: 'TableToolbar' })(
     TableToolbar
 )

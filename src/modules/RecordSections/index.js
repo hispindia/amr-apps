@@ -157,8 +157,8 @@ export const RecordSections = props => {
                             disabled: !eventData.status.deletable || buttonDisabled,
                             icon: 'delete',
                             kind: 'destructive',
-                            tooltip: 'Permanently delete record.',
-                            disabledTooltip: 'You cannot delete records with an approval status.',
+                            tooltip: 'Permanently delete record',
+                            disabledTooltip: 'You cannot delete records with an approval status',
                         },
                         {
                             label: eventData.status.completed ? 'Edit' : 'Submit',
@@ -166,10 +166,10 @@ export const RecordSections = props => {
                             disabled: !eventData.status.editable || disabled,
                             icon: eventData.status.completed ? 'edit' : 'done',
                             kind: 'primary',
-                            tooltip: eventData.status.completed ? 'Edit record' : 'Submit record.',
+                            tooltip: eventData.status.completed ? 'Edit record' : 'Submit record',
                             disabledTooltip: eventData.status.completed ?
-                                'Records with this approval status cannot be edited.' :
-                                'A required field is empty.',
+                                'Records with this approval status cannot be edited' :
+                                'A required field is empty',
                         },
                     ] : []
                     : [
@@ -179,8 +179,8 @@ export const RecordSections = props => {
                             disabled: disabled,
                             icon: 'add',
                             kind: 'primary',
-                            tooltip: 'Submit record and add new record for the same person.',
-                            disabledTooltip: 'A required field is empty.',
+                            tooltip: 'Submit record and add new record for the same person',
+                            disabledTooltip: 'A required field is empty',
                         },
                         {
                             label: 'Submit',
@@ -188,8 +188,8 @@ export const RecordSections = props => {
                             disabled: disabled,
                             icon: 'done',
                             kind: 'primary',
-                            tooltip: 'Submit record.',
-                            disabledTooltip: 'A required field is empty.',
+                            tooltip: 'Submit record',
+                            disabledTooltip: 'A required field is empty',
                         },
                     ]
                 }

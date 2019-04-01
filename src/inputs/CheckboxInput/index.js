@@ -1,54 +1,45 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Checkbox } from '@dhis2/ui/core'
 import { RowW, Label, OptionSpacer } from '../../helpers/helpers'
 
 /**
  * Input consisting of a a group of checkboxes.
  */
-export class CheckboxInput extends React.Component {
-    state = {
-        values: {},
-    }
-
-    componentDidMount = () => {
-        if (this.props.values) this.setState({ values: this.props.values })
-    }
-
-    componentWillReceiveProps = props => {
-        if (this.state.values !== props.values)
-            this.setState({ values: props.values })
-    }
+export const CheckboxInput = props => {
+    const [values, setValues] = useState({})
 
     /**
      * Called on checkbox click.
      */
-    onChange = (name, value) => {
-        let values = { ...this.state.values }
-        value = value ? 'true' : ''
-        values[name] = value
-        this.setState({ values: values })
-        this.props.onChange(name, value)
+    const onChange = (n, v) => {
+        let newValues = { ...values }
+        v = v ? 'true' : ''
+        newValues[n] = v
+        setValues(newValues)
+        props.onChange(n, v)
     }
 
-    render() {
-        return (
-            <div>
-                <Label required={this.props.required}>{this.props.label}</Label>
-                <RowW>
-                    {Object.keys(this.props.objects).map(id => (
-                        <OptionSpacer key={id}>
-                            <Checkbox
-                                name={id}
-                                value={id}
-                                label={this.props.objects[id].label}
-                                checked={this.state.values[id] === 'true'}
-                                onChange={this.onChange}
-                                disabled={this.props.objects[id].disabled}
-                            />
-                        </OptionSpacer>
-                    ))}
-                </RowW>
-            </div>
-        )
-    }
+    useEffect(() => {
+        setValues(props.values)
+    }, [props.values])
+
+    return (
+        <div>
+            <Label required={props.required}>{props.label}</Label>
+            <RowW>
+                {Object.keys(props.objects).map(id => (
+                    <OptionSpacer key={id}>
+                        <Checkbox
+                            name={id}
+                            value={id}
+                            label={props.objects[id].label}
+                            checked={values[id] === 'true'}
+                            onChange={onChange}
+                            disabled={props.objects[id].disabled}
+                        />
+                    </OptionSpacer>
+                ))}
+            </RowW>
+        </div>
+    )
 }

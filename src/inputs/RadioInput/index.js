@@ -1,69 +1,57 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Radio } from '@dhis2/ui/core'
 import { RowW, Label, OptionSpacer, Input } from '../../helpers/helpers'
 
 /**
  * Input consisting of a group of radios.
  */
-export class RadioInput extends React.Component {
-    state = {
-        value: '',
-    }
+export const RadioInput = props => {
+    const [value, setValue] = useState('')
 
-    componentDidMount = () => {
-        this.initValue(this.props)
-    }
-
-    componentWillReceiveProps = props => {
-        if (this.state.value !== props.value) this.initValue(props)
-    }
-
-    initValue = props => {
-        if (props.objects.length === 1) this.onChange(props.objects[0].value)
-        else if (props.value) this.setState({ value: props.value })
-    }
-
-    onChange = value => {
-        this.setState({ value: value })
-        this.props.onChange(this.props.name, value)
+    const onChange = v => {
+        setValue(v)
+        props.onChange(props.name, v)
     }
 
     /**
      * Used to make radio deselectable.
      */
-    onClick = event => {
-        if (this.state.value === event.target.value) this.setState({ value: '' })
+    const onClick = event => {
+        if (value === event.target.value) setValue('')
     }
 
-    render() {
-        return (
-            <Input>
-                <Label required={this.props.required}>{this.props.label}</Label>
-                <RowW>
-                    {this.props.objects.map(object => (
-                        <OptionSpacer key={object.value} onClick={this.onClick}>
-                            <Radio
-                                key={object.value}
-                                name={object.value}
-                                value={object.value}
-                                label={object.label}
-                                checked={this.state.value === object.value}
-                                onChange={this.onChange}
-                                disabled={this.props.disabled}
-                                status={
-                                    object.value === 'Approved'
-                                        ? 'valid'
-                                        : object.value === 'Resend'
-                                        ? 'warning'
-                                        : object.value === 'Rejected'
-                                        ? 'error'
-                                        : 'default'
-                                }
-                            />
-                        </OptionSpacer>
-                    ))}
-                </RowW>
-            </Input>
-        )
-    }
+    useEffect(() => {
+        if (props.objects.length === 1) onChange(props.objects[0].value)
+        else setValue(props.value)
+    }, [props.value])
+
+    return (
+        <Input>
+            <Label required={props.required}>{props.label}</Label>
+            <RowW>
+                {props.objects.map(object => (
+                    <OptionSpacer key={object.value} onClick={onClick}>
+                        <Radio
+                            key={object.value}
+                            name={object.value}
+                            value={object.value}
+                            label={object.label}
+                            checked={value === object.value}
+                            onChange={onChange}
+                            disabled={props.disabled}
+                            status={
+                                object.value === 'Approved'
+                                    ? 'valid'
+                                    : object.value === 'Resend'
+                                    ? 'warning'
+                                    : object.value === 'Rejected'
+                                    ? 'error'
+                                    : 'default'
+                            }
+                        />
+                    </OptionSpacer>
+                ))}
+            </RowW>
+        </Input>
+    )
 }

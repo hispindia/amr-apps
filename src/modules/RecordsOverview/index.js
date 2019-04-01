@@ -1,71 +1,56 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { getEvents, Margin } from '../..'
-import { RecordTable, ProgressSection, TitleRow } from '../'
+import { RecordTable, ProgressSection, TitleRow } from '..'
 import { titles, headers } from './config'
 
 /**
  * Shows events by status.
  */
-export class RecordsOverview extends React.Component {
-    state = { loading: true }
+export const RecordsOverview = props => {
+    const [data, setData] = useState(null)
+    const [loading, setLoading] = useState(true)
 
-    componentDidMount = async () => await this.init()
+    useEffect(() => {
+        setLoading(true)
+        init()
+    }, [props.selected, props.match.params.status])
 
-    componentDidUpdate = async prevProps => {
-        if (
-            prevProps.selected !== this.props.selected ||
-            prevProps.match.params.status !== this.props.match.params.status
-        ) {
-            this.setState({ loading: true })
-            await this.init()
-        }
-    }
-
-    init = async () => {
-        let data = {
+    const init = async () => {
+        setData({
             rows: await getEvents(
-                this.props.tables[this.props.match.params.status],
-                this.props.selected,
-                !this.props.isApproval
+                props.tables[props.match.params.status],
+                props.selected,
+                !props.isApproval
             ),
             headers: headers,
-        }
-        this.setState({
-            data: data,
-            loading: false,
         })
+        setLoading(false)
     }
 
     /**
      * Called when table row is clicked.
      */
-    onEventClick = row => {
-        this.props.history.push('/orgUnit/' + row[5] + '/event/' + row[6])
-    }
+    const onEventClick = row =>
+        props.history.push('/orgUnit/' + row[5] + '/event/' + row[6])
 
     /**
      * On table add click.
      */
-    onAddClick = () => {
-        this.props.history.push('/orgUnit/' + this.props.selected + '/event/')
-    }
+    const onAddClick = () =>
+        props.history.push('/orgUnit/' + props.selected + '/event/')
 
-    render() {
-        return (
-            <Margin>
-                <TitleRow title={titles[this.props.match.params.status]} />
-                {this.state.loading || this.props.loading ? (
-                    <ProgressSection />
-                ) : (
-                    <RecordTable
-                        data={this.state.data}
-                        onEventClick={this.onEventClick}
-                        title=""
-                        onAddClick={this.onAddClick}
-                        addButton={this.props.userOnly}
-                    />
-                )}
-            </Margin>
-        )
-    }
+    return (
+        <Margin>
+            <TitleRow title={titles[props.match.params.status]} />
+            {loading ? <ProgressSection /> :
+                <RecordTable
+                    data={data}
+                    onEventClick={onEventClick}
+                    title=""
+                    onAddClick={onAddClick}
+                    addButton={!props.isApproval}
+                />
+            }
+        </Margin>
+    )
 }
