@@ -16,11 +16,9 @@ export const RecordTable = props => (
                 selectableRows: false,
                 onRowClick: row => props.onEventClick(row),
                 elevation: 0,
-                customToolbar: () => {
-                    return props.addButton ? (
-                        <TableToolbar onAddClick={props.onAddClick} />
-                    ) : null
-                },
+                customToolbar: () => props.addButton
+                    ? <TableToolbar onAddClick={props.onAddClick} />
+                    : null
             }}
         />
     </Card>

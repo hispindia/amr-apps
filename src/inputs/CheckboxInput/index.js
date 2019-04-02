@@ -8,6 +8,10 @@ import { RowW, Label, OptionSpacer } from '../../helpers/helpers'
 export const CheckboxInput = props => {
     const [values, setValues] = useState({})
 
+    useEffect(() => {
+        if (props.values !== values)setValues(props.values)
+    }, [props.values])
+
     /**
      * Called on checkbox click.
      */
@@ -18,10 +22,6 @@ export const CheckboxInput = props => {
         setValues(newValues)
         props.onChange(n, v)
     }
-
-    useEffect(() => {
-        setValues(props.values)
-    }, [props.values])
 
     return (
         <div>

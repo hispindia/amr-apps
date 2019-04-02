@@ -7,14 +7,14 @@ import Switch from '@dhis2/ui/core/Switch'
 export const SwitchInput = props => {
     const [value, setValue] = useState(false)
 
-    const onChange = (name, value) => {
-        setValue(value)
-        props.onChange(props.name, value)
-    }
-
     useEffect(() => {
-        setValue(props.value)
+        if (props.value !== value) setValue(props.value)
     }, [props.value])
+
+    const onChange = (n, v) => {
+        setValue(v)
+        props.onChange(props.name, v)
+    }
 
     return (
         <Switch

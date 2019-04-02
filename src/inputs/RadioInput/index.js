@@ -8,6 +8,11 @@ import { RowW, Label, OptionSpacer, Input } from '../../helpers/helpers'
 export const RadioInput = props => {
     const [value, setValue] = useState('')
 
+    useEffect(() => {
+        if (props.objects.length === 1) onChange(props.objects[0].value)
+        else if (props.value !== value) setValue(props.value)
+    }, [props.value])
+
     const onChange = v => {
         setValue(v)
         props.onChange(props.name, v)
@@ -19,11 +24,6 @@ export const RadioInput = props => {
     const onClick = event => {
         if (value === event.target.value) setValue('')
     }
-
-    useEffect(() => {
-        if (props.objects.length === 1) onChange(props.objects[0].value)
-        else setValue(props.value)
-    }, [props.value])
 
     return (
         <Input>

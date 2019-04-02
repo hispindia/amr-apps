@@ -9,6 +9,13 @@ import { Input } from '../../helpers/helpers'
  * Date picker.
  */
 export const DateInput = props => {
+    const [value, setValue] = useState('')
+    const [picker, setPicker] = useState(null)
+    
+    useEffect(() => {
+        if (props.value !== value) setValue(props.value)
+    }, [props.value])
+
     /**
      * Called on date picker input.
      * @param {string} - New date.
@@ -31,13 +38,6 @@ export const DateInput = props => {
     const onKeyPress = e => {
         if (e.key === 'Enter') picker.open(e)
     }
-
-    const [value, setValue] = useState('')
-    const [picker, setPicker] = useState(null)
-    
-    useEffect(() => {
-        setValue(props.value)
-    }, [props.value])
 
     /**
      * Gets input field used for date picker.

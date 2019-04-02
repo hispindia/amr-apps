@@ -22,7 +22,7 @@ export const AgeInput = props => {
     const [picker, setPicker] = useState(null)
 
     useEffect(() => {
-        if (props.value) setValues(props.value)
+        if (props.value !== value) setValues(props.value)
     }, [props.value])
 
     const setValues = date => {

@@ -8,14 +8,14 @@ import { Input } from '../../helpers/helpers'
 export const SelectInput = props => {
     const [value, setValue] = useState('')
 
+    useEffect(() => {
+        if (props.value != value) setValue(props.value)
+    }, [props.value])
+
     const onChange = (n, v) => {
         setValue(v)
         props.onChange(props.name, v)
     }
-
-    useEffect(() => {
-        setValue(props.value)
-    }, [props.value])
 
     return (
         <Input>

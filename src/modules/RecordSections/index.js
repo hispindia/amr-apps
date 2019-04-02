@@ -17,38 +17,6 @@ import {
 } from '../../'
 
 export const RecordSections = props => {
-    const onSubmit = async addMore => {
-        setButtonDisabled(true)
-        await setEventStatus(eventData.eventId, true, props.isApproval)
-
-        if (addMore) {
-            setPanel(null)
-            setEventData(null)
-            setEventValid(false)
-            setResetSwitch(!resetSwitch)
-            setButtonDisabled(false)
-        }
-        else props.history.goBack()
-    }
-
-    const onEdit = async() => {
-        setButtonDisabled(true)
-        await setEventStatus(eventData.eventId)
-        let newEventData = {...eventData}
-        newEventData.status.completed = false
-        setEventData(newEventData)
-        setButtonDisabled(false)
-    }
-
-    const onDelete = async () => {
-        setButtonDisabled(true)
-        if (window.confirm('Are you sure you want to permanently delete this record?')) {
-            await deleteEvent(eventData.eventId)
-            props.history.goBack()
-        }
-        setButtonDisabled(false)
-    }
-
     const { optionSets, person, programs, programList, stageLists, programOrganisms } = props.metadata
     const event = props.match.params.event
 
@@ -105,6 +73,38 @@ export const RecordSections = props => {
     }, [])
 
     const disabled = buttonDisabled || !eventValid || !entity.valid || !panel.valid
+
+    const onSubmit = async addMore => {
+        setButtonDisabled(true)
+        await setEventStatus(eventData.eventId, true, props.isApproval)
+
+        if (addMore) {
+            setPanel(null)
+            setEventData(null)
+            setEventValid(false)
+            setResetSwitch(!resetSwitch)
+            setButtonDisabled(false)
+        }
+        else props.history.goBack()
+    }
+
+    const onEdit = async() => {
+        setButtonDisabled(true)
+        await setEventStatus(eventData.eventId)
+        let newEventData = {...eventData}
+        newEventData.status.completed = false
+        setEventData(newEventData)
+        setButtonDisabled(false)
+    }
+
+    const onDelete = async () => {
+        setButtonDisabled(true)
+        if (window.confirm('Are you sure you want to permanently delete this record?')) {
+            await deleteEvent(eventData.eventId)
+            props.history.goBack()
+        }
+        setButtonDisabled(false)
+    }
 
     return (
         <Margin>
