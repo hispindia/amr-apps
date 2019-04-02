@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import styled, { css } from 'styled-components'
 import { Row } from '../../../../helpers/helpers'
 
@@ -58,53 +58,47 @@ const ChildTree = styled.ul`
 /**
  * Organisation unit node.
  */
-export class OrgUnitNode extends React.Component {
-    state = { opened: false }
+export const OrgUnitNode = props => {
+    const { selected, orgUnit, onSelect } = props
+    const [opened, setOpened] = useState(false)
 
-    componentDidMount = () => {
-        if (this.props.selected.id === this.props.orgUnit.id)
-            this.setState({ opened: true })
-    }
+    useEffect(() => {
+        setOpened(props.selected.id === props.orgUnit.id)
+    }, [props.orgUnit.id])
 
-    onCarretClick = () => {
-        this.setState({ opened: !this.state.opened })
-    }
+    const onCarretClick = () => setOpened(!opened)
 
-    render() {
-        const { selected, orgUnit, onSelect } = this.props
-        const opened = this.state.opened
+    return (
+        <li key={orgUnit.id}>
+            <Row>
+                {orgUnit.children.length > 0
+                    ? <Caret opened={opened} onClick={onCarretClick} />
+                    : <NoCaret/>}
+                <OrgUnitText
+                    isSelected={selected.id === orgUnit.id}
+                    onClick={() =>
+                        onSelect({
+                            id: orgUnit.id,
+                            name: orgUnit.displayName,
+                        })
+                    }
+                >
+                    {orgUnit.displayName}
+                </OrgUnitText>
+            </Row>
+            {orgUnit.children.length > 0 && opened ? (
+                <ChildTree opened={opened}>
+                    {orgUnit.children.map(child => (
+                        <OrgUnitNode
+                            orgUnit={child}
+                            key={child.id}
+                            onSelect={onSelect}
+                            selected={selected}
+                        />
+                    ))}
+                </ChildTree>
+            ) : null}
+        </li>
+    )
 
-        return (
-            <li key={orgUnit.id}>
-                <Row>
-                    {orgUnit.children.length > 0 ? (
-                        <Caret opened={opened} onClick={this.onCarretClick} />
-                    ) : <NoCaret/>}
-                    <OrgUnitText
-                        isSelected={selected.id === orgUnit.id}
-                        onClick={() =>
-                            onSelect({
-                                id: orgUnit.id,
-                                name: orgUnit.displayName,
-                            })
-                        }
-                    >
-                        {orgUnit.displayName}
-                    </OrgUnitText>
-                </Row>
-                {orgUnit.children.length > 0 && opened ? (
-                    <ChildTree opened={this.state.opened}>
-                        {orgUnit.children.map(child => (
-                            <OrgUnitNode
-                                orgUnit={child}
-                                key={child.id}
-                                onSelect={onSelect}
-                                selected={selected}
-                            />
-                        ))}
-                    </ChildTree>
-                ) : null}
-            </li>
-        )
-    }
 }
