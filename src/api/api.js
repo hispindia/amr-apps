@@ -341,7 +341,7 @@ export async function addPerson(values, orgUnit) {
  */
 export async function updatePerson(id, values) {
     let data = await get(
-        'trackedEntityInstances/' + id + '.json?ouMode=ALL&fields=*'
+        'trackedEntityInstances/' + id
     )
     data.attributes = []
     for (let key in values)
