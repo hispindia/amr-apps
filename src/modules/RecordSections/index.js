@@ -40,7 +40,7 @@ export const RecordSections = props => {
     useEffect(() => {
         const getNewRecord = async () => {
             setLoading(true)
-            setEventData(await newRecord(
+            const data = await newRecord(
                 panel.programId,
                 programs.find(p => p.id === panel.programId).programStages
                     .find(s => s.id === panel.programStageId),
@@ -48,7 +48,13 @@ export const RecordSections = props => {
                 props.match.params.orgUnit,
                 entity.id,
                 entity.values
-            ))
+            )
+            setEventData(data)
+            if (!entity.id) {
+                let newEntity = {...entity}
+                newEntity.id = data.entityId
+                setEntity(newEntity)
+            }
             setLoading(false)
         }
         if (panel.valid && !event) getNewRecord()
@@ -79,7 +85,12 @@ export const RecordSections = props => {
         await setEventStatus(eventData.eventId, true, props.isApproval)
 
         if (addMore) {
-            setPanel(null)
+            setPanel({
+                programId: null,
+                programStageId: null,
+                organism: null,
+                valid: false,
+            })
             setEventData(null)
             setEventValid(false)
             setResetSwitch(!resetSwitch)

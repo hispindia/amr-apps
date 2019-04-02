@@ -360,13 +360,13 @@ export async function deletePerson(id) {
 
 export async function newRecord( pId, pStage, orgaCode, ou, eId, eValues) {
     let initialValues = { [_organismsDataElementId]: orgaCode, [_amrDataElement]: await generateAmrId(ou) }
-    const eventId = eId ?
+    const { entityId, eventId } = eId ?
         await addEvent(initialValues, pId, pStage.id, ou, eId, eValues) :
         await addPersonWithEvent(initialValues, pId, pStage.id, ou, eValues)
 
     const { programStage, eventValues, status } = await getProgramStageDeo(pStage, initialValues, false, true)
 
-    return { programStage, eventValues, status, eventId }
+    return { programStage, eventValues, status, eventId, entityId }
 }
 
 export async function existingRecord(programs, eventId, isApproval) {
@@ -503,7 +503,10 @@ export async function addPersonWithEvent(
 
     const r = await postData('trackedEntityInstances/', data)
 
-    return r.response.importSummaries[0].enrollments.importSummaries[0].events.importSummaries[0].reference
+    return {
+        entityId: r.response.importSummaries[0].reference,
+        eventId: r.response.importSummaries[0].enrollments.importSummaries[0].events.importSummaries[0].reference
+    }
 }
 
 /**
@@ -561,8 +564,10 @@ export async function addEvent(
 
     const r = await postData('events', event)
 
-
-    return r.response.importSummaries[0].reference
+    return {
+        entityId,
+        eventId: r.response.importSummaries[0].reference
+    }
 }
 
 export async function setEventStatus(eventId, completed, isApproval) {
