@@ -9,6 +9,15 @@ import { titles, headers } from './config'
 export const RecordsOverview = props => {
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [addButtonDisabled, setAddButtonDisabled] = useState(true)
+
+    useEffect(() => {
+        if(props.isApproval) return
+        const noProgram = !props.programs.find(p =>
+            p.organisationUnits.find(ou => ou.id === props.selected))
+        if (noProgram !== addButtonDisabled)
+            setAddButtonDisabled(!addButtonDisabled)
+    }, [props.selected])
 
     useEffect(() => {
         setLoading(true)
@@ -49,6 +58,7 @@ export const RecordsOverview = props => {
                     title=""
                     onAddClick={onAddClick}
                     addButton={!props.isApproval}
+                    addButtonDisabled={addButtonDisabled}
                 />
             }
         </Margin>

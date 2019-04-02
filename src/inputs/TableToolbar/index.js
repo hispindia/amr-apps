@@ -3,7 +3,7 @@ import IconButton from '@material-ui/core/IconButton'
 import Tooltip from '@material-ui/core/Tooltip'
 import AddIcon from '@material-ui/icons/Add'
 import { withStyles } from '@material-ui/core/styles'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 const IconContainer = styled(IconButton)`
     color: white !important;
@@ -12,6 +12,11 @@ const IconContainer = styled(IconButton)`
     &:hover {
         background: linear-gradient(180deg, #054fa3, #034793);
     }
+    ${props =>
+        props.disabled &&
+        css`
+            opacity: .33;
+        `}
 `
 
 /**
@@ -19,10 +24,19 @@ const IconContainer = styled(IconButton)`
  */
 const TableToolbar = props => (
     <React.Fragment>
-        <Tooltip title='Add new record'>
-            <IconContainer onClick={props.onAddClick}>
+        <Tooltip title={
+            props.addButtonDisabled
+            ? 'You cannot add records for the selected organisation unit'
+            : 'Add new record'}
+        >
+        <span>
+            <IconContainer
+                onClick={props.onAddClick}
+                disabled={props.addButtonDisabled}
+            >
                 <AddIcon />
             </IconContainer>
+            </span>
         </Tooltip>
     </React.Fragment>
 )

@@ -119,7 +119,7 @@ export async function initMetadata() {
     let data = await get('metadata.json?' +
         'options=true&programs=true&optionSets=true&optionGroups=true&' +
         'programRuleVariables=true&programRules=true&trackedEntityTypes=true' +
-        '&fields=id,name,displayName,code,options,dataElement,program,' +
+        '&fields=id,name,displayName,code,options,dataElement,program,organisationUnits,' +
         'programStage,programStages[id,displayName,programStageDataElements[' +
         'dataElement[id],compulsory],programStageSections[id,name,' +
         'displayName,renderType,dataElements[id,displayFormName,code,' +

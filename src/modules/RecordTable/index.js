@@ -17,7 +17,10 @@ export const RecordTable = props => (
                 onRowClick: row => props.onEventClick(row),
                 elevation: 0,
                 customToolbar: () => props.addButton
-                    ? <TableToolbar onAddClick={props.onAddClick} />
+                    ? <TableToolbar
+                        onAddClick={props.onAddClick}
+                        addButtonDisabled={props.addButtonDisabled}
+                    />
                     : null
             }}
         />

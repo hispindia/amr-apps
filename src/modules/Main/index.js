@@ -42,6 +42,7 @@ export const Main = props => {
                             selected={props.selected}
                             tables={props.tables}
                             isApproval={props.isApproval}
+                            programs={metadata.programs}
                         />
                     )}
                 />
