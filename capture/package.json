@@ -1,6 +1,6 @@
 {
     "name": "amr-record-capture",
-    "version": "0.0.7",
+    "version": "0.0.9",
     "description": "AMR capture app for DHIS2",
     "main": "index.js",
     "license": "BSD-3-Clause",
