@@ -2,8 +2,7 @@ import moment from 'moment'
 import _ from 'lodash'
 import { get, postData, del, put, setBaseUrl } from './crud'
 import {
-    getProgramStageDeo,
-    getProgramStageApproval,
+    getProgramStage,
     getEventValues,
     getEntityRules,
     generateAmrId,
@@ -358,24 +357,29 @@ export async function deletePerson(id) {
     await del('trackedEntityInstances/' + id)
 }
 
-export async function newRecord( pId, pStage, orgaCode, ou, eId, eValues) {
-    let initialValues = { [_organismsDataElementId]: orgaCode, [_amrDataElement]: await generateAmrId(ou) }
-    const { entityId, eventId } = eId ?
-        await addEvent(initialValues, pId, pStage.id, ou, eId, eValues) :
-        await addPersonWithEvent(initialValues, pId, pStage.id, ou, eValues)
+export async function newRecord(pId, pStage, orgaCode, ou, eId, eValues) {
+    let initialValues = {
+        [_organismsDataElementId]: orgaCode,
+        [_amrDataElement]: await generateAmrId(ou)
+    }
+    const { entityId, eventId } = eId
+        ? await addEvent(initialValues, pId, pStage.id, ou, eId, eValues)
+        : await addPersonWithEvent(initialValues, pId, pStage.id, ou, eValues)
 
-    const { programStage, eventValues, status } = await getProgramStageDeo(pStage, initialValues, false, true)
+    const { programStage, eventValues, status } =
+        await getProgramStage(pStage, initialValues, false, true)
 
     return { programStage, eventValues, status, eventId, entityId }
 }
 
 export async function existingRecord(programs, eventId, isApproval) {
-    let { eventValues: initialValues, programId, programStageId, completed, entityId } = await getEventValues(eventId)
+    let {eventValues: initialValues, programId, programStageId, completed, entityId }
+        = await getEventValues(eventId)
     const pStage = programs.find(p => p.id === programId)
         .programStages.find(ps => ps.id = programStageId)
-    const { programStage, eventValues, status } = !isApproval ?
-        await getProgramStageDeo(pStage, initialValues, completed, false) :
-        await getProgramStageApproval(pStage, initialValues, completed, false, _isL1User, _isL2User)
+    const { programStage, eventValues, status } = !isApproval
+        ? await getProgramStage(pStage, initialValues, completed, false)
+        : await getProgramStage(pStage, initialValues, completed, false, _isL1User, _isL2User)
     return { programId, programStage, eventValues, status, eventId, entityId }
 }
 

@@ -9,10 +9,10 @@ const _l2ApprovalStatus = 'sXDQT6Yaf77'
 const _l2RejectionReason = 'pz8SoHBO6RL'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
-export const getProgramStageApproval = async (pStage, values, completed, newRecord, isL1User, isL2User) => {
+/*export const getProgramStageApproval = async (pStage, values, completed, newRecord, isL1User, isL2User) => {
     let { programStage, status, eventValues } = await getProgramStage(pStage, values, completed, newRecord, isL1User, isL2User)
 
-    hideWithValues(programStage.programStageSections, 'Results')
+    //hideWithValues(programStage.programStageSections, 'Results')
 
     return { programStage, eventValues, status }
 }
@@ -20,17 +20,8 @@ export const getProgramStageApproval = async (pStage, values, completed, newReco
 export const getProgramStageDeo = async (pStage, values, completed, newRecord) => {
     let { programStage, status, eventValues } = await getProgramStage(pStage, values, completed, newRecord)
 
-    if (!eventValues[_l1ApprovalStatus] && !eventValues[_l2ApprovalStatus])
-        hideWithValues(programStage.programStageSections, 'Approval')
-    hideWithValues(programStage.programStageSections, 'Results')
-
     return { programStage, eventValues, status }
-}
-
-const hideWithValues = (sections, sectionName) => {
-    let toBeHidden = sections.find(s => s.name === sectionName)
-    if (toBeHidden) toBeHidden.hideWithValues = true
-}
+}*/
 
 /**
  * Gets values for a single event.
@@ -239,7 +230,7 @@ const getProgramRules = async (programId, programStageId) => {
     return rules
 }
 
-const getProgramStage = async (
+export const getProgramStage = async (
     programStage,
     values,
     completed,
@@ -250,9 +241,11 @@ const getProgramStage = async (
     const shouldDisable = element => {
         switch (element.id) {
             case _amrDataElement:
-                return values[_amrDataElement] && values[_amrDataElement] !== ''
+                return values[_amrDataElement]
+                    && values[_amrDataElement] !== ''
             case _organismsDataElementId:
-                return values[_organismsDataElementId] && values[_organismsDataElementId] !== ''
+                return values[_organismsDataElementId]
+                    && values[_organismsDataElementId] !== ''
             case _l1ApprovalStatus:
             case _l1RejectionReason:
             case _l1RevisionReason:
@@ -299,7 +292,15 @@ const getProgramStage = async (
         })
 
     programStage.programStageSections.forEach(s => {
-        s.hide = false
+        s.hideWithValues = (s.name === 'Results'
+            || (s.name === 'Approval'
+                && !isL1User
+                && !isL2User
+                && !values[_l1ApprovalStatus]
+                && !values[_l2ApprovalStatus]
+            )
+        )
+
         setDataElements(s.dataElements, programStage.programStageDataElements)
         s.childSections.forEach(cs => {
             cs.hide = false
@@ -308,8 +309,12 @@ const getProgramStage = async (
     })
 
     const status = {
-        deletable: values === {} || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus]),
-        editable: values === {} || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus]) || [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes('Resend'),
+        deletable: values === {}
+            || (!values[_l1ApprovalStatus]
+            && !values[_l2ApprovalStatus]),
+        editable: values === {}
+            || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
+            || [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes('Resend'),
         finished: values[_l1ApprovalStatus] === values[_l2ApprovalStatus] === 'Approved',
         completed: completed
     }
