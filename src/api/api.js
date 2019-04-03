@@ -1,5 +1,4 @@
 import moment from 'moment'
-import _ from 'lodash'
 import { get, postData, del, put, setBaseUrl } from './crud'
 import {
     getProgramStage,
@@ -394,9 +393,7 @@ export async function getOrgUnits() {
     )).organisationUnits[0].level
 
     // Creating string which will be used in query.
-    let childrenString = ''
-    _.times(maxLevel, () => (childrenString += ',children[id,displayName'))
-    _.times(maxLevel, () => (childrenString += ']'))
+    let childrenString = '' + ',children[id,displayName'.repeat(maxLevel) + ']'.repeat(maxLevel)
 
     // Getting the user's OU's.
     const userOrgUnits = (await get('me.json?fields=organisationUnits'))
@@ -404,10 +401,7 @@ export async function getOrgUnits() {
 
     // Creating string which will be used in query.
     let orgUnitsString = '[' + userOrgUnits[0].id
-    _.times(
-        userOrgUnits.length - 1,
-        index => (orgUnitsString += ',' + userOrgUnits[index + 1].id)
-    )
+    Array.from(Array(userOrgUnits.length - 1), (i) => (orgUnitsString += ',' + userOrgUnits[index + 1].id))
     orgUnitsString += ']'
 
     // Getting the OU's with descendants.

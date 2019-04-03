@@ -1,82 +1,72 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import InputField from '@dhis2/ui/core/InputField'
-import _ from 'lodash'
+import { debounced }  from '../../hooks'
 
 /**
  * Textfield input.
  */
-export class TextInput extends React.Component {
-    state = {
-        value: '',
-        errorText: '',
-    }
+export const TextInput = props => {
+    const [value, setValue] = useState('')
+    const [errorText, setErrorText] = useState('')
+    const [validating, setValidating] = useState(false)
 
-    constructor(props) {
-        super(props)
-        // Will start searching after user has stopped typing for 3 seconds.
-        this.passValue = _.debounce(this.passValue, 2000)
-    }
+    const debouncedValue = debounced(value, 2000)
 
-    componentDidMount = () => {
-        if (this.props.value) this.setState({ value: this.props.value })
-    }
+    useEffect(() => {
+        if (props.value !== value) setValue(props.value)
+    }, [props.value])
 
-    componentWillReceiveProps = props => {
-        if (this.state.value !== props.value)
-            this.setState({ value: props.value })
-    }
+    useEffect(() => {
+        if (debouncedValue) passValue(debouncedValue)
+    }, [debouncedValue])
 
     /**
      * Passes the value to parent component after 1 sec.
      */
-    passValue = async (name, value) => {
-        const didValidate = await this.validate(value)
-        this.setState({ errorText: didValidate })
-        this.props.onChange(name, value)
-    }
-
-    setValue = (name, value) => {
-        this.setState({ value: value })
-        this.passValue(name, value)
+    const passValue = async (value) => {
+        const didValidate = await validate(value)
+        setErrorText(didValidate)
+        props.onChange(props.name, value)
     }
 
     /**
      * @param {String} value input value
      * @returns Appropriate error text. Empty if valid.
      */
-    validate = async value => {
-        const { name, label, required, unique } = this.props
-        let errorText = ''
-        if (required && !value) errorText = 'This field is required'
-        if (unique && value)
-            if (!(await this.props.validateUnique(name, value, label)))
-                errorText = 'This field requires a unique value'
-        return errorText
+    const validate = async value => {
+        const { name, label, required, unique } = props
+        let error = ''
+        if (required && !value) error = 'This field is required'
+        if (unique && value) {
+            setValidating(true)
+            if (!(await props.validateUnique(name, value, label)))
+                error = 'This field requires a unique value'
+            setValidating(false)
+        }
+        return error
     }
 
-    render() {
-        return (
-            <div
-                className={
-                    this.props.backgroundColor
-                        ? 'input ' + this.props.backgroundColor
-                        : 'input'
-                }
-            >
-                <InputField
-                    required={this.props.required}
-                    name={this.props.name}
-                    label={this.props.label}
-                    value={this.state.value}
-                    onChange={this.setValue}
-                    kind={'outlined'}
-                    status={this.state.errorText === '' ? 'default' : 'error'}
-                    help={this.state.errorText}
-                    disabled={this.props.disabled}
-                    type={this.props.type}
-                    size="dense"
-                />
-            </div>
-        )
-    }
+    return (
+        <div
+            className={
+                props.backgroundColor
+                    ? 'input ' + props.backgroundColor
+                    : 'input'
+            }
+        >
+            <InputField
+                required={props.required}
+                name={props.name}
+                label={props.label}
+                value={value}
+                onChange={(n, v) => setValue(v)}
+                kind={'outlined'}
+                status={errorText !== '' ? 'error' : validating ? 'warning' : 'default'}
+                help={errorText !== '' ? errorText : validating ? 'Validating' : ''}
+                disabled={props.disabled}
+                type={props.type}
+                size="dense"
+            />
+        </div>
+    )
 }

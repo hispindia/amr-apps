@@ -9,20 +9,6 @@ const _l2ApprovalStatus = 'sXDQT6Yaf77'
 const _l2RejectionReason = 'pz8SoHBO6RL'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
-/*export const getProgramStageApproval = async (pStage, values, completed, newRecord, isL1User, isL2User) => {
-    let { programStage, status, eventValues } = await getProgramStage(pStage, values, completed, newRecord, isL1User, isL2User)
-
-    //hideWithValues(programStage.programStageSections, 'Results')
-
-    return { programStage, eventValues, status }
-}
-
-export const getProgramStageDeo = async (pStage, values, completed, newRecord) => {
-    let { programStage, status, eventValues } = await getProgramStage(pStage, values, completed, newRecord)
-
-    return { programStage, eventValues, status }
-}*/
-
 /**
  * Gets values for a single event.
  * @param {string} eventId - AMR Id.
@@ -44,65 +30,6 @@ export const getEventValues = async eventId => {
         completed: event.status === 'COMPLETED',
         entityId: event.trackedEntityInstance
     }
-}
-
-/**
- * Gets all tracked entity program rules.
- * @param {Object} attributeIds - Object with attribute name as key and id as value.
- * @returns {Object} Tracked entity program rules.
- */
-export const getEntityRules = async attributeIds => {
-    // Replaces 'A{xxx}' with 'this.state.values['id of xxx']'
-    const getCondition = condition => {
-        const variableDuplicated = condition.match(/A\{.*?\}/g)
-        let variables = []
-        if (!variableDuplicated) return condition
-        variableDuplicated.forEach(duplicated => {
-            if (variables.indexOf(duplicated) === -1) variables.push(duplicated)
-        })
-
-        variables.forEach(variable => {
-            const id = attributeIds[variable.substring(2, variable.length - 1)]
-            condition = condition.replace(/A\{.*?\}/g, "values['" + id + "']")
-        })
-
-        return condition
-    }
-
-    let data = (await get(
-        'programRules.json?paging=false&fields=name,programRuleActions[' +
-            'programRuleActionType,optionGroup[id,options[code,displayName]],trackedEntityAttribute[name,id]' +
-            ',programRule[condition]]&order=priority:asc&filter=programRuleActions.trackedEntityAttribute:!null' +
-            '&filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD]'
-    )).programRules
-
-    let rules = []
-    data.forEach(d => {
-        if (!rules.find(rule => rule.name === d.name)) {
-            d.programRuleActions.forEach(programRuleAction => {
-                programRuleAction.programRule.condition = getCondition(
-                    programRuleAction.programRule.condition
-                )
-                if (
-                    programRuleAction.programRuleActionType ===
-                    'SHOWOPTIONGROUP'
-                ) {
-                    let options = []
-
-                    programRuleAction.optionGroup.options.forEach(option =>
-                        options.push({
-                            value: option.code,
-                            label: option.displayName,
-                        })
-                    )
-                    programRuleAction.optionGroup.options = options
-                }
-            })
-            rules.push(d)
-        }
-    })
-
-    return rules
 }
 
 /**
@@ -132,102 +59,6 @@ export const generateAmrId = async orgUnitId => {
         amrId = newCode()
 
     return amrId
-}
-
-/**
- * Gets AMR program rules.
- * @returns {Object} Object with data element and section rules.
- */
-const getProgramRules = async (programId, programStageId) => {
-    // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
-    const getCondition = condition => {
-        const original = condition
-        try {
-            const variableDuplicated = condition.match(/#\{.*?\}/g)
-            let variables = []
-            if (!variableDuplicated) return condition
-            variableDuplicated.forEach(duplicated => {
-                if (variables.indexOf(duplicated) === -1)
-                    variables.push(duplicated)
-            })
-            variables.forEach(variable => {
-                const name = variable.substring(2, variable.length - 1)
-                const id = programRuleVariables.find(
-                    ruleVariable => ruleVariable.name === name
-                ).dataElement.id
-                condition = condition.replace(
-                    new RegExp('#{' + name + '}', 'g'),
-                    "values['" + id + "']"
-                )
-            })
-        } catch {
-            console.warn('Improper condition:', original)
-        }
-        return condition
-    }
-
-    // Program specific dataElement rules.
-    let dataElementRules = (await get(
-        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],data,programRuleActionType,' +
-            'optionGroup[id,options[code,displayName]]&filter=programRuleActions.dataElement:!null&filter=programStage:null&' +
-            'order=priority:asc&filter=programRuleActions.programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD,ASSIGN]' +
-            '&filter=program.id:eq:' +
-            programId
-    )).programRules
-
-    // ProgramStage specific dataElement rules.
-    let dataElementRulesStage = (await get(
-        'programRules.json?paging=false&fields=condition,programRuleActions[dataElement[id,name],data,programRuleActionType,' +
-            'optionGroup[id,options[code,displayName]]&filter=programRuleActions.dataElement:!null&filter=programRuleActions.' +
-            'programRuleActionType:in:[SHOWOPTIONGROUP,HIDEFIELD,ASSIGN]&order=priority:asc&&filter=programStage.id:eq:' +
-            programStageId
-    )).programRules
-
-    // Program specific section rules.
-    let sectionRules = (await get(
-        'programRules.json?paging=false&fields=condition,programRuleActions[programStageSection[name,id],programRuleActionType]' +
-            '&filter=programRuleActions.programStageSection:!null&filter=programStage:null&filter=' +
-            'programRuleActions.programRuleActionType:eq:HIDESECTION&order=priority:asc&&filter=program.id:eq:' +
-            programId
-    )).programRules
-
-    // ProgramStage specific section rules.
-    let sectionRulesStage = (await get(
-        'programRules.json?paging=false&fields=condition,programRuleActions[programStageSection[name,id],programRuleActionType]' +
-            '&filter=programRuleActions.programStageSection:!null&programRuleActions.programRuleActionType:eq:' +
-            'HIDESECTION&order=priority:asc&&filter=programStage.id:eq:' +
-            programStageId
-    )).programRules
-
-    const programRuleVariables = (await get(
-        'programRuleVariables.json?paging=false&fields=name,dataElement&filter=program.id:eq:' +
-            programId
-    )).programRuleVariables
-
-    let rules = dataElementRules.concat(
-        sectionRules,
-        dataElementRulesStage,
-        sectionRulesStage
-    )
-    rules.forEach(rule => {
-        rule.condition = getCondition(rule.condition)
-        rule.programRuleActions.forEach(programRuleAction => {
-            if (programRuleAction.programRuleActionType === 'SHOWOPTIONGROUP') {
-                let options = []
-                // For some reason there are duplicates in the option group. Organisms only?
-                programRuleAction.optionGroup.options.forEach(option => {
-                    if (!options.find(o => o.value === option.code))
-                        options.push({
-                            value: option.code,
-                            label: option.displayName,
-                        })
-                })
-                programRuleAction.optionGroup.options = options
-            }
-        })
-    })
-
-    return rules
 }
 
 export const getProgramStage = async (
