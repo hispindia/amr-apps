@@ -17,7 +17,7 @@ export const TextInput = props => {
     }, [props.value])
 
     useEffect(() => {
-        if (debouncedValue) passValue(debouncedValue)
+        if (debouncedValue !== null && debouncedValue !== props.value) passValue(debouncedValue)
     }, [debouncedValue])
 
     /**
