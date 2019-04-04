@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Card } from '@dhis2/ui/core/Card'
 import { Grid } from '@material-ui/core'
 import {
@@ -9,25 +9,33 @@ import {
     MarginBottom,
 } from '../../helpers/helpers'
 import { SelectInput, RadioInput } from '../../inputs'
-import { hook } from './hook';
+//import { hook } from './hook';
+
+
 
 /**
  * Contains event panel information.
  */
 export const RecordPanel = props => {
-    const [state, dispatch, types] = hook(
-        props.programId ? getOrganisms(props.programId) : null,
-        props.programId ? props.programId : '',
-        props.programStageId ? props.programStageId : '',
-        props.organism ? props.organism : '',
-    )
+    hello()
+    /*const [state, dispatch, types] = hook(
+        (props.programId ? getOrganisms(props.programId) : null),
+        (props.programId ? props.programId : ''),
+        (props.programStageId ? props.programStageId : ''),
+        (props.organism ? props.organism : ''),
+        )*/
 
-    const dataElements = getDataElements()
+        const hello = () => {
+            console.log('hi')
+        }
+        
+        return (<p>HIO</p>)
+        const dataElements = getDataElements()
     const half = Math.ceil(dataElements.length / 2)
 
-    useEffect(() => {
+    /*useEffect(() => {
         dispatch({type: types.RESET_PANEL})
-    }, [props.resetSwitch])
+    }, [props.resetSwitch])*/
 
     const getOrganisms = programId => {
         let organisms = []
