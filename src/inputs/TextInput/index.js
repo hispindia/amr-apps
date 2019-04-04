@@ -13,11 +13,13 @@ export const TextInput = props => {
     const debouncedValue = debounced(value, 2000)
 
     useEffect(() => {
-        if (props.value !== value) setValue(props.value)
+        if (props.value !== value)
+            setValue(props.value)
     }, [props.value])
 
     useEffect(() => {
-        if (debouncedValue !== null && debouncedValue !== props.value) passValue(debouncedValue)
+        if (debouncedValue !== null && debouncedValue === value && debouncedValue !== props.value)
+            passValue(debouncedValue)
     }, [debouncedValue])
 
     /**

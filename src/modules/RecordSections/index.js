@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import {
     PersonForm,
     RecordForm,
@@ -11,110 +11,73 @@ import {
     setEventStatus,
     newRecord,
     existingRecord,
-    _organismsDataElementId,
     ButtonRow,
     Margin
 } from '../../'
+import { hook } from './hook';
 
 export const RecordSections = props => {
     const { optionSets, person, programs, programList, stageLists, programOrganisms } = props.metadata
     const event = props.match.params.event
+    const orgUnit = props.match.params.orgUnit
 
-    const [loading, setLoading] = useState(false) 
-    const [entity, setEntity] = useState({
-        values: person.values,
-        id: null,
-        valid: false,
-    })
-    const [panel, setPanel] = useState({
-        programId: null,
-        programStageId: null,
-        organism: null,
-        valid: false,
-    })
-    const [eventValid, setEventValid] = useState(false)
-    const [eventData, setEventData] = useState(null)
-    const [resetSwitch, setResetSwitch] = useState(false)
-    const [buttonDisabled, setButtonDisabled] = useState(false)
+    const [state, dispatch, types] = hook(person.values)
+
+    const { entityId, entityValues, entityValid, programId, programStageId,
+        organism, panelValid, eventId, eventValues, status, programStage,
+        eventValid, resetSwitch, buttonDisabled, loading } = state
 
     useEffect(() => {
         const getNewRecord = async () => {
-            setLoading(true)
-            const data = await newRecord(
-                panel.programId,
-                programs.find(p => p.id === panel.programId).programStages
-                    .find(s => s.id === panel.programStageId),
-                panel.organism,
-                props.match.params.orgUnit,
-                entity.id,
-                entity.values
-            )
-            setEventData(data)
-            if (!entity.id) {
-                let newEntity = {...entity}
-                newEntity.id = data.entityId
-                setEntity(newEntity)
-            }
-            setLoading(false)
+            dispatch({type: types.DISABLE_BUTTON, buttonDisabled: true})
+            dispatch({
+                type: types.NEW_RECORD,
+                ...(await newRecord(
+                    programId,
+                    programs.find(p => p.id === programId).programStages
+                        .find(s => s.id === programStageId),
+                    organism,
+                    orgUnit,
+                    entityId,
+                    entityValues
+            ))})
         }
-        if (panel.valid && !event) getNewRecord()
-    }, [panel.valid])
+        if (panelValid && !event) getNewRecord()
+    }, [panelValid])
 
     useEffect(() => {
         const getExistingRecord = async () => {
-            const { programId, programStage, eventValues, status, eventId, entityId }
-                = await existingRecord(programs, event, props.isApproval)
-            setEntity({ id: entityId })
-            setPanel({
-                programId,
-                programStageId: programStage.id,
-                organism: eventValues[_organismsDataElementId],
-                valid: true,
+            dispatch({
+                type: types.EXISTING_RECORD,
+                ...(await existingRecord(programs, event, props.isApproval))
             })
-            setButtonDisabled(false)
-            setEventData({ programStage, eventValues, status, eventId })
         }
-        
         if (event) getExistingRecord()
     }, [])
 
-    const disabled = buttonDisabled || !eventValid || !entity.valid || !panel.valid
+    const disabled = buttonDisabled || !eventValid || !entityValid || !panelValid
 
     const onSubmit = async addMore => {
-        setButtonDisabled(true)
-        await setEventStatus(eventData.eventId, true, props.isApproval)
+        dispatch({type: types.DISABLE_BUTTON, buttonDisabled: true})
+        await setEventStatus(eventId, true, props.isApproval)
 
-        if (addMore) {
-            setPanel({
-                programId: null,
-                programStageId: null,
-                organism: null,
-                valid: false,
-            })
-            setEventData(null)
-            setEventValid(false)
-            setResetSwitch(!resetSwitch)
-            setButtonDisabled(false)
-        }
+        if (addMore) dispatch({type: types.ADD_MORE})
         else props.history.goBack()
     }
 
     const onEdit = async() => {
-        setButtonDisabled(true)
-        await setEventStatus(eventData.eventId)
-        let newEventData = {...eventData}
-        newEventData.status.completed = false
-        setEventData(newEventData)
-        setButtonDisabled(false)
+        dispatch({type: types.DISABLE_BUTTON, buttonDisabled: true})
+        await setEventStatus(eventId)
+        dispatch({type: types.EDIT})
     }
 
     const onDelete = async () => {
-        setButtonDisabled(true)
+        dispatch({type: types.DISABLE_BUTTON, buttonDisabled: true})
         if (window.confirm('Are you sure you want to permanently delete this record?')) {
-            await deleteEvent(eventData.eventId)
+            await deleteEvent(eventId)
             props.history.goBack()
         }
-        setButtonDisabled(false)
+        dispatch({type: types.DISABLE_BUTTON, buttonDisabled: false})
     }
 
     return (
@@ -124,61 +87,64 @@ export const RecordSections = props => {
                 history={props.history}
             />
             <PersonForm
-                metadata={{
-                    person: person,
-                    optionSets: optionSets
-                }}
-                passValues={setEntity}
-                entityId={entity.id}
-                showEdit={!event && !panel.valid}
+                id={entityId}
+                values={entityValues}
+                valid={entityValid}
+                attributes={person.trackedEntityTypeAttributes}
+                optionSets={optionSets}
+                showEdit={!event && !panelValid}
+                rules={person.rules}
+                passValues={action => dispatch({type: types.SET_ENTITY, ...action})}
             />
-            {entity.valid && <RecordPanel
+            {entityValid && <RecordPanel
+                programId={programId}
+                programStageId={programStageId}
+                organism={organism}
                 programs={programList}
                 programStages={stageLists}
                 programOrganisms={programOrganisms}
                 optionSets={optionSets}
                 resetSwitch={resetSwitch}
-                passValues={setPanel}
-                disabled={panel.valid}
-                values={panel}
+                passValues={action => dispatch({type: types.SET_PANEL, ...action})}
+                disabled={panelValid}
             />}
-            {eventData && <RecordForm
-                passValues={setEventValid}
-                programStage={eventData.programStage}
+            {eventId && <RecordForm
+                programStage={programStage}
                 rules={
                     programs.rules.filter(r =>
-                        (r.program.id === panel.programId &&
-                        (r.programStage ? r.programStage.id === panel.programStageId : true)) ||
-                        (r.programStage ? r.programStage.id === panel.programStageId : false)
-                    )
-                }
+                        (r.program.id === programId &&
+                            (r.programStage ? r.programStage.id === programStageId : true)) ||
+                            (r.programStage ? r.programStage.id === programStageId : false)
+                            )
+                        }
                 optionSets={optionSets}
-                values={eventData.eventValues}
-                eventId={eventData.eventId}
-                status={eventData.status}
+                values={eventValues}
+                eventId={eventId}
+                status={status}
+                passValues={valid => dispatch({type: types.EVENT_VALID, valid: valid})}
             />}
             {loading && <ProgressSection />}
             <ButtonRow
                 buttons={
                     event
-                    ? eventData ? [
+                    ? eventId ? [
                         {
                             label: 'Delete',
                             onClick: onDelete,
-                            disabled: !eventData.status.deletable || buttonDisabled,
+                            disabled: !status.deletable || buttonDisabled,
                             icon: 'delete',
                             kind: 'destructive',
                             tooltip: 'Permanently delete record',
                             disabledTooltip: 'You cannot delete records with an approval status',
                         },
                         {
-                            label: eventData.status.completed ? 'Edit' : 'Submit',
-                            onClick: () => eventData.status.completed ? onEdit() : onSubmit(false),
-                            disabled: !eventData.status.editable || disabled,
-                            icon: eventData.status.completed ? 'edit' : 'done',
+                            label: status.completed ? 'Edit' : 'Submit',
+                            onClick: () => status.completed ? onEdit() : onSubmit(false),
+                            disabled: !status.editable || disabled,
+                            icon: status.completed ? 'edit' : 'done',
                             kind: 'primary',
-                            tooltip: eventData.status.completed ? 'Edit record' : 'Submit record',
-                            disabledTooltip: eventData.status.completed ?
+                            tooltip: status.completed ? 'Edit record' : 'Submit record',
+                            disabledTooltip: status.completed ?
                                 'Records with this approval status cannot be edited' :
                                 'A required field is empty',
                         },

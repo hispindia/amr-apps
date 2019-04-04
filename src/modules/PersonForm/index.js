@@ -12,7 +12,6 @@ import {
     MarginBottom,
 } from '../../helpers/helpers'
 import {
-    getEntityAttributes,
     getPersonValues,
     checkUnique,
 } from '../../api/api'
@@ -37,11 +36,10 @@ export class PersonForm extends Component {
     }
 
     componentDidMount = async () => {
-        let { trackedEntityTypeAttributes, values, uniques, rules } = this.props.metadata.person
-        const entityId = this.props.entityId
+        let { id, attributes, values, uniques, rules } = this.props
 
-        if (entityId) {
-            this.onNewValues(await getPersonValues(entityId), entityId)
+        if (id) {
+            this.onNewValues(await getPersonValues(id), id)
             this.setState({
                 uniques: uniques,
                 half: Math.floor(trackedEntityTypeAttributes.length / 2),
@@ -50,12 +48,12 @@ export class PersonForm extends Component {
             })
         }
         else {
-            this.checkRules(values, trackedEntityTypeAttributes, rules)
+            this.checkRules(values, attributes, rules)
             this.setState({
                 uniques: uniques,
-                half: Math.floor(trackedEntityTypeAttributes.length / 2),
+                half: Math.floor(attributes.length / 2),
                 rules: rules,
-                attributes: trackedEntityTypeAttributes,
+                attributes: attributes,
                 values: values,
                 loading: false
             })
@@ -63,8 +61,8 @@ export class PersonForm extends Component {
     }
 
     componentDidUpdate = async prevProps => {
-        const entityId = this.props.entityId
-        if (entityId !== prevProps.entityId) {
+        const entityId = this.props.id
+        if (entityId && entityId !== prevProps.id) {
             //this.setState({ loading: true })
             this.onNewValues(await getPersonValues(entityId), entityId)
             this.setState({ loading: false })
@@ -160,7 +158,7 @@ export class PersonForm extends Component {
                                 }
                                 // Only reset selected value if the options do not include current value.
                                 if (
-                                    !this.props.metadata.optionSets[affectedAttribute.trackedEntityAttribute.optionSet.id].find(
+                                    !this.props.optionSets[affectedAttribute.trackedEntityAttribute.optionSet.id].find(
                                         option =>
                                             option.value ===
                                             values[
@@ -214,12 +212,12 @@ export class PersonForm extends Component {
                         disabled={disabled}
                     />
                 ) : attribute.trackedEntityAttribute.optionSetValue ? (
-                    this.props.metadata.optionSets[attribute.trackedEntityAttribute.optionSet.id].length < 4 ?
+                    this.props.optionSets[attribute.trackedEntityAttribute.optionSet.id].length < 4 ?
                     (
                         <RadioInput
                             required={attribute.mandatory}
                             objects={
-                                this.props.metadata.optionSets[attribute.trackedEntityAttribute.optionSet
+                                this.props.optionSets[attribute.trackedEntityAttribute.optionSet
                                     .id]
                             }
                             name={attribute.trackedEntityAttribute.id}
@@ -232,7 +230,7 @@ export class PersonForm extends Component {
                         <SelectInput
                             required={attribute.mandatory}
                             objects={
-                                this.props.metadata.optionSets[attribute.trackedEntityAttribute.optionSet
+                                this.props.optionSets[attribute.trackedEntityAttribute.optionSet
                                     .id]
                             }
                             name={attribute.trackedEntityAttribute.id}

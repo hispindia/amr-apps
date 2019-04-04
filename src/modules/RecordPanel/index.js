@@ -15,30 +15,26 @@ import { Grid } from '@material-ui/core'
  */
 export class RecordPanel extends Component {
     state = {
-        organisms: null,
-        values: {}
+        organisms: '',
+        programId: ''
     }
 
     componentDidMount = () => {
-        const values = this.props.values
+        const { programId, programStageId, organism } = this.props
         this.setState({
-            organisms: values.programId ? this.getOrganisms(values.programId) : null,
-            values: {
-                programId: values.programId ? values.programId : '',
-                programStageId: values.programStageId ? values.programStageId : '',
-                organismCode: values.organism ? values.organism: ''
-            }
+            organisms: programId ? this.getOrganisms(programId) : null,
+            programId: programId ? programId : '',
+            programStageId: programStageId ? programStageId : '',
+            organism: organism ? organism : '',
         })
     }
 
     componentDidUpdate = prevProps => {
         if (this.props.resetSwitch !== prevProps.resetSwitch)
             this.setState({
-                values: {
-                    programId: '',
-                    programStageId: '',
-                    organismCode: '',
-                },
+                programId: '',
+                programStageId: '',
+                organism: '',
             })
     }
 
@@ -56,18 +52,14 @@ export class RecordPanel extends Component {
      */
     onProgramChange = async (name, value) => {
         const { programStages } = this.props
-        let values = {
+        this.setState({
+            organisms: this.getOrganisms(value),
             programId: value,
             programStageId:
                 programStages[value].length > 1
                     ? ''
                     : programStages[value][0].value,
-            organismCode: '',
-        }
-
-        this.setState({
-            organisms: this.getOrganisms(value),
-            values: values,
+            organism: '',
         })
     }
 
@@ -75,13 +67,13 @@ export class RecordPanel extends Component {
      * Called when a new program stage or organism is selected.
      */
     onChange = (name, value) => {
-        let values = { ...this.state.values }
+        let values = {...this.state}
         values[name] = value
-        this.setState({ values: values })
+        this.setState(values)
         this.props.passValues({
             programId: values.programId,
             programStageId: values.programStageId,
-            organism: values.organismCode,
+            organism: values.organism,
             valid: !Object.values(values).includes('')
         })
     }
@@ -92,7 +84,7 @@ export class RecordPanel extends Component {
      */
     getDataElements = () => {
         const { programs, programStages } = this.props
-        const { organisms, values } = this.state
+        const { programId, organisms } = this.state
 
         let dataElements = [
             {
@@ -102,16 +94,16 @@ export class RecordPanel extends Component {
                 onChange: this.onProgramChange,
             },
         ]
-        if (values.programId && programStages[values.programId].length > 1)
+        if (programId && programStages[programId].length > 1)
             dataElements.push({
                 id: 'programStageId',
                 label: 'Type',
-                objects: programStages[values.programId],
+                objects: programStages[programId],
                 onChange: this.onChange,
             })
         if (organisms)
             dataElements.push({
-                id: 'organismCode',
+                id: 'organism',
                 label: 'Organism',
                 objects: organisms,
                 onChange: this.onChange,
@@ -133,7 +125,7 @@ export class RecordPanel extends Component {
                         objects={dataElement.objects}
                         name={dataElement.id}
                         label={dataElement.label}
-                        value={this.state.values[dataElement.id]}
+                        value={this.state[dataElement.id]}
                         onChange={dataElement.onChange}
                         disabled={this.props.disabled}
                         required
@@ -143,7 +135,7 @@ export class RecordPanel extends Component {
                         objects={dataElement.objects}
                         name={dataElement.id}
                         label={dataElement.label}
-                        value={this.state.values[dataElement.id]}
+                        value={this.state[dataElement.id]}
                         onChange={dataElement.onChange}
                         disabled={this.props.disabled}
                         required
