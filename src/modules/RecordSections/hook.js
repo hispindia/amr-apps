@@ -11,6 +11,13 @@ const types = {
     EVENT_VALID: 6
 }
 
+const getRules = (rules, programId, programStageId) =>
+    rules.filter(r =>
+        (r.programStage ? r.programStage.id === programStageId : false) ||
+        (r.program.id === programId &&
+        (r.programStage ? r.programStage.id === programStageId : true))
+    )
+
 const reducer = (state, action) => {
     switch (action.type) {
         case types.SET_ENTITY: {
@@ -27,7 +34,12 @@ const reducer = (state, action) => {
                 programId: action.programId,
                 programStageId: action.programStageId,
                 organism: action.organism,
-                panelValid: action.valid
+                panelValid: action.valid,
+                rules: getRules(
+                    state.allRules,
+                    action.programId,
+                    action.programStageId
+                )
             }
         }
         case types.NEW_RECORD: {
@@ -57,7 +69,12 @@ const reducer = (state, action) => {
                 status: action.status,
                 eventId: action.eventId,
                 loading: false,
-                buttonDisabled: false
+                buttonDisabled: false,
+                rules: getRules(
+                    state.allRules,
+                    action.programId,
+                    action.programStage.id
+                )
             }
         }
         case types.ADD_MORE: {
@@ -101,8 +118,9 @@ const reducer = (state, action) => {
     }
 }
 
-export const hook = personValues => {
+export const hook = (rules, personValues) => {
     const [state, dispatch] = useReducer(reducer, {
+        allRules: rules,
         entityId: null,
         entityValues: personValues,
         entityValid: false,
@@ -114,6 +132,7 @@ export const hook = personValues => {
         eventValues: null,
         status: null,
         programStage: null,
+        rules: null,
         eventValid: false,
         resetSwitch: false,
         buttonDisabled: false,

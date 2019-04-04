@@ -21,11 +21,23 @@ export const RecordSections = props => {
     const event = props.match.params.event
     const orgUnit = props.match.params.orgUnit
 
-    const [state, dispatch, types] = hook(person.values)
+    const [state, dispatch, types] = hook(programs.rules, person.values)
 
     const { entityId, entityValues, entityValid, programId, programStageId,
         organism, panelValid, eventId, eventValues, status, programStage,
-        eventValid, resetSwitch, buttonDisabled, loading } = state
+        eventValid, resetSwitch, buttonDisabled, loading, rules } = state
+
+    const disabled = buttonDisabled || !eventValid || !entityValid || !panelValid
+
+    useEffect(() => {
+        const getExistingRecord = async () => {
+            dispatch({
+                type: types.EXISTING_RECORD,
+                ...(await existingRecord(programs, event, props.isApproval))
+            })
+        }
+        if (event) getExistingRecord()
+    }, [])
 
     useEffect(() => {
         const getNewRecord = async () => {
@@ -44,18 +56,6 @@ export const RecordSections = props => {
         }
         if (panelValid && !event) getNewRecord()
     }, [panelValid])
-
-    useEffect(() => {
-        const getExistingRecord = async () => {
-            dispatch({
-                type: types.EXISTING_RECORD,
-                ...(await existingRecord(programs, event, props.isApproval))
-            })
-        }
-        if (event) getExistingRecord()
-    }, [])
-
-    const disabled = buttonDisabled || !eventValid || !entityValid || !panelValid
 
     const onSubmit = async addMore => {
         dispatch({type: types.DISABLE_BUTTON, buttonDisabled: true})
@@ -110,13 +110,7 @@ export const RecordSections = props => {
             />}
             {eventId && <RecordForm
                 programStage={programStage}
-                rules={
-                    programs.rules.filter(r =>
-                        (r.program.id === programId &&
-                            (r.programStage ? r.programStage.id === programStageId : true)) ||
-                            (r.programStage ? r.programStage.id === programStageId : false)
-                            )
-                        }
+                rules={rules}
                 optionSets={optionSets}
                 values={eventValues}
                 eventId={eventId}

@@ -34,7 +34,7 @@
     "dependencies": {
         "react": "link:../node_modules/react",
         "react-dom": "link:../node_modules/react-dom",
-        "react-scripts": "link:../node_modules/react-scripts",
-        "typeface-roboto": "link:../node_modules/typeface-roboto"
+        "react-scripts": "^2.1.8",
+        "typeface-roboto": "^0.0.54"
     }
 }
