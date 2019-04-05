@@ -389,7 +389,7 @@ export async function addPersonWithEvent(
 ) {
     const date = eventValues[_sampleDateElementId]
         ? eventValues[_sampleDateElementId]
-        : moment()
+        : moment().add(-1, 'days')
 
     let event = await setEventValues(
         {
@@ -444,7 +444,7 @@ export async function addEvent(
 ) {
     const date = eventValues[_sampleDateElementId]
         ? eventValues[_sampleDateElementId]
-        : moment()
+        : moment().add(-1, 'days')
 
     let event = await setEventValues(
         {
