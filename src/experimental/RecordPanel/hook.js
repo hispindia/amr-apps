@@ -3,7 +3,8 @@ import { useReducer } from 'react'
 const types = {
     SET_PANEL: 0,
     RESET_PANEL: 1,
-    SET_VALUE: 2
+    SET_VALUE: 2,
+    SET_DATAELEMENTS: 3
 }
 
 const reducer = (state, action) => {
@@ -35,6 +36,12 @@ const reducer = (state, action) => {
                 [action.key]: action.value
             }
         }
+        case types.SET_DATAELEMENTS: {
+            return {
+                ...state,
+                dataElements: action.dataElements
+            }
+        }
         default: {
             return state
         }
@@ -47,7 +54,8 @@ export const hook = resetSwitch => {
         programId: '',
         programStageId: '',
         organism: '',
-        resetSwitch: resetSwitch
+        resetSwitch: resetSwitch,
+        dataElements: []
     })
     return [state, dispatch, types]
 }

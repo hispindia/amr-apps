@@ -1,6 +1,4 @@
-import React, { useEffect } from 'react'
-import { Card } from '@dhis2/ui/core'
-import { Grid } from '@material-ui/core'
+import React, { Component } from 'react'
 import {
     Heading,
     Margin,
@@ -9,53 +7,58 @@ import {
     MarginBottom,
 } from '../../helpers/helpers'
 import { SelectInput, RadioInput } from '../../inputs'
-import { hook } from './hook'
+import { Card } from '@dhis2/ui/core/Card'
+import { Grid } from '@material-ui/core'
 
 /**
- * Contains event panel information.
+ * Contains event panal and/or event information.
  */
-export const RecordPanel = props => {
-    const [state, dispatch, types] = hook(props.resetSwitch)
+export class RecordPanel extends Component {
+    state = {
+        organisms: '',
+        programId: ''
+    }
 
-    useEffect(() => {
-        console.log(props)
-        dispatch({type: types.SET_PANEL,
-            organisms: props.programId ? getOrganisms(props.programId) : null,
-            programId: props.programId ? props.programId : '',
-            programStageId: props.programStageId ? props.programStageId : '',
-            organism: props.organism ? props.organism : '',
-            resetSwitch: props.resetSwitch
+    componentDidMount = () => {
+        const { programId, programStageId, organism } = this.props
+        this.setState({
+            organisms: programId ? this.getOrganisms(programId) : null,
+            programId: programId ? programId : '',
+            programStageId: programStageId ? programStageId : '',
+            organism: organism ? organism : '',
         })
-    }, [props])
+    }
 
-    useEffect(() => {
-        console.log(props.resetSwitch, state.resetSwitch)
-        if (props.resetSwitch !== state.resetSwitch)
-        dispatch({type: types.RESET_PANEL})
-    }, [props.resetSwitch])
+    componentDidUpdate = prevProps => {
+        if (this.props.resetSwitch !== prevProps.resetSwitch)
+            this.setState({
+                programId: '',
+                programStageId: '',
+                organism: '',
+            })
+    }
 
-
-    const getOrganisms = programId => {
+    getOrganisms = programId => {
         let organisms = []
-        props.optionSets[props.programOrganisms[programId]].forEach(o => {
+        this.props.optionSets[this.props.programOrganisms[programId]].forEach(o => {
             if (!organisms.find(org => org.value === o.value))
                 organisms.push(o)
         })
         return organisms
     }
 
-
     /**
      * Called when a new program is selected.
      */
-    const onProgramChange = (name, value) => {
-        dispatch({type: types.SET_PANEL,
-            organisms: getOrganisms(value),
+    onProgramChange = async (name, value) => {
+        const { programStages } = this.props
+        this.onNewValues({
+            organisms: this.getOrganisms(value),
             programId: value,
             programStageId:
-                props.programStages[value].length > 1
+                programStages[value].length > 1
                     ? ''
-                    : props.programStages[value][0].value,
+                    : programStages[value][0].value,
             organism: '',
         })
     }
@@ -63,12 +66,15 @@ export const RecordPanel = props => {
     /**
      * Called when a new program stage or organism is selected.
      */
-    const onChange = (name, value) => {
-        const values =  dispatch({type: types.SET_PANEL,
-            key: name,
-            value, value
-        })
-        props.passValues({
+    onChange = (name, value) => {
+        let values = {...this.state}
+        values[name] = value
+        this.onNewValues(values)
+    }
+
+    onNewValues = values => {
+        this.setState(values)
+        this.props.passValues({
             programId: values.programId,
             programStageId: values.programStageId,
             organism: values.organism,
@@ -80,49 +86,34 @@ export const RecordPanel = props => {
      * Gets the data elements to be rendered.
      * @returns {Object[]} Data elements.
      */
-    const getDataElements = (state) => {
+    getDataElements = () => {
+        const { programs, programStages } = this.props
+        const { programId, organisms } = this.state
+
         let dataElements = [
             {
                 id: 'programId',
                 label: 'Organism group',
-                objects: props.programs,
-                onChange: onProgramChange,
+                objects: programs,
+                onChange: this.onProgramChange,
             },
         ]
-        if (state.programId && props.programStages[state.programId].length > 1)
+        if (programId && programStages[programId].length > 1)
             dataElements.push({
                 id: 'programStageId',
                 label: 'Type',
-                objects: props.programStages[state.programId],
-                onChange: onChange,
+                objects: programStages[programId],
+                onChange: this.onChange,
             })
-        if (state.organisms)
+        if (organisms)
             dataElements.push({
                 id: 'organism',
                 label: 'Organism',
-                objects: state.organisms,
-                onChange: onChange,
+                objects: organisms,
+                onChange: this.onChange,
             })
 
         return dataElements
-    }
-
-    const DataElements = (props) => {
-        const { dataElements, half } = props
-        return (
-        <Grid container spacing={0}>
-            <Grid item xs>
-                {dataElements.slice(0, half).map(dataElement =>
-                    getInput(dataElement)
-                )}
-            </Grid>
-            <Grid item xs>
-                {dataElements.slice(half).map(dataElement =>
-                    getInput(dataElement)
-                )}
-            </Grid>
-        </Grid>
-        )
     }
 
     /**
@@ -130,54 +121,66 @@ export const RecordPanel = props => {
      * @param {Object} dataElement - Data element.
      * @returns {Component} Input component.
      */
-    const getInput = dataElement => (
-        <Padding key={dataElement.id}>
-            {dataElement.objects.length < 4 ? (
-                <RadioInput
-                    objects={dataElement.objects}
-                    name={dataElement.id}
-                    label={dataElement.label}
-                    value={state[dataElement.id]}
-                    onChange={dataElement.onChange}
-                    disabled={props.disabled}
-                    required
-                />
-            ) : (
-                <SelectInput
-                    objects={dataElement.objects}
-                    name={dataElement.id}
-                    label={dataElement.label}
-                    value={state[dataElement.id]}
-                    onChange={dataElement.onChange}
-                    disabled={props.disabled}
-                    required
-                />
-            )}
-        </Padding>
-    )
+    getInput = dataElement => {
+        return (
+            <Padding key={dataElement.id}>
+                {dataElement.objects.length < 4 ? (
+                    <RadioInput
+                        objects={dataElement.objects}
+                        name={dataElement.id}
+                        label={dataElement.label}
+                        value={this.state[dataElement.id]}
+                        onChange={dataElement.onChange}
+                        disabled={this.props.disabled}
+                        required
+                    />
+                ) : (
+                    <SelectInput
+                        objects={dataElement.objects}
+                        name={dataElement.id}
+                        label={dataElement.label}
+                        value={this.state[dataElement.id]}
+                        onChange={dataElement.onChange}
+                        disabled={this.props.disabled}
+                        required
+                    />
+                )}
+            </Padding>
+        )
+    }
 
-    const PanelCard = props => (
-        <MarginBottom>
+    render() {
+        const dataElements = this.getDataElements()
+        const half = Math.ceil(dataElements.length / 2)
+
+        return (
             <MarginBottom>
-                <Card>
-                    <Margin>
-                        <MarginSides>
-                            <Heading>Panel</Heading>
-                        </MarginSides>
-                        {props.children}
-                    </Margin>
-                </Card>
+                <MarginBottom>
+                    <Card>
+                        <Margin>
+                            <MarginSides>
+                                <Heading>Panel</Heading>
+                            </MarginSides>
+                            <Grid container spacing={0}>
+                                <Grid item xs>
+                                    {dataElements
+                                        .slice(0, half)
+                                        .map(dataElement =>
+                                            this.getInput(dataElement)
+                                        )}
+                                </Grid>
+                                <Grid item xs>
+                                    {dataElements
+                                        .slice(half)
+                                        .map(dataElement =>
+                                            this.getInput(dataElement)
+                                        )}
+                                </Grid>
+                            </Grid>
+                        </Margin>
+                    </Card>
+                </MarginBottom>
             </MarginBottom>
-        </MarginBottom>
-    )
-
-    console.log(state)
-
-    return (
-        <PanelCard>
-            <DataElements
-                dataElements={getDataElements(state)}
-                half={Math.ceil(getDataElements(state).length / 2)}/>
-        </PanelCard>
-    )
+        )
+    }
 }
