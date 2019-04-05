@@ -7,6 +7,7 @@ const types = {
 }
 
 const reducer = (state, action) => {
+    console.log(action)
     switch (action.type) {
         case types.SET_PANEL: {
             return {
@@ -14,15 +15,18 @@ const reducer = (state, action) => {
                 organisms: action.organisms,
                 programId: action.programId,
                 programStageId: action.programStageId,
-                organism: action.organism
+                organism: action.organism,
+                resetSwitch: action.resetSwitch
             }
         }
         case types.RESET_PANEL: {
             return {
                 ...state,
+                organisms: null,
                 programId: '',
                 programStageId: '',
-                organism: ''
+                organism: '',
+                resetSwitch: !state.resetSwitch
             }
         }
         case types.SET_VALUE: {
@@ -37,13 +41,13 @@ const reducer = (state, action) => {
     }
 }
 
-export const hook = (organisms, programId, programStageId, organism) => {
+export const hook = resetSwitch => {
     const [state, dispatch] = useReducer(reducer, {
-        organisms: organisms,
-        programId: programId,
-        programStageId: programStageId,
-        organism: organism
+        organisms: null,
+        programId: '',
+        programStageId: '',
+        organism: '',
+        resetSwitch: resetSwitch
     })
-
     return [state, dispatch, types]
 }

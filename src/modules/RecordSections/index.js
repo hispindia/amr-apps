@@ -14,7 +14,7 @@ import {
     ButtonRow,
     Margin
 } from '../../'
-import { hook } from './hook';
+import { hook } from './hook'
 
 export const RecordSections = props => {
     const { optionSets, person, programs, programList, stageLists, programOrganisms } = props.metadata

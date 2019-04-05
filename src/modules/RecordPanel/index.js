@@ -1,5 +1,5 @@
-import React from 'react'
-import { Card } from '@dhis2/ui/core/Card'
+import React, { useEffect } from 'react'
+import { Card } from '@dhis2/ui/core'
 import { Grid } from '@material-ui/core'
 import {
     Heading,
@@ -9,33 +9,31 @@ import {
     MarginBottom,
 } from '../../helpers/helpers'
 import { SelectInput, RadioInput } from '../../inputs'
-//import { hook } from './hook';
-
-
+import { hook } from './hook'
 
 /**
  * Contains event panel information.
  */
 export const RecordPanel = props => {
-    hello()
-    /*const [state, dispatch, types] = hook(
-        (props.programId ? getOrganisms(props.programId) : null),
-        (props.programId ? props.programId : ''),
-        (props.programStageId ? props.programStageId : ''),
-        (props.organism ? props.organism : ''),
-        )*/
+    const [state, dispatch, types] = hook(props.resetSwitch)
 
-        const hello = () => {
-            console.log('hi')
-        }
-        
-        return (<p>HIO</p>)
-        const dataElements = getDataElements()
-    const half = Math.ceil(dataElements.length / 2)
+    useEffect(() => {
+        console.log(props)
+        dispatch({type: types.SET_PANEL,
+            organisms: props.programId ? getOrganisms(props.programId) : null,
+            programId: props.programId ? props.programId : '',
+            programStageId: props.programStageId ? props.programStageId : '',
+            organism: props.organism ? props.organism : '',
+            resetSwitch: props.resetSwitch
+        })
+    }, [props])
 
-    /*useEffect(() => {
+    useEffect(() => {
+        console.log(props.resetSwitch, state.resetSwitch)
+        if (props.resetSwitch !== state.resetSwitch)
         dispatch({type: types.RESET_PANEL})
-    }, [props.resetSwitch])*/
+    }, [props.resetSwitch])
+
 
     const getOrganisms = programId => {
         let organisms = []
@@ -45,6 +43,7 @@ export const RecordPanel = props => {
         })
         return organisms
     }
+
 
     /**
      * Called when a new program is selected.
@@ -81,7 +80,7 @@ export const RecordPanel = props => {
      * Gets the data elements to be rendered.
      * @returns {Object[]} Data elements.
      */
-    const getDataElements = () => {
+    const getDataElements = (state) => {
         let dataElements = [
             {
                 id: 'programId',
@@ -108,12 +107,30 @@ export const RecordPanel = props => {
         return dataElements
     }
 
+    const DataElements = (props) => {
+        const { dataElements, half } = props
+        return (
+        <Grid container spacing={0}>
+            <Grid item xs>
+                {dataElements.slice(0, half).map(dataElement =>
+                    getInput(dataElement)
+                )}
+            </Grid>
+            <Grid item xs>
+                {dataElements.slice(half).map(dataElement =>
+                    getInput(dataElement)
+                )}
+            </Grid>
+        </Grid>
+        )
+    }
+
     /**
      * Gets the input component.
      * @param {Object} dataElement - Data element.
      * @returns {Component} Input component.
      */
-    const getInput = dataElement =>
+    const getInput = dataElement => (
         <Padding key={dataElement.id}>
             {dataElement.objects.length < 4 ? (
                 <RadioInput
@@ -137,8 +154,9 @@ export const RecordPanel = props => {
                 />
             )}
         </Padding>
+    )
 
-    const PanelCard = props =>
+    const PanelCard = props => (
         <MarginBottom>
             <MarginBottom>
                 <Card>
@@ -151,21 +169,15 @@ export const RecordPanel = props => {
                 </Card>
             </MarginBottom>
         </MarginBottom>
+    )
+
+    console.log(state)
 
     return (
         <PanelCard>
-            <Grid container spacing={0}>
-                <Grid item xs>
-                    {dataElements.slice(0, half).map(dataElement =>
-                        getInput(dataElement)
-                    )}
-                </Grid>
-                <Grid item xs>
-                    {dataElements.slice(half).map(dataElement =>
-                        getInput(dataElement)
-                    )}
-                </Grid>
-            </Grid>
+            <DataElements
+                dataElements={getDataElements(state)}
+                half={Math.ceil(getDataElements(state).length / 2)}/>
         </PanelCard>
     )
 }
