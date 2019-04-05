@@ -103,7 +103,7 @@ export const RecordSections = props => {
                 programStageId={programStageId}
                 organism={organism}
                 sampleDate={sampleDate}
-                programs={programList}
+                programs={programList.filter(p => p.orgUnits.includes(orgUnit))}
                 programStages={stageLists}
                 programOrganisms={programOrganisms}
                 optionSets={optionSets}

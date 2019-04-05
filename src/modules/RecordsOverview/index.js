@@ -13,8 +13,7 @@ export const RecordsOverview = props => {
 
     useEffect(() => {
         if(props.isApproval) return
-        const noProgram = !props.programs.find(p =>
-            p.organisationUnits.find(ou => ou.id === props.selected))
+        const noProgram = !props.programs.find(p => p.orgUnits.includes(props.selected))
         if (noProgram !== addButtonDisabled)
             setAddButtonDisabled(!addButtonDisabled)
     }, [props.selected])

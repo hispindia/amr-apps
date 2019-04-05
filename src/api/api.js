@@ -174,6 +174,7 @@ export async function initMetadata() {
         programList.push({
             value: p.id,
             label: p.name,
+            orgUnits: p.organisationUnits.map(o => o.id)
         })
         let stages = []
         programOrganisms[p.id] = data.optionGroups.find(og => og.name === p.name).id
