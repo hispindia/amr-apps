@@ -28,7 +28,8 @@ export const getEventValues = async eventId => {
         programStageId: event.programStage,
         eventValues: values,
         completed: event.status === 'COMPLETED',
-        entityId: event.trackedEntityInstance
+        entityId: event.trackedEntityInstance,
+        sampleDate: event.eventDate
     }
 }
 

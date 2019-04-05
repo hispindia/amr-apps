@@ -356,14 +356,14 @@ export async function deletePerson(id) {
     await del('trackedEntityInstances/' + id)
 }
 
-export async function newRecord(pId, pStage, orgaCode, ou, eId, eValues) {
+export async function newRecord(pId, pStage, orgaCode, ou, eId, eValues, sampleDate) {
     let initialValues = {
         [_organismsDataElementId]: orgaCode,
         [_amrDataElement]: await generateAmrId(ou)
     }
     const { entityId, eventId } = eId
-        ? await addEvent(initialValues, pId, pStage.id, ou, eId, eValues)
-        : await addPersonWithEvent(initialValues, pId, pStage.id, ou, eValues)
+        ? await addEvent(initialValues, pId, pStage.id, ou, eId, eValues, sampleDate)
+        : await addPersonWithEvent(initialValues, pId, pStage.id, ou, eValues, sampleDate)
 
     const { programStage, eventValues, status } =
         await getProgramStage(pStage, initialValues, false, true)
@@ -372,14 +372,14 @@ export async function newRecord(pId, pStage, orgaCode, ou, eId, eValues) {
 }
 
 export async function existingRecord(programs, eventId, isApproval) {
-    let {eventValues: initialValues, programId, programStageId, completed, entityId }
+    let {eventValues: initialValues, programId, programStageId, completed, entityId, sampleDate }
         = await getEventValues(eventId)
     const pStage = programs.find(p => p.id === programId)
         .programStages.find(ps => ps.id = programStageId)
     const { programStage, eventValues, status } = !isApproval
         ? await getProgramStage(pStage, initialValues, completed, false)
         : await getProgramStage(pStage, initialValues, completed, false, _isL1User, _isL2User)
-    return { programId, programStage, eventValues, status, eventId, entityId }
+    return { programId, programStage, eventValues, status, eventId, entityId, sampleDate }
 }
 
 /**
@@ -522,16 +522,13 @@ export async function addEvent(
     programStageId,
     orgUnitId,
     entityId,
-    entityValues
+    entityValues,
+    sampleDate
 ) {
-    const date = eventValues[_sampleDateElementId]
-        ? eventValues[_sampleDateElementId]
-        : moment()
-
     let event = await setEventValues(
         {
             dataValues: [],
-            eventDate: date,
+            eventDate: sampleDate,
             orgUnit: orgUnitId,
             program: programId,
             programStage: programStageId,
@@ -555,8 +552,8 @@ export async function addEvent(
             trackedEntityInstance: entityId,
             orgUnit: orgUnitId,
             program: programId,
-            enrollmentDate: date,
-            incidentDate: date,
+            enrollmentDate: sampleDate,
+            incidentDate: sampleDate,
         })
     }
 
@@ -570,8 +567,6 @@ export async function addEvent(
 
 export async function setEventStatus(eventId, completed, isApproval) {
     let event = await get('events/' + eventId)
-    let dateElement = event.dataValues.find(dv => dv.dataElement === _sampleDateElementId)
-    if (dateElement) event.eventDate = dateElement.value
     event.status = completed ? 'COMPLETED' : 'ACTIVE'
     if (!isApproval) {
         let values = {}
@@ -590,12 +585,10 @@ export async function setEventStatus(eventId, completed, isApproval) {
 }
 
 export async function updateEventValue(eventId, dataElementId, value) {
-    const updateValue = async (i, v) =>
-        await put('events/' + eventId + '/' + dataElementId, { dataValues: [{ dataElement: i, value: v }] })
-
-    await updateValue(dataElementId, value)
-    if (dataElementId === _sampleDateElementId)
-        await updateValue(_sampleDateElementId, value)
+    await put(
+        'events/' + eventId + '/' + dataElementId,
+        { dataValues: [{ dataElement: dataElementId, value: value }] }
+    )
 }
 
 /**

@@ -6,7 +6,7 @@ import {
     MarginSides,
     MarginBottom,
 } from '../../helpers/helpers'
-import { SelectInput, RadioInput } from '../../inputs'
+import { SelectInput, RadioInput, DateInput } from '../../inputs'
 import { Card } from '@dhis2/ui/core/Card'
 import { Grid } from '@material-ui/core'
 
@@ -20,12 +20,13 @@ export class RecordPanel extends Component {
     }
 
     componentDidMount = () => {
-        const { programId, programStageId, organism } = this.props
+        const { programId, programStageId, organism, sampleDate } = this.props
         this.setState({
             organisms: programId ? this.getOrganisms(programId) : null,
             programId: programId ? programId : '',
             programStageId: programStageId ? programStageId : '',
             organism: organism ? organism : '',
+            sampleDate: sampleDate ? sampleDate : ''
         })
     }
 
@@ -35,6 +36,7 @@ export class RecordPanel extends Component {
                 programId: '',
                 programStageId: '',
                 organism: '',
+                sampleDate: ''
             })
     }
 
@@ -60,6 +62,7 @@ export class RecordPanel extends Component {
                     ? ''
                     : programStages[value][0].value,
             organism: '',
+            sampleDate: ''
         })
     }
 
@@ -78,6 +81,7 @@ export class RecordPanel extends Component {
             programId: values.programId,
             programStageId: values.programStageId,
             organism: values.organism,
+            sampleDate: values.sampleDate,
             valid: !Object.values(values).includes('')
         })
     }
@@ -86,34 +90,41 @@ export class RecordPanel extends Component {
      * Gets the data elements to be rendered.
      * @returns {Object[]} Data elements.
      */
-    getDataElements = () => {
+    getDataElement = id => {
         const { programs, programStages } = this.props
         const { programId, organisms } = this.state
 
-        let dataElements = [
-            {
-                id: 'programId',
-                label: 'Organism group',
-                objects: programs,
-                onChange: this.onProgramChange,
-            },
-        ]
-        if (programId && programStages[programId].length > 1)
-            dataElements.push({
-                id: 'programStageId',
-                label: 'Type',
-                objects: programStages[programId],
-                onChange: this.onChange,
-            })
-        if (organisms)
-            dataElements.push({
-                id: 'organism',
-                label: 'Organism',
-                objects: organisms,
-                onChange: this.onChange,
-            })
-
-        return dataElements
+        switch (id) {
+            case 'programId':
+                return this.getInput({
+                    id: 'programId',
+                    label: 'Organism group',
+                    objects: programs,
+                    onChange: this.onProgramChange,
+                })
+            case 'programStageId':
+                return this.getInput({
+                    id: 'programStageId',
+                    label: 'Type',
+                    objects: programStages[programId],
+                    onChange: this.onChange,
+                })
+            case 'organism':
+                return this.getInput({
+                    id: 'organism',
+                    label: 'Organism',
+                    objects: organisms,
+                    onChange: this.onChange,
+                })
+            case 'sampleDate':
+                return this.getInput({
+                    id: 'sampleDate',
+                    label: 'Date of Sample',
+                    onChange: this.onChange,
+                })
+            default:
+                return
+        }
     }
 
     /**
@@ -124,7 +135,16 @@ export class RecordPanel extends Component {
     getInput = dataElement => {
         return (
             <Padding key={dataElement.id}>
-                {dataElement.objects.length < 4 ? (
+                {!dataElement.objects ? (
+                    <DateInput
+                        name={dataElement.id}
+                        label={dataElement.label}
+                        value={this.state[dataElement.id]}
+                        onChange={dataElement.onChange}
+                        disabled={this.props.disabled}
+                        required
+                    />
+                ) : dataElement.objects.length < 4 ? (
                     <RadioInput
                         objects={dataElement.objects}
                         name={dataElement.id}
@@ -150,9 +170,8 @@ export class RecordPanel extends Component {
     }
 
     render() {
-        const dataElements = this.getDataElements()
-        const half = Math.ceil(dataElements.length / 2)
-
+        const { programStages } = this.props
+        const { programId, organisms, organism } = this.state
         return (
             <MarginBottom>
                 <MarginBottom>
@@ -163,18 +182,19 @@ export class RecordPanel extends Component {
                             </MarginSides>
                             <Grid container spacing={0}>
                                 <Grid item xs>
-                                    {dataElements
-                                        .slice(0, half)
-                                        .map(dataElement =>
-                                            this.getInput(dataElement)
-                                        )}
+                                    {this.getDataElement('programId')}
+                                    {programId
+                                        && programStages[programId].length > 1
+                                        && this.getDataElement('programStageId')
+                                    }
                                 </Grid>
                                 <Grid item xs>
-                                    {dataElements
-                                        .slice(half)
-                                        .map(dataElement =>
-                                            this.getInput(dataElement)
-                                        )}
+                                    {organisms
+                                        && this.getDataElement('organism')
+                                    }
+                                    {organism
+                                        && this.getDataElement('sampleDate')
+                                    }
                                 </Grid>
                             </Grid>
                         </Margin>

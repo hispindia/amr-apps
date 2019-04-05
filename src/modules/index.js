@@ -1,4 +1,5 @@
 export * from './App'
+export * from './ErrorSection'
 export * from './Main'
 export * from './PersonForm'
 export * from './ProgressSection'

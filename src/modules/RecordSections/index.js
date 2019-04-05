@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import {
+    ErrorSection,
     PersonForm,
     RecordForm,
     RecordPanel,
@@ -24,7 +25,7 @@ export const RecordSections = props => {
     const [state, dispatch, types] = hook(programs.rules, person.values)
 
     const { entityId, entityValues, entityValid, programId, programStageId,
-        organism, panelValid, eventId, eventValues, status, programStage,
+        organism, sampleDate, panelValid, eventId, eventValues, status, programStage,
         eventValid, resetSwitch, buttonDisabled, loading, rules } = state
 
     const disabled = buttonDisabled || !eventValid || !entityValid || !panelValid
@@ -51,7 +52,8 @@ export const RecordSections = props => {
                     organism,
                     orgUnit,
                     entityId,
-                    entityValues
+                    entityValues,
+                    sampleDate
             ))})
         }
         if (panelValid && !event) getNewRecord()
@@ -100,6 +102,7 @@ export const RecordSections = props => {
                 programId={programId}
                 programStageId={programStageId}
                 organism={organism}
+                sampleDate={sampleDate}
                 programs={programList}
                 programStages={stageLists}
                 programOrganisms={programOrganisms}
@@ -117,11 +120,10 @@ export const RecordSections = props => {
                 status={status}
                 passValues={valid => dispatch({type: types.EVENT_VALID, valid: valid})}
             />}
-            {loading && <ProgressSection />}
+            {loading && <ProgressSection/>}
             <ButtonRow
                 buttons={
-                    event
-                    ? eventId ? [
+                    eventId ? [
                         {
                             label: 'Delete',
                             onClick: onDelete,
@@ -142,7 +144,7 @@ export const RecordSections = props => {
                                 'Records with this approval status cannot be edited' :
                                 'A required field is empty',
                         },
-                    ] : []
+                    ]
                     : [
                         {
                             label: 'Submit and add new',
