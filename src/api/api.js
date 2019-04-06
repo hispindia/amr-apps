@@ -289,7 +289,11 @@ export async function checkUnique(property, value) {
         ':eq:' +
         value
     )).trackedEntityInstances
-    return entities.length > 0 ? entities[0].trackedEntityInstance : false
+    return !entities
+        ? false
+        : entities.length > 0
+        ? entities[0].trackedEntityInstance
+        : false
 }
 
 /**
