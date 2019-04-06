@@ -13,11 +13,11 @@
 - [x] Hide result section
 - [x] Same sections on approval screen as on entry screen
 - [x] Modals
-- [ ] Automatic possible duplation check
+- [x] Automatic possible duplation check
 - [ ] Manual duplication confirmation
 - [ ] Hashing patient registration number
-- [ ] Special characters in test values
 - [ ] DD not have color when MIC has value
+- [ ] Special characters in test values
 - [ ] Increased program rule support
 - [ ] Validation support
 - [ ] Person overview?

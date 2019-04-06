@@ -385,7 +385,7 @@ export class RecordForm extends Component {
             <MarginBottom>
                 {sections.map(section => {
                     const dataElements = section.dataElements.filter(
-                        dataElement => !dataElement.hide
+                        dataElement => !dataElement.hide && !dataElement.hideWithValues
                     )
                     const half = Math.ceil(
                         (dataElements.length +

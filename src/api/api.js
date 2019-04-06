@@ -7,29 +7,28 @@ import {
     generateAmrId,
 } from './helpers'
 
-const _personTypeId = 'tOJvIFXsB5V'
-
-const _deoGroup = 'mYdK5QT4ndl'
-const _l1ApprovalGroup = 'jVK9RNKNLus'
-const _l2ApprovalGroup = 'TFmNnLn06Rd'
-
 export const _organismsDataElementId = 'SaQe2REkGVw'
-const _amrDataElement = 'lIkk661BLpG'
-const _sampleDateElementId = 'JRUa0qYKQDF'
 export const _testResultDataElementId = 'bSgpKbkbVGL'
 export const _duplicateStatusDataElement = 'L6ZyBJGOeAV'
+const _amrDataElement = 'lIkk661BLpG'
+const _sampleDateElementId = 'JRUa0qYKQDF'
+
+const _personTypeId = 'tOJvIFXsB5V'
 
 const _l1ApprovalStatus = 'tAyVrNUTVHX'
 const _l1RevisionReason = 'wCNQtIHJRON'
 const _l2ApprovalStatus = 'sXDQT6Yaf77'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
+const _deoGroup = 'mYdK5QT4ndl'
+const _l1ApprovalGroup = 'jVK9RNKNLus'
+const _l2ApprovalGroup = 'TFmNnLn06Rd'
+
 let _isDeoUser
 let _isL1User
 let _isL2User
 
 let _username = ''
-let _orgUnitNames = {}
 
 /**
  * Gets organisms data element ID.
@@ -186,6 +185,11 @@ export async function initMetadata() {
                 label: ps.displayName,
             })
             ps.programStageSections.forEach(pss => {
+                if (pss.dataElements) {
+                    let orgDataElement = pss.dataElements.find(de =>
+                        de.id === _organismsDataElementId)
+                    if(orgDataElement) orgDataElement.hideWithValues = true
+                }
                 let childSections = []
                 ps.programStageSections
                     .filter(childSection =>
@@ -426,7 +430,6 @@ export async function getOrgUnits() {
 
     // Sorts the children of the OU by display name.
     const sortChildren = orgUnit => {
-        _orgUnitNames[orgUnit.id] = orgUnit.displayName
         if (orgUnit.children)
             if (orgUnit.children.length) {
                 orgUnit.children.forEach(child => sortChildren(child))
