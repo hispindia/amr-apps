@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { get, postData, del, put, setBaseUrl } from './crud'
+import { get, postData, del, put, setBaseUrl, post } from './crud'
 import {
     getProgramStage,
     getEventValues,
@@ -17,6 +17,7 @@ export const _organismsDataElementId = 'SaQe2REkGVw'
 const _amrDataElement = 'lIkk661BLpG'
 const _sampleDateElementId = 'JRUa0qYKQDF'
 export const _testResultDataElementId = 'bSgpKbkbVGL'
+export const _duplicateStatusDataElement = 'L6ZyBJGOeAV'
 
 const _l1ApprovalStatus = 'tAyVrNUTVHX'
 const _l1RevisionReason = 'wCNQtIHJRON'
@@ -115,10 +116,10 @@ export async function initMetadata() {
     }
 
     let data = await get('metadata.json?' +
-        'options=true&programs=true&optionSets=true&optionGroups=true&' +
-        'programRuleVariables=true&programRules=true&trackedEntityTypes=true' +
+        'options=true&programs=true&optionSets=true&optionGroups=true&constants=true' +
+        '&programRuleVariables=true&programRules=true&trackedEntityTypes=true' +
         '&fields=id,name,displayName,code,options,dataElement,program,organisationUnits,' +
-        'programStage,programStages[id,displayName,programStageDataElements[' +
+        'value,programStage,programStages[id,displayName,programStageDataElements[' +
         'dataElement[id],compulsory],programStageSections[id,name,' +
         'displayName,renderType,dataElements[id,displayFormName,code,' +
         'valueType,optionSetValue,optionSet]]],programRuleActions[' +
@@ -217,7 +218,13 @@ export async function initMetadata() {
     })
     programs.rules = programs.rules.sort((a, b) => (a.priority > b.priority) || !a.priority ? 1 : -1)
 
-    let metadata = { optionSets, person, programs, programList, stageLists, programOrganisms }
+    let constants = {}
+    if(data.constants)
+        data.constants.forEach(c => {
+            if (c.code) constants[c.code] = c.value
+        })
+
+    let metadata = { optionSets, person, programs, programList, stageLists, programOrganisms, constants }
     console.log(data)
     console.log(metadata)
 
@@ -647,4 +654,19 @@ export async function getCounts(items, orgUnit, userOnly) {
                     (userOnly ? '&var=username:' + _username : '')
             )).listGrid.rows[0][0]
     return items
+}
+
+export async function possibleDuplicate(entityId, eventId, eventDate, days, organism) {
+    const events = (await get('events.json?paging=false&fields=eventDate,event' +
+        '&trackedEntityInstance=' + entityId + '&filter=' +
+        _organismsDataElementId + ':eq:' + organism)).events
+    
+    eventDate = moment(eventDate)
+    
+    if (events.find(e =>
+        e.event !== eventId &&
+        eventDate.diff(moment(e.eventDate), 'days') > -days &&
+        eventDate.diff(moment(e.eventDate), 'days') < days
+    ))
+        await updateEventValue(eventId, _duplicateStatusDataElement, 'Possible')
 }

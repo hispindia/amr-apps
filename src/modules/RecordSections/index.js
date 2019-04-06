@@ -11,13 +11,14 @@ import {
     setEventStatus,
     newRecord,
     existingRecord,
+    possibleDuplicate,
     ButtonRow,
     Margin
 } from '../../'
 import { hook } from './hook'
 
 export const RecordSections = props => {
-    const { optionSets, person, programs, programList, stageLists, programOrganisms } = props.metadata
+    const { optionSets, person, programs, programList, stageLists, programOrganisms, constants } = props.metadata
     const event = props.match.params.event
     const orgUnit = props.match.params.orgUnit
 
@@ -60,6 +61,17 @@ export const RecordSections = props => {
 
     const onSubmit = async addMore => {
         dispatch({type: types.DISABLE_BUTTON, buttonDisabled: true})
+
+        if (constants.days) {
+            await possibleDuplicate(
+                entityId,
+                eventId,
+                eventDate,
+                constants.days,
+                optionSets[programOrganisms[programId]].find(o => o.value === organism).label
+            )
+        }
+
         await setEventStatus(eventId, true, props.isApproval)
 
         if (addMore) dispatch({type: types.ADD_MORE})
