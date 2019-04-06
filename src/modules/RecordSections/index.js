@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react'
 import {
-    ErrorSection,
     PersonForm,
+    ProgressSection,
     RecordForm,
     RecordPanel,
-    TitleRow,
-    ProgressSection,
+    TitleRow
 } from '../'
 import {
     deleteEvent,

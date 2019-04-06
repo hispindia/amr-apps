@@ -12,7 +12,7 @@
 - [x] Getting metadata at startup
 - [x] Hide result section
 - [x] Same sections on approval screen as on entry screen
-- [ ] Modals
+- [x] Modals
 - [ ] Automatic possible duplation check
 - [ ] Manual duplication confirmation
 - [ ] Hashing patient registration number
@@ -23,7 +23,6 @@
 - [ ] Person overview?
 
 ### Installation
-
 ```
 cd [root_dir]
 yarn install
@@ -34,7 +33,6 @@ yarn install
 ```
 
 ### Development
-
 You need to log in to the test server:
 `http://apps.hispindia.org/amr/`
 
@@ -48,7 +46,6 @@ yarn start
 ```
 
 ### Building
-
 ```
 cd [root_dir]
 yarn build

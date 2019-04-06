@@ -1,6 +1,7 @@
 export * from './App'
 export * from './ErrorSection'
 export * from './Main'
+export * from './ModalPopup'
 export * from './PersonForm'
 export * from './ProgressSection'
 export * from './RecordForm'

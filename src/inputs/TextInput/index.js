@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react'
 import InputField from '@dhis2/ui/core/InputField'
 import { debounced }  from '../../hooks'
 
+const errors = {
+    required: 'This field is required',
+    unique: 'This field requires a unique value'
+}
+
 /**
  * Textfield input.
  */
@@ -22,6 +27,11 @@ export const TextInput = props => {
             passValue(debouncedValue)
     }, [debouncedValue])
 
+    useEffect(() => {
+        if(props.uniqueValid && errorText === errors.unique)
+            setErrorText('')
+    }, [props.uniqueValid])
+
     /**
      * Passes the value to parent component after 1 sec.
      */
@@ -38,11 +48,11 @@ export const TextInput = props => {
     const validate = async value => {
         const { name, label, required, unique } = props
         let error = ''
-        if (required && !value) error = 'This field is required'
+        if (required && !value) error = errors.required
         if (unique && value) {
             setValidating(true)
             if (!(await props.validateUnique(name, value, label)))
-                error = 'This field requires a unique value'
+                error = errors.unique
             setValidating(false)
         }
         return error

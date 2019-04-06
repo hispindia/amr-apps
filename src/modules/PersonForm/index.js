@@ -17,6 +17,7 @@ import {
 } from '../../api/api'
 import { TextInput, AgeInput, RadioInput, SelectInput } from '../../inputs'
 import { ProgressSection } from '../ProgressSection'
+import { ModalPopup } from '../'
 
 const ButtonPositioned = styled.div`
     float: right;
@@ -32,7 +33,8 @@ export class PersonForm extends Component {
         uniques: [], // Unique textfield values are validated.
         entityId: null,
         editing: false,
-        loading: true
+        loading: true,
+        modal: null
     }
 
     componentDidMount = async () => {
@@ -123,19 +125,16 @@ export class PersonForm extends Component {
      */
     validateUnique = async (id, value, label) => {
         const entityId = await checkUnique(id, value)
-        if (entityId)
-            if (
-                window.confirm(
-                    `A person with ${label} ${value} is already registered. Do you want to get this person?`
-                )
-            ) {
-                this.onNewValues(await getPersonValues(entityId), entityId)
-                return true
-            } else return false
-        let uniques = { ...this.state.uniques }
-        uniques[id] = true
-        this.setState({ uniques: uniques })
-        return true
+        if (!entityId) return true
+            this.setState({
+                modal: {
+                    id: id,
+                    label: label,
+                    value: value,
+                    entityId: entityId
+                }
+            })
+            return false
     }
 
     checkRules = (values, attributes, rules) => {
@@ -196,7 +195,7 @@ export class PersonForm extends Component {
     getInput = attribute => {
         if (attribute.hide) return null
 
-        const { values, entityId, editing } = this.state
+        const { values, entityId, editing, uniques } = this.state
         const disabled = entityId && !editing ? true : false
 
         return (
@@ -244,6 +243,7 @@ export class PersonForm extends Component {
                     <TextInput
                         required={attribute.mandatory}
                         unique={attribute.trackedEntityAttribute.unique}
+                        uniqueValid={uniques && uniques[attribute.trackedEntityAttribute.id]}
                         validateUnique={this.validateUnique}
                         name={attribute.trackedEntityAttribute.id}
                         label={attribute.trackedEntityAttribute.displayName}
@@ -257,13 +257,34 @@ export class PersonForm extends Component {
         )
     }
 
+    onModalClick = async yes => {
+        const { id, entityId } = this.state.modal
+        let uniques = { ...this.state.uniques }
+        uniques[id] = yes
+
+        if (yes)
+            this.onNewValues(await getPersonValues(entityId), entityId)
+
+        this.setState({ uniques: uniques, modal: null })
+    }
+
     render() {
-        const { attributes, half, entityId, editing, loading } = this.state
+        const { attributes, half, entityId, editing, loading, modal } = this.state
 
         if (loading) return <ProgressSection />
 
         return (
             <MarginBottom>
+                {modal && <ModalPopup
+                    text={
+                        <span>
+                            A person with <em>{modal.label}</em> {modal.value} is already registered.
+                            <br/>
+                            Do you want to get this person?
+                        </span>
+                    }
+                    onClick={this.onModalClick}
+                />}
                 <Card>
                     <Margin>
                         {entityId && !editing && this.props.showEdit && (
