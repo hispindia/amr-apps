@@ -4,7 +4,8 @@ import {
     ProgressSection,
     RecordForm,
     RecordPanel,
-    TitleRow
+    TitleRow,
+    ModalPopup
 } from '../'
 import {
     deleteEvent,
@@ -25,8 +26,9 @@ export const RecordSections = props => {
     const [state, dispatch, types] = hook(programs.rules, person.values)
 
     const { entityId, entityValues, entityValid, programId, programStageId,
-        organism, sampleDate, panelValid, eventId, eventValues, status, programStage,
-        eventValid, resetSwitch, buttonDisabled, loading, rules } = state
+        organism, sampleDate, panelValid, eventId, eventValues, status,
+        programStage, eventValid, resetSwitch, buttonDisabled, loading,
+        rules, deleteClicked, deleteConfirmation } = state
 
     const disabled = buttonDisabled || !eventValid || !entityValid || !panelValid
 
@@ -59,6 +61,14 @@ export const RecordSections = props => {
         if (panelValid && !event) getNewRecord()
     }, [panelValid])
 
+    useEffect(() => {
+        const deleteAndExit = async () => {
+            await deleteEvent(eventId)
+            props.history.goBack()
+        }
+        if (deleteConfirmation) deleteAndExit()
+    }, [deleteConfirmation])
+
     const onSubmit = async addMore => {
         dispatch({type: types.DISABLE_BUTTON, buttonDisabled: true})
 
@@ -84,17 +94,22 @@ export const RecordSections = props => {
         dispatch({type: types.EDIT})
     }
 
-    const onDelete = async () => {
-        dispatch({type: types.DISABLE_BUTTON, buttonDisabled: true})
-        if (window.confirm('Are you sure you want to permanently delete this record?')) {
-            await deleteEvent(eventId)
-            props.history.goBack()
-        }
-        dispatch({type: types.DISABLE_BUTTON, buttonDisabled: false})
-    }
+    const onDelete = () =>
+        dispatch({type: types.DELETE_CLICKED})
+
+    const onDeleteConfirmed = yes =>
+        dispatch({
+            type: types.DELETE_CONFIRMED,
+            delete: yes
+        })
 
     return (
         <Margin>
+            {deleteClicked && <ModalPopup
+                text='Are you sure you want to permanently delete this record?'
+                onClick={onDeleteConfirmed}
+                deletion
+            />}
             <TitleRow
                 title="Record"
                 history={props.history}

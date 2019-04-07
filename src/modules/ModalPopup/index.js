@@ -31,16 +31,15 @@ export const ModalPopup = props => (
                 <ButtonRow
                     buttons={[
                         {
-                            label: 'No',
-                            kind:'destructive',
+                            label: props.deletion ? 'Cancel' : 'No',
+                            kind: 'basic',
                             icon:'clear',
                             onClick: () => props.onClick(false)
                         },
                         {
-                            label: 'Yes',
-                            kind: 'primary',
-                            icon:'done',
-                            focus: true,
+                            label: props.deletion ? 'Delete' : 'Yes',
+                            kind: props.deletion ? 'destructive' : 'primary',
+                            icon: props.deletion ? 'delete' : 'done',
                             onClick: () => props.onClick(true)
                         }
                     ]}

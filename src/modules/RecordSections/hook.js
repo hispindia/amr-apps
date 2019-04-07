@@ -8,7 +8,9 @@ const types = {
     EXISTING_RECORD: 3,
     EDIT: 4,
     DISABLE_BUTTON: 5,
-    EVENT_VALID: 6
+    EVENT_VALID: 6,
+    DELETE_CLICKED: 7,
+    DELETE_CONFIRMED: 8
 }
 
 const getRules = (rules, programId, programStageId) =>
@@ -115,6 +117,21 @@ const reducer = (state, action) => {
                 eventValid: action.valid
             }
         }
+        case types.DELETE_CLICKED: {
+            return {
+                ...state,
+                buttonDisabled: true,
+                deleteClicked: true
+            }
+        }
+        case types.DELETE_CONFIRMED: {
+            return {
+                ...state,
+                buttonDisabled: false,
+                deleteClicked: false,
+                deleteConfirmation: action.delete
+            }
+        }
         default: {
             return state
         }
@@ -140,7 +157,9 @@ export const hook = (rules, personValues) => {
         eventValid: false,
         resetSwitch: false,
         buttonDisabled: false,
-        loading: false
+        loading: false,
+        deleteClicked: false,
+        deleteConfirmation: null
     })
 
     return [state, dispatch, types]
