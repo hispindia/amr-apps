@@ -18,7 +18,11 @@ const theme = createMuiTheme({
     overrides: {
         MUIDataTableToolbar: {
             titleRoot: { marginLeft: 16 },
-            titleText: { fontSize: '1.25rem !important' },
+            titleText: {
+                fontSize: '1.25rem',
+                color: '#0d0d0e',
+                letterSpacing: 'normal'
+            },
         },
         MUIDataTableBodyRow: {
             root: {

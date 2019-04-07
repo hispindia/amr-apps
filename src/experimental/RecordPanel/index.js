@@ -16,7 +16,6 @@ import { hook } from './hook'
  */
 export const RecordPanel = props => {
     const [state, dispatch, types] = hook(props.resetSwitch)
-    console.log(state.programId)
 
     useEffect(() => {
         const dataElements = getDataElements()

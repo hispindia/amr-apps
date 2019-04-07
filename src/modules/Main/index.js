@@ -58,6 +58,7 @@ export const Main = props => {
                             render={componentProps => (
                                 <RecordSections
                                     {...componentProps}
+                                    isApproval={props.isApproval}
                                     metadata={metadata}
                                 />
                             )}

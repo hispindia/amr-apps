@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import {
+    DuplicationSection,
     PersonForm,
     ProgressSection,
     RecordForm,
@@ -13,13 +14,16 @@ import {
     newRecord,
     existingRecord,
     possibleDuplicate,
+    updateEventValue,
+    _duplicateStatusDataElement,
     ButtonRow,
     Margin
 } from '../../'
 import { hook } from './hook'
 
 export const RecordSections = props => {
-    const { optionSets, person, programs, programList, stageLists, programOrganisms, constants } = props.metadata
+    const { optionSets, person, programs, programList, stageLists,
+        programOrganisms, constants, dataElements } = props.metadata
     const event = props.match.params.event
     const orgUnit = props.match.params.orgUnit
 
@@ -76,7 +80,7 @@ export const RecordSections = props => {
             await possibleDuplicate(
                 entityId,
                 eventId,
-                eventDate,
+                sampleDate,
                 constants.days,
                 optionSets[programOrganisms[programId]].find(o => o.value === organism).label
             )
@@ -102,6 +106,10 @@ export const RecordSections = props => {
             type: types.DELETE_CONFIRMED,
             delete: yes
         })
+
+    const onDuplicationClick = async value => {
+        await updateEventValue(eventId, _duplicateStatusDataElement, value)
+    }
 
     return (
         <Margin>
@@ -146,6 +154,18 @@ export const RecordSections = props => {
                 status={status}
                 passValues={valid => dispatch({type: types.EVENT_VALID, valid: valid})}
             />}
+            {false && eventId && constants.days && eventValues[_duplicateStatusDataElement] === 'Possible' &&
+                <DuplicationSection
+                    entityId={entityId}
+                    eventDate={sampleDate}
+                    days={constants.days}
+                    dataElements={dataElements}
+                    history={props.history}
+                    onClick={onDuplicationClick}
+                    organism={optionSets[programOrganisms[programId]]
+                        .find(o => o.value === organism).label}
+                />
+            }
             {loading && <ProgressSection/>}
             <ButtonRow
                 buttons={

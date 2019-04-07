@@ -1,11 +1,26 @@
 import React from 'react'
 import { Button } from '@dhis2/ui/core'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { MarginTop } from '../../helpers/helpers'
 
 const SpaceBetween = styled.div`
     justify-content: space-between;
     display: flex;
+    ${props =>
+        props.unspaced &&
+        css`
+            justify-content: unset;
+        `
+    }
+`
+
+const ButtonPadding = styled.div`
+    ${props =>
+        props.unspaced &&
+        css`
+            padding-right: 16px;
+        `
+    }
 `
 
 /**
@@ -13,9 +28,10 @@ const SpaceBetween = styled.div`
  */
 export const ButtonRow = props => (
     <MarginTop>
-        <SpaceBetween>
+        <SpaceBetween unspaced={props.unspaced}>
             {props.buttons.map(button => (
-                <div
+                <ButtonPadding
+                    unspaced={props.unspaced}
                     key={button.label}
                     title={
                         button.disabled
@@ -31,7 +47,7 @@ export const ButtonRow = props => (
                     >
                         {button.label}
                     </Button>
-                </div>
+                </ButtonPadding>
             ))}
         </SpaceBetween>
     </MarginTop>

@@ -20,7 +20,7 @@ const Background = styled.div`
 `
 
 const BottomCard = styled(Card)`
-    width: 30%;
+    width: 30% !important;
 `
 
 export const ModalPopup = props => (

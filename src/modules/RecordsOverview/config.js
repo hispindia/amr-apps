@@ -9,33 +9,26 @@ export const titles = {
 
 export const headers = [
     {
-        name: 'AMR Id',
-        column: 'AMR Id',
+        name: 'AMR Id'
     },
     {
-        name: 'Organism group',
-        column: 'Organism group',
+        name: 'Organism group'
     },
     {
-        name: 'Organism',
-        column: 'Organism',
+        name: 'Organism'
     },
     {
-        name: 'Created',
-        column: 'Created',
+        name: 'Created'
     },
     {
-        name: 'Updated',
-        column: 'Updated',
+        name: 'Updated'
     },
     {
         name: 'Organisation unit ID',
-        column: 'Organisation unit ID',
         options: { display: false },
     },
     {
         name: 'Event',
-        column: 'Event',
         options: { display: false },
     },
 ]

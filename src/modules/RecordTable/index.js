@@ -7,22 +7,21 @@ import TableToolbar from '../../inputs/TableToolbar'
  * Table containg the persons events (records).
  */
 export const RecordTable = props => (
-    <Card>
-        <MUIDataTable
-            title={props.title}
-            data={props.data.rows}
-            columns={props.data.headers}
-            options={{
-                selectableRows: false,
-                onRowClick: row => props.onEventClick(row),
-                elevation: 0,
-                customToolbar: () => props.addButton
-                    ? <TableToolbar
-                        onAddClick={props.onAddClick}
-                        addButtonDisabled={props.addButtonDisabled}
-                    />
-                    : null
-            }}
-        />
-    </Card>
+    <MUIDataTable
+        title={props.title}
+        data={props.data.rows}
+        columns={props.data.headers}
+        options={{
+            selectableRows: false,
+            elevation: 0,
+            onRowClick: props.onEventClick
+                ? row => props.onEventClick(row)
+                : () => {},
+            customToolbar: () => props.addButton &&
+                <TableToolbar
+                    onAddClick={props.onAddClick}
+                    addButtonDisabled={props.addButtonDisabled}
+                />
+        }}
+    />
 )

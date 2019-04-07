@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Card } from '@dhis2/ui/core';
 import { getEvents, Margin } from '../..'
 import { RecordTable, ProgressSection, TitleRow } from '..'
 import { titles, headers } from './config'
@@ -51,14 +52,16 @@ export const RecordsOverview = props => {
         <Margin>
             <TitleRow title={titles[props.match.params.status]} />
             {loading ? <ProgressSection /> :
-                <RecordTable
-                    data={data}
-                    onEventClick={onEventClick}
-                    title=""
-                    onAddClick={onAddClick}
-                    addButton={!props.isApproval}
-                    addButtonDisabled={addButtonDisabled}
-                />
+                <Card>
+                    <RecordTable
+                        data={data}
+                        onEventClick={onEventClick}
+                        title=""
+                        onAddClick={onAddClick}
+                        addButton={!props.isApproval}
+                        addButtonDisabled={addButtonDisabled}
+                    />
+                </Card>
             }
         </Margin>
     )

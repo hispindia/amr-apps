@@ -146,7 +146,8 @@ export const getProgramStage = async (
             && !values[_l2ApprovalStatus]),
         editable: values === {}
             || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
-            || [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes('Resend'),
+            || [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes('Resend')
+            || (isL2User && !values[_l2ApprovalStatus]),
         finished: values[_l1ApprovalStatus] === values[_l2ApprovalStatus] === 'Approved',
         completed: completed
     }
