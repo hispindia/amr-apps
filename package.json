@@ -1,6 +1,6 @@
 {
   "name": "@amr/lib",
-  "version": "0.9.0",
+  "version": "0.1.0",
   "description": "AMR record capture app for DHIS2",
   "main": "index.js",
   "author": "Terje Uglebakken <terjeug@ifi.uio.no>",
