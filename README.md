@@ -34,7 +34,7 @@ yarn install
 
 ### Development
 You need to log in to the test server:
-`http://apps.hispindia.org/amr/`
+`https://amrtest.icmr.org.in/amrtest`
 
 ```
 cd [root_dir]

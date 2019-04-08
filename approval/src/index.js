@@ -5,7 +5,7 @@ import { App } from 'modules'
 import { init } from 'api'
 import { menuItems, tables } from './config'
 
-const developmentServer = 'https://amrtest.icmr.org.in/amr'
+const developmentServer = 'https://amrtest.icmr.org.in/amrtest'
 const rootElement = document.getElementById('root')
 
 const withBaseUrl = async baseUrl => {

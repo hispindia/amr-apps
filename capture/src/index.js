@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import * as serviceWorker from './serviceWorker'
-import { init, addMetadata } from 'api'
+import { init } from 'api'
 import { App } from 'modules'
 import { menuItems, tables } from './config'
 
@@ -11,7 +11,6 @@ const rootElement = document.getElementById('root')
 const withBaseUrl = async baseUrl => {
     baseUrl = `${baseUrl}/api`
     await init(baseUrl)
-    await addMetadata()
 
     ReactDOM.render(
         <App
