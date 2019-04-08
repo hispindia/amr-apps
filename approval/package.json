@@ -1,6 +1,6 @@
 {
     "name": "amr-record-approval",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "AMR approval app for DHIS2",
     "main": "index.js",
     "license": "BSD-3-Clause",
