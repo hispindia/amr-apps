@@ -488,7 +488,7 @@ export async function addPersonWithEvent(
 ) {
     const date = eventValues[_sampleDateElementId]
         ? eventValues[_sampleDateElementId]
-        : moment()
+        : moment().add(-1, 'days')
 
     let event = await setEventValues(
         {
@@ -738,4 +738,31 @@ export async function getDuplicates(entityId, eventDate, days, organism, dataEle
     console.log(headers)
     console.log(rows)
     return { headers, rows }
+}
+
+export async function addMetadata() {
+    await postData('dataElements', {
+        code: "Duplicate Status",
+        id: "L6ZyBJGOeAV",
+        name: "Duplicate Status",
+        shortName: "Duplicate Status",
+        aggregationType: "NONE",
+        domainType: "TRACKER",
+        displayName: "Duplicate Status",
+        displayShortName: "Duplicate Status",
+        valueType: "TEXT",
+        formName: "Duplicate Status",
+        displayFormName: "Duplicate Status",
+        optionSetValue: true,
+        optionSet: {
+        id: "NsnxXMTpxrY"
+        },
+        })
+    /*await postData('options', {
+        code: "Possible",
+        name: "Possible",
+        id: "fGIQfEOu0Ot",
+        displayName: "Possible",
+        sortOrder: 2,
+    })*/
 }
