@@ -26,11 +26,19 @@ export const AgeInput = props => {
     }, [props.value])
 
     const setValues = date => {
-        const age = moment.duration(moment().diff(date))
-        setValue(date)
-        setYears(age.years().toString())
-        setMonths(age.months().toString())
-        setDays(age.days().toString())
+        date = moment(date)
+        const now = moment()
+
+        const years = now.diff(date, 'year')
+        date.add(years, 'years')
+        const months = now.diff(date, 'months')
+        date.add(months, 'months')
+        const days = now.diff(date, 'days')
+
+        setValue(date.add(-months, 'months').add(-years, 'years'))
+        setYears(years.toString())
+        setMonths(months.toString())
+        setDays(days.toString())
     }
 
     /**
