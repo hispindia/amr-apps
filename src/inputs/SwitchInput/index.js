@@ -1,26 +1,28 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Switch from '@dhis2/ui/core/Switch'
 
 /**
  * Switch input.
  */
-export class SwitchInput extends React.Component {
-    state = { value: false }
+export const SwitchInput = props => {
+    const [value, setValue] = useState(false)
 
-    onChange = async (name, value) => {
-        this.setState({ value: value })
-        this.props.onChange(name, value)
+    useEffect(() => {
+        if (props.value !== value) setValue(props.value)
+    }, [props.value])
+
+    const onChange = (n, v) => {
+        setValue(v)
+        props.onChange(props.name, v)
     }
 
-    render() {
-        return (
-            <Switch
-                name={this.props.name}
-                checked={this.state.value}
-                label={this.props.label}
-                disabled={this.props.disabled}
-                onChange={this.onChange}
-            />
-        )
-    }
+    return (
+        <Switch
+            name={props.name}
+            checked={value}
+            label={props.label}
+            disabled={props.disabled}
+            onChange={onChange}
+        />
+    )
 }

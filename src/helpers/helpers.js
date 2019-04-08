@@ -84,6 +84,11 @@ export const MarginSides = styled.div`
     margin-right: 16px;
 `
 
+export const MarginSidesSmall = styled.div`
+    margin-left: 8px;
+    margin-right: 8px;
+`
+
 export const MarginTop = styled.div`
     margin-top: 16px;
 `

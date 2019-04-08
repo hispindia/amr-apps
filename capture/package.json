@@ -1,6 +1,6 @@
 {
     "name": "amr-record-capture",
-    "version": "0.0.9",
+    "version": "0.1.0",
     "description": "AMR capture app for DHIS2",
     "main": "index.js",
     "license": "BSD-3-Clause",
@@ -32,9 +32,9 @@
         "eject": "react-scripts eject"
     },
     "dependencies": {
-        "react": "^16",
-        "react-dom": "^16",
-        "react-scripts": "^2.1.3",
+        "react": "link:../node_modules/react",
+        "react-dom": "link:../node_modules/react-dom",
+        "react-scripts": "^2.1.8",
         "typeface-roboto": "0.0.54"
     }
 }

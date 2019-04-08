@@ -34,11 +34,11 @@ export class RecordForm extends Component {
     componentDidMount = async () => await this.init()
 
     componentDidUpdate = async prevProps => {
-        const { programStage, values, completed } = this.props
+        const { programStage, values, status } = this.props
         if (
             prevProps.programStage !== programStage ||
             prevProps.values !== values ||
-            prevProps.completed !== completed
+            prevProps.status !== status
         )
             await this.init()
     }
@@ -46,8 +46,8 @@ export class RecordForm extends Component {
     init = async () => {
         this.setState({ loading: true })
 
-        let { programStage, values, passValues, completed } = this.props
-        this.checkRules(completed ? {...values} : values, programStage.programStageSections, !completed)
+        let { programStage, values, passValues, status } = this.props
+        this.checkRules(status.completed ? {...values} : values, programStage.programStageSections, !status.completed)
 
         this.setState({
             loading: false,
@@ -72,7 +72,7 @@ export class RecordForm extends Component {
 
     onNewValues = values => {
         let programStage = { ...this.state.programStage }
-        this.checkRules(values, programStage.programStageSections, !this.props.completed)
+        this.checkRules(values, programStage.programStageSections, !this.props.status.completed)
         this.setState({
             values: values,
             programStage: programStage,
@@ -187,12 +187,9 @@ export class RecordForm extends Component {
                                     affectedDataElement.optionSet.id !==
                                     r.optionGroup.id
                                 ) {
-                                    affectedDataElement.optionSet = {
-                                        id: r.optionGroup.id,
-                                        options: r.optionGroup.options,
-                                    }
+                                    affectedDataElement.optionSet.id = r.optionGroup.id
                                     // Only reset selected value if the options do not include current value.
-                                    if (!affectedDataElement.optionSet.options.find(option => option.value === values[affectedDataElement.id]) && values[affectedDataElement.id] !== '') {
+                                    if (!this.props.optionSets[affectedDataElement.optionSet.id].find(option => option.value === values[affectedDataElement.id]) && values[affectedDataElement.id] !== '') {
                                         values[affectedDataElement.id] = ''
                                         if (pushChanges)
                                             this.onNewValue(affectedDataElement.id, '')
@@ -271,7 +268,7 @@ export class RecordForm extends Component {
                 .forEach(dataElement => {
                     objects[dataElement.id] = {
                         label: dataElement.displayFormName,
-                        disabled: dataElement.disabled || this.props.completed,
+                        disabled: dataElement.disabled || this.props.status.completed,
                     }
                     values[dataElement.id] = this.state.values[dataElement.id]
                 })
@@ -315,13 +312,14 @@ export class RecordForm extends Component {
      * @returns {Component} Date element component.
      */
     getDataElement = dataElement => {
-        const completed = this.props.completed
+        const completed = this.props.status.completed
+        const { optionSets } = this.props
         return (
             <Padding key={dataElement.id}>
                 {dataElement.optionSetValue ? (
-                    dataElement.optionSet.options.length < 5 ? (
+                    optionSets[dataElement.optionSet.id].length < 5 ? (
                         <RadioInput
-                            objects={dataElement.optionSet.options}
+                            objects={optionSets[dataElement.optionSet.id]}
                             name={dataElement.id}
                             label={dataElement.displayFormName}
                             value={this.state.values[dataElement.id]}
@@ -331,7 +329,7 @@ export class RecordForm extends Component {
                         />
                     ) : (
                         <SelectInput
-                            objects={dataElement.optionSet.options}
+                            objects={optionSets[dataElement.optionSet.id]}
                             name={dataElement.id}
                             label={dataElement.displayFormName}
                             value={this.state.values[dataElement.id]}
@@ -387,7 +385,7 @@ export class RecordForm extends Component {
             <MarginBottom>
                 {sections.map(section => {
                     const dataElements = section.dataElements.filter(
-                        dataElement => !dataElement.hide
+                        dataElement => !dataElement.hide && !dataElement.hideWithValues
                     )
                     const half = Math.ceil(
                         (dataElements.length +

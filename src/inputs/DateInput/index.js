@@ -1,111 +1,78 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import InputField from '@dhis2/ui/core/InputField'
 import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
 import MomentUtils from '@date-io/moment'
 import moment from 'moment'
-import InputField from '@dhis2/ui/core/InputField'
 import { Input } from '../../helpers/helpers'
 
 /**
  * Date picker.
  */
-export class DateInput extends React.Component {
-    state = {
-        value: '',
-        errorText: '',
-    }
-
-    componentDidMount = () => {
-        if (this.props.value) {
-            this.setState({
-                value: this.props.value,
-            })
-        }
-    }
-
-    componentWillReceiveProps = props => {
-        if (
-            this.state.value !== props.value &&
-            (this.state.value !== '' && props.value !== null)
-        ) {
-            this.setState({
-                value: props.value,
-            })
-        }
-    }
+export const DateInput = props => {
+    const [value, setValue] = useState('')
+    const [picker, setPicker] = useState(null)
+    
+    useEffect(() => {
+        if (props.value !== value) setValue(props.value)
+    }, [props.value])
 
     /**
      * Called on date picker input.
      * @param {string} - New date.
      */
-    setDate = date => {
-        this.setState({
-            value: date,
-        })
-        this.props.onChange(this.props.name, date.format('YYYY-MM-DD'))
+    const setDate = date => {
+        setValue(date)
+        props.onChange(props.name, date.format('YYYY-MM-DD'))
     }
 
     /**
      * Opens date picker.
      * @param {Object} e - Event.
      */
-    openPicker = e => {
-        this.picker.open(e)
-    }
+    const openPicker = e => picker.open(e)
 
     /**
      * Opens date picker.
      * @param {Object} e - Event.
      */
-    onKeyPress = e => {
-        if (e.key === 'Enter') this.picker.open(e)
+    const onKeyPress = e => {
+        if (e.key === 'Enter') picker.open(e)
     }
 
     /**
      * Gets input field used for date picker.
      * @returns {Component} Input field.
      */
-    getField = () => {
-        return (
-            <Input
-                onClick={this.props.disabled ? null : this.openPicker}
-                onKeyPress={this.props.disabled ? null : this.onKeyPress}
-            >
-                <InputField
-                    name={this.props.name}
-                    label={this.props.label}
-                    value={
-                        this.state.value !== ''
-                            ? moment(this.state.value).format('LL')
-                            : this.state.value
-                    }
-                    onChange={() => {}}
-                    kind={'outlined'}
-                    status={this.state.errorText === '' ? 'default' : 'error'}
-                    help={this.state.errorText}
-                    disabled={this.props.disabled}
-                    size="dense"
-                    required={this.props.required}
-                />
-            </Input>
-        )
-    }
+    const getField = () => (
+        <Input
+            onClick={props.disabled ? null : openPicker}
+            onKeyPress={props.disabled ? null : onKeyPress}
+        >
+            <InputField
+                name={props.name}
+                label={props.label}
+                value={value !== ''? moment(value).format('LL'): value}
+                onChange={() => {}}
+                kind={'outlined'}
+                disabled={props.disabled}
+                size="dense"
+                required={props.required}
+            />
+        </Input>
+    )
 
-    render() {
-        return (
-            <div>
-                <MuiPickersUtilsProvider utils={MomentUtils}>
-                    <DatePicker
-                        value={this.state.value}
-                        onChange={this.setDate}
-                        showTodayButton
-                        TextFieldComponent={this.getField}
-                        maxDate={moment()}
-                        ref={node => {
-                            this.picker = node
-                        }}
-                    />
-                </MuiPickersUtilsProvider>
-            </div>
-        )
-    }
+    return (
+        <div>
+            <MuiPickersUtilsProvider utils={MomentUtils}>
+                <DatePicker
+                    value={value}
+                    onChange={setDate}
+                    showTodayButton
+                    TextFieldComponent={getField}
+                    maxDate={moment()}
+                    ref={node => setPicker(node)}
+                />
+            </MuiPickersUtilsProvider>
+        </div>
+    )
 }

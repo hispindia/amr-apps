@@ -6,64 +6,63 @@ import {
     MarginSides,
     MarginBottom,
 } from '../../helpers/helpers'
-import { SelectInput, RadioInput } from '../../inputs'
+import { SelectInput, RadioInput, DateInput } from '../../inputs'
 import { Card } from '@dhis2/ui/core/Card'
-import { getPrograms, getOrganisms } from '../../api/api'
 import { Grid } from '@material-ui/core'
-import { ProgressSection } from '../'
 
 /**
  * Contains event panal and/or event information.
  */
 export class RecordPanel extends Component {
     state = {
-        programs: null,
-        programStages: null,
-        organisms: null,
-        values: {
-            programId: '',
-            programStageId: '',
-            organismCode: '',
-        },
+        organisms: '',
+        programId: ''
     }
 
-    componentDidMount = async () => {
-        const { programs, programStages } = await getPrograms()
+    componentDidMount = () => {
+        const { programId, programStageId, organism, sampleDate } = this.props
         this.setState({
-            programs: programs,
-            programStages: programStages,
+            organisms: programId ? this.getOrganisms(programId) : null,
+            programId: programId ? programId : '',
+            programStageId: programStageId ? programStageId : '',
+            organism: organism ? organism : '',
+            sampleDate: sampleDate ? sampleDate : ''
         })
     }
 
     componentDidUpdate = prevProps => {
         if (this.props.resetSwitch !== prevProps.resetSwitch)
             this.setState({
-                values: {
-                    programId: '',
-                    programStageId: '',
-                    organismCode: '',
-                },
+                programId: '',
+                programStageId: '',
+                organism: '',
+                sampleDate: ''
             })
+    }
+
+    getOrganisms = programId => {
+        let organisms = []
+        this.props.optionSets[this.props.programOrganisms[programId]].forEach(o => {
+            if (!organisms.find(org => org.value === o.value))
+                organisms.push(o)
+        })
+        return organisms
     }
 
     /**
      * Called when a new program is selected.
      */
     onProgramChange = async (name, value) => {
-        const { programs, programStages } = this.state
-        let values = {
+        const { programStages } = this.props
+        this.onNewValues({
+            organisms: this.getOrganisms(value),
             programId: value,
             programStageId:
                 programStages[value].length > 1
                     ? ''
                     : programStages[value][0].value,
-            organismCode: '',
-        }
-        this.setState({
-            organisms: await getOrganisms(
-                programs.find(program => program.value === value).label
-            ),
-            values: values,
+            organism: '',
+            sampleDate: ''
         })
     }
 
@@ -71,48 +70,61 @@ export class RecordPanel extends Component {
      * Called when a new program stage or organism is selected.
      */
     onChange = (name, value) => {
-        let values = { ...this.state.values }
+        let values = {...this.state}
         values[name] = value
-        this.setState({ values: values })
-        this.props.passValues(
-            values.programId,
-            values.programStageId,
-            values.organismCode,
-            !Object.values(values).includes('')
-        )
+        this.onNewValues(values)
+    }
+
+    onNewValues = values => {
+        this.setState(values)
+        this.props.passValues({
+            programId: values.programId,
+            programStageId: values.programStageId,
+            organism: values.organism,
+            sampleDate: values.sampleDate,
+            valid: !Object.values(values).includes('')
+        })
     }
 
     /**
      * Gets the data elements to be rendered.
      * @returns {Object[]} Data elements.
      */
-    getDataElements = () => {
-        const { programs, programStages, organisms, values } = this.state
+    getDataElement = id => {
+        const { programs, programStages } = this.props
+        const { programId, organisms } = this.state
 
-        let dataElements = [
-            {
-                id: 'programId',
-                label: 'Organism group',
-                objects: programs,
-                onChange: this.onProgramChange,
-            },
-        ]
-        if (values.programId && programStages[values.programId].length > 0)
-            dataElements.push({
-                id: 'programStageId',
-                label: 'Type',
-                objects: programStages[values.programId],
-                onChange: this.onChange,
-            })
-        if (organisms)
-            dataElements.push({
-                id: 'organismCode',
-                label: 'Organisms',
-                objects: organisms,
-                onChange: this.onChange,
-            })
-
-        return dataElements
+        switch (id) {
+            case 'programId':
+                return this.getInput({
+                    id: 'programId',
+                    label: 'Organism group',
+                    objects: programs,
+                    onChange: this.onProgramChange,
+                })
+            case 'programStageId':
+                return this.getInput({
+                    id: 'programStageId',
+                    label: 'Type',
+                    objects: programStages[programId],
+                    onChange: this.onChange,
+                })
+            case 'organism':
+                return this.getInput({
+                    id: 'organism',
+                    label: 'Organism',
+                    objects: organisms,
+                    onChange: this.onChange,
+                })
+            case 'sampleDate':
+                return this.getInput({
+                    id: 'sampleDate',
+                    label: 'Date of Sample',
+                    onChange: this.onChange,
+                })
+            default:
+                return
+        }
     }
 
     /**
@@ -123,12 +135,21 @@ export class RecordPanel extends Component {
     getInput = dataElement => {
         return (
             <Padding key={dataElement.id}>
-                {dataElement.objects.length < 4 ? (
+                {!dataElement.objects ? (
+                    <DateInput
+                        name={dataElement.id}
+                        label={dataElement.label}
+                        value={this.state[dataElement.id]}
+                        onChange={dataElement.onChange}
+                        disabled={this.props.disabled}
+                        required
+                    />
+                ) : dataElement.objects.length < 4 ? (
                     <RadioInput
                         objects={dataElement.objects}
                         name={dataElement.id}
                         label={dataElement.label}
-                        value={this.state.values[dataElement.id]}
+                        value={this.state[dataElement.id]}
                         onChange={dataElement.onChange}
                         disabled={this.props.disabled}
                         required
@@ -138,7 +159,7 @@ export class RecordPanel extends Component {
                         objects={dataElement.objects}
                         name={dataElement.id}
                         label={dataElement.label}
-                        value={this.state.values[dataElement.id]}
+                        value={this.state[dataElement.id]}
                         onChange={dataElement.onChange}
                         disabled={this.props.disabled}
                         required
@@ -149,12 +170,9 @@ export class RecordPanel extends Component {
     }
 
     render() {
-        const dataElements = this.getDataElements()
-        const half = Math.ceil(dataElements.length / 2)
-
-        if (!this.state.programs) return <ProgressSection />
-
-        return !this.state.programs ? null : (
+        const { programStages } = this.props
+        const { programId, organisms, organism } = this.state
+        return (
             <MarginBottom>
                 <MarginBottom>
                     <Card>
@@ -164,18 +182,19 @@ export class RecordPanel extends Component {
                             </MarginSides>
                             <Grid container spacing={0}>
                                 <Grid item xs>
-                                    {dataElements
-                                        .slice(0, half)
-                                        .map(dataElement =>
-                                            this.getInput(dataElement)
-                                        )}
+                                    {this.getDataElement('programId')}
+                                    {programId
+                                        && programStages[programId].length > 1
+                                        && this.getDataElement('programStageId')
+                                    }
                                 </Grid>
                                 <Grid item xs>
-                                    {dataElements
-                                        .slice(half)
-                                        .map(dataElement =>
-                                            this.getInput(dataElement)
-                                        )}
+                                    {organisms
+                                        && this.getDataElement('organism')
+                                    }
+                                    {organism
+                                        && this.getDataElement('sampleDate')
+                                    }
                                 </Grid>
                             </Grid>
                         </Margin>

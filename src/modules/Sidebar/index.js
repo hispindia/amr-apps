@@ -12,7 +12,8 @@ export const Sidebar = props => (
         <Margin>
             <SidebarMenu
                 selected={props.selected}
-                menuItems={props.menuItems}
+                items={props.menuItems.items}
+                userOnly={props.menuItems.userOnly}
                 counts={props.counts}
             />
             <Route

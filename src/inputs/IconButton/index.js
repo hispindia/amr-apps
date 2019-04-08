@@ -1,5 +1,4 @@
-import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
+import React from 'react'
 import styled from 'styled-components'
 import { Icon } from '@dhis2/ui/core'
 
@@ -25,14 +24,9 @@ const IconContainer = styled.div`
 /**
  * Icon Button.
  */
-class IconButton extends Component {
-    render() {
-        return (
-            <IconContainer onClick={this.props.onClick}>
-                <Icon name={this.props.name} className={this.props.icon} />
-            </IconContainer>
-        )
-    }
-}
+export const IconButton = props => (
+    <IconContainer onClick={props.onClick}>
+        <Icon name={props.name} className={props.icon} />
+    </IconContainer>
+)
 
-export default withRouter(IconButton)
