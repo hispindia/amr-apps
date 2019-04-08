@@ -125,16 +125,22 @@ export class PersonForm extends Component {
      */
     validateUnique = async (id, value, label) => {
         const entityId = await checkUnique(id, value)
-        if (!entityId) return true
-            this.setState({
-                modal: {
-                    id: id,
-                    label: label,
-                    value: value,
-                    entityId: entityId
-                }
-            })
-            return false
+        let uniques = { ...this.state.uniques }
+        uniques[id] = entityId ? false : true
+        if (!entityId) {
+            this.setState({uniques: uniques})
+            return true
+        }
+        this.setState({
+            uniques: uniques,
+            modal: {
+                id: id,
+                label: label,
+                value: value,
+                entityId: entityId
+            }
+        })
+        return false
     }
 
     checkRules = (values, attributes, rules) => {
