@@ -131,6 +131,7 @@ export const RecordSections = props => {
                 showEdit={!event && !panelValid}
                 rules={person.rules}
                 passValues={action => dispatch({type: types.SET_ENTITY, ...action})}
+                loading={event && !eventId}
             />
             {entityValid && <RecordPanel
                 programId={programId}

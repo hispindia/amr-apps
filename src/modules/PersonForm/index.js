@@ -38,34 +38,21 @@ export class PersonForm extends Component {
     }
 
     componentDidMount = async () => {
-        let { id, attributes, values, uniques, rules } = this.props
-
-        if (id) {
-            this.onNewValues(await getPersonValues(id), id)
-            this.setState({
-                uniques: uniques,
-                half: Math.floor(trackedEntityTypeAttributes.length / 2),
-                rules: rules,
-                loading: false
-            })
-        }
-        else {
-            this.checkRules(values, attributes, rules)
-            this.setState({
-                uniques: uniques,
-                half: Math.floor(attributes.length / 2),
-                rules: rules,
-                attributes: attributes,
-                values: values,
-                loading: false
-            })
-        }
+        let { attributes, values, uniques, rules, loading } = this.props
+        this.checkRules(values, attributes, rules)
+        this.setState({
+            uniques: uniques,
+            half: Math.floor(attributes.length / 2),
+            rules: rules,
+            attributes: attributes,
+            values: values,
+            loading: loading
+        })
     }
 
     componentDidUpdate = async prevProps => {
         const entityId = this.props.id
         if (entityId && entityId !== prevProps.id) {
-            //this.setState({ loading: true })
             this.onNewValues(await getPersonValues(entityId), entityId)
             this.setState({ loading: false })
         }
