@@ -242,7 +242,7 @@ export class PersonForm extends Component {
                         label={attribute.trackedEntityAttribute.displayName}
                         value={values[attribute.trackedEntityAttribute.id]}
                         onChange={this.onChange}
-                        disabled={disabled}
+                        disabled={disabled || (entityId && attribute.trackedEntityAttribute.unique)}
                         type={attribute.trackedEntityAttribute.valueType === 'NUMBER' ? 'number' : 'text'}
                     />
                 )}
