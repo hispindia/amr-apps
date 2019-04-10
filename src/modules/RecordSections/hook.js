@@ -10,7 +10,8 @@ const types = {
     DISABLE_BUTTON: 5,
     EVENT_VALID: 6,
     DELETE_CLICKED: 7,
-    DELETE_CONFIRMED: 8
+    DELETE_CONFIRMED: 8,
+    SET_LOADING: 9
 }
 
 const getRules = (rules, programId, programStageId) =>
@@ -91,6 +92,7 @@ const reducer = (state, action) => {
                 panelValid: false,
                 eventData: null,
                 eventValid: false,
+                eventId: null,
                 resetSwitch: !state.resetSwitch,
                 buttonDisabled: false
             }
@@ -130,6 +132,12 @@ const reducer = (state, action) => {
                 buttonDisabled: false,
                 deleteClicked: false,
                 deleteConfirmation: action.delete
+            }
+        }
+        case types.SET_LOADING: {
+            return {
+                ...state,
+                loading: true
             }
         }
         default: {

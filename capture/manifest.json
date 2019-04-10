@@ -7,9 +7,9 @@
         }
     },
     "appType": "APP",
-    "name": "AMR Capture",
-    "version": "0.1.3",
-    "description": "AMR capture app for DHIS2",
+    "name": "AMR Data Entry",
+    "version": "0.1.4",
+    "description": "AMR data entry app for DHIS2",
     "icons": {
         "48": "icon.png"
     },

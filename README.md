@@ -1,4 +1,4 @@
-# AMR Approval and Capture
+# AMR Entry and Approval
 
 ### TODO
 - [x] Deleting records

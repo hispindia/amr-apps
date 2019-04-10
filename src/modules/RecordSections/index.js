@@ -49,6 +49,7 @@ export const RecordSections = props => {
     useEffect(() => {
         const getNewRecord = async () => {
             dispatch({type: types.DISABLE_BUTTON, buttonDisabled: true})
+            dispatch({type: types.SET_LOADING})
             dispatch({
                 type: types.NEW_RECORD,
                 ...(await newRecord(
@@ -171,7 +172,8 @@ export const RecordSections = props => {
             {loading && <ProgressSection/>}
             <ButtonRow
                 buttons={
-                    eventId ? [
+                    event ? (!eventId ? []
+                    : [
                         {
                             label: 'Delete',
                             onClick: onDelete,
@@ -192,7 +194,7 @@ export const RecordSections = props => {
                                 'Records with this approval status cannot be edited' :
                                 'A required field is empty',
                         },
-                    ]
+                    ])
                     : [
                         {
                             label: 'Submit and add new',
