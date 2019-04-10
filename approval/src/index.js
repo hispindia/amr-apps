@@ -14,7 +14,7 @@ const withBaseUrl = async baseUrl => {
 
     ReactDOM.render(
         <App
-            appName="AMR Approval"
+            appName="Data Approval"
             menuItems={menuItems}
             tables={tables}
             isApproval
