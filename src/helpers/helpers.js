@@ -105,6 +105,10 @@ export const MarginTopSmall = styled.div`
     margin-top: 8px;
 `
 
+export const MarginTopLarge = styled.div`
+    margin-top: 24px;
+`
+
 export const Padding = styled.div`
     padding: 16px;
 `

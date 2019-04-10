@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Card } from '@dhis2/ui/core'
-import { ButtonRow, Margin, Text } from '../../'
+import { ButtonRow, Heading, MarginSmall, MarginTopLarge, Margin, Text } from '../../'
 
 const Background = styled.div`
     display: flex;
@@ -20,14 +20,17 @@ const Background = styled.div`
 `
 
 const BottomCard = styled(Card)`
-    width: 30% !important;
+    width: 400px !important;
 `
 
 export const ModalPopup = props => (
     <Background>
         <BottomCard>
             <Margin>
+                <Heading>{props.heading}</Heading>
+                <MarginSmall>
                 <Text>{props.text}</Text>
+                <MarginTopLarge>
                 <ButtonRow
                     buttons={[
                         {
@@ -44,6 +47,8 @@ export const ModalPopup = props => (
                         }
                     ]}
                 />
+                </MarginTopLarge>
+                </MarginSmall>
             </Margin>
         </BottomCard>
     </Background>

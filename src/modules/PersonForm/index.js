@@ -269,6 +269,7 @@ export class PersonForm extends Component {
         return (
             <MarginBottom>
                 {modal && <ModalPopup
+                    heading='Person found'
                     text={
                         <span>
                             A person with <em>{modal.label}</em> {modal.value} is already registered.

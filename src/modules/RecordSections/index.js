@@ -114,6 +114,7 @@ export const RecordSections = props => {
     return (
         <Margin>
             {deleteClicked && <ModalPopup
+                heading='Delete'
                 text='Are you sure you want to permanently delete this record?'
                 onClick={onDeleteConfirmed}
                 deletion
