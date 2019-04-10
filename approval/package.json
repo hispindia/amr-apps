@@ -1,5 +1,5 @@
 {
-    "name": "amr-record-approval",
+    "name": "amr-approval",
     "version": "0.1.2",
     "description": "AMR approval app for DHIS2",
     "main": "index.js",

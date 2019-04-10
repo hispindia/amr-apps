@@ -30,3 +30,5 @@ package-lock.json
 /capture/node_modules
 /capture/build
 /build
+
+manifest.webapp

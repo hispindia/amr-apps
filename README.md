@@ -50,3 +50,9 @@ yarn start
 cd [root_dir]
 yarn build
 ```
+
+### Versioning
+```
+cd [root_dir]
+yarn bump x.x.x
+```
