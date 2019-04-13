@@ -1,7 +1,14 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Card } from '@dhis2/ui/core'
-import { ButtonRow, Heading, MarginSmall, MarginTopLarge, Margin, Text } from '../../'
+import {
+    ButtonRow,
+    Heading,
+    MarginSmall,
+    MarginTopLarge,
+    Margin,
+    Text,
+} from '../../'
 
 const Background = styled.div`
     display: flex;
@@ -15,41 +22,44 @@ const Background = styled.div`
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
 `
 
-const BottomCard = styled(Card)`
+const CustomCard = styled(Card)`
     width: 400px !important;
+    height: auto !important;
 `
 
 export const ModalPopup = props => (
     <Background>
-        <BottomCard>
+        <CustomCard>
             <Margin>
                 <Heading>{props.heading}</Heading>
                 <MarginSmall>
-                <Text>{props.text}</Text>
-                <MarginTopLarge>
-                <ButtonRow
-                    buttons={[
-                        {
-                            label: props.deletion ? 'Cancel' : 'No',
-                            kind: 'basic',
-                            icon:'clear',
-                            onClick: () => props.onClick(false)
-                        },
-                        {
-                            label: props.deletion ? 'Delete' : 'Yes',
-                            kind: props.deletion ? 'destructive' : 'primary',
-                            icon: props.deletion ? 'delete' : 'done',
-                            onClick: () => props.onClick(true)
-                        }
-                    ]}
-                />
-                </MarginTopLarge>
+                    <Text>{props.text}</Text>
+                    <MarginTopLarge>
+                        <ButtonRow
+                            buttons={[
+                                {
+                                    label: props.deletion ? 'Cancel' : 'No',
+                                    kind: 'basic',
+                                    icon: 'clear',
+                                    onClick: () => props.onClick(false),
+                                },
+                                {
+                                    label: props.deletion ? 'Delete' : 'Yes',
+                                    kind: props.deletion
+                                        ? 'destructive'
+                                        : 'primary',
+                                    icon: props.deletion ? 'delete' : 'done',
+                                    onClick: () => props.onClick(true),
+                                },
+                            ]}
+                        />
+                    </MarginTopLarge>
                 </MarginSmall>
             </Margin>
-        </BottomCard>
+        </CustomCard>
     </Background>
 )
