@@ -1,4 +1,4 @@
-# AMR Entry and Approval
+# AMR Data Entry and Approval
 
 ### TODO
 - [x] Deleting records
@@ -13,14 +13,11 @@
 - [x] Hide result section
 - [x] Same sections on approval screen as on entry screen
 - [x] Modals
-- [x] Automatic possible duplation check
-- [ ] Manual duplication confirmation
+- [ ] Automatic duplication check
 - [ ] Hashing patient registration number
 - [ ] DD not have color when MIC has value
 - [ ] Special characters in test values
-- [ ] Increased program rule support
-- [ ] Validation support
-- [ ] Person overview?
+- [ ] Warning/error program rule action
 
 ### Installation
 ```

@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import {
-    DuplicationSection,
     PersonForm,
     ProgressSection,
     RecordForm,
@@ -13,9 +12,6 @@ import {
     setEventStatus,
     newRecord,
     existingRecord,
-    possibleDuplicate,
-    updateEventValue,
-    _duplicateStatusDataElement,
     ButtonRow,
     Margin
 } from '../../'
@@ -77,16 +73,6 @@ export const RecordSections = props => {
     const onSubmit = async addMore => {
         dispatch({type: types.DISABLE_BUTTON, buttonDisabled: true})
 
-        if (constants.days) {
-            await possibleDuplicate(
-                entityId,
-                eventId,
-                sampleDate,
-                constants.days,
-                optionSets[programOrganisms[programId]].find(o => o.value === organism).label
-            )
-        }
-
         await setEventStatus(eventId, true, props.isApproval)
 
         if (addMore) dispatch({type: types.ADD_MORE})
@@ -107,10 +93,6 @@ export const RecordSections = props => {
             type: types.DELETE_CONFIRMED,
             delete: yes
         })
-
-    const onDuplicationClick = async value => {
-        await updateEventValue(eventId, _duplicateStatusDataElement, value)
-    }
 
     return (
         <Margin>
@@ -157,18 +139,6 @@ export const RecordSections = props => {
                 status={status}
                 passValues={valid => dispatch({type: types.EVENT_VALID, valid: valid})}
             />}
-            {false && eventId && constants.days && eventValues[_duplicateStatusDataElement] === 'Possible' &&
-                <DuplicationSection
-                    entityId={entityId}
-                    eventDate={sampleDate}
-                    days={constants.days}
-                    dataElements={dataElements}
-                    history={props.history}
-                    onClick={onDuplicationClick}
-                    organism={optionSets[programOrganisms[programId]]
-                        .find(o => o.value === organism).label}
-                />
-            }
             {loading && <ProgressSection/>}
             <ButtonRow
                 buttons={
