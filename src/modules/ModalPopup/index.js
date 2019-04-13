@@ -8,7 +8,7 @@ import {
     MarginTopLarge,
     Margin,
     Text,
-} from '../../'
+} from 'helpers'
 
 const Background = styled.div`
     display: flex;

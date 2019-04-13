@@ -1,6 +1,6 @@
 import React from 'react'
-import { Row, Title } from '../../helpers/helpers'
-import { IconButton } from '../../'
+import { Row, Title } from 'helpers'
+import { IconButton } from 'inputs'
 
 export const TitleRow = props => (
     <Row>

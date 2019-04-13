@@ -1,5 +1,4 @@
 import React from 'react'
-import { Card } from '@dhis2/ui/core'
 import MUIDataTable from 'mui-datatables'
 import TableToolbar from '../../inputs/TableToolbar'
 
@@ -17,11 +16,13 @@ export const RecordTable = props => (
             onRowClick: props.onEventClick
                 ? row => props.onEventClick(row)
                 : () => {},
-            customToolbar: () => props.addButton &&
-                <TableToolbar
-                    onAddClick={props.onAddClick}
-                    addButtonDisabled={props.addButtonDisabled}
-                />
+            customToolbar: () =>
+                props.addButton && (
+                    <TableToolbar
+                        onAddClick={props.onAddClick}
+                        addButtonDisabled={props.addButtonDisabled}
+                    />
+                ),
         }}
     />
 )

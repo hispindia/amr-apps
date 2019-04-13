@@ -3,7 +3,7 @@ import InputField from '@dhis2/ui/core/InputField'
 import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
 import MomentUtils from '@date-io/moment'
 import moment from 'moment'
-import { Input } from '../../helpers/helpers'
+import { Input } from 'helpers'
 
 /**
  * Date picker.
@@ -11,7 +11,7 @@ import { Input } from '../../helpers/helpers'
 export const DateInput = props => {
     const [value, setValue] = useState('')
     const [picker, setPicker] = useState(null)
-    
+
     useEffect(() => {
         if (props.value !== value) setValue(props.value)
     }, [props.value])
@@ -51,7 +51,7 @@ export const DateInput = props => {
             <InputField
                 name={props.name}
                 label={props.label}
-                value={value !== ''? moment(value).format('LL'): value}
+                value={value !== '' ? moment(value).format('LL') : value}
                 onChange={() => {}}
                 kind={'outlined'}
                 disabled={props.disabled}

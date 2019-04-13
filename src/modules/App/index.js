@@ -4,7 +4,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
 import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
 import { createGlobalStyle } from 'styled-components'
 import 'typeface-roboto'
-import { Content } from '../'
+import { Content } from 'modules'
 
 const BodyStyle = createGlobalStyle`
     body {

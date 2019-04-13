@@ -1,7 +1,7 @@
 import React from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
-import { RecordSections, RecordsOverview } from '../'
+import { RecordSections, RecordsOverview } from 'modules'
 
 const MainSection = styled.main`
     width: 100%;

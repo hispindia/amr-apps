@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Card } from '@dhis2/ui/core';
-import { getEvents, Margin } from '../..'
-import { RecordTable, ProgressSection, TitleRow } from '..'
+import { Card } from '@dhis2/ui/core'
+import { getEvents } from 'api'
+import { Margin } from 'helpers'
+import { RecordTable, ProgressSection, TitleRow } from 'modules'
 import { titles, headers } from './config'
 
 /**
@@ -13,8 +14,10 @@ export const RecordsOverview = props => {
     const [addButtonDisabled, setAddButtonDisabled] = useState(true)
 
     useEffect(() => {
-        if(props.isApproval) return
-        const noProgram = !props.programs.find(p => p.orgUnits.includes(props.selected))
+        if (props.isApproval) return
+        const noProgram = !props.programs.find(p =>
+            p.orgUnits.includes(props.selected)
+        )
         if (noProgram !== addButtonDisabled)
             setAddButtonDisabled(!addButtonDisabled)
     }, [props.selected])
@@ -51,7 +54,9 @@ export const RecordsOverview = props => {
     return (
         <Margin>
             <TitleRow title={titles[props.match.params.status]} />
-            {loading ? <ProgressSection /> :
+            {loading ? (
+                <ProgressSection />
+            ) : (
                 <Card>
                     <RecordTable
                         data={data}
@@ -62,7 +67,7 @@ export const RecordsOverview = props => {
                         addButtonDisabled={addButtonDisabled}
                     />
                 </Card>
-            }
+            )}
         </Margin>
     )
 }

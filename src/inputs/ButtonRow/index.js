@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button } from '@dhis2/ui/core'
 import styled, { css } from 'styled-components'
-import { MarginTop } from '../../helpers/helpers'
+import { MarginTop } from 'helpers'
 
 const SpaceBetween = styled.div`
     justify-content: space-between;
@@ -10,8 +10,7 @@ const SpaceBetween = styled.div`
         props.unspaced &&
         css`
             justify-content: unset;
-        `
-    }
+        `}
 `
 
 const ButtonPadding = styled.div`
@@ -19,8 +18,7 @@ const ButtonPadding = styled.div`
         props.unspaced &&
         css`
             padding-right: 16px;
-        `
-    }
+        `}
 `
 
 /**

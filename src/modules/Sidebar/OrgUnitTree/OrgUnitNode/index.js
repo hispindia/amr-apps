@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import styled, { css } from 'styled-components'
-import { Row } from '../../../../helpers/helpers'
+import { Row } from 'helpers'
 
 const Caret = styled.span`
     cursor: pointer;

@@ -1,14 +1,8 @@
 import React, { Component } from 'react'
-import {
-    Heading,
-    Margin,
-    Padding,
-    MarginSides,
-    MarginBottom,
-} from '../../helpers/helpers'
-import { SelectInput, RadioInput, DateInput } from '../../inputs'
 import { Card } from '@dhis2/ui/core/Card'
 import { Grid } from '@material-ui/core'
+import { Heading, Margin, Padding, MarginSides, MarginBottom } from 'helpers'
+import { SelectInput, RadioInput, DateInput } from 'inputs'
 
 /**
  * Contains event panal and/or event information.
@@ -16,7 +10,7 @@ import { Grid } from '@material-ui/core'
 export class RecordPanel extends Component {
     state = {
         organisms: '',
-        programId: ''
+        programId: '',
     }
 
     componentDidMount = () => {
@@ -26,7 +20,7 @@ export class RecordPanel extends Component {
             programId: programId ? programId : '',
             programStageId: programStageId ? programStageId : '',
             organism: organism ? organism : '',
-            sampleDate: sampleDate ? sampleDate : ''
+            sampleDate: sampleDate ? sampleDate : '',
         })
     }
 
@@ -36,16 +30,18 @@ export class RecordPanel extends Component {
                 programId: '',
                 programStageId: '',
                 organism: '',
-                sampleDate: ''
+                sampleDate: '',
             })
     }
 
     getOrganisms = programId => {
         let organisms = []
-        this.props.optionSets[this.props.programOrganisms[programId]].forEach(o => {
-            if (!organisms.find(org => org.value === o.value))
-                organisms.push(o)
-        })
+        this.props.optionSets[this.props.programOrganisms[programId]].forEach(
+            o => {
+                if (!organisms.find(org => org.value === o.value))
+                    organisms.push(o)
+            }
+        )
         return organisms
     }
 
@@ -62,7 +58,7 @@ export class RecordPanel extends Component {
                     ? ''
                     : programStages[value][0].value,
             organism: '',
-            sampleDate: ''
+            sampleDate: '',
         })
     }
 
@@ -70,7 +66,7 @@ export class RecordPanel extends Component {
      * Called when a new program stage or organism is selected.
      */
     onChange = (name, value) => {
-        let values = {...this.state}
+        let values = { ...this.state }
         values[name] = value
         this.onNewValues(values)
     }
@@ -82,7 +78,7 @@ export class RecordPanel extends Component {
             programStageId: values.programStageId,
             organism: values.organism,
             sampleDate: values.sampleDate,
-            valid: !Object.values(values).includes('')
+            valid: !Object.values(values).includes(''),
         })
     }
 
@@ -183,18 +179,15 @@ export class RecordPanel extends Component {
                             <Grid container spacing={0}>
                                 <Grid item xs>
                                     {this.getDataElement('programId')}
-                                    {programId
-                                        && programStages[programId].length > 1
-                                        && this.getDataElement('programStageId')
-                                    }
+                                    {programId &&
+                                        programStages[programId].length > 1 &&
+                                        this.getDataElement('programStageId')}
                                 </Grid>
                                 <Grid item xs>
-                                    {organisms
-                                        && this.getDataElement('organism')
-                                    }
-                                    {organism
-                                        && this.getDataElement('sampleDate')
-                                    }
+                                    {organisms &&
+                                        this.getDataElement('organism')}
+                                    {organism &&
+                                        this.getDataElement('sampleDate')}
                                 </Grid>
                             </Grid>
                         </Margin>

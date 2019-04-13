@@ -4,7 +4,7 @@ import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
 import MomentUtils from '@date-io/moment'
 import moment from 'moment'
 import styled from 'styled-components'
-import { RowW, Label, Input, MarginTop } from '../../helpers/helpers'
+import { RowW, Label, Input, MarginTop } from 'helpers'
 
 const UnitContainer = styled.div`
     margin-right: 16px;
@@ -115,7 +115,7 @@ export const AgeInput = props => {
                 onChange={() => {}}
                 kind={'outlined'}
                 disabled={props.disabled}
-                size='dense'
+                size="dense"
             />
         </MarginTop>
     )
@@ -132,7 +132,7 @@ export const AgeInput = props => {
                         onChange={onAge}
                         kind={'outlined'}
                         disabled={props.disabled}
-                        size='dense'
+                        size="dense"
                     />
                 </UnitContainer>
                 <UnitContainer>
@@ -143,7 +143,7 @@ export const AgeInput = props => {
                         onChange={onAge}
                         kind={'outlined'}
                         disabled={props.disabled}
-                        size='dense'
+                        size="dense"
                     />
                 </UnitContainer>
                 <UnitContainer>
@@ -154,7 +154,7 @@ export const AgeInput = props => {
                         onChange={onAge}
                         kind={'outlined'}
                         disabled={props.disabled}
-                        size='dense'
+                        size="dense"
                     />
                 </UnitContainer>
             </RowW>

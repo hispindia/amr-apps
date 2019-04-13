@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import SelectField from '@dhis2/ui/core/SelectField'
 import styled from 'styled-components'
-import { Input } from '../../helpers/helpers'
+import { Input } from 'helpers'
 
 /**
  * Max height for dropdown.
@@ -34,18 +34,18 @@ export const SelectInput = props => {
     return (
         <Input>
             <CustomSelectField>
-            <SelectField
-                name={props.name}
-                kind="outlined"
-                list={props.objects}
-                value={value}
-                label={props.label}
-                help={props.disabled ? props.helperText : null}
-                onChange={onChange}
-                disabled={props.disabled}
-                size="dense"
-                required={props.required}
-            />
+                <SelectField
+                    name={props.name}
+                    kind="outlined"
+                    list={props.objects}
+                    value={value}
+                    label={props.label}
+                    help={props.disabled ? props.helperText : null}
+                    onChange={onChange}
+                    disabled={props.disabled}
+                    size="dense"
+                    required={props.required}
+                />
             </CustomSelectField>
         </Input>
     )

@@ -4,20 +4,11 @@ import React, { Component } from 'react'
 import { Grid } from '@material-ui/core'
 import { Card, Button } from '@dhis2/ui/core'
 import styled from 'styled-components'
-import {
-    Heading,
-    Padding,
-    Margin,
-    MarginSides,
-    MarginBottom,
-} from '../../helpers/helpers'
-import {
-    getPersonValues,
-    checkUnique,
-} from '../../api/api'
-import { TextInput, AgeInput, RadioInput, SelectInput } from '../../inputs'
+import { Heading, Padding, Margin, MarginSides, MarginBottom } from 'helpers'
+import { getPersonValues, checkUnique } from 'api'
+import { TextInput, AgeInput, RadioInput, SelectInput } from 'inputs'
 import { ProgressSection } from '../ProgressSection'
-import { ModalPopup } from '../'
+import { ModalPopup } from 'modules'
 
 const ButtonPositioned = styled.div`
     float: right;
@@ -34,7 +25,7 @@ export class PersonForm extends Component {
         entityId: null,
         editing: false,
         loading: true,
-        modal: null
+        modal: null,
     }
 
     componentDidMount = async () => {
@@ -46,7 +37,7 @@ export class PersonForm extends Component {
             rules: rules,
             attributes: attributes,
             values: values,
-            loading: loading
+            loading: loading,
         })
     }
 
@@ -81,7 +72,7 @@ export class PersonForm extends Component {
         this.props.passValues({
             values: values,
             id: entityId,
-            valid: this.validate(attributes, values, uniques)
+            valid: this.validate(attributes, values, uniques),
         })
     }
 
@@ -115,7 +106,7 @@ export class PersonForm extends Component {
         let uniques = { ...this.state.uniques }
         uniques[id] = entityId ? false : true
         if (!entityId) {
-            this.setState({uniques: uniques})
+            this.setState({ uniques: uniques })
             return true
         }
         this.setState({
@@ -124,8 +115,8 @@ export class PersonForm extends Component {
                 id: id,
                 label: label,
                 value: value,
-                entityId: entityId
-            }
+                entityId: entityId,
+            },
         })
         return false
     }
@@ -146,11 +137,14 @@ export class PersonForm extends Component {
                                     .optionSet.id !== r.optionGroup.id
                             ) {
                                 affectedAttribute.trackedEntityAttribute.optionSet = {
-                                    id: r.optionGroup.id
+                                    id: r.optionGroup.id,
                                 }
                                 // Only reset selected value if the options do not include current value.
                                 if (
-                                    !this.props.optionSets[affectedAttribute.trackedEntityAttribute.optionSet.id].find(
+                                    !this.props.optionSets[
+                                        affectedAttribute.trackedEntityAttribute
+                                            .optionSet.id
+                                    ].find(
                                         option =>
                                             option.value ===
                                             values[
@@ -159,7 +153,9 @@ export class PersonForm extends Component {
                                             ]
                                     )
                                 )
-                                    values[affectedAttribute.trackedEntityAttribute.id] = ''
+                                    values[
+                                        affectedAttribute.trackedEntityAttribute.id
+                                    ] = ''
                             }
                         }
                         break
@@ -172,7 +168,10 @@ export class PersonForm extends Component {
                         )
                         if (hide !== affectedAttribute.hide) {
                             affectedAttribute.hide = hide
-                            if (hide) values[affectedAttribute.trackedEntityAttribute.id] = ''
+                            if (hide)
+                                values[
+                                    affectedAttribute.trackedEntityAttribute.id
+                                ] = ''
                         }
                         break
                     default:
@@ -204,13 +203,16 @@ export class PersonForm extends Component {
                         disabled={disabled}
                     />
                 ) : attribute.trackedEntityAttribute.optionSetValue ? (
-                    this.props.optionSets[attribute.trackedEntityAttribute.optionSet.id].length < 4 ?
-                    (
+                    this.props.optionSets[
+                        attribute.trackedEntityAttribute.optionSet.id
+                    ].length < 4 ? (
                         <RadioInput
                             required={attribute.mandatory}
                             objects={
-                                this.props.optionSets[attribute.trackedEntityAttribute.optionSet
-                                    .id]
+                                this.props.optionSets[
+                                    attribute.trackedEntityAttribute.optionSet
+                                        .id
+                                ]
                             }
                             name={attribute.trackedEntityAttribute.id}
                             label={attribute.trackedEntityAttribute.displayName}
@@ -222,8 +224,10 @@ export class PersonForm extends Component {
                         <SelectInput
                             required={attribute.mandatory}
                             objects={
-                                this.props.optionSets[attribute.trackedEntityAttribute.optionSet
-                                    .id]
+                                this.props.optionSets[
+                                    attribute.trackedEntityAttribute.optionSet
+                                        .id
+                                ]
                             }
                             name={attribute.trackedEntityAttribute.id}
                             label={attribute.trackedEntityAttribute.displayName}
@@ -236,14 +240,26 @@ export class PersonForm extends Component {
                     <TextInput
                         required={attribute.mandatory}
                         unique={attribute.trackedEntityAttribute.unique}
-                        uniqueValid={uniques && uniques[attribute.trackedEntityAttribute.id]}
+                        uniqueValid={
+                            uniques &&
+                            uniques[attribute.trackedEntityAttribute.id]
+                        }
                         validateUnique={this.validateUnique}
                         name={attribute.trackedEntityAttribute.id}
                         label={attribute.trackedEntityAttribute.displayName}
                         value={values[attribute.trackedEntityAttribute.id]}
                         onChange={this.onChange}
-                        disabled={disabled || (entityId && attribute.trackedEntityAttribute.unique)}
-                        type={attribute.trackedEntityAttribute.valueType === 'NUMBER' ? 'number' : 'text'}
+                        disabled={
+                            disabled ||
+                            (entityId &&
+                                attribute.trackedEntityAttribute.unique)
+                        }
+                        type={
+                            attribute.trackedEntityAttribute.valueType ===
+                            'NUMBER'
+                                ? 'number'
+                                : 'text'
+                        }
                     />
                 )}
             </Padding>
@@ -255,30 +271,39 @@ export class PersonForm extends Component {
         let uniques = { ...this.state.uniques }
         uniques[id] = yes
 
-        if (yes)
-            this.onNewValues(await getPersonValues(entityId), entityId)
+        if (yes) this.onNewValues(await getPersonValues(entityId), entityId)
 
         this.setState({ uniques: uniques, modal: null })
     }
 
     render() {
-        const { attributes, half, entityId, editing, loading, modal } = this.state
+        const {
+            attributes,
+            half,
+            entityId,
+            editing,
+            loading,
+            modal,
+        } = this.state
 
         if (loading) return <ProgressSection />
 
         return (
             <MarginBottom>
-                {modal && <ModalPopup
-                    heading='Person found'
-                    text={
-                        <span>
-                            A person with <em>{modal.label}</em> {modal.value} is already registered.
-                            <br/>
-                            Do you want to get this person?
-                        </span>
-                    }
-                    onClick={this.onModalClick}
-                />}
+                {modal && (
+                    <ModalPopup
+                        heading="Person found"
+                        text={
+                            <span>
+                                A person with <em>{modal.label}</em>{' '}
+                                {modal.value} is already registered.
+                                <br />
+                                Do you want to get this person?
+                            </span>
+                        }
+                        onClick={this.onModalClick}
+                    />
+                )}
                 <Card>
                     <Margin>
                         {entityId && !editing && this.props.showEdit && (

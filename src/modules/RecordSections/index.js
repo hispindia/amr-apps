@@ -1,20 +1,15 @@
 import React, { useEffect } from 'react'
 import {
+    ModalPopup,
     PersonForm,
     ProgressSection,
     RecordForm,
     RecordPanel,
     TitleRow,
-    ModalPopup,
-} from '../'
-import {
-    deleteEvent,
-    setEventStatus,
-    newRecord,
-    existingRecord,
-    ButtonRow,
-    Margin,
-} from '../../'
+} from 'modules'
+import { deleteEvent, setEventStatus, newRecord, existingRecord } from 'api'
+import { ButtonRow } from 'inputs'
+import { Margin } from 'helpers'
 import { hook } from './hook'
 
 export const RecordSections = props => {

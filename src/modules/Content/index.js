@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react'
 import { CircularProgress } from '@dhis2/ui/core'
+import { Main, Sidebar } from 'modules'
+import { Row } from 'helpers'
+import { initMetadata } from 'api'
 import { hook } from './hook'
-import { Main, Sidebar } from '../'
-import { Row, initMetadata } from '../../'
 
 export const Content = props => {
     const { menuItems, tables, isApproval } = props

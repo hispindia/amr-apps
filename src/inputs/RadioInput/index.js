@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Radio } from '@dhis2/ui/core'
 import styled from 'styled-components'
-import { RowW, Label, OptionSpacer, Input } from '../../helpers/helpers'
+import { RowW, Label, OptionSpacer, Input } from 'helpers'
 
 /**
  * Green valid.
@@ -42,24 +42,24 @@ export const RadioInput = props => {
                 {props.objects.map(object => (
                     <OptionSpacer key={object.value} onClick={onClick}>
                         <CustomRadio>
-                        <Radio
-                            key={object.value}
-                            name={object.value}
-                            value={object.value}
-                            label={object.label}
-                            checked={value === object.value}
-                            onChange={onChange}
-                            disabled={props.disabled}
-                            status={
-                                object.value === 'Approved'
-                                    ? 'valid'
-                                    : object.value === 'Resend'
-                                    ? 'warning'
-                                    : object.value === 'Rejected'
-                                    ? 'error'
-                                    : 'default'
-                            }
-                        />
+                            <Radio
+                                key={object.value}
+                                name={object.value}
+                                value={object.value}
+                                label={object.label}
+                                checked={value === object.value}
+                                onChange={onChange}
+                                disabled={props.disabled}
+                                status={
+                                    object.value === 'Approved'
+                                        ? 'valid'
+                                        : object.value === 'Resend'
+                                        ? 'warning'
+                                        : object.value === 'Rejected'
+                                        ? 'error'
+                                        : 'default'
+                                }
+                            />
                         </CustomRadio>
                     </OptionSpacer>
                 ))}

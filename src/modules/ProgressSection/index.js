@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Card, CircularProgress } from '@dhis2/ui'
-import { MarginBottom } from '../../'
+import { MarginBottom } from 'helpers'
 
 const WithHeight = styled.div`
     height: 100px;

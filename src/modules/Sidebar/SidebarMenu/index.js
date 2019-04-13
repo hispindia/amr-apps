@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Menu } from '@dhis2/ui/core'
 import styled from 'styled-components'
-import { getCounts } from '../../../api'
+import { getCounts } from 'api'
 
 /**
  * Colored icons and corrected height.

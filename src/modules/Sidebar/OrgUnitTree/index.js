@@ -1,8 +1,8 @@
 import React from 'react'
-import { OrgUnitNode } from './OrgUnitNode'
 import { Card } from '@dhis2/ui/core'
 import styled from 'styled-components'
-import { MarginTopSmall, MarginSmall } from '../../../helpers/helpers'
+import { MarginTopSmall, MarginSmall } from 'helpers'
+import { OrgUnitNode } from './OrgUnitNode'
 
 const OrgUnitTreeStyle = styled.ul`
     list-style-type: none;
