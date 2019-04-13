@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import SelectField from '@dhis2/ui/core/SelectField'
+import styled from 'styled-components'
 import { Input } from '../../helpers/helpers'
+
+/**
+ * Max height for dropdown.
+ */
+const CustomSelectField = styled.div`
+    .ui_selectfield_menu_1a3v8 > .ui_card_base_l2vmf {
+        overflow: auto;
+        max-height: 300px;
+    }
+    .ui_selectfield_menu_1a3v8 {
+        width: inherit !important;
+    }
+`
 
 /**
  * Single select field.
@@ -19,6 +33,7 @@ export const SelectInput = props => {
 
     return (
         <Input>
+            <CustomSelectField>
             <SelectField
                 name={props.name}
                 kind="outlined"
@@ -31,6 +46,7 @@ export const SelectInput = props => {
                 size="dense"
                 required={props.required}
             />
+            </CustomSelectField>
         </Input>
     )
 }

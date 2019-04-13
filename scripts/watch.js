@@ -1,6 +1,5 @@
 const fs = require('fs-extra')
 const path = require('path')
-const { exec } = require('child_process')
 const { watch } = require('chokidar')
 
 // transpilers
@@ -44,12 +43,11 @@ async function main() {
         },
     })
 
-    function fileChange(path, stats) {
-        console.log(`${path} changed size to ${stats.size}`)
+    function fileChange(path) {
         handler(path)
     }
 
-    function fileAdd(path, stats) {
+    function fileAdd(path) {
         handler(path)
     }
 

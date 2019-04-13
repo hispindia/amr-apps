@@ -62,7 +62,7 @@ export const DateInput = props => {
     )
 
     return (
-        <div>
+        <>
             <MuiPickersUtilsProvider utils={MomentUtils}>
                 <DatePicker
                     value={value}
@@ -73,6 +73,6 @@ export const DateInput = props => {
                     ref={node => setPicker(node)}
                 />
             </MuiPickersUtilsProvider>
-        </div>
+        </>
     )
 }

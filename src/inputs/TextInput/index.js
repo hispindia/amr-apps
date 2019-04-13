@@ -1,6 +1,38 @@
 import React, { useState, useEffect } from 'react'
 import InputField from '@dhis2/ui/core/InputField'
+import styled, { css } from 'styled-components'
 import { debounced }  from '../../hooks'
+import { Input } from '../../helpers'
+
+/**
+ * Colored field background.
+ */
+export const CustomInputField = styled.div`
+    ${props => {
+        switch (props.color) {
+            case 'red':
+                return (css`
+                    .ui_inputfield_flatline_kvrmz {
+                        background-color: rgba(255, 0, 0, 0.082) !important;
+                    }
+                `)
+            case 'yellow':
+                return (css`
+                    .ui_inputfield_flatline_kvrmz {
+                        background-color: rgba(255, 255, 0, 0.082) !important;
+                    }
+                `)
+            case 'green':
+                return (css`
+                    .ui_inputfield_flatline_kvrmz {
+                        background-color: rgba(0, 255, 0, 0.082) !important;
+                    }
+                `)
+            default:
+                return null
+        }
+    }}
+`
 
 const errors = {
     required: 'This field is required',
@@ -59,13 +91,8 @@ export const TextInput = props => {
     }
 
     return (
-        <div
-            className={
-                props.backgroundColor
-                    ? 'input ' + props.backgroundColor
-                    : 'input'
-            }
-        >
+        <Input>
+            <CustomInputField color={props.color}>
             <InputField
                 required={props.required}
                 name={props.name}
@@ -79,6 +106,7 @@ export const TextInput = props => {
                 type={props.type}
                 size="dense"
             />
-        </div>
+            </CustomInputField>
+        </Input>
     )
 }

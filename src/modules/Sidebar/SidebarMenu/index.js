@@ -1,7 +1,29 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Menu } from '@dhis2/ui/core'
+import styled from 'styled-components'
 import { getCounts } from '../../../api'
+
+/**
+ * Colored icons and corrected height.
+ */
+const CustomMenu = styled.div`
+    .ui_menu_item_4jpdr:first-child :first-child {
+        color: var(--blue600);
+    }
+    .ui_menu_item_4jpdr:nth-child(2) :first-child {
+        color: var(--yellow600);
+    }
+    .ui_menu_item_4jpdr:nth-child(3) :first-child {
+        color: var(--red600);
+    }
+    .ui_menu_item_4jpdr:nth-child(4) :first-child {
+        color: var(--green600);
+    }
+    .ui_card_base_l2vmf {
+        height: auto !important;
+    }
+`
 
 /**
  * Sidebar menu.
@@ -28,13 +50,13 @@ const SidebarMenu = props => {
     }
 
     return (
-        <div id='sidebar_menu'>
-            <Menu
-                size='dense'
-                list={menuItems ? menuItems : props.items}
-                onClick={path => props.history.push(path)}
-            />
-        </div>
+        <CustomMenu>
+        <Menu
+            size='dense'
+            list={menuItems ? menuItems : props.items}
+            onClick={path => props.history.push(path)}
+        />
+        </CustomMenu>
     )
 }
 

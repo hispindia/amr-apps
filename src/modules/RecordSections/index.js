@@ -186,7 +186,9 @@ export const RecordSections = props => {
                         {
                             label: status.completed ? 'Edit' : 'Submit',
                             onClick: () => status.completed ? onEdit() : onSubmit(false),
-                            disabled: !status.editable || disabled,
+                            disabled: status.completed 
+                                ? !status.editable
+                                : disabled,
                             icon: status.completed ? 'edit' : 'done',
                             kind: 'primary',
                             tooltip: status.completed ? 'Edit record' : 'Submit record',

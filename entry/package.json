@@ -34,7 +34,6 @@
     "dependencies": {
         "react": "link:../node_modules/react",
         "react-dom": "link:../node_modules/react-dom",
-        "react-scripts": "^2.1.8",
-        "typeface-roboto": "0.0.54"
+        "react-scripts": "^2.1.8"
     }
 }

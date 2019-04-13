@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { Radio } from '@dhis2/ui/core'
+import styled from 'styled-components'
 import { RowW, Label, OptionSpacer, Input } from '../../helpers/helpers'
+
+/**
+ * Green valid.
+ */
+const CustomRadio = styled.div`
+    .ui_radio_valid-icon_ixvar:not(.ui_radio_disabled_ixvar) {
+        color: var(--green600) !important;
+    }
+`
 
 /**
  * Input consisting of a group of radios.
@@ -31,6 +41,7 @@ export const RadioInput = props => {
             <RowW>
                 {props.objects.map(object => (
                     <OptionSpacer key={object.value} onClick={onClick}>
+                        <CustomRadio>
                         <Radio
                             key={object.value}
                             name={object.value}
@@ -49,6 +60,7 @@ export const RadioInput = props => {
                                     : 'default'
                             }
                         />
+                        </CustomRadio>
                     </OptionSpacer>
                 ))}
             </RowW>
