@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { BrowserRouter, HashRouter } from 'react-router-dom'
-import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
-import 'typeface-roboto'
+import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
 import { createGlobalStyle } from 'styled-components'
-import { Main, Sidebar } from '../'
-import { Row, getOrgUnits } from '../../'
+import 'typeface-roboto'
+import { Content } from '../'
 
 const BodyStyle = createGlobalStyle`
     body {
@@ -32,7 +31,7 @@ const theme = createMuiTheme({
             titleText: {
                 fontSize: '1.25rem',
                 color: '#0d0d0e',
-                letterSpacing: 'normal'
+                letterSpacing: 'normal',
             },
         },
         MUIDataTableBodyRow: {
@@ -44,49 +43,20 @@ const theme = createMuiTheme({
     },
 })
 
-export const App = props => {
-    const { menuItems, tables, isApproval } = props
-    const [orgUnits, setOrgUnits] = useState(null)
-    const [selected, setSelected] = useState(null)
-
-    useEffect(() => {
-        const setMetadata = async () => {
-            const ous = await getOrgUnits()
-            const sel = {
-                id: ous[0].id,
-                name: ous[0].displayName,
-            }
-            setOrgUnits(ous)
-            setSelected(sel)
-        }
-        setMetadata()
-    }, [])
-
-    if (!selected) return null
-
-    return (
-        <BrowserRouter>
+export const App = props => (
+    <BrowserRouter>
         <HashRouter>
-        <MuiThemeProvider theme={theme}>
-            <>
-            <BodyStyle/>
-            <HeaderBar appName={props.appName} />
-            <Row>
-                <Sidebar
-                    onSelect={setSelected}
-                    selected={selected}
-                    orgUnits={orgUnits}
-                    menuItems={menuItems}
-                />
-                <Main
-                    tables={tables}
-                    selected={selected.id}
-                    isApproval={isApproval}
-                />
-            </Row>
-            </>
-        </MuiThemeProvider>
+            <MuiThemeProvider theme={theme}>
+                <>
+                    <BodyStyle />
+                    <HeaderBar appName={props.appName} />
+                    <Content
+                        menuItems={props.menuItems}
+                        tables={props.tables}
+                        isApproval={props.isApproval}
+                    />
+                </>
+            </MuiThemeProvider>
         </HashRouter>
-        </BrowserRouter>
-    )
-}
+    </BrowserRouter>
+)

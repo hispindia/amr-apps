@@ -63,7 +63,7 @@ export const OrgUnitNode = props => {
     const [opened, setOpened] = useState(false)
 
     useEffect(() => {
-        setOpened(props.selected.id === props.orgUnit.id)
+        setOpened(props.selected === props.orgUnit.id)
     }, [props.orgUnit.id])
 
     const onCarretClick = () => setOpened(!opened)
@@ -71,17 +71,14 @@ export const OrgUnitNode = props => {
     return (
         <li key={orgUnit.id}>
             <Row>
-                {orgUnit.children.length > 0
-                    ? <Caret opened={opened} onClick={onCarretClick} />
-                    : <NoCaret/>}
+                {orgUnit.children.length > 0 ? (
+                    <Caret opened={opened} onClick={onCarretClick} />
+                ) : (
+                    <NoCaret />
+                )}
                 <OrgUnitText
-                    isSelected={selected.id === orgUnit.id}
-                    onClick={() =>
-                        onSelect({
-                            id: orgUnit.id,
-                            name: orgUnit.displayName,
-                        })
-                    }
+                    isSelected={selected === orgUnit.id}
+                    onClick={() => onSelect(orgUnit.id)}
                 >
                     {orgUnit.displayName}
                 </OrgUnitText>
@@ -100,5 +97,4 @@ export const OrgUnitNode = props => {
             ) : null}
         </li>
     )
-
 }

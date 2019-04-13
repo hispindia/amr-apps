@@ -29,14 +29,6 @@ let _isL2User
 let _username = ''
 
 /**
- * Gets organisms data element ID.
- * @returns {string} Organisms data element ID.
- */
-export function getOrganismsDataElementId() {
-    return _organismsDataElementId
-}
-
-/**
  * Gets user accesses.
  * @returns {Object} User accesses.
  */
@@ -54,17 +46,6 @@ export function getUserAccess() {
  */
 export async function init(baseUrl) {
     setBaseUrl(baseUrl)
-
-    const user = await get(
-        'me.json?fields=userGroups,userCredentials[username]'
-    )
-
-    _username = user.userCredentials.username
-
-    const userGroups = user.userGroups.map(userGroup => userGroup.id)
-    _isDeoUser = userGroups.includes(_deoGroup)
-    _isL1User = userGroups.includes(_l1ApprovalGroup)
-    _isL2User = userGroups.includes(_l2ApprovalGroup)
 }
 
 export async function initMetadata() {
@@ -112,36 +93,86 @@ export async function initMetadata() {
         return c
     }
 
-    let data = await get('metadata.json?' +
-        'options=true&programs=true&optionSets=true&optionGroups=true&constants=true' +
-        '&programRuleVariables=true&programRules=true&trackedEntityTypes=true&dataElements=true' +
-        '&fields=id,name,displayName,code,options,dataElement,program,organisationUnits,' +
-        'formName,value,programStage,programStages[id,displayName,programStageDataElements[' +
-        'dataElement[id],compulsory],programStageSections[id,name,' +
-        'displayName,renderType,dataElements[id,displayFormName,code,' +
-        'valueType,optionSetValue,optionSet]]],programRuleActions[' +
-        'programRuleActionType,dataElement,optionGroup,' +
-        'trackedEntityAttribute,programStageSection,data],condition,' +
-        'trackedEntityTypeAttributes[name,id,displayName,valueType,unique,' +
-        'optionSetValue,optionSet]trackedEntityTypeAttributes[mandatory,' +
-        'trackedEntityAttribute[name,id,displayName,valueType,unique,' +
-        'optionSetValue,optionSet]],priority')
+    const user = await get(
+        'me.json?fields=organisationUnits,userGroups,userCredentials[username]'
+    )
+    _username = user.userCredentials.username
+    const userGroups = user.userGroups.map(userGroup => userGroup.id)
+    _isDeoUser = userGroups.includes(_deoGroup)
+    _isL1User = userGroups.includes(_l1ApprovalGroup)
+    _isL2User = userGroups.includes(_l2ApprovalGroup)
+    const userOrgUnits = user.organisationUnits.map(uo => uo.id)
+
+    let data = await get(
+        'metadata.json?' +
+            'options=true&programs=true&optionSets=true&optionGroups=true&constants=true&organisationUnits=true' +
+            '&programRuleVariables=true&programRules=true&trackedEntityTypes=true&dataElements=true' +
+            '&fields=id,name,displayName,code,path,children,options,dataElement,program,organisationUnits,' +
+            'formName,value,programStage,programStages[id,displayName,programStageDataElements[' +
+            'dataElement[id],compulsory],programStageSections[id,name,' +
+            'displayName,renderType,dataElements[id,displayFormName,code,' +
+            'valueType,optionSetValue,optionSet]]],programRuleActions[' +
+            'programRuleActionType,dataElement,optionGroup,' +
+            'trackedEntityAttribute,programStageSection,data],condition,' +
+            'trackedEntityTypeAttributes[name,id,displayName,valueType,unique,' +
+            'optionSetValue,optionSet]trackedEntityTypeAttributes[mandatory,' +
+            'trackedEntityAttribute[name,id,displayName,valueType,unique,' +
+            'optionSetValue,optionSet]],priority&order=level:asc'
+    )
+
+    let orgUnits = []
+    data.organisationUnits
+        .filter(o => userOrgUnits.some(uo => o.path.includes(uo)))
+        .forEach(o => {
+            if (userOrgUnits.includes(o.id)) orgUnits.push(o)
+            else {
+                let ancestors = o.path.split('/').slice(1, -1)
+                let ancestor = ancestors.shift()
+                let parent = orgUnits.find(o => ancestor === o.id)
+                while (ancestors.length > 0) {
+                    ancestor = ancestors.shift()
+                    parent = parent.children.find(o => ancestor === o.id)
+                }
+                if (parent) {
+                    const children = parent.children
+                    children[children.findIndex(s => s.id === o.id)] = o
+                }
+            }
+        })
+
+    // Sorts the children of the OU by display name.
+    const sortChildren = ou => {
+        ou.children.forEach(c => sortChildren(c))
+        ou.children.sort((a, b) =>
+            a.displayName > b.displayName
+                ? 1
+                : b.displayName > a.displayName
+                ? -1
+                : 0
+        )
+    }
+
+    // Sorting descendants of each of the user's OU's.
+    orgUnits.forEach(ou => sortChildren(ou))
 
     let options = {}
-    data.options.forEach(o => options[o.id] = {
-        label: o.displayName,
-        value: o.code
-    })
+    data.options.forEach(
+        o =>
+            (options[o.id] = {
+                label: o.displayName,
+                value: o.code,
+            })
+    )
 
     let optionSets = {}
-    data.optionSets.forEach(os => optionSets[os.id] =
-        os.options.map(o => options[o.id])
+    data.optionSets.forEach(
+        os => (optionSets[os.id] = os.options.map(o => options[o.id]))
     )
-    data.optionGroups.forEach(os => optionSets[os.id] =
-        os.options.map(o => options[o.id])
+    data.optionGroups.forEach(
+        os => (optionSets[os.id] = os.options.map(o => options[o.id]))
     )
 
-    let person = data.trackedEntityTypes.find(type => type.id = _personTypeId)
+    let person = data.trackedEntityTypes.find(type => (type.id = _personTypeId))
 
     person.uniques = {}
     person.values = {}
@@ -151,17 +182,19 @@ export async function initMetadata() {
             person.uniques[a.trackedEntityAttribute.id] = true
         person.values[a.trackedEntityAttribute.id] = ''
         a.hide = false
-        attributeIds[a.trackedEntityAttribute.name] = a.trackedEntityAttribute.id
+        attributeIds[a.trackedEntityAttribute.name] =
+            a.trackedEntityAttribute.id
     })
 
     person.rules = []
-    data.programRules.filter(r => r.programRuleActions.find(a => a.trackedEntityAttribute))
-    .forEach(d => {
-        if (!person.rules.find(rule => rule.name === d.name)) {
-            d.condition = entityCondition(d.condition)
-            person.rules.push(d)
-        }
-    })
+    data.programRules
+        .filter(r => r.programRuleActions.find(a => a.trackedEntityAttribute))
+        .forEach(d => {
+            if (!person.rules.find(rule => rule.name === d.name)) {
+                d.condition = entityCondition(d.condition)
+                person.rules.push(d)
+            }
+        })
 
     let programs = data.programs
 
@@ -172,10 +205,12 @@ export async function initMetadata() {
         programList.push({
             value: p.id,
             label: p.name,
-            orgUnits: p.organisationUnits.map(o => o.id)
+            orgUnits: p.organisationUnits.map(o => o.id),
         })
         let stages = []
-        programOrganisms[p.id] = data.optionGroups.find(og => og.name === p.name).id
+        programOrganisms[p.id] = data.optionGroups.find(
+            og => og.name === p.name
+        ).id
         let remove = []
         p.programStages.forEach(ps => {
             stages.push({
@@ -184,14 +219,17 @@ export async function initMetadata() {
             })
             ps.programStageSections.forEach(pss => {
                 if (pss.dataElements) {
-                    let orgDataElement = pss.dataElements.find(de =>
-                        de.id === _organismsDataElementId)
-                    if(orgDataElement) orgDataElement.hideWithValues = true
+                    let orgDataElement = pss.dataElements.find(
+                        de => de.id === _organismsDataElementId
+                    )
+                    if (orgDataElement) orgDataElement.hideWithValues = true
                 }
                 let childSections = []
                 ps.programStageSections
                     .filter(childSection =>
-                        childSection.name.match(new RegExp('{' + pss.name + '}.*'))
+                        childSection.name.match(
+                            new RegExp('{' + pss.name + '}.*')
+                        )
                     )
                     .forEach(childSection => {
                         remove.push(childSection.id)
@@ -206,49 +244,65 @@ export async function initMetadata() {
             ps.programStageSections = ps.programStageSections.filter(
                 s => !remove.includes(s.id)
             )
-            let resultSection = ps.programStageSections.find(s => s.name === 'Result')
-            if(resultSection) resultSection.hideWithValues = true
+            let resultSection = ps.programStageSections.find(
+                s => s.name === 'Result'
+            )
+            if (resultSection) resultSection.hideWithValues = true
         })
         stageLists[p.id] = stages
     })
 
     programs.rules = []
-    data.programRules.filter(r => r.programRuleActions.find(a => a.dataElement || a.programStageSection))
-    .forEach(d => {
-        d.condition = programCondition(d.condition)
-        programs.rules.push(d)
-    })
-    programs.rules = programs.rules.sort((a, b) => (a.priority > b.priority) || !a.priority ? 1 : -1)
+    data.programRules
+        .filter(r =>
+            r.programRuleActions.find(
+                a => a.dataElement || a.programStageSection
+            )
+        )
+        .forEach(d => {
+            d.condition = programCondition(d.condition)
+            programs.rules.push(d)
+        })
+    programs.rules = programs.rules.sort((a, b) =>
+        a.priority > b.priority || !a.priority ? 1 : -1
+    )
 
     let constants = {}
-    if(data.constants)
+    if (data.constants)
         data.constants.forEach(c => {
             if (c.code) constants[c.code] = c.value
         })
 
     let dataElements = {}
-    data.dataElements.forEach(de =>
-        dataElements[de.id] = de.formName ? de.formName : de.displayName)
+    data.dataElements.forEach(
+        de => (dataElements[de.id] = de.formName ? de.formName : de.displayName)
+    )
 
-    let metadata = { optionSets, person, programs, programList, stageLists, programOrganisms, constants, dataElements }
-    console.log(data)
-    console.log(metadata)
-
-    return metadata
+    return {
+        optionSets,
+        person,
+        programs,
+        programList,
+        stageLists,
+        programOrganisms,
+        constants,
+        dataElements,
+        orgUnits,
+    }
 }
 
 /**
  * Gets the attributes and values of the AMR program.
  * @param {string} entityId - Entity id.
  * @returns {Object} Attributes, values, uniques, districts.
- */''
+ */ ;('')
 export async function getEntityAttributes(entityId) {
     const attributes = (await get(
         'trackedEntityTypes/' +
-        _personTypeId +
-        '.json?fields=trackedEntityTypeAttributes[mandatory,' +
-        'trackedEntityAttribute[name,id,displayName,valueType,unique,' +
-        'optionSetValue,optionSet[id,options[displayName,code]]]]'
+            _personTypeId +
+            '.json?fields=trackedEntityTypeAttributes[mandatory,' +
+            'trackedEntityAttribute[name,id,displayName,valueType,unique,' +
+            'optionSetValue,optionSet[id,options[displayName,code]]]]'
     )).trackedEntityTypeAttributes
 
     // Contains attribute values.
@@ -295,12 +349,12 @@ export async function getEntityAttributes(entityId) {
 export async function checkUnique(property, value) {
     const entities = (await get(
         'trackedEntityInstances.json?ouMode=ACCESSIBLE&paging=false&' +
-        'fields=trackedEntityInstance&trackedEntityType=' +
-        _personTypeId +
-        '&filter=' +
-        property +
-        ':eq:' +
-        value
+            'fields=trackedEntityInstance&trackedEntityType=' +
+            _personTypeId +
+            '&filter=' +
+            property +
+            ':eq:' +
+            value
     )).trackedEntityInstances
     return !entities
         ? false
@@ -356,9 +410,7 @@ export async function addPerson(values, orgUnit) {
  * @param {Object} values - Values.
  */
 export async function updatePerson(id, values) {
-    let data = await get(
-        'trackedEntityInstances/' + id
-    )
+    let data = await get('trackedEntityInstances/' + id)
     data.attributes = []
     for (let key in values)
         data.attributes.push({ attribute: key, value: values[key] })
@@ -374,81 +426,79 @@ export async function deletePerson(id) {
     await del('trackedEntityInstances/' + id)
 }
 
-export async function newRecord(pId, pStage, orgaCode, ou, eId, eValues, sampleDate) {
+export async function newRecord(
+    pId,
+    pStage,
+    orgaCode,
+    ou,
+    eId,
+    eValues,
+    sampleDate
+) {
     let initialValues = {
         [_organismsDataElementId]: orgaCode,
-        [_amrDataElement]: await generateAmrId(ou)
+        [_amrDataElement]: await generateAmrId(ou),
     }
     const { entityId, eventId } = eId
-        ? await addEvent(initialValues, pId, pStage.id, ou, eId, eValues, sampleDate)
-        : await addPersonWithEvent(initialValues, pId, pStage.id, ou, eValues, sampleDate)
+        ? await addEvent(
+              initialValues,
+              pId,
+              pStage.id,
+              ou,
+              eId,
+              eValues,
+              sampleDate
+          )
+        : await addPersonWithEvent(
+              initialValues,
+              pId,
+              pStage.id,
+              ou,
+              eValues,
+              sampleDate
+          )
 
-    const { programStage, eventValues, status } =
-        await getProgramStage(pStage, initialValues, false, true)
+    const { programStage, eventValues, status } = await getProgramStage(
+        pStage,
+        initialValues,
+        false,
+        true
+    )
 
     return { programStage, eventValues, status, eventId, entityId }
 }
 
 export async function existingRecord(programs, eventId, isApproval) {
-    let {eventValues: initialValues, programId, programStageId, completed, entityId, sampleDate }
-        = await getEventValues(eventId)
-    const pStage = programs.find(p => p.id === programId)
-        .programStages.find(ps => ps.id = programStageId)
+    let {
+        eventValues: initialValues,
+        programId,
+        programStageId,
+        completed,
+        entityId,
+        sampleDate,
+    } = await getEventValues(eventId)
+    const pStage = programs
+        .find(p => p.id === programId)
+        .programStages.find(ps => (ps.id = programStageId))
     const { programStage, eventValues, status } = !isApproval
         ? await getProgramStage(pStage, initialValues, completed, false)
-        : await getProgramStage(pStage, initialValues, completed, false, _isL1User, _isL2User)
-    return { programId, programStage, eventValues, status, eventId, entityId, sampleDate }
-}
-
-/**
- * Gets the user's organisation units along with their descendants.
- * @returns {Object[]} Organisation units.
- */
-export async function getOrgUnits() {
-    // Getting the max OU level.
-    const maxLevel = (await get(
-        'organisationUnits.json?fields=level&pageSize=1&order=level:desc'
-    )).organisationUnits[0].level
-
-    // Creating string which will be used in query.
-    let childrenString = '' + ',children[id,displayName'.repeat(maxLevel) + ']'.repeat(maxLevel)
-
-    // Getting the user's OU's.
-    const userOrgUnits = (await get('me.json?fields=organisationUnits'))
-        .organisationUnits
-
-    // Creating string which will be used in query.
-    let orgUnitsString = '[' + userOrgUnits[0].id
-    Array.from(Array(userOrgUnits.length - 1), (i) => (orgUnitsString += ',' + userOrgUnits[index + 1].id))
-    orgUnitsString += ']'
-
-    // Getting the OU's with descendants.
-    let data = (await get(
-        'organisationUnits.json?filter=id:in:' +
-            orgUnitsString +
-            '&paging=false&order=level:asc&fields=id,displayName' +
-            childrenString
-    )).organisationUnits
-
-    // Sorts the children of the OU by display name.
-    const sortChildren = orgUnit => {
-        if (orgUnit.children)
-            if (orgUnit.children.length) {
-                orgUnit.children.forEach(child => sortChildren(child))
-                orgUnit.children.sort((a, b) =>
-                    a.displayName > b.displayName
-                        ? 1
-                        : b.displayName > a.displayName
-                        ? -1
-                        : 0
-                )
-            }
+        : await getProgramStage(
+              pStage,
+              initialValues,
+              completed,
+              false,
+              _isL1User,
+              _isL2User
+          )
+    return {
+        programId,
+        programStage,
+        eventValues,
+        status,
+        eventId,
+        entityId,
+        sampleDate,
     }
-
-    // Sorting descendants of each of the user's OU's.
-    data.forEach(d => sortChildren(d))
-
-    return data
 }
 
 /**
@@ -491,7 +541,7 @@ export async function addPersonWithEvent(
             orgUnit: orgUnitId,
             program: programId,
             programStage: programStageId,
-            status: 'ACTIVE'
+            status: 'ACTIVE',
         },
         eventValues
     )
@@ -517,7 +567,9 @@ export async function addPersonWithEvent(
 
     return {
         entityId: r.response.importSummaries[0].reference,
-        eventId: r.response.importSummaries[0].enrollments.importSummaries[0].events.importSummaries[0].reference
+        eventId:
+            r.response.importSummaries[0].enrollments.importSummaries[0].events
+                .importSummaries[0].reference,
     }
 }
 
@@ -547,7 +599,7 @@ export async function addEvent(
             program: programId,
             programStage: programStageId,
             trackedEntityInstance: entityId,
-            status: 'ACTIVE'
+            status: 'ACTIVE',
         },
         eventValues
     )
@@ -575,7 +627,7 @@ export async function addEvent(
 
     return {
         entityId,
-        eventId: r.response.importSummaries[0].reference
+        eventId: r.response.importSummaries[0].reference,
     }
 }
 
@@ -584,7 +636,9 @@ export async function setEventStatus(eventId, completed, isApproval) {
     event.status = completed ? 'COMPLETED' : 'ACTIVE'
     if (!isApproval) {
         let values = {}
-        event.dataValues.forEach(dataValue => (values[dataValue.dataElement] = dataValue.value))
+        event.dataValues.forEach(
+            dataValue => (values[dataValue.dataElement] = dataValue.value)
+        )
         if (values[_l1ApprovalStatus] === 'Resend') {
             values[_l1ApprovalStatus] = ''
             values[_l1RevisionReason] = ''
@@ -599,10 +653,9 @@ export async function setEventStatus(eventId, completed, isApproval) {
 }
 
 export async function updateEventValue(eventId, dataElementId, value) {
-    await put(
-        'events/' + eventId + '/' + dataElementId,
-        { dataValues: [{ dataElement: dataElementId, value: value }] }
-    )
+    await put('events/' + eventId + '/' + dataElementId, {
+        dataValues: [{ dataElement: dataElementId, value: value }],
+    })
 }
 
 /**
@@ -657,4 +710,3 @@ export async function getCounts(items, orgUnit, userOnly) {
             )).listGrid.rows[0][0]
     return items
 }
-

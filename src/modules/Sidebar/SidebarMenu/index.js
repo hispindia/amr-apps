@@ -40,7 +40,7 @@ const SidebarMenu = props => {
      * Updates count number in menu.
      */
     const updateCounts = async items => {
-        items = await getCounts(items, props.selected.id, props.userOnly)
+        items = await getCounts(items, props.selected, props.userOnly)
         items.forEach(
             item =>
                 (item.label = item.label.replace(/\(\d*\)/, `(${item.count})`))
@@ -51,14 +51,13 @@ const SidebarMenu = props => {
 
     return (
         <CustomMenu>
-        <Menu
-            size='dense'
-            list={menuItems ? menuItems : props.items}
-            onClick={path => props.history.push(path)}
-        />
+            <Menu
+                size="dense"
+                list={menuItems ? menuItems : props.items}
+                onClick={path => props.history.push(path)}
+            />
         </CustomMenu>
     )
 }
 
 export default withRouter(SidebarMenu)
-
