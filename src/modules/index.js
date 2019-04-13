@@ -1,5 +1,4 @@
 export * from './App'
-export * from './DuplicationSection'
 export * from './Main'
 export * from './ModalPopup'
 export * from './PersonForm'
