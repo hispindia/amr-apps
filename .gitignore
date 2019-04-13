@@ -27,8 +27,8 @@ package-lock.json
 
 /approval/node_modules
 /approval/build
-/capture/node_modules
-/capture/build
+/entry/node_modules
+/entry/build
 /build
 
 manifest.webapp

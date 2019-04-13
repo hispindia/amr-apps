@@ -38,8 +38,8 @@ function build_app(app, build) {
 
 function main() {
     const root = process.cwd()
-    const app = path.join(root, 'capture')
-    const build = path.join(root, 'build', 'capture')
+    const app = path.join(root, 'entry')
+    const build = path.join(root, 'build', 'entry')
 
     install_app(app, build)
 }

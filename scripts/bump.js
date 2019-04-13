@@ -6,8 +6,8 @@ const paths = [
     'package.json',
     'approval/manifest.json',
     'approval/package.json',
-    'capture/manifest.json',
-    'capture/package.json'
+    'entry/manifest.json',
+    'entry/package.json'
 ]
 
 const version = process.argv[2]

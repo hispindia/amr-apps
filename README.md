@@ -28,7 +28,7 @@ cd [root_dir]
 yarn install
 cd [root_dir]/approval
 yarn install
-cd [root_dir]/capture
+cd [root_dir]/entry
 yarn install
 ```
 
@@ -41,7 +41,7 @@ cd [root_dir]
 yarn start
 cd [root_dir]/approval
 yarn start
-cd [root_dir]/capture
+cd [root_dir]/entry
 yarn start
 ```
 
