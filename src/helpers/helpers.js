@@ -19,7 +19,7 @@ export const Heading = styled.h2`
 `
 
 export const Text = styled.div`
-    margin: 12px 0;
+    margin: 8px 0;
     line-height: 24px;
 `
 
@@ -38,8 +38,7 @@ export const Label = styled.div`
                 color: var(--red600);
                 padding-left: 4px;
             }
-        `
-    }
+        `}
 `
 
 export const Row = styled.div`

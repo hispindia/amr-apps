@@ -296,11 +296,13 @@ export class PersonForm extends Component {
                         text={
                             <span>
                                 A person with <em>{modal.label}</em>{' '}
-                                {modal.value} is already registered.
-                                <br />
-                                Do you want to get this person?
+                                {modal.value} is already registered. Do you want
+                                to get this person?
                             </span>
                         }
+                        label="Import"
+                        icon="person"
+                        kind="primary"
                         onClick={this.onModalClick}
                     />
                 )}

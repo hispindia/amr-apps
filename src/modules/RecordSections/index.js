@@ -118,9 +118,12 @@ export const RecordSections = props => {
         <Margin>
             {deleteClicked && (
                 <ModalPopup
-                    heading="Delete"
+                    heading="Delete record"
                     text="Are you sure you want to permanently delete this record?"
                     onClick={onDeleteConfirmed}
+                    label="Delete"
+                    icon="delete"
+                    kind="destructive"
                     deletion
                 />
             )}

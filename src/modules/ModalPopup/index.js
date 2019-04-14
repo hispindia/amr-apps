@@ -1,14 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Card } from '@dhis2/ui/core'
-import {
-    ButtonRow,
-    Heading,
-    MarginSmall,
-    MarginTopLarge,
-    Margin,
-    Text,
-} from 'helpers'
+import { ButtonRow } from 'inputs'
+import { Heading, Text } from 'helpers'
 
 const Background = styled.div`
     display: flex;
@@ -22,44 +16,41 @@ const Background = styled.div`
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0, 0, 0);
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(33, 43, 54, 0.4);
 `
 
 const CustomCard = styled(Card)`
     width: 400px !important;
     height: auto !important;
+    padding: 24px !important;
+`
+
+const CustomHeading = styled(Heading)`
+    margin: 0;
 `
 
 export const ModalPopup = props => (
     <Background>
         <CustomCard>
-            <Margin>
-                <Heading>{props.heading}</Heading>
-                <MarginSmall>
-                    <Text>{props.text}</Text>
-                    <MarginTopLarge>
-                        <ButtonRow
-                            buttons={[
-                                {
-                                    label: props.deletion ? 'Cancel' : 'No',
-                                    kind: 'basic',
-                                    icon: 'clear',
-                                    onClick: () => props.onClick(false),
-                                },
-                                {
-                                    label: props.deletion ? 'Delete' : 'Yes',
-                                    kind: props.deletion
-                                        ? 'destructive'
-                                        : 'primary',
-                                    icon: props.deletion ? 'delete' : 'done',
-                                    onClick: () => props.onClick(true),
-                                },
-                            ]}
-                        />
-                    </MarginTopLarge>
-                </MarginSmall>
-            </Margin>
+            <CustomHeading>{props.heading}</CustomHeading>
+            <Text>{props.text}</Text>
+            <ButtonRow
+                unspaced
+                buttons={[
+                    {
+                        label: 'Cancel',
+                        icon: 'clear',
+                        kind: 'secondary',
+                        onClick: () => props.onClick(false),
+                    },
+                    {
+                        label: props.label,
+                        icon: props.icon,
+                        kind: props.kind,
+                        onClick: () => props.onClick(true),
+                    },
+                ]}
+            />
         </CustomCard>
     </Background>
 )

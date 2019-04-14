@@ -9,7 +9,7 @@ const SpaceBetween = styled.div`
     ${props =>
         props.unspaced &&
         css`
-            justify-content: unset;
+            justify-content: flex-end;
         `}
 `
 
@@ -17,7 +17,7 @@ const ButtonPadding = styled.div`
     ${props =>
         props.unspaced &&
         css`
-            padding-right: 16px;
+            padding-left: 8px;
         `}
 `
 
