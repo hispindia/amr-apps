@@ -112,7 +112,7 @@ export async function initMetadata() {
             'dataElement[id],compulsory],programStageSections[id,name,' +
             'displayName,renderType,dataElements[id,displayFormName,code,' +
             'valueType,optionSetValue,optionSet]]],programRuleActions[' +
-            'programRuleActionType,dataElement,optionGroup,' +
+            'programRuleActionType,dataElement,optionGroup,content,' +
             'trackedEntityAttribute,programStageSection,data],condition,' +
             'trackedEntityTypeAttributes[name,id,displayName,valueType,unique,' +
             'optionSetValue,optionSet]trackedEntityTypeAttributes[mandatory,' +
