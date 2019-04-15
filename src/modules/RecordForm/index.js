@@ -1,100 +1,62 @@
 /* eslint no-eval: 0 */
 
-import React, { Component } from 'react'
-import { Card } from '@dhis2/ui/core'
-import { Grid } from '@material-ui/core'
-import styled from 'styled-components'
-import { ProgressSection } from '../'
-import {
-    Heading,
-    Label,
-    Margin,
-    Padding,
-    MarginSides,
-    MarginBottom,
-} from 'helpers'
+import React, { useEffect } from 'react'
 import { updateEventValue, _testResultDataElementId } from 'api'
-import {
-    TextInput,
-    RadioInput,
-    SelectInput,
-    SwitchInput,
-    CheckboxInput,
-    DateInput,
-} from 'inputs'
+import { MarginBottom } from 'helpers'
+import { ProgressSection } from '../'
+import { hook } from './hook'
+import { Section } from './Section'
 
-const ChildSectionLabel = styled.div`
-    margin: 16px 16px -16px;
-`
+export const RecordForm = props => {
+    const [state, dispatch, types] = hook()
 
-export class RecordForm extends Component {
-    state = { loading: true }
+    useEffect(() => {
+        init()
+    }, [props.programStage, props.values, props.status])
 
-    componentDidMount = async () => await this.init()
-
-    componentDidUpdate = async prevProps => {
-        const { programStage, values, status } = this.props
-        if (
-            prevProps.programStage !== programStage ||
-            prevProps.values !== values ||
-            prevProps.status !== status
-        )
-            await this.init()
-    }
-
-    init = async () => {
-        this.setState({ loading: true })
-
-        let { programStage, values, passValues, status } = this.props
-        this.checkRules(
+    const init = async () => {
+        dispatch({ type: types.LOADING })
+        let { programStage, values, passValues, status } = props
+        checkRules(
             status.completed ? { ...values } : values,
             programStage.programStageSections,
             !status.completed
         )
-
-        this.setState({
-            loading: false,
-            programStage: programStage,
-            values: values,
-        })
-
+        dispatch({ type: types.SET, programStage, values })
         if (passValues)
             passValues(
-                this.validateValues(programStage.programStageSections, values)
+                validateValues(programStage.programStageSections, values)
             )
     }
 
-    onNewValue = (id, value) => updateEventValue(this.props.eventId, id, value)
+    const onNewValue = (id, value) => updateEventValue(props.eventId, id, value)
 
-    onChange = (name, value) => {
-        let values = { ...this.state.values }
+    const onChange = (name, value) => {
+        let values = { ...state.values }
         if (values[name] === value) return
-        this.onNewValue(name, value)
+        onNewValue(name, value)
         values[name] = value
-        this.onNewValues(values)
+        onNewValues(values)
     }
 
-    onNewValues = values => {
-        let programStage = { ...this.state.programStage }
-        this.checkRules(
+    const onNewValues = values => {
+        let programStage = { ...state.programStage }
+        checkRules(
             values,
             programStage.programStageSections,
-            !this.props.status.completed
+            !props.status.completed
         )
-        this.setState({
-            values: values,
-            programStage: programStage,
-        })
-        if (this.props.passValues)
-            this.props.passValues(
-                this.validateValues(programStage.programStageSections, values)
+        dispatch({ type: types.SET, programStage, values })
+        if (props.passValues)
+            props.passValues(
+                validateValues(programStage.programStageSections, values)
             )
     }
 
-    validateValues = (sections, values) => {
+    const validateValues = (sections, values) => {
         for (let section of sections) {
             if (section.childSections)
-                this.validateValues(section.childSections, values)
+                validateValues(section.childSections, values)
             if (
                 section.dataElements.find(
                     dataElement =>
@@ -106,7 +68,7 @@ export class RecordForm extends Component {
         return true
     }
 
-    checkRules = (values, sections, pushChanges) => {
+    const checkRules = (values, sections, pushChanges) => {
         /**
          * Gets the data element that is affected by rule.
          * @param {string} id - Data element id.
@@ -175,10 +137,9 @@ export class RecordForm extends Component {
             }
         }
 
-        const setColors = (condition, affectedDataElement, testValue) => {
-            if (!affectedDataElement.optionSetValue) return
-            if (affectedDataElement.optionSet.id !== _testResultDataElementId)
-                return
+        const setColors = (condition, affected, testValue) => {
+            if (!affected.optionSetValue) return
+            if (affected.optionSet.id !== _testResultDataElementId) return
             const variables = getVariables(condition)
             variables.forEach(variable => {
                 let dataElement = findDataElement(variable)
@@ -189,96 +150,65 @@ export class RecordForm extends Component {
             })
         }
 
-        this.props.rules.forEach(rule => {
+        props.rules.forEach(rule => {
             rule.programRuleActions.forEach(r => {
                 try {
+                    const cond = eval(rule.condition)
+                    let de = r.dataElement
+                        ? findDataElement(r.dataElement.id)
+                        : null
+                    let s = r.programStageSection
+                        ? findSection(r.programStageSection.id)
+                        : null
                     switch (r.programRuleActionType) {
                         case 'SHOWOPTIONGROUP':
-                            if (eval(rule.condition)) {
-                                let affectedDataElement = findDataElement(
-                                    r.dataElement.id
-                                )
-                                // Changing options if it is not the same.
-                                if (
-                                    affectedDataElement.optionSet.id !==
-                                    r.optionGroup.id
-                                ) {
-                                    affectedDataElement.optionSet.id =
-                                        r.optionGroup.id
-                                    // Only reset selected value if the options do not include current value.
-                                    if (
-                                        !this.props.optionSets[
-                                            affectedDataElement.optionSet.id
-                                        ].find(
-                                            option =>
-                                                option.value ===
-                                                values[affectedDataElement.id]
-                                        ) &&
-                                        values[affectedDataElement.id] !== ''
-                                    ) {
-                                        values[affectedDataElement.id] = ''
-                                        if (pushChanges)
-                                            this.onNewValue(
-                                                affectedDataElement.id,
-                                                ''
-                                            )
-                                    }
-                                }
+                            if (!cond || de.optionSet.id === r.optionGroup.id)
+                                break
+                            de.optionSet.id = r.optionGroup.id
+                            // Only reset selected value if the options do not include current value.
+                            if (
+                                !props.optionSets[de.optionSet.id].find(
+                                    option => option.value === values[de.id]
+                                ) &&
+                                values[de.id] !== ''
+                            ) {
+                                values[de.id] = ''
+                                if (pushChanges) onNewValue(de.id, '')
                             }
                             break
                         case 'HIDEFIELD':
-                            const hide = eval(rule.condition)
-                            let affectedDataElement = findDataElement(
-                                r.dataElement.id
-                            )
-                            if (affectedDataElement) {
-                                if (hide !== affectedDataElement.hide) {
-                                    setColors(
-                                        rule.condition,
-                                        affectedDataElement
-                                    )
-                                    affectedDataElement.hide = hide
-                                    if (values[affectedDataElement.id] !== '') {
-                                        values[affectedDataElement.id] = ''
-                                        if (pushChanges)
-                                            this.onNewValue(
-                                                affectedDataElement.id,
-                                                ''
-                                            )
-                                    }
-                                }
+                            if (cond === de.hide) break
+                            setColors(rule.condition, de)
+                            de.hide = cond
+                            if (values[de.id] !== '') {
+                                values[de.id] = ''
+                                if (pushChanges) onNewValue(de.id, '')
                             }
                             break
                         case 'HIDESECTION':
-                            const hideS = eval(rule.condition)
-                            let affectedSection = findSection(
-                                r.programStageSection.id
-                            )
-                            if (affectedSection)
-                                if (hideS !== affectedSection.hide)
-                                    affectedSection.hide = hideS
+                            if (cond !== section.hide) s.hide = cond
                             break
                         case 'ASSIGN':
-                            if (eval(rule.condition)) {
-                                let affectedDataElement = findDataElement(
-                                    r.dataElement.id
-                                )
-                                setColors(
-                                    rule.condition,
-                                    affectedDataElement,
-                                    r.data
-                                )
-                                // Assigning value.
-                                if (values[affectedDataElement.id] !== r.data) {
-                                    values[affectedDataElement.id] = r.data
-                                    if (pushChanges)
-                                        this.onNewValue(
-                                            affectedDataElement.id,
-                                            r.data
-                                        )
-                                }
-                                affectedDataElement.disabled = true
+                            if (!cond) break
+                            setColors(rule.condition, de, r.data)
+                            // Assigning value.
+                            if (values[de.id] !== r.data) {
+                                values[de.id] = r.data
+                                if (pushChanges) onNewValue(de.id, r.data)
                             }
+                            de.disabled = true
+                            break
+                        case 'SHOWWARNING':
+                            if (cond && de.warning !== r.content)
+                                de.warning = r.content
+                            else if (!cond && de.warning === r.content)
+                                de.warning = null
+                            break
+                        case 'SHOWERROR':
+                            if (cond && de.error !== r.content)
+                                de.error = r.content
+                            else if (!cond && de.error === r.content)
+                                de.error = null
                             break
                         default:
                             break
@@ -290,147 +220,13 @@ export class RecordForm extends Component {
         })
     }
 
-    /**
-     * Gets the child section component.
-     * @param {Object} childSection - Child section.
-     * @returns {Component} Child section component.
-     */
-    getChildSection = childSection => {
-        // If all, or all but one, of the data elements are of type TRUE_ONLY, the section is rendered as a group of checkboxes.
-        if (
-            childSection.dataElements.filter(
-                dataElement => dataElement.valueType === 'TRUE_ONLY'
-            ).length >
-            childSection.dataElements.length - 2
-        ) {
-            let objects = {}
-            let values = {}
-            childSection.dataElements
-                .filter(dataElement => dataElement.valueType === 'TRUE_ONLY')
-                .forEach(dataElement => {
-                    objects[dataElement.id] = {
-                        label: dataElement.displayFormName,
-                        disabled:
-                            dataElement.disabled || this.props.status.completed,
-                    }
-                    values[dataElement.id] = this.state.values[dataElement.id]
-                })
-            return (
-                <div key={childSection.name}>
-                    <Padding>
-                        <CheckboxInput
-                            objects={objects}
-                            name={childSection.name}
-                            label={childSection.name}
-                            values={values}
-                            onChange={this.onChange}
-                        />
-                    </Padding>
-                    {childSection.dataElements
-                        .filter(
-                            dataElement =>
-                                dataElement.valueType === 'TEXT' &&
-                                !dataElement.hide
-                        )
-                        .map(dataElement => this.getDataElement(dataElement))}
-                </div>
-            )
-        }
+    if (state.loading) return <ProgressSection />
 
-        return (
-            <div key={childSection.name}>
-                <ChildSectionLabel>
-                    <Label>{childSection.name}</Label>
-                </ChildSectionLabel>
-                {childSection.dataElements
-                    .filter(dataElement => !dataElement.hide)
-                    .map(dataElement => this.getDataElement(dataElement))}
-            </div>
-        )
-    }
-
-    /**
-     * Gets the data element component.
-     * @param {Object} dataElement - Data element.
-     * @returns {Component} Date element component.
-     */
-    getDataElement = dataElement => {
-        const completed = this.props.status.completed
-        const { optionSets } = this.props
-        return (
-            <Padding key={dataElement.id}>
-                {dataElement.optionSetValue ? (
-                    optionSets[dataElement.optionSet.id].length < 5 ? (
-                        <RadioInput
-                            objects={optionSets[dataElement.optionSet.id]}
-                            name={dataElement.id}
-                            label={dataElement.displayFormName}
-                            value={this.state.values[dataElement.id]}
-                            onChange={this.onChange}
-                            required={dataElement.required}
-                            disabled={dataElement.disabled || completed}
-                        />
-                    ) : (
-                        <SelectInput
-                            objects={optionSets[dataElement.optionSet.id]}
-                            name={dataElement.id}
-                            label={dataElement.displayFormName}
-                            value={this.state.values[dataElement.id]}
-                            onChange={this.onChange}
-                            required={dataElement.required}
-                            disabled={dataElement.disabled || completed}
-                        />
-                    )
-                ) : dataElement.valueType === 'TRUE_ONLY' ? (
-                    <SwitchInput
-                        name={dataElement.id}
-                        label={dataElement.displayFormName}
-                        checked={this.state.values[dataElement.id]}
-                        onChange={this.onChange}
-                        required={dataElement.required}
-                        disabled={dataElement.disabled || completed}
-                    />
-                ) : dataElement.valueType === 'DATE' ? (
-                    <DateInput
-                        name={dataElement.id}
-                        label={dataElement.displayFormName}
-                        value={this.state.values[dataElement.id]}
-                        required={dataElement.required}
-                        onChange={this.onChange}
-                        disabled={dataElement.disabled || completed}
-                    />
-                ) : (
-                    <TextInput
-                        name={dataElement.id}
-                        label={dataElement.displayFormName}
-                        value={this.state.values[dataElement.id]}
-                        required={dataElement.required}
-                        onChange={this.onChange}
-                        disabled={dataElement.disabled || completed}
-                        type={
-                            dataElement.valueType === 'NUMBER'
-                                ? 'number'
-                                : 'text'
-                        }
-                        color={dataElement.color}
-                    />
-                )}
-            </Padding>
-        )
-    }
-
-    render() {
-        const { programStage, loading } = this.state
-
-        if (loading) return <ProgressSection />
-
-        const sections = programStage.programStageSections.filter(
-            section => !section.hide && !section.hideWithValues
-        )
-
-        return (
-            <MarginBottom>
-                {sections.map(section => {
+    return (
+        <MarginBottom>
+            {state.programStage.programStageSections
+                .filter(section => !section.hide && !section.hideWithValues)
+                .map(section => {
                     const dataElements = section.dataElements.filter(
                         dataElement =>
                             !dataElement.hide && !dataElement.hideWithValues
@@ -451,103 +247,26 @@ export class RecordForm extends Component {
                                 !childSection.hideWithValues
                         )
 
+                    const childHalf = childSections
+                        ? Math.ceil(childSections.length / 2)
+                        : 0
+
                     return (
-                        <MarginBottom key={section.id}>
-                            <Card>
-                                <Margin>
-                                    <MarginSides>
-                                        <Heading>{section.displayName}</Heading>
-                                    </MarginSides>
-                                    {dataElements.length > 0 ? (
-                                        section.renderType.DESKTOP.type ===
-                                        'MATRIX' ? (
-                                            <Grid container spacing={0}>
-                                                {section.dataElements
-                                                    .filter(
-                                                        dataElement =>
-                                                            !dataElement.hide
-                                                    )
-                                                    .map(dataElement => (
-                                                        <Grid
-                                                            item
-                                                            key={dataElement.id}
-                                                        >
-                                                            {this.getDataElement(
-                                                                dataElement
-                                                            )}
-                                                        </Grid>
-                                                    ))}
-                                            </Grid>
-                                        ) : (
-                                            <Grid container spacing={0}>
-                                                <Grid item xs>
-                                                    {dataElements
-                                                        .slice(0, half)
-                                                        .map(dataElement =>
-                                                            this.getDataElement(
-                                                                dataElement
-                                                            )
-                                                        )}
-                                                </Grid>
-                                                <Grid item xs>
-                                                    {dataElements
-                                                        .slice(half)
-                                                        .map(dataElement =>
-                                                            this.getDataElement(
-                                                                dataElement
-                                                            )
-                                                        )}
-                                                    {childSections &&
-                                                        childSections.map(
-                                                            childSection =>
-                                                                this.getChildSection(
-                                                                    childSection
-                                                                )
-                                                        )}
-                                                </Grid>
-                                            </Grid>
-                                        )
-                                    ) : (
-                                        <Grid container spacing={0}>
-                                            <Grid item xs>
-                                                {childSections &&
-                                                    childSections
-                                                        .slice(
-                                                            0,
-                                                            Math.ceil(
-                                                                childSections.length /
-                                                                    2
-                                                            )
-                                                        )
-                                                        .map(childSection =>
-                                                            this.getChildSection(
-                                                                childSection
-                                                            )
-                                                        )}
-                                            </Grid>
-                                            <Grid item xs>
-                                                {childSections &&
-                                                    childSections
-                                                        .slice(
-                                                            Math.ceil(
-                                                                childSections.length /
-                                                                    2
-                                                            )
-                                                        )
-                                                        .map(childSection =>
-                                                            this.getChildSection(
-                                                                childSection
-                                                            )
-                                                        )}
-                                            </Grid>
-                                        </Grid>
-                                    )}
-                                </Margin>
-                            </Card>
-                        </MarginBottom>
+                        <Section
+                            key={section.id}
+                            heading={section.displayName}
+                            renderType={section.renderType.DESKTOP.type}
+                            dataElements={dataElements}
+                            half={half}
+                            childSections={childSections}
+                            childHalf={childHalf}
+                            completed={props.status.completed}
+                            onChange={onChange}
+                            optionSets={props.optionSets}
+                            values={state.values}
+                        />
                     )
                 })}
-            </MarginBottom>
-        )
-    }
+        </MarginBottom>
+    )
 }
