@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import PropTypes from 'prop-types'
 import {
     ModalPopup,
     PersonForm,
@@ -243,4 +244,9 @@ export const RecordSections = props => {
             />
         </Margin>
     )
+}
+
+RecordSections.propTypes = {
+    metadata: PropTypes.object.isRequired,
+    isApproval: PropTypes.bool,
 }

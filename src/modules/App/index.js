@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { BrowserRouter, HashRouter } from 'react-router-dom'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
 import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
@@ -60,3 +61,10 @@ export const App = props => (
         </HashRouter>
     </BrowserRouter>
 )
+
+App.propTypes = {
+    appName: PropTypes.string.isRequired,
+    menuItems: PropTypes.object.isRequired,
+    tables: PropTypes.object.isRequired,
+    isApproval: PropTypes.bool,
+}

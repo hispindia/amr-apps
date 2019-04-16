@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
 import { Row } from 'helpers'
 
@@ -63,8 +64,8 @@ export const OrgUnitNode = props => {
     const [opened, setOpened] = useState(false)
 
     useEffect(() => {
-        setOpened(props.selected === props.orgUnit.id)
-    }, [props.orgUnit.id])
+        setOpened(selected === orgUnit.id)
+    }, [orgUnit.id])
 
     const onCarretClick = () => setOpened(!opened)
 
@@ -97,4 +98,10 @@ export const OrgUnitNode = props => {
             ) : null}
         </li>
     )
+}
+
+OrgUnitNode.propTypes = {
+    selected: PropTypes.string.isRequired,
+    onSelect: PropTypes.func.isRequired,
+    orgUnit: PropTypes.object.isRequired,
 }

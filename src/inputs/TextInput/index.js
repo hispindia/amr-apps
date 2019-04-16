@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import InputField from '@dhis2/ui/core/InputField'
 import styled, { css } from 'styled-components'
 import { Input } from 'helpers'
@@ -7,7 +8,7 @@ import { debounced } from './debounced'
 /**
  * Colored field background.
  */
-export const CustomInputField = styled.div`
+const CustomInputField = styled.div`
     ${props => {
         switch (props.color) {
             case 'red':
@@ -137,4 +138,19 @@ export const TextInput = props => {
             </CustomInputField>
         </Input>
     )
+}
+
+TextInput.propTypes = {
+    onChange: PropTypes.func.isRequired,
+    name: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    required: PropTypes.bool,
+    unique: PropTypes.bool,
+    disabled: PropTypes.bool,
+    value: PropTypes.string,
+    valid: PropTypes.bool,
+    warning: PropTypes.string,
+    error: PropTypes.string,
+    uniqueValid: PropTypes.bool,
+    validateUnique: PropTypes.func,
 }

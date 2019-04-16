@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import SelectField from '@dhis2/ui/core/SelectField'
 import styled from 'styled-components'
 import { Input } from 'helpers'
@@ -49,4 +50,20 @@ export const SelectInput = props => {
             </CustomSelectField>
         </Input>
     )
+}
+
+SelectInput.propTypes = {
+    onChange: PropTypes.func.isRequired,
+    name: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    required: PropTypes.bool,
+    disabled: PropTypes.bool,
+    helperText: PropTypes.string,
+    value: PropTypes.string,
+    objects: PropTypes.arrayOf(
+        PropTypes.shape({
+            label: PropTypes.string.isRequired,
+            value: PropTypes.string.isRequired,
+        })
+    ).isRequired,
 }

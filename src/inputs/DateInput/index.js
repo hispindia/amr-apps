@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import InputField from '@dhis2/ui/core/InputField'
 import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
 import MomentUtils from '@date-io/moment'
@@ -75,4 +76,13 @@ export const DateInput = props => {
             </MuiPickersUtilsProvider>
         </>
     )
+}
+
+DateInput.propTypes = {
+    onChange: PropTypes.func.isRequired,
+    name: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    required: PropTypes.bool,
+    disabled: PropTypes.bool,
+    value: PropTypes.string,
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Button } from '@dhis2/ui/core'
 import styled, { css } from 'styled-components'
 import { MarginTop } from 'helpers'
@@ -50,3 +51,23 @@ export const ButtonRow = props => (
         </SpaceBetween>
     </MarginTop>
 )
+
+ButtonRow.propTypes = {
+    unspaced: PropTypes.bool,
+    buttons: PropTypes.arrayOf(
+        PropTypes.shape({
+            label: PropTypes.string.isRequired,
+            onClick: PropTypes.func.isRequired,
+            icon: PropTypes.string.isRequired,
+            tooltip: PropTypes.string,
+            disabledTooltip: PropTypes.string,
+            disabled: PropTypes.bool,
+            kind: PropTypes.oneOf([
+                'basic',
+                'primary',
+                'secondary',
+                'destructive',
+            ]).isRequired,
+        })
+    ).isRequired,
+}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import Switch from '@dhis2/ui/core/Switch'
 
 /**
@@ -25,4 +26,12 @@ export const SwitchInput = props => {
             onChange={onChange}
         />
     )
+}
+
+SwitchInput.propTypes = {
+    onChange: PropTypes.func.isRequired,
+    name: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    disabled: PropTypes.bool,
+    value: PropTypes.string,
 }

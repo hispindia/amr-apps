@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import { Card } from '@dhis2/ui/core'
 import { getEvents } from 'api'
 import { Margin } from 'helpers'
@@ -70,4 +71,10 @@ export const RecordsOverview = props => {
             )}
         </Margin>
     )
+}
+
+RecordsOverview.propTypes = {
+    programs: PropTypes.array.isRequired,
+    selected: PropTypes.string.isRequired,
+    isApproval: PropTypes.bool,
 }

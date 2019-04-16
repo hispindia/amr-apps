@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import { Menu } from '@dhis2/ui/core'
 import styled from 'styled-components'
@@ -58,6 +59,11 @@ const SidebarMenu = props => {
             />
         </CustomMenu>
     )
+}
+
+SidebarMenu.propTypes = {
+    items: PropTypes.arrayOf(PropTypes.object).isRequired,
+    userOnly: PropTypes.bool,
 }
 
 export default withRouter(SidebarMenu)

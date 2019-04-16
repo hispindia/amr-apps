@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Icon } from '@dhis2/ui/core'
 
@@ -30,3 +31,8 @@ export const IconButton = props => (
     </IconContainer>
 )
 
+IconButton.propTypes = {
+    onClick: PropTypes.func.isRequired,
+    name: PropTypes.string.isRequired,
+    icon: PropTypes.string.isRequired,
+}

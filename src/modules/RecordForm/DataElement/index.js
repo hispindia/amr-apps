@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Padding } from 'helpers'
 import {
     TextInput,
@@ -71,4 +72,12 @@ export const DataElement = props => {
             )}
         </Padding>
     )
+}
+
+DataElement.propTypes = {
+    dataElement: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired,
+    value: PropTypes.string.isRequired,
+    optionSets: PropTypes.object,
+    completed: PropTypes.bool,
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Label, Padding } from 'helpers'
 import { CheckboxInput } from 'inputs'
@@ -82,4 +83,11 @@ export const ChildSection = props => {
                 ))}
         </>
     )
+}
+
+ChildSection.propTypes = {
+    childSection: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired,
+    values: PropTypes.object.isRequired,
+    completed: PropTypes.bool,
 }

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
 
 export const Title = styled.h1`
@@ -21,24 +22,6 @@ export const Heading = styled.h2`
 export const Text = styled.div`
     margin: 8px 0;
     line-height: 24px;
-`
-
-export const Label = styled.div`
-    color: var(--grey700);
-    white-space: nowrap;
-    padding: 0px 12px 12px 12px;
-    line-height: 24px;
-    font-weight: 500;
-    ${props =>
-        props.required &&
-        !props.disabled &&
-        css`
-            ::after {
-                content: '*';
-                color: var(--red600);
-                padding-left: 4px;
-            }
-        `}
 `
 
 export const Row = styled.div`
@@ -117,3 +100,26 @@ export const MarginTopLarge = styled.div`
 export const Padding = styled.div`
     padding: 16px;
 `
+
+export const Label = styled.div`
+    color: var(--grey700);
+    white-space: nowrap;
+    padding: 0px 12px 12px 12px;
+    line-height: 24px;
+    font-weight: 500;
+    ${props =>
+        props.required &&
+        !props.disabled &&
+        css`
+            ::after {
+                content: '*';
+                color: var(--red600);
+                padding-left: 4px;
+            }
+        `}
+`
+
+Label.propTypes = {
+    required: PropTypes.bool,
+    disabled: PropTypes.bool,
+}
