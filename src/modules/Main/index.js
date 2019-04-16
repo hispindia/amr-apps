@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
 import { RecordSections, RecordsOverview } from 'modules'
@@ -55,3 +56,10 @@ export const Main = props => (
         </Switch>
     </MainSection>
 )
+
+Main.propTypes = {
+    selected: PropTypes.string.isRequired,
+    metadata: PropTypes.object.isRequired,
+    tables: PropTypes.object.isRequired,
+    isApproval: PropTypes.bool,
+}

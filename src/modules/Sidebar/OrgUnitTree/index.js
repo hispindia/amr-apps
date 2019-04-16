@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Card } from '@dhis2/ui/core'
 import styled from 'styled-components'
 import { MarginTopSmall, MarginSmall } from 'helpers'
@@ -32,3 +33,9 @@ export const OrgUnitTree = props => (
         </Card>
     </MarginTopSmall>
 )
+
+OrgUnitTree.propTypes = {
+    selected: PropTypes.string.isRequired,
+    onSelect: PropTypes.func.isRequired,
+    orgUnits: PropTypes.arrayOf(PropTypes.object).isRequired,
+}

@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Card } from '@dhis2/ui/core'
 import { Heading, Margin, MarginSides, MarginBottom } from 'helpers'
 import { SectionContent } from '../SectionContent'
@@ -34,3 +35,14 @@ export const Section = props => (
         </Card>
     </MarginBottom>
 )
+
+Section.propTypes = {
+    heading: PropTypes.string.isRequired,
+    renderType: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
+    values: PropTypes.object.isRequired,
+    dataElements: PropTypes.array.isRequired,
+    childSections: PropTypes.array.isRequired,
+    optionSets: PropTypes.object,
+    completed: PropTypes.bool,
+}

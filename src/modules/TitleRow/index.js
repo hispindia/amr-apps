@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Row, Title } from 'helpers'
 import { IconButton } from 'inputs'
 
@@ -14,3 +15,7 @@ export const TitleRow = props => (
         <Title>{props.title}</Title>
     </Row>
 )
+
+TitleRow.propTypes = {
+    title: PropTypes.string.isRequired,
+}

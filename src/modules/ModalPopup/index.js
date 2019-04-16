@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Card } from '@dhis2/ui/core'
 import { ButtonRow } from 'inputs'
@@ -54,3 +55,18 @@ export const ModalPopup = props => (
         </CustomCard>
     </Background>
 )
+
+ModalPopup.propTypes = {
+    heading: PropTypes.string.isRequired,
+    onClick: PropTypes.func.isRequired,
+    label: PropTypes.string.isRequired,
+    icon: PropTypes.string.isRequired,
+    text: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
+    kind: PropTypes.oneOf([
+        'default',
+        'basic',
+        'secondary',
+        'primary',
+        'destructive',
+    ]).isRequired,
+}

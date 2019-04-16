@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import { Radio } from '@dhis2/ui/core'
 import styled from 'styled-components'
 import { RowW, Label, OptionSpacer, Input } from 'helpers'
@@ -66,4 +67,18 @@ export const RadioInput = props => {
             </RowW>
         </Input>
     )
+}
+
+RadioInput.propTypes = {
+    label: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
+    value: PropTypes.string,
+    required: PropTypes.bool,
+    disabled: PropTypes.bool,
+    objects: PropTypes.arrayOf(
+        PropTypes.shape({
+            value: PropTypes.string.isRequired,
+            label: PropTypes.string.isRequired,
+        })
+    ).isRequired,
 }

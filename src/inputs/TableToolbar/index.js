@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import IconButton from '@material-ui/core/IconButton'
 import Tooltip from '@material-ui/core/Tooltip'
 import AddIcon from '@material-ui/icons/Add'
@@ -15,9 +16,11 @@ const IconContainer = styled(IconButton)`
     &:hover {
         background: linear-gradient(180deg, #054fa3, #034793);
     }
-    ${props => props.disabled &&
-        css`opacity: .33;`
-    }
+    ${props =>
+        props.disabled &&
+        css`
+            opacity: 0.33;
+        `}
 `
 
 /**
@@ -25,22 +28,29 @@ const IconContainer = styled(IconButton)`
  */
 const TableToolbar = props => (
     <>
-        <Tooltip title={
-            props.addButtonDisabled
-            ? 'You cannot add records for the selected organisation unit'
-            : 'Add new record'}
+        <Tooltip
+            title={
+                props.addButtonDisabled
+                    ? 'You cannot add records for the selected organisation unit'
+                    : 'Add new record'
+            }
         >
-        <span>
-            <IconContainer
-                onClick={props.onAddClick}
-                disabled={props.addButtonDisabled}
-            >
-                <AddIcon />
-            </IconContainer>
-        </span>
+            <span>
+                <IconContainer
+                    onClick={props.onAddClick}
+                    disabled={props.addButtonDisabled}
+                >
+                    <AddIcon />
+                </IconContainer>
+            </span>
         </Tooltip>
     </>
 )
+
+TableToolbar.propTypes = {
+    onAddClick: PropTypes.func.isRequired,
+    addButtonDisabled: PropTypes.bool.isRequired,
+}
 
 export default withStyles({ iconButton: {} }, { name: 'TableToolbar' })(
     TableToolbar

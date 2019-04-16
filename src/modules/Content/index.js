@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import PropTypes from 'prop-types'
 import { CircularProgress } from '@dhis2/ui/core'
 import { Main, Sidebar } from 'modules'
 import { Row } from 'helpers'
@@ -40,4 +41,10 @@ export const Content = props => {
             />
         </Row>
     )
+}
+
+Content.propTypes = {
+    menuItems: PropTypes.object.isRequired,
+    tables: PropTypes.object.isRequired,
+    isApproval: PropTypes.bool,
 }
