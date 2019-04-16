@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Button } from '@dhis2/ui/core'
 import styled, { css } from 'styled-components'
-import { MarginTop } from 'helpers'
+import { MarginTop } from 'styles'
 
 const SpaceBetween = styled.div`
     justify-content: space-between;

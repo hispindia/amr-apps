@@ -5,7 +5,7 @@ import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
 import MomentUtils from '@date-io/moment'
 import moment from 'moment'
 import styled from 'styled-components'
-import { RowW, Label, Input, MarginTop } from 'helpers'
+import { Input, Label, MarginTop, Row } from 'styles'
 
 const UnitContainer = styled.div`
     margin-right: 16px;
@@ -124,7 +124,7 @@ export const AgeInput = props => {
     return (
         <Input>
             <Label required={props.required}>{props.label}</Label>
-            <RowW>
+            <Row wrapped>
                 <UnitContainer>
                     <InputField
                         name={'years'}
@@ -158,7 +158,7 @@ export const AgeInput = props => {
                         size="dense"
                     />
                 </UnitContainer>
-            </RowW>
+            </Row>
             <MuiPickersUtilsProvider utils={MomentUtils}>
                 <DatePicker
                     value={value}

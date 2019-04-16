@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { Grid } from '@material-ui/core'
 import { Card, Button } from '@dhis2/ui/core'
 import styled from 'styled-components'
-import { Heading, Padding, Margin, MarginSides, MarginBottom } from 'helpers'
+import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { getPersonValues, checkUnique } from 'api'
 import { TextInput, AgeInput, RadioInput, SelectInput } from 'inputs'
 import { ProgressSection } from '../ProgressSection'
@@ -320,9 +320,7 @@ export class PersonForm extends Component {
                                 </Button>
                             </ButtonPositioned>
                         )}
-                        <MarginSides>
-                            <Heading>Person</Heading>
-                        </MarginSides>
+                        <Heading>Person</Heading>
                         <Grid container spacing={0}>
                             <Grid item xs>
                                 {attributes

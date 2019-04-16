@@ -1,14 +1,8 @@
 import React, { useEffect } from 'react'
 import { Card } from '@dhis2/ui/core'
 import { Grid } from '@material-ui/core'
-import {
-    Heading,
-    Margin,
-    Padding,
-    MarginSides,
-    MarginBottom,
-} from '../../helpers/helpers'
-import { SelectInput, RadioInput } from '../../inputs'
+import { Heading, Margin, Padding, MarginBottom } from 'styles'
+import { SelectInput, RadioInput } from 'inputs'
 import { hook } from './hook'
 
 /**
@@ -22,43 +16,46 @@ export const RecordPanel = props => {
         if (dataElements !== state.dataElements)
             dispatch({
                 type: types.SET_DATAELEMENTS,
-                dataElements: getDataElements()
+                dataElements: getDataElements(),
             })
         props.passValues({
             programId: state.programId,
             programStageId: state.programStageId,
             organism: state.organism,
-            valid: !Object.values(state).includes('')
+            valid: !Object.values(state).includes(''),
         })
     }, [state.programId, state.programStageId, state.organism])
 
     useEffect(() => {
-        if (props.programId !== state.programId
-            || props.programStageId !== state.programStageId
-            || props.organism !== state.organism
+        if (
+            props.programId !== state.programId ||
+            props.programStageId !== state.programStageId ||
+            props.organism !== state.organism
         )
             dispatch({
                 type: types.SET_PANEL,
-                organisms: props.programId ? getOrganisms(props.programId) : null,
+                organisms: props.programId
+                    ? getOrganisms(props.programId)
+                    : null,
                 programId: props.programId ? props.programId : '',
-                programStageId: props.programStageId ? props.programStageId : '',
+                programStageId: props.programStageId
+                    ? props.programStageId
+                    : '',
                 organism: props.organism ? props.organism : '',
                 resetSwitch: props.resetSwitch,
-                dataElements: getDataElements()
+                dataElements: getDataElements(),
             })
     }, [props.programId, props.programStageId, props.organism])
 
     useEffect(() => {
         if (props.resetSwitch !== state.resetSwitch)
-            dispatch({type: types.RESET_PANEL})
+            dispatch({ type: types.RESET_PANEL })
     }, [props.resetSwitch])
-
 
     const getOrganisms = programId => {
         let organisms = []
         props.optionSets[props.programOrganisms[programId]].forEach(o => {
-            if (!organisms.find(org => org.value === o.value))
-                organisms.push(o)
+            if (!organisms.find(org => org.value === o.value)) organisms.push(o)
         })
         return organisms
     }
@@ -71,9 +68,10 @@ export const RecordPanel = props => {
             type: types.SET_PANEL,
             organisms: getOrganisms(value),
             programId: value,
-            programStageId: props.programStages[value].length > 1
-                ? ''
-                : props.programStages[value][0].value,
+            programStageId:
+                props.programStages[value].length > 1
+                    ? ''
+                    : props.programStages[value][0].value,
             organism: '',
         })
     }
@@ -85,7 +83,8 @@ export const RecordPanel = props => {
         dispatch({
             type: types.SET_VALUE,
             key: name,
-            value, value
+            value,
+            value,
         })
     }
 
@@ -100,7 +99,7 @@ export const RecordPanel = props => {
                 label: 'Organism group',
                 objects: props.programs,
                 onChange: onProgramChange,
-                value: state.programId
+                value: state.programId,
             },
         ]
         if (state.programId && props.programStages[state.programId].length > 1)
@@ -109,7 +108,7 @@ export const RecordPanel = props => {
                 label: 'Type',
                 objects: props.programStages[state.programId],
                 onChange: onChange,
-                value: state.programStageId
+                value: state.programStageId,
             })
         if (state.organisms)
             dataElements.push({
@@ -117,7 +116,7 @@ export const RecordPanel = props => {
                 label: 'Organism',
                 objects: state.organisms,
                 onChange: onChange,
-                value: state.organism
+                value: state.organism,
             })
 
         return dataElements
@@ -128,20 +127,22 @@ export const RecordPanel = props => {
         return (
             <Grid container spacing={0}>
                 <Grid item xs>
-                    {dataElements.slice(0, half).map(dataElement =>
-                        <DataElement key={dataElement.id}
+                    {dataElements.slice(0, half).map(dataElement => (
+                        <DataElement
+                            key={dataElement.id}
                             {...dataElement}
                             disabled={disabled}
                         />
-                    )}
+                    ))}
                 </Grid>
                 <Grid item xs>
-                    {dataElements.slice(half).map(dataElement =>
-                        <DataElement key={dataElement.id}
+                    {dataElements.slice(half).map(dataElement => (
+                        <DataElement
+                            key={dataElement.id}
                             {...dataElement}
                             disabled={disabled}
                         />
-                    )}
+                    ))}
                 </Grid>
             </Grid>
         )
@@ -197,7 +198,7 @@ export const RecordPanel = props => {
         <PanelCard>
             <DataElements
                 dataElements={state.dataElements}
-                half={Math.ceil(state.dataElements.length/2)}
+                half={Math.ceil(state.dataElements.length / 2)}
                 disabled={props.disabled}
             />
         </PanelCard>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Checkbox } from '@dhis2/ui/core'
-import { RowW, Label, OptionSpacer } from 'helpers'
+import { Label, OptionSpacer, Row } from 'styles'
 
 /**
  * Input consisting of a a group of checkboxes.
@@ -27,7 +27,7 @@ export const CheckboxInput = props => {
     return (
         <>
             <Label required={props.required}>{props.label}</Label>
-            <RowW>
+            <Row wrapped>
                 {Object.keys(props.objects).map(id => (
                     <OptionSpacer key={id}>
                         <Checkbox
@@ -40,7 +40,7 @@ export const CheckboxInput = props => {
                         />
                     </OptionSpacer>
                 ))}
-            </RowW>
+            </Row>
         </>
     )
 }

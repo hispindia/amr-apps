@@ -10,7 +10,7 @@ import {
 } from 'modules'
 import { deleteEvent, setEventStatus, newRecord, existingRecord } from 'api'
 import { ButtonRow } from 'inputs'
-import { Margin } from 'helpers'
+import { Margin } from 'styles'
 import { hook } from './hook'
 
 export const RecordSections = props => {

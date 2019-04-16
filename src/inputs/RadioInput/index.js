@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Radio } from '@dhis2/ui/core'
 import styled from 'styled-components'
-import { RowW, Label, OptionSpacer, Input } from 'helpers'
+import { Input, Label, OptionSpacer, Row } from 'styles'
 
 /**
  * Green valid.
@@ -39,7 +39,7 @@ export const RadioInput = props => {
     return (
         <Input>
             <Label required={props.required}>{props.label}</Label>
-            <RowW>
+            <Row wrapped>
                 {props.objects.map(object => (
                     <OptionSpacer key={object.value} onClick={onClick}>
                         <CustomRadio>
@@ -64,7 +64,7 @@ export const RadioInput = props => {
                         </CustomRadio>
                     </OptionSpacer>
                 ))}
-            </RowW>
+            </Row>
         </Input>
     )
 }

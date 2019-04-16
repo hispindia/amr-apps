@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Card } from '@dhis2/ui/core'
 import styled from 'styled-components'
-import { MarginTopSmall, MarginSmall } from 'helpers'
+import { Margin } from 'styles'
 import { OrgUnitNode } from './OrgUnitNode'
 
 const OrgUnitTreeStyle = styled.ul`
@@ -15,23 +15,21 @@ const OrgUnitTreeStyle = styled.ul`
  * Organisation unit tree.
  */
 export const OrgUnitTree = props => (
-    <MarginTopSmall>
-        <Card>
-            <MarginSmall>
-                <OrgUnitTreeStyle>
-                    {props.orgUnits.map(orgUnit => (
-                        <OrgUnitNode
-                            orgUnit={orgUnit}
-                            key={orgUnit.id}
-                            show={true}
-                            onSelect={props.onSelect}
-                            selected={props.selected}
-                        />
-                    ))}
-                </OrgUnitTreeStyle>
-            </MarginSmall>
-        </Card>
-    </MarginTopSmall>
+    <Card>
+        <Margin margin={8}>
+            <OrgUnitTreeStyle>
+                {props.orgUnits.map(orgUnit => (
+                    <OrgUnitNode
+                        orgUnit={orgUnit}
+                        key={orgUnit.id}
+                        show={true}
+                        onSelect={props.onSelect}
+                        selected={props.selected}
+                    />
+                ))}
+            </OrgUnitTreeStyle>
+        </Margin>
+    </Card>
 )
 
 OrgUnitTree.propTypes = {

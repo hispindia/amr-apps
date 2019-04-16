@@ -4,7 +4,7 @@ import InputField from '@dhis2/ui/core/InputField'
 import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
 import MomentUtils from '@date-io/moment'
 import moment from 'moment'
-import { Input } from 'helpers'
+import { Input } from 'styles'
 
 /**
  * Date picker.

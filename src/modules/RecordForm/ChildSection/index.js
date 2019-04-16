@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { Label, Padding } from 'helpers'
+import { Label, Padding } from 'styles'
 import { CheckboxInput } from 'inputs'
 import { DataElement } from '../DataElement'
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Card } from '@dhis2/ui/core/Card'
 import { Grid } from '@material-ui/core'
-import { Heading, Margin, Padding, MarginSides, MarginBottom } from 'helpers'
+import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { SelectInput, RadioInput, DateInput } from 'inputs'
 
 /**
@@ -170,29 +170,23 @@ export class RecordPanel extends Component {
         const { programId, organisms, organism } = this.state
         return (
             <MarginBottom>
-                <MarginBottom>
-                    <Card>
-                        <Margin>
-                            <MarginSides>
-                                <Heading>Panel</Heading>
-                            </MarginSides>
-                            <Grid container spacing={0}>
-                                <Grid item xs>
-                                    {this.getDataElement('programId')}
-                                    {programId &&
-                                        programStages[programId].length > 1 &&
-                                        this.getDataElement('programStageId')}
-                                </Grid>
-                                <Grid item xs>
-                                    {organisms &&
-                                        this.getDataElement('organism')}
-                                    {organism &&
-                                        this.getDataElement('sampleDate')}
-                                </Grid>
+                <Card>
+                    <Margin>
+                        <Heading>Panel</Heading>
+                        <Grid container spacing={0}>
+                            <Grid item xs>
+                                {this.getDataElement('programId')}
+                                {programId &&
+                                    programStages[programId].length > 1 &&
+                                    this.getDataElement('programStageId')}
                             </Grid>
-                        </Margin>
-                    </Card>
-                </MarginBottom>
+                            <Grid item xs>
+                                {organisms && this.getDataElement('organism')}
+                                {organism && this.getDataElement('sampleDate')}
+                            </Grid>
+                        </Grid>
+                    </Margin>
+                </Card>
             </MarginBottom>
         )
     }

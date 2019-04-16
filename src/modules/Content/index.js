@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { CircularProgress } from '@dhis2/ui/core'
 import { Main, Sidebar } from 'modules'
-import { Row } from 'helpers'
+import { Row } from 'styles'
 import { initMetadata } from 'api'
 import { hook } from './hook'
 

@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Card } from '@dhis2/ui/core'
+import { Heading, Text } from 'styles'
 import {
     ButtonRow,
-    Heading,
     Margin,
     MarginSides,
     MarginSidesSmall,
     MarginBottom,
-    Text,
     getDuplicates,
-    _testResultDataElementId
+    _testResultDataElementId,
 } from '../../'
 import { ProgressSection } from '../ProgressSection'
 import { RecordTable } from '../RecordTable'
@@ -39,51 +38,48 @@ export const DuplicationSection = props => {
         props.onClick(value)
     }
 
-    if (!data) return <ProgressSection/>
+    if (!data) return <ProgressSection />
 
     return (
         <MarginBottom>
-        <MarginBottom>
-            <Card>
-                <Margin>
+            <MarginBottom>
+                <Card>
+                    <Margin>
+                        <MarginSides>
+                            <Heading>Possible duplicate record</Heading>
+                        </MarginSides>
+                    </Margin>
                     <MarginSides>
-                        <Heading>Possible duplicate record</Heading>
+                        <MarginSides>
+                            <MarginSidesSmall>
+                                <Text>Is this record a duplicate?</Text>
+                                <ButtonRow
+                                    unspaced
+                                    buttons={[
+                                        {
+                                            label: 'No',
+                                            onClick: () => onClick(''),
+                                            disabled: clicked,
+                                            icon: 'clear',
+                                            kind: 'basic',
+                                            tooltip: 'No',
+                                        },
+                                        {
+                                            label: 'Yes',
+                                            onClick: () => onClick('Confirmed'),
+                                            disabled: clicked,
+                                            icon: 'done',
+                                            kind: 'basic',
+                                            tooltip: 'Yes',
+                                        },
+                                    ]}
+                                />
+                            </MarginSidesSmall>
+                        </MarginSides>
                     </MarginSides>
-                </Margin>
-                <MarginSides>
-                <MarginSides>
-                <MarginSidesSmall>
-                    <Text>Is this record a duplicate?</Text>
-                    <ButtonRow
-                        unspaced
-                        buttons={[
-                            {
-                                label: 'No',
-                                onClick: () => onClick(''),
-                                disabled: clicked,
-                                icon: 'clear',
-                                kind: 'basic',
-                                tooltip: 'No'
-                            },
-                            {
-                                label: 'Yes',
-                                onClick: () => onClick('Confirmed'),
-                                disabled: clicked,
-                                icon: 'done',
-                                kind: 'basic',
-                                tooltip: 'Yes',
-                            }
-                        ]}
-                    />
-                </MarginSidesSmall>
-                </MarginSides>
-                </MarginSides>
-                <RecordTable
-                    data={data}
-                    title=''
-                />
-            </Card>
-        </MarginBottom>
+                    <RecordTable data={data} title="" />
+                </Card>
+            </MarginBottom>
         </MarginBottom>
     )
 }
