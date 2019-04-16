@@ -34,9 +34,16 @@ export const CustomInputField = styled.div`
     }}
 `
 
-const errors = {
+const texts = {
     required: 'This field is required',
     unique: 'This field requires a unique value',
+    validate: 'Validating',
+}
+
+const statuses = {
+    default: 'default',
+    warning: 'warning',
+    error: 'error',
 }
 
 /**
@@ -44,14 +51,15 @@ const errors = {
  */
 export const TextInput = props => {
     const [value, setValue] = useState('')
-    const [errorText, setErrorText] = useState('')
+    //const [warning, setWarning] = useState(null)
+    const [error, setError] = useState(null)
     const [validating, setValidating] = useState(false)
 
     const debouncedValue = debounced(value, 2000)
 
     useEffect(() => {
         if (props.value !== value) setValue(props.value)
-    }, [props.value])
+    }, [props.valid])
 
     useEffect(() => {
         if (
@@ -63,7 +71,7 @@ export const TextInput = props => {
     }, [debouncedValue])
 
     useEffect(() => {
-        if (props.uniqueValid && errorText === errors.unique) setErrorText('')
+        if (props.uniqueValid && error === texts.unique) setError(props.error)
     }, [props.uniqueValid])
 
     /**
@@ -71,7 +79,7 @@ export const TextInput = props => {
      */
     const passValue = async value => {
         const didValidate = await validate(value)
-        setErrorText(didValidate)
+        setError(didValidate)
         props.onChange(props.name, value)
     }
 
@@ -81,12 +89,12 @@ export const TextInput = props => {
      */
     const validate = async value => {
         const { name, label, required, unique } = props
-        let error = ''
-        if (required && !value) error = errors.required
+        let error
+        if (required && !value) error = texts.required
         if (unique && value) {
             setValidating(true)
             if (!(await props.validateUnique(name, value, label)))
-                error = errors.unique
+                error = texts.unique
             setValidating(false)
         }
         return error
@@ -103,17 +111,23 @@ export const TextInput = props => {
                     onChange={(n, v) => setValue(v)}
                     kind={'outlined'}
                     status={
-                        errorText !== ''
-                            ? 'error'
-                            : validating
-                            ? 'warning'
-                            : 'default'
+                        validating
+                            ? statuses.warning
+                            : error || props.error
+                            ? statuses.error
+                            : props.warning
+                            ? statuses.warning
+                            : statuses.default
                     }
                     help={
-                        errorText !== ''
-                            ? errorText
-                            : validating
-                            ? 'Validating'
+                        validating
+                            ? texts.validate
+                            : error
+                            ? error
+                            : props.error
+                            ? props.error
+                            : props.warning
+                            ? props.warning
                             : ''
                     }
                     disabled={props.disabled}

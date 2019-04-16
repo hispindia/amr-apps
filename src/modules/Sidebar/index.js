@@ -1,8 +1,8 @@
 import React from 'react'
 import { Route } from 'react-router-dom'
+import { Margin, Col } from 'helpers'
 import { OrgUnitTree } from './OrgUnitTree'
 import SidebarMenu from './SidebarMenu'
-import { Margin, Col } from '../../helpers/helpers'
 
 /**
  * Sidebar with menu and possibly OU tree.

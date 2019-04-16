@@ -11,14 +11,20 @@ const types = {
     EVENT_VALID: 6,
     DELETE_CLICKED: 7,
     DELETE_CONFIRMED: 8,
-    SET_LOADING: 9
+    SET_LOADING: 9,
+}
+
+const invalidReason = {
+    required: 'A required field is empty',
+    error: 'A field is invalid',
 }
 
 const getRules = (rules, programId, programStageId) =>
-    rules.filter(r =>
-        (r.programStage ? r.programStage.id === programStageId : false) ||
-        (r.program.id === programId &&
-        (r.programStage ? r.programStage.id === programStageId : true))
+    rules.filter(
+        r =>
+            (r.programStage ? r.programStage.id === programStageId : false) ||
+            (r.program.id === programId &&
+                (r.programStage ? r.programStage.id === programStageId : true))
     )
 
 const reducer = (state, action) => {
@@ -28,7 +34,7 @@ const reducer = (state, action) => {
                 ...state,
                 entityValues: action.values,
                 entityId: action.id,
-                entityValid: action.valid
+                entityValid: action.valid,
             }
         }
         case types.SET_PANEL: {
@@ -43,7 +49,7 @@ const reducer = (state, action) => {
                     state.allRules,
                     action.programId,
                     action.programStageId
-                )
+                ),
             }
         }
         case types.NEW_RECORD: {
@@ -53,11 +59,9 @@ const reducer = (state, action) => {
                 eventValues: action.eventValues,
                 status: action.status,
                 eventId: action.eventId,
-                entityId: state.entityId
-                    ? state.entityId
-                    : action.entityId,
+                entityId: state.entityId ? state.entityId : action.entityId,
                 loading: false,
-                buttonDisabled: false
+                buttonDisabled: false,
             }
         }
         case types.EXISTING_RECORD: {
@@ -79,7 +83,7 @@ const reducer = (state, action) => {
                     state.allRules,
                     action.programId,
                     action.programStage.id
-                )
+                ),
             }
         }
         case types.ADD_MORE: {
@@ -91,39 +95,39 @@ const reducer = (state, action) => {
                 sampleDate: null,
                 panelValid: false,
                 eventData: null,
-                eventValid: false,
+                eventInvalid: invalidReason.required,
                 eventId: null,
                 resetSwitch: !state.resetSwitch,
-                buttonDisabled: false
+                buttonDisabled: false,
             }
         }
         case types.EDIT: {
             return {
                 ...state,
                 status: {
-                    ...state.status, 
-                    ...{completed: false}
+                    ...state.status,
+                    ...{ completed: false },
                 },
-                buttonDisabled: false
+                buttonDisabled: false,
             }
         }
         case types.DISABLE_BUTTON: {
             return {
                 ...state,
-                buttonDisabled: action.buttonDisabled
+                buttonDisabled: action.buttonDisabled,
             }
         }
         case types.EVENT_VALID: {
             return {
                 ...state,
-                eventValid: action.valid
+                eventInvalid: action.invalid,
             }
         }
         case types.DELETE_CLICKED: {
             return {
                 ...state,
                 buttonDisabled: true,
-                deleteClicked: true
+                deleteClicked: true,
             }
         }
         case types.DELETE_CONFIRMED: {
@@ -131,13 +135,13 @@ const reducer = (state, action) => {
                 ...state,
                 buttonDisabled: false,
                 deleteClicked: false,
-                deleteConfirmation: action.delete
+                deleteConfirmation: action.delete,
             }
         }
         case types.SET_LOADING: {
             return {
                 ...state,
-                loading: true
+                loading: true,
             }
         }
         default: {
@@ -162,12 +166,12 @@ export const hook = (rules, personValues) => {
         status: null,
         programStage: null,
         rules: null,
-        eventValid: false,
+        eventInvalid: invalidReason.required,
         resetSwitch: false,
         buttonDisabled: false,
         loading: false,
         deleteClicked: false,
-        deleteConfirmation: null
+        deleteConfirmation: null,
     })
 
     return [state, dispatch, types]
