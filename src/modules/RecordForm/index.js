@@ -7,6 +7,11 @@ import { ProgressSection } from '../'
 import { hook } from './hook'
 import { Section } from './Section'
 
+const invalidReason = {
+    required: 'A required field is empty',
+    error: 'A field is invalid',
+}
+
 export const RecordForm = props => {
     const [state, dispatch, types] = hook()
 
@@ -55,17 +60,21 @@ export const RecordForm = props => {
 
     const validateValues = (sections, values) => {
         for (let section of sections) {
-            if (section.childSections)
-                validateValues(section.childSections, values)
+            if (section.childSections) {
+                const invalid = validateValues(section.childSections, values)
+                if (invalid) return invalid
+            }
             if (
                 section.dataElements.find(
                     dataElement =>
                         dataElement.required && values[dataElement.id] === ''
                 )
             )
-                return false
+                return invalidReason.required
+            if (section.dataElements.find(dataElement => dataElement.error))
+                return invalidReason.error
         }
-        return true
+        return false
     }
 
     const checkRules = (values, sections, pushChanges) => {

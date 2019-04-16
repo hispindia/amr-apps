@@ -39,7 +39,7 @@ export const RecordSections = props => {
         eventValues,
         status,
         programStage,
-        eventValid,
+        eventInvalid,
         resetSwitch,
         buttonDisabled,
         loading,
@@ -49,7 +49,7 @@ export const RecordSections = props => {
     } = state
 
     const disabled =
-        buttonDisabled || !eventValid || !entityValid || !panelValid
+        buttonDisabled || eventInvalid !== false || !entityValid || !panelValid
 
     useEffect(() => {
         const getExistingRecord = async () => {
@@ -169,7 +169,7 @@ export const RecordSections = props => {
                     eventId={eventId}
                     status={status}
                     passValues={valid =>
-                        dispatch({ type: types.EVENT_VALID, valid: valid })
+                        dispatch({ type: types.EVENT_VALID, invalid: valid })
                     }
                 />
             )}
@@ -209,7 +209,9 @@ export const RecordSections = props => {
                                           : 'Submit record',
                                       disabledTooltip: status.completed
                                           ? 'Records with this approval status cannot be edited'
-                                          : 'A required field is empty',
+                                          : eventInvalid
+                                          ? eventInvalid
+                                          : undefined,
                                   },
                               ]
                         : [
@@ -221,7 +223,9 @@ export const RecordSections = props => {
                                   kind: 'primary',
                                   tooltip:
                                       'Submit record and add new record for the same person',
-                                  disabledTooltip: 'A required field is empty',
+                                  disabledTooltip: eventInvalid
+                                      ? eventInvalid
+                                      : undefined,
                               },
                               {
                                   label: 'Submit',
@@ -230,7 +234,9 @@ export const RecordSections = props => {
                                   icon: 'done',
                                   kind: 'primary',
                                   tooltip: 'Submit record',
-                                  disabledTooltip: 'A required field is empty',
+                                  disabledTooltip: eventInvalid
+                                      ? eventInvalid
+                                      : undefined,
                               },
                           ]
                 }
