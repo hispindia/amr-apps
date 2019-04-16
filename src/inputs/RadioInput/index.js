@@ -32,7 +32,7 @@ export const RadioInput = props => {
      * Used to make radio deselectable.
      */
     const onClick = event => {
-        if (value === event.target.value) setValue('')
+        if (value === event.target.value) onChange('')
     }
 
     return (
