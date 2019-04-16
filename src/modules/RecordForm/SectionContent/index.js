@@ -34,6 +34,7 @@ export const SectionContent = props => {
             values={values}
             onChange={onChange}
             completed={completed}
+            optionSets={optionSets}
         />
     )
 
