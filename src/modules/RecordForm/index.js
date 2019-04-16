@@ -226,47 +226,19 @@ export const RecordForm = props => {
         <MarginBottom>
             {state.programStage.programStageSections
                 .filter(section => !section.hide && !section.hideWithValues)
-                .map(section => {
-                    const dataElements = section.dataElements.filter(
-                        dataElement =>
-                            !dataElement.hide && !dataElement.hideWithValues
-                    )
-                    const half = Math.ceil(
-                        (dataElements.length +
-                            (section.childSections
-                                ? section.childSections.length
-                                : 0)) /
-                            2
-                    )
-
-                    let childSections = section.childSections
-                    if (section.childSections)
-                        childSections = section.childSections.filter(
-                            childSection =>
-                                !childSection.hide &&
-                                !childSection.hideWithValues
-                        )
-
-                    const childHalf = childSections
-                        ? Math.ceil(childSections.length / 2)
-                        : 0
-
-                    return (
-                        <Section
-                            key={section.id}
-                            heading={section.displayName}
-                            renderType={section.renderType.DESKTOP.type}
-                            dataElements={dataElements}
-                            half={half}
-                            childSections={childSections}
-                            childHalf={childHalf}
-                            completed={props.status.completed}
-                            onChange={onChange}
-                            optionSets={props.optionSets}
-                            values={state.values}
-                        />
-                    )
-                })}
+                .map(section => (
+                    <Section
+                        key={section.id}
+                        heading={section.displayName}
+                        renderType={section.renderType.DESKTOP.type}
+                        dataElements={section.dataElements}
+                        childSections={section.childSections}
+                        completed={props.status.completed}
+                        onChange={onChange}
+                        optionSets={props.optionSets}
+                        values={state.values}
+                    />
+                ))}
         </MarginBottom>
     )
 }

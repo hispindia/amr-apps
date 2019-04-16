@@ -13,11 +13,11 @@
 - [x] Hide result section
 - [x] Same sections on approval screen as on entry screen
 - [x] Modals
+- [x] Warning/error program rule action
 - [ ] Automatic duplication check
 - [ ] Hashing patient registration number
 - [ ] DD not have color when MIC has value
 - [ ] Special characters in test values
-- [ ] Warning/error program rule action
 
 ### Installation
 ```
