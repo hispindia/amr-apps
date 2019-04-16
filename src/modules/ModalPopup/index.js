@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Card } from '@dhis2/ui/core'
 import { ButtonRow } from 'inputs'
-import { Heading, Text } from 'helpers'
+import { Heading, Text } from 'styles'
 
 const Background = styled.div`
     display: flex;

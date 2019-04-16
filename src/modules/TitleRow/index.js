@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Row, Title } from 'helpers'
+import { Row, Title } from 'styles'
 import { IconButton } from 'inputs'
 
 export const TitleRow = props => (

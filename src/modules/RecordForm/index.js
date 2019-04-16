@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { updateEventValue, _testResultDataElementId } from 'api'
-import { MarginBottom } from 'helpers'
+import { MarginBottom } from 'styles'
 import { ProgressSection } from '../'
 import { hook } from './hook'
 import { Section } from './Section'

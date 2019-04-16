@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import SelectField from '@dhis2/ui/core/SelectField'
 import styled from 'styled-components'
-import { Input } from 'helpers'
+import { Input } from 'styles'
 
 /**
  * Max height for dropdown.

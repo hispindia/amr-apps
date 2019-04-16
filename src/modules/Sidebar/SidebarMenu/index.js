@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
 import { withRouter } from 'react-router-dom'
+import PropTypes from 'prop-types'
 import { Menu } from '@dhis2/ui/core'
 import styled from 'styled-components'
+import { Margin } from 'styles'
 import { getCounts } from 'api'
 
 /**

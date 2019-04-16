@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import InputField from '@dhis2/ui/core/InputField'
 import styled, { css } from 'styled-components'
-import { Input } from 'helpers'
+import { Input } from 'styles'
 import { debounced } from './debounced'
 
 /**

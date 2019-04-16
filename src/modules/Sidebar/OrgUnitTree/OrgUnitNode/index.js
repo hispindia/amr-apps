@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
-import { Row } from 'helpers'
+import { Row } from 'styles'
 
 const Caret = styled.span`
     cursor: pointer;

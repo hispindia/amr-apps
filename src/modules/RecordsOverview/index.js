@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Card } from '@dhis2/ui/core'
 import { getEvents } from 'api'
-import { Margin } from 'helpers'
+import { Margin } from 'styles'
 import { RecordTable, ProgressSection, TitleRow } from 'modules'
 import { titles, headers } from './config'
 

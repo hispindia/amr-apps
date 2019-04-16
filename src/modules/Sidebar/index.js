@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Route } from 'react-router-dom'
-import { Margin, Col } from 'helpers'
+import { Col, Margin, MarginBottom } from 'styles'
 import { OrgUnitTree } from './OrgUnitTree'
 import SidebarMenu from './SidebarMenu'
 
@@ -11,35 +11,39 @@ import SidebarMenu from './SidebarMenu'
 export const Sidebar = props => (
     <Col>
         <Margin>
-            <SidebarMenu
-                selected={props.selected}
-                items={props.menuItems.items}
-                userOnly={props.menuItems.userOnly}
-                counts={props.counts}
-            />
-            <Route
-                exact
-                path="/"
-                render={compProps => (
-                    <OrgUnitTree
-                        {...compProps}
-                        onSelect={props.onSelect}
-                        selected={props.selected}
-                        orgUnits={props.orgUnits}
-                    />
-                )}
-            />
-            <Route
-                path="/approval"
-                render={compProps => (
-                    <OrgUnitTree
-                        {...compProps}
-                        onSelect={props.onSelect}
-                        selected={props.selected}
-                        orgUnits={props.orgUnits}
-                    />
-                )}
-            />
+            <MarginBottom margin={12}>
+                <SidebarMenu
+                    selected={props.selected}
+                    items={props.menuItems.items}
+                    userOnly={props.menuItems.userOnly}
+                    counts={props.counts}
+                />
+            </MarginBottom>
+            <MarginBottom margin={12}>
+                <Route
+                    exact
+                    path="/"
+                    render={compProps => (
+                        <OrgUnitTree
+                            {...compProps}
+                            onSelect={props.onSelect}
+                            selected={props.selected}
+                            orgUnits={props.orgUnits}
+                        />
+                    )}
+                />
+                <Route
+                    path="/approval"
+                    render={compProps => (
+                        <OrgUnitTree
+                            {...compProps}
+                            onSelect={props.onSelect}
+                            selected={props.selected}
+                            orgUnits={props.orgUnits}
+                        />
+                    )}
+                />
+            </MarginBottom>
         </Margin>
     </Col>
 )

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Card } from '@dhis2/ui/core'
-import { Heading, Margin, MarginSides, MarginBottom } from 'helpers'
+import { Heading, Margin, MarginBottom } from 'styles'
 import { SectionContent } from '../SectionContent'
 
 const getProps = (dataElements, childSections) => {
@@ -20,9 +20,7 @@ export const Section = props => (
     <MarginBottom>
         <Card>
             <Margin>
-                <MarginSides>
-                    <Heading>{props.heading}</Heading>
-                </MarginSides>
+                <Heading>{props.heading}</Heading>
                 <SectionContent
                     renderType={props.renderType}
                     completed={props.completed}
