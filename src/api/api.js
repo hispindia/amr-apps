@@ -4,7 +4,7 @@ import {
     getEventValues,
     getEntityRules,
     generateAmrId,
-} from './helpers'
+} from './internal'
 
 export const _organismsDataElementId = 'SaQe2REkGVw'
 export const _testResultDataElementId = 'bSgpKbkbVGL'
