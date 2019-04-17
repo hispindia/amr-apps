@@ -4,7 +4,7 @@ import {
     getEventValues,
     getEntityRules,
     generateAmrId,
-} from './helpers'
+} from './internal'
 
 export const _organismsDataElementId = 'SaQe2REkGVw'
 export const _testResultDataElementId = 'bSgpKbkbVGL'
@@ -292,55 +292,6 @@ export async function initMetadata() {
 }
 
 /**
- * Gets the attributes and values of the AMR program.
- * @param {string} entityId - Entity id.
- * @returns {Object} Attributes, values, uniques, districts.
- */ ;('')
-export async function getEntityAttributes(entityId) {
-    const attributes = (await get(
-        'trackedEntityTypes/' +
-            _personTypeId +
-            '.json?fields=trackedEntityTypeAttributes[mandatory,' +
-            'trackedEntityAttribute[name,id,displayName,valueType,unique,' +
-            'optionSetValue,optionSet[id,options[displayName,code]]]]'
-    )).trackedEntityTypeAttributes
-
-    // Contains attribute values.
-    let values = entityId ? await getPersonValues(entityId) : {}
-    // Contains attributes which are unique.
-    let uniques = {}
-    // Attribute names as key and id as value.
-    let attributeIds = {}
-
-    attributes.forEach(a => {
-        if (a.trackedEntityAttribute.unique)
-            uniques[a.trackedEntityAttribute.id] = true
-        if (!values[a.trackedEntityAttribute.id])
-            values[a.trackedEntityAttribute.id] = ''
-        if (a.trackedEntityAttribute.optionSetValue) {
-            let options = []
-            a.trackedEntityAttribute.optionSet.options.forEach(option =>
-                options.push({
-                    value: option.code,
-                    label: option.displayName,
-                })
-            )
-            a.trackedEntityAttribute.optionSet.options = options
-        }
-        a.hide = false
-        attributeIds[a.trackedEntityAttribute.name] =
-            a.trackedEntityAttribute.id
-    })
-
-    return {
-        attributes: attributes,
-        values: values,
-        uniques: uniques,
-        rules: await getEntityRules(attributeIds),
-    }
-}
-
-/**
  * Checks if any tracked entity instance has property with value.
  * @param {string} property - Property.
  * @param {string} value - Value.
@@ -433,11 +384,12 @@ export async function newRecord(
     ou,
     eId,
     eValues,
-    sampleDate
+    sampleDate,
+    orgUnitCode
 ) {
     let initialValues = {
         [_organismsDataElementId]: orgaCode,
-        [_amrDataElement]: await generateAmrId(ou),
+        [_amrDataElement]: await generateAmrId(orgUnitCode),
     }
     const { entityId, eventId } = eId
         ? await addEvent(

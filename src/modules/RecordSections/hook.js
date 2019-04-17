@@ -12,6 +12,7 @@ const types = {
     DELETE_CLICKED: 7,
     DELETE_CONFIRMED: 8,
     SET_LOADING: 9,
+    SET_CODE: 10,
 }
 
 const invalidReason = {
@@ -142,6 +143,12 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 loading: true,
+            }
+        }
+        case types.SET_CODE: {
+            return {
+                ...state,
+                code: action.code,
             }
         }
         default: {

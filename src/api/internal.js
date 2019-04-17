@@ -29,7 +29,7 @@ export const getEventValues = async eventId => {
         eventValues: values,
         completed: event.status === 'COMPLETED',
         entityId: event.trackedEntityInstance,
-        sampleDate: event.eventDate
+        sampleDate: event.eventDate,
     }
 }
 
@@ -38,15 +38,11 @@ export const getEventValues = async eventId => {
  * @param {string} orgUnitId - Organisation unit ID.
  * @returns {string} AMR Id.
  */
-export const generateAmrId = async orgUnitId => {
-    const orgUnitCode = (await get(
-        'organisationUnits/' + orgUnitId + '.json?fields=code'
-    )).code
-
-    const newCode = () =>
+export const generateAmrId = async orgUnitCode => {
+    const newId = () =>
         orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
 
-    let amrId = newCode()
+    let amrId = newId()
     while (
         (await get(
             'events.json?paging=false&fields=event&orgUnit=' +
@@ -57,7 +53,7 @@ export const generateAmrId = async orgUnitId => {
                 amrId
         )).events.length !== 0
     )
-        amrId = newCode()
+        amrId = newId()
 
     return amrId
 }
@@ -73,11 +69,12 @@ export const getProgramStage = async (
     const shouldDisable = element => {
         switch (element.id) {
             case _amrDataElement:
-                return values[_amrDataElement]
-                    && values[_amrDataElement] !== ''
+                return values[_amrDataElement] && values[_amrDataElement] !== ''
             case _organismsDataElementId:
-                return values[_organismsDataElementId]
-                    && values[_organismsDataElementId] !== ''
+                return (
+                    values[_organismsDataElementId] &&
+                    values[_organismsDataElementId] !== ''
+                )
             case _l1ApprovalStatus:
             case _l1RejectionReason:
             case _l1RevisionReason:
@@ -116,40 +113,46 @@ export const getProgramStage = async (
             // Adding missing values.
             if (!values[de.id]) values[de.id] = ''
             // Adding required property.
-            de.required = psDataElements.find(psde =>
-                psde.dataElement.id === de.id
+            de.required = psDataElements.find(
+                psde => psde.dataElement.id === de.id
             ).compulsory
             de.disabled = shouldDisable(de)
-
         })
 
     programStage.programStageSections.forEach(s => {
-        s.hideWithValues = (s.name === 'Results'
-            || (s.name === 'Approval'
-                && !isL1User
-                && !isL2User
-                && !values[_l1ApprovalStatus]
-                && !values[_l2ApprovalStatus]
-            )
-        )
+        s.hideWithValues =
+            s.name === 'Results' ||
+            (s.name === 'Approval' &&
+                !isL1User &&
+                !isL2User &&
+                !values[_l1ApprovalStatus] &&
+                !values[_l2ApprovalStatus])
 
         setDataElements(s.dataElements, programStage.programStageDataElements)
         s.childSections.forEach(cs => {
             cs.hide = false
-            setDataElements(cs.dataElements, programStage.programStageDataElements)
+            setDataElements(
+                cs.dataElements,
+                programStage.programStageDataElements
+            )
         })
     })
 
     const status = {
-        deletable: values === {}
-            || (!values[_l1ApprovalStatus]
-            && !values[_l2ApprovalStatus]),
-        editable: values === {}
-            || (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus])
-            || [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes('Resend')
-            || (isL2User && !values[_l2ApprovalStatus]),
-        finished: values[_l1ApprovalStatus] === values[_l2ApprovalStatus] === 'Approved',
-        completed: completed
+        deletable:
+            values === {} ||
+            (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus]),
+        editable:
+            values === {} ||
+            (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus]) ||
+            [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes(
+                'Resend'
+            ) ||
+            (isL2User && !values[_l2ApprovalStatus]),
+        finished:
+            (values[_l1ApprovalStatus] === values[_l2ApprovalStatus]) ===
+            'Approved',
+        completed: completed,
     }
 
     return { programStage, status, eventValues: values }
