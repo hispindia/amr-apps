@@ -25,6 +25,9 @@
         "zip:approval": "cd build/approval && zip -r -X ../../amr-approval.zip .",
         "zip:entry": "cd build/entry && zip -r -X ../../amr-entry.zip ."
     },
+    "peerDependencies": {
+        "typeface-roboto": "^0.0.54"
+    },
     "devDependencies": {
         "@babel/cli": "^7.2.3",
         "@babel/core": "^7.4.0",
@@ -54,8 +57,7 @@
         "react-dom": "^16.8.6",
         "react-router-dom": "^5.0.0",
         "react-scripts": "^2.1.8",
-        "styled-components": "^4.2.0",
-        "typeface-roboto": "0.0.54"
+        "styled-components": "^4.2.0"
     },
     "husky": {
         "hooks": {
