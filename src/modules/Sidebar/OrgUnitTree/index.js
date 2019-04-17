@@ -33,7 +33,10 @@ export const OrgUnitTree = props => (
 )
 
 OrgUnitTree.propTypes = {
-    selected: PropTypes.string.isRequired,
     onSelect: PropTypes.func.isRequired,
     orgUnits: PropTypes.arrayOf(PropTypes.object).isRequired,
+    selected: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        path: PropTypes.string.isRequired,
+    }).isRequired,
 }

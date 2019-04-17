@@ -64,8 +64,8 @@ export const OrgUnitNode = props => {
     const [opened, setOpened] = useState(false)
 
     useEffect(() => {
-        setOpened(selected === orgUnit.id)
-    }, [orgUnit.id])
+        setOpened(selected.path.includes(orgUnit.id))
+    }, [])
 
     const onCarretClick = () => setOpened(!opened)
 
@@ -78,8 +78,8 @@ export const OrgUnitNode = props => {
                     <NoCaret />
                 )}
                 <OrgUnitText
-                    isSelected={selected === orgUnit.id}
-                    onClick={() => onSelect(orgUnit.id)}
+                    isSelected={selected.id === orgUnit.id}
+                    onClick={() => onSelect(orgUnit.id, orgUnit.path)}
                 >
                     {orgUnit.displayName}
                 </OrgUnitText>
@@ -101,7 +101,10 @@ export const OrgUnitNode = props => {
 }
 
 OrgUnitNode.propTypes = {
-    selected: PropTypes.string.isRequired,
     onSelect: PropTypes.func.isRequired,
     orgUnit: PropTypes.object.isRequired,
+    selected: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        path: PropTypes.string.isRequired,
+    }).isRequired,
 }

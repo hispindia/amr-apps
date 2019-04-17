@@ -17,25 +17,33 @@ export const Content = props => {
             dispatch({
                 type: types.INIT,
                 metadata: data,
-                selected: data.orgUnits[0].id,
+                id: data.orgUnits[0].id,
+                path: data.orgUnits[0].path,
             })
         }
         getMetaData()
     }, [])
 
     if (!metadata) return <CircularProgress size="large" overlay />
+    console.log(selected.path)
 
     return (
         <Row>
             <Sidebar
-                onSelect={s => dispatch({ type: types.SELECTED, selected: s })}
+                onSelect={(id, path) =>
+                    dispatch({
+                        type: types.SELECTED,
+                        id: id,
+                        path: path,
+                    })
+                }
                 selected={selected}
                 orgUnits={metadata.orgUnits}
                 menuItems={menuItems}
             />
             <Main
                 tables={tables}
-                selected={selected}
+                selected={selected.id}
                 isApproval={isApproval}
                 metadata={metadata}
             />

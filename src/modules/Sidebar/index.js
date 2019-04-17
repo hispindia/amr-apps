@@ -13,7 +13,7 @@ export const Sidebar = props => (
         <Margin>
             <MarginBottom margin={12}>
                 <SidebarMenu
-                    selected={props.selected}
+                    selected={props.selected.id}
                     items={props.menuItems.items}
                     userOnly={props.menuItems.userOnly}
                     counts={props.counts}
@@ -49,9 +49,12 @@ export const Sidebar = props => (
 )
 
 Sidebar.propTypes = {
-    selected: PropTypes.string.isRequired,
     onSelect: PropTypes.func.isRequired,
     orgUnits: PropTypes.arrayOf(PropTypes.object).isRequired,
+    selected: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        path: PropTypes.string.isRequired,
+    }).isRequired,
     menuItems: PropTypes.shape({
         items: PropTypes.arrayOf(PropTypes.object).isRequired,
         userOnly: PropTypes.bool,

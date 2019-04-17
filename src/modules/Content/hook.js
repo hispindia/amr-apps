@@ -11,13 +11,19 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 metadata: action.metadata,
-                selected: action.selected,
+                selected: {
+                    id: action.id,
+                    path: action.path,
+                },
             }
         }
         case types.SELECTED: {
             return {
                 ...state,
-                selected: action.selected,
+                selected: {
+                    id: action.id,
+                    path: action.path,
+                },
             }
         }
         default: {
