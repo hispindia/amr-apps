@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { bool, object } from 'prop-types'
 import { CircularProgress } from '@dhis2/ui/core'
 import { Main, Sidebar } from 'modules'
 import { Row } from 'styles'
@@ -25,7 +25,6 @@ export const Content = props => {
     }, [])
 
     if (!metadata) return <CircularProgress size="large" overlay />
-    console.log(selected.path)
 
     return (
         <Row>
@@ -52,7 +51,7 @@ export const Content = props => {
 }
 
 Content.propTypes = {
-    menuItems: PropTypes.object.isRequired,
-    tables: PropTypes.object.isRequired,
-    isApproval: PropTypes.bool,
+    menuItems: object.isRequired,
+    tables: object.isRequired,
+    isApproval: bool,
 }

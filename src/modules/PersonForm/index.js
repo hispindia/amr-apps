@@ -3,17 +3,12 @@
 import React, { Component } from 'react'
 import { Grid } from '@material-ui/core'
 import { Card, Button } from '@dhis2/ui/core'
-import styled from 'styled-components'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { getPersonValues, checkUnique } from 'api'
 import { TextInput, AgeInput, RadioInput, SelectInput } from 'inputs'
 import { ProgressSection } from '../ProgressSection'
 import { ModalPopup } from 'modules'
-
-const ButtonPositioned = styled.div`
-    float: right;
-    margin-right: 16px;
-`
+import { ButtonPositioned } from './style'
 
 /**
  * Entity information section.

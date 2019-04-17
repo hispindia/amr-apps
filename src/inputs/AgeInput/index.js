@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { bool, func, string } from 'prop-types'
 import InputField from '@dhis2/ui/core/InputField'
 import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
 import MomentUtils from '@date-io/moment'
 import moment from 'moment'
-import styled from 'styled-components'
 import { Input, Label, MarginTop, Row } from 'styles'
-
-const UnitContainer = styled.div`
-    margin-right: 16px;
-    width: 70px;
-`
+import { UnitContainer } from './style'
 
 /**
  * Age input consisting of date picker and year/month/date input fields.
@@ -174,10 +169,10 @@ export const AgeInput = props => {
 }
 
 AgeInput.propTypes = {
-    onChange: PropTypes.func.isRequired,
-    name: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-    required: PropTypes.bool,
-    disabled: PropTypes.bool,
-    value: PropTypes.string,
+    onChange: func.isRequired,
+    name: string.isRequired,
+    label: string.isRequired,
+    required: bool,
+    disabled: bool,
+    value: string,
 }

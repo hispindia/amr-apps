@@ -1,5 +1,5 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import { arrayOf, bool, func, object, objectOf, string } from 'prop-types'
 import { Padding } from 'styles'
 import {
     TextInput,
@@ -75,9 +75,9 @@ export const DataElement = props => {
 }
 
 DataElement.propTypes = {
-    dataElement: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
-    value: PropTypes.string.isRequired,
-    optionSets: PropTypes.object,
-    completed: PropTypes.bool,
+    dataElement: object.isRequired,
+    onChange: func.isRequired,
+    value: string.isRequired,
+    optionSets: objectOf(arrayOf(object)).isRequired,
+    completed: bool,
 }

@@ -1,17 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { arrayOf, bool, func, shape, string } from 'prop-types'
 import { Radio } from '@dhis2/ui/core'
-import styled from 'styled-components'
 import { Input, Label, OptionSpacer, Row } from 'styles'
-
-/**
- * Green valid.
- */
-const CustomRadio = styled.div`
-    .ui_radio_valid-icon_ixvar:not(.ui_radio_disabled_ixvar) {
-        color: var(--green600) !important;
-    }
-`
+import { CustomRadio } from './style'
 
 /**
  * Input consisting of a group of radios.
@@ -70,15 +61,15 @@ export const RadioInput = props => {
 }
 
 RadioInput.propTypes = {
-    label: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
-    value: PropTypes.string,
-    required: PropTypes.bool,
-    disabled: PropTypes.bool,
-    objects: PropTypes.arrayOf(
-        PropTypes.shape({
-            value: PropTypes.string.isRequired,
-            label: PropTypes.string.isRequired,
+    label: string.isRequired,
+    onChange: func.isRequired,
+    objects: arrayOf(
+        shape({
+            value: string.isRequired,
+            label: string.isRequired,
         })
     ).isRequired,
+    value: string,
+    required: bool,
+    disabled: bool,
 }

@@ -1,39 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { bool, func, string } from 'prop-types'
 import InputField from '@dhis2/ui/core/InputField'
-import styled, { css } from 'styled-components'
 import { Input } from 'styles'
 import { debounced } from './debounced'
-
-/**
- * Colored field background.
- */
-const CustomInputField = styled.div`
-    ${props => {
-        switch (props.color) {
-            case 'red':
-                return css`
-                    .ui_inputfield_flatline_kvrmz {
-                        background-color: rgba(255, 0, 0, 0.082) !important;
-                    }
-                `
-            case 'yellow':
-                return css`
-                    .ui_inputfield_flatline_kvrmz {
-                        background-color: rgba(255, 255, 0, 0.082) !important;
-                    }
-                `
-            case 'green':
-                return css`
-                    .ui_inputfield_flatline_kvrmz {
-                        background-color: rgba(0, 255, 0, 0.082) !important;
-                    }
-                `
-            default:
-                return null
-        }
-    }}
-`
+import { CustomInputField } from './style'
 
 const texts = {
     required: 'This field is required',
@@ -141,16 +111,16 @@ export const TextInput = props => {
 }
 
 TextInput.propTypes = {
-    onChange: PropTypes.func.isRequired,
-    name: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-    required: PropTypes.bool,
-    unique: PropTypes.bool,
-    disabled: PropTypes.bool,
-    value: PropTypes.string,
-    valid: PropTypes.bool,
-    warning: PropTypes.string,
-    error: PropTypes.string,
-    uniqueValid: PropTypes.bool,
-    validateUnique: PropTypes.func,
+    onChange: func.isRequired,
+    name: string.isRequired,
+    label: string.isRequired,
+    required: bool,
+    unique: bool,
+    disabled: bool,
+    value: string,
+    valid: bool,
+    warning: string,
+    error: string,
+    uniqueValid: bool,
+    validateUnique: func,
 }

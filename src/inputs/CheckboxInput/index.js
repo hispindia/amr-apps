@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { bool, func, object, objectOf, string } from 'prop-types'
 import { Checkbox } from '@dhis2/ui/core'
 import { Label, OptionSpacer, Row } from 'styles'
 
@@ -46,9 +46,9 @@ export const CheckboxInput = props => {
 }
 
 CheckboxInput.propTypes = {
-    label: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
-    values: PropTypes.objectOf(PropTypes.string),
-    required: PropTypes.bool,
-    objects: PropTypes.object.isRequired,
+    label: string.isRequired,
+    onChange: func.isRequired,
+    objects: object.isRequired,
+    values: objectOf(string),
+    required: bool,
 }

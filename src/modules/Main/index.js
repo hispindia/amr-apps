@@ -1,12 +1,8 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import { bool, object, string } from 'prop-types'
 import { Route, Switch, Redirect } from 'react-router-dom'
-import styled from 'styled-components'
 import { RecordSections, RecordsOverview } from 'modules'
-
-const MainSection = styled.main`
-    width: 100%;
-`
+import { MainSection } from './style'
 
 export const Main = props => (
     <MainSection>
@@ -58,8 +54,8 @@ export const Main = props => (
 )
 
 Main.propTypes = {
-    selected: PropTypes.string.isRequired,
-    metadata: PropTypes.object.isRequired,
-    tables: PropTypes.object.isRequired,
-    isApproval: PropTypes.bool,
+    selected: string.isRequired,
+    metadata: object.isRequired,
+    tables: object.isRequired,
+    isApproval: bool,
 }

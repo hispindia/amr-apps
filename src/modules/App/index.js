@@ -1,48 +1,10 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import { bool, object, string } from 'prop-types'
 import { BrowserRouter, HashRouter } from 'react-router-dom'
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
+import { MuiThemeProvider } from '@material-ui/core'
 import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
-import { createGlobalStyle } from 'styled-components'
-import 'typeface-roboto'
 import { Content } from 'modules'
-
-const BodyStyle = createGlobalStyle`
-    body {
-        background-color: rgb(240, 240, 240);
-        margin: 0;
-        padding: 0;
-        font-family: Roboto;
-        letter-spacing: 0.0075em;
-    }
-`
-
-const theme = createMuiTheme({
-    palette: {
-        primary: {
-            main: '#1565c0',
-        },
-    },
-    typography: {
-        useNextVariants: true,
-    },
-    overrides: {
-        MUIDataTableToolbar: {
-            titleRoot: { marginLeft: 16 },
-            titleText: {
-                fontSize: '1.25rem',
-                color: '#0d0d0e',
-                letterSpacing: 'normal',
-            },
-        },
-        MUIDataTableBodyRow: {
-            root: {
-                userSelect: 'none',
-                cursor: 'pointer',
-            },
-        },
-    },
-})
+import { BodyStyle, theme } from './style'
 
 export const App = props => (
     <BrowserRouter>
@@ -63,8 +25,8 @@ export const App = props => (
 )
 
 App.propTypes = {
-    appName: PropTypes.string.isRequired,
-    menuItems: PropTypes.object.isRequired,
-    tables: PropTypes.object.isRequired,
-    isApproval: PropTypes.bool,
+    appName: string.isRequired,
+    menuItems: object.isRequired,
+    tables: object.isRequired,
+    isApproval: bool,
 }

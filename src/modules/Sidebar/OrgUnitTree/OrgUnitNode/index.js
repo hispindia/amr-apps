@@ -1,60 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
-import styled, { css } from 'styled-components'
+import { func, object, shape, string } from 'prop-types'
 import { Row } from 'styles'
-
-const Caret = styled.span`
-    cursor: pointer;
-    user-select: none;
-    &::before {
-        content: '\\2023';
-        color: black;
-        display: inline-block;
-        margin-right: 5px;
-    }
-    :hover::before {
-        color: var(--primary800);
-    }
-    ${props =>
-        props.opened &&
-        css`
-            &:before {
-                transform: rotate(90deg);
-            }
-        `}
-`
-
-const NoCaret = styled.span`
-    user-select: none;
-    &::before {
-        content: '\\2007';
-        display: inline-block;
-        margin-right: 5px;
-    }
-`
-
-const OrgUnitText = styled.span`
-    cursor: pointer;
-    user-select: none;
-    &:hover {
-        color: var(--primary800);
-    }
-    ${props =>
-        props.isSelected &&
-        css`
-            color: var(--primary800);
-        `}
-`
-
-const ChildTree = styled.ul`
-    list-style-type: none;
-    padding-left: 20px;
-    ${props =>
-        !props.opened &&
-        css`
-            display: none;
-        `}
-`
+import { Caret, ChildTree, OrgUnitText, NoCaret } from './style'
 
 /**
  * Organisation unit node.
@@ -101,10 +48,10 @@ export const OrgUnitNode = props => {
 }
 
 OrgUnitNode.propTypes = {
-    onSelect: PropTypes.func.isRequired,
-    orgUnit: PropTypes.object.isRequired,
-    selected: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        path: PropTypes.string.isRequired,
+    onSelect: func.isRequired,
+    orgUnit: object.isRequired,
+    selected: shape({
+        id: string.isRequired,
+        path: string.isRequired,
     }).isRequired,
 }

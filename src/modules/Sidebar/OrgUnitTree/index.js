@@ -1,15 +1,9 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import { arrayOf, func, object, shape, string } from 'prop-types'
 import { Card } from '@dhis2/ui/core'
-import styled from 'styled-components'
 import { Margin } from 'styles'
 import { OrgUnitNode } from './OrgUnitNode'
-
-const OrgUnitTreeStyle = styled.ul`
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-`
+import { OrgUnitTreeStyle } from './style'
 
 /**
  * Organisation unit tree.
@@ -33,10 +27,10 @@ export const OrgUnitTree = props => (
 )
 
 OrgUnitTree.propTypes = {
-    onSelect: PropTypes.func.isRequired,
-    orgUnits: PropTypes.arrayOf(PropTypes.object).isRequired,
-    selected: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        path: PropTypes.string.isRequired,
+    onSelect: func.isRequired,
+    orgUnits: arrayOf(object).isRequired,
+    selected: shape({
+        id: string.isRequired,
+        path: string.isRequired,
     }).isRequired,
 }

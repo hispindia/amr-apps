@@ -2,20 +2,27 @@ import React from 'react'
 import { Grid } from '@material-ui/core'
 import { DataElement } from '../DataElement'
 import { ChildSection } from '../ChildSection'
+import {
+    arrayOf,
+    bool,
+    func,
+    number,
+    object,
+    objectOf,
+    string,
+} from 'prop-types'
 
-export const SectionContent = props => {
-    const {
-        dataElements,
-        values,
-        onChange,
-        completed,
-        renderType,
-        half,
-        childHalf,
-        optionSets,
-        childSections,
-    } = props
-
+export const SectionContent = ({
+    dataElements,
+    values,
+    onChange,
+    renderType,
+    half,
+    childHalf,
+    optionSets,
+    childSections,
+    completed,
+}) => {
     const getDataElement = dataElement => (
         <DataElement
             key={dataElement.id}
@@ -85,4 +92,16 @@ export const SectionContent = props => {
             </Grid>
         </Grid>
     )
+}
+
+SectionContent.propTypes = {
+    dataElements: arrayOf(object).isRequired,
+    values: objectOf(string).isRequired,
+    onChange: func.isRequired,
+    renderType: string.isRequired,
+    half: number.isRequired,
+    childHalf: number.isRequired,
+    optionSets: objectOf(arrayOf(object)).isRequired,
+    childSections: arrayOf(object).isRequired,
+    completed: bool,
 }

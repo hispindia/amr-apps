@@ -1,26 +1,8 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import { arrayOf, bool, func, oneOf, shape, string } from 'prop-types'
 import { Button } from '@dhis2/ui/core'
-import styled, { css } from 'styled-components'
 import { MarginTop } from 'styles'
-
-const SpaceBetween = styled.div`
-    justify-content: space-between;
-    display: flex;
-    ${props =>
-        props.unspaced &&
-        css`
-            justify-content: flex-end;
-        `}
-`
-
-const ButtonPadding = styled.div`
-    ${props =>
-        props.unspaced &&
-        css`
-            padding-left: 8px;
-        `}
-`
+import { ButtonPadding, SpaceBetween } from './style'
 
 /**
  * Row of buttons.
@@ -53,21 +35,17 @@ export const ButtonRow = props => (
 )
 
 ButtonRow.propTypes = {
-    unspaced: PropTypes.bool,
-    buttons: PropTypes.arrayOf(
-        PropTypes.shape({
-            label: PropTypes.string.isRequired,
-            onClick: PropTypes.func.isRequired,
-            icon: PropTypes.string.isRequired,
-            tooltip: PropTypes.string,
-            disabledTooltip: PropTypes.string,
-            disabled: PropTypes.bool,
-            kind: PropTypes.oneOf([
-                'basic',
-                'primary',
-                'secondary',
-                'destructive',
-            ]).isRequired,
+    unspaced: bool,
+    buttons: arrayOf(
+        shape({
+            label: string.isRequired,
+            onClick: func.isRequired,
+            icon: string.isRequired,
+            tooltip: string,
+            disabledTooltip: string,
+            disabled: bool,
+            kind: oneOf(['basic', 'primary', 'secondary', 'destructive'])
+                .isRequired,
         })
     ).isRequired,
 }

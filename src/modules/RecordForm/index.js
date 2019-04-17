@@ -1,7 +1,7 @@
 /* eslint no-eval: 0 */
 
 import React, { useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { arrayOf, func, object, objectOf, string } from 'prop-types'
 import { updateEventValue, _testResultDataElementId } from 'api'
 import { MarginBottom } from 'styles'
 import { ProgressSection } from '../'
@@ -254,12 +254,12 @@ export const RecordForm = props => {
 }
 
 RecordForm.propTypes = {
-    programStage: PropTypes.object.isRequired,
-    values: PropTypes.object.isRequired,
-    passValues: PropTypes.func.isRequired,
-    status: PropTypes.object.isRequired,
-    rules: PropTypes.array.isRequired,
-    optionSets: PropTypes.object.isRequired,
-    eventId: PropTypes.string,
-    passValues: PropTypes.func,
+    programStage: object.isRequired,
+    values: objectOf(string).isRequired,
+    passValues: func.isRequired,
+    status: object.isRequired,
+    rules: arrayOf(object).isRequired,
+    optionSets: objectOf(arrayOf(object)).isRequired,
+    eventId: string,
+    passValues: func,
 }

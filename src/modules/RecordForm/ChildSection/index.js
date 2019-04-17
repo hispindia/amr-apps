@@ -1,13 +1,9 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import styled from 'styled-components'
+import { arrayOf, bool, func, object, objectOf, string } from 'prop-types'
 import { Label, Padding } from 'styles'
 import { CheckboxInput } from 'inputs'
 import { DataElement } from '../DataElement'
-
-const ChildSectionLabel = styled.div`
-    margin: 16px 16px -16px;
-`
+import { ChildSectionLabel } from './style'
 
 /**
  * Gets the child section component.
@@ -88,9 +84,9 @@ export const ChildSection = props => {
 }
 
 ChildSection.propTypes = {
-    childSection: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
-    values: PropTypes.object.isRequired,
-    optionSets: PropTypes.object.isRequired,
-    completed: PropTypes.bool,
+    childSection: object.isRequired,
+    onChange: func.isRequired,
+    values: objectOf(string).isRequired,
+    optionSets: objectOf(arrayOf(object)).isRequired,
+    completed: bool,
 }

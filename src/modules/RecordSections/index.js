@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { bool, object } from 'prop-types'
 import {
     ModalPopup,
     PersonForm,
@@ -261,6 +261,6 @@ export const RecordSections = props => {
 }
 
 RecordSections.propTypes = {
-    metadata: PropTypes.object.isRequired,
-    isApproval: PropTypes.bool,
+    metadata: object.isRequired,
+    isApproval: bool,
 }

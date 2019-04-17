@@ -1,21 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { arrayOf, bool, func, shape, string } from 'prop-types'
 import SelectField from '@dhis2/ui/core/SelectField'
-import styled from 'styled-components'
 import { Input } from 'styles'
-
-/**
- * Max height for dropdown.
- */
-const CustomSelectField = styled.div`
-    .ui_selectfield_menu_1a3v8 > .ui_card_base_l2vmf {
-        overflow: auto;
-        max-height: 300px;
-    }
-    .ui_selectfield_menu_1a3v8 {
-        width: inherit !important;
-    }
-`
+import { CustomSelectField } from './style'
 
 /**
  * Single select field.
@@ -53,17 +40,17 @@ export const SelectInput = props => {
 }
 
 SelectInput.propTypes = {
-    onChange: PropTypes.func.isRequired,
-    name: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-    required: PropTypes.bool,
-    disabled: PropTypes.bool,
-    helperText: PropTypes.string,
-    value: PropTypes.string,
-    objects: PropTypes.arrayOf(
-        PropTypes.shape({
-            label: PropTypes.string.isRequired,
-            value: PropTypes.string.isRequired,
+    onChange: func.isRequired,
+    name: string.isRequired,
+    label: string.isRequired,
+    required: bool,
+    disabled: bool,
+    helperText: string,
+    value: string,
+    objects: arrayOf(
+        shape({
+            label: string.isRequired,
+            value: string.isRequired,
         })
     ).isRequired,
 }

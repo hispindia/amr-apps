@@ -1,34 +1,8 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import styled from 'styled-components'
-import { Card } from '@dhis2/ui/core'
+import { element, func, oneOf, oneOfType, string } from 'prop-types'
 import { ButtonRow } from 'inputs'
-import { Heading, Text } from 'styles'
-
-const Background = styled.div`
-    display: flex;
-    position: fixed;
-    justify-content: center;
-    align-items: baseline;
-    z-index: 1;
-    padding-top: 62px;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(33, 43, 54, 0.4);
-`
-
-const CustomCard = styled(Card)`
-    width: 400px !important;
-    height: auto !important;
-    padding: 24px !important;
-`
-
-const CustomHeading = styled(Heading)`
-    margin: 0;
-`
+import { Text } from 'styles'
+import { Background, CustomCard, CustomHeading } from './style'
 
 export const ModalPopup = props => (
     <Background>
@@ -57,16 +31,11 @@ export const ModalPopup = props => (
 )
 
 ModalPopup.propTypes = {
-    heading: PropTypes.string.isRequired,
-    onClick: PropTypes.func.isRequired,
-    label: PropTypes.string.isRequired,
-    icon: PropTypes.string.isRequired,
-    text: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
-    kind: PropTypes.oneOf([
-        'default',
-        'basic',
-        'secondary',
-        'primary',
-        'destructive',
-    ]).isRequired,
+    heading: string.isRequired,
+    onClick: func.isRequired,
+    label: string.isRequired,
+    icon: string.isRequired,
+    text: oneOfType([string, element]).isRequired,
+    kind: oneOf(['default', 'basic', 'secondary', 'primary', 'destructive'])
+        .isRequired,
 }

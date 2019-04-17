@@ -1,5 +1,5 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import { arrayOf, bool, func, object, shape, string } from 'prop-types'
 import { Route } from 'react-router-dom'
 import { Col, Margin, MarginBottom } from 'styles'
 import { OrgUnitTree } from './OrgUnitTree'
@@ -49,14 +49,14 @@ export const Sidebar = props => (
 )
 
 Sidebar.propTypes = {
-    onSelect: PropTypes.func.isRequired,
-    orgUnits: PropTypes.arrayOf(PropTypes.object).isRequired,
-    selected: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        path: PropTypes.string.isRequired,
+    onSelect: func.isRequired,
+    orgUnits: arrayOf(object).isRequired,
+    selected: shape({
+        id: string.isRequired,
+        path: string.isRequired,
     }).isRequired,
-    menuItems: PropTypes.shape({
-        items: PropTypes.arrayOf(PropTypes.object).isRequired,
-        userOnly: PropTypes.bool,
+    menuItems: shape({
+        items: arrayOf(object).isRequired,
+        userOnly: bool,
     }).isRequired,
 }

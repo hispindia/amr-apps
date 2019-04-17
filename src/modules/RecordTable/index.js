@@ -1,5 +1,5 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import { arrayOf, bool, func, object, shape, string } from 'prop-types'
 import MUIDataTable from 'mui-datatables'
 import TableToolbar from '../../inputs/TableToolbar'
 
@@ -29,12 +29,12 @@ export const RecordTable = props => (
 )
 
 RecordTable.propTypes = {
-    title: PropTypes.string.isRequired,
-    onEventClick: PropTypes.func.isRequired,
-    onAddClick: PropTypes.func,
-    addButtonDisabled: PropTypes.bool,
-    data: PropTypes.shape({
-        rows: PropTypes.array.isRequired,
-        headers: PropTypes.array.isRequired,
+    title: string.isRequired,
+    onEventClick: func.isRequired,
+    onAddClick: func,
+    addButtonDisabled: bool,
+    data: shape({
+        rows: arrayOf(arrayOf(string)).isRequired,
+        headers: arrayOf(object).isRequired,
     }).isRequired,
 }
