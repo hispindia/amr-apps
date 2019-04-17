@@ -38,15 +38,11 @@ export const getEventValues = async eventId => {
  * @param {string} orgUnitId - Organisation unit ID.
  * @returns {string} AMR Id.
  */
-export const generateAmrId = async orgUnitId => {
-    const orgUnitCode = (await get(
-        'organisationUnits/' + orgUnitId + '.json?fields=code'
-    )).code
-
-    const newCode = () =>
+export const generateAmrId = async orgUnitCode => {
+    const newId = () =>
         orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
 
-    let amrId = newCode()
+    let amrId = newId()
     while (
         (await get(
             'events.json?paging=false&fields=event&orgUnit=' +
@@ -57,7 +53,7 @@ export const generateAmrId = async orgUnitId => {
                 amrId
         )).events.length !== 0
     )
-        amrId = newCode()
+        amrId = newId()
 
     return amrId
 }

@@ -21,6 +21,7 @@ export const RecordSections = props => {
         programList,
         stageLists,
         programOrganisms,
+        orgUnits,
     } = props.metadata
     const event = props.match.params.event
     const orgUnit = props.match.params.orgUnit
@@ -47,6 +48,7 @@ export const RecordSections = props => {
         rules,
         deleteClicked,
         deleteConfirmation,
+        code,
     } = state
 
     const disabled =
@@ -60,6 +62,7 @@ export const RecordSections = props => {
             })
         }
         if (event) getExistingRecord()
+        else dispatch({ type: types.SET_CODE, code: getCode(orgUnits) })
     }, [])
 
     useEffect(() => {
@@ -77,7 +80,8 @@ export const RecordSections = props => {
                     orgUnit,
                     entityId,
                     entityValues,
-                    sampleDate
+                    sampleDate,
+                    code
                 )),
             })
         }
@@ -114,6 +118,16 @@ export const RecordSections = props => {
             type: types.DELETE_CONFIRMED,
             delete: yes,
         })
+
+    const getCode = ous => {
+        for (const ou of ous) {
+            if (ou.id === orgUnit) return ou.code
+            if (ou.children) {
+                const code = getCode(ou.children)
+                if (code) return code
+            }
+        }
+    }
 
     return (
         <Margin>
