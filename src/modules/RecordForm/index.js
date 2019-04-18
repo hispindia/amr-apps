@@ -1,9 +1,10 @@
 /* eslint no-eval: 0 */
 
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { arrayOf, func, object, objectOf, string } from 'prop-types'
 import { updateEventValue, _testResultDataElementId } from 'api'
 import { MarginBottom } from 'styles'
+import { MetadataContext } from 'contexts'
 import { ProgressSection } from '../'
 import { hook } from './hook'
 import { Section } from './Section'
@@ -15,6 +16,7 @@ const invalidReason = {
 
 export const RecordForm = props => {
     const [state, dispatch, types] = hook()
+    const { optionSets } = useContext(MetadataContext)
 
     useEffect(() => {
         init()
@@ -177,7 +179,7 @@ export const RecordForm = props => {
                             de.optionSet.id = r.optionGroup.id
                             // Only reset selected value if the options do not include current value.
                             if (
-                                !props.optionSets[de.optionSet.id].find(
+                                !optionSets[de.optionSet.id].find(
                                     option => option.value === values[de.id]
                                 ) &&
                                 values[de.id] !== ''
@@ -245,7 +247,6 @@ export const RecordForm = props => {
                         childSections={section.childSections}
                         completed={props.status.completed}
                         onChange={onChange}
-                        optionSets={props.optionSets}
                         values={state.values}
                     />
                 ))}
@@ -259,7 +260,6 @@ RecordForm.propTypes = {
     passValues: func.isRequired,
     status: object.isRequired,
     rules: arrayOf(object).isRequired,
-    optionSets: objectOf(arrayOf(object)).isRequired,
     eventId: string,
     passValues: func,
 }

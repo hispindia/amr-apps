@@ -1,6 +1,7 @@
-import React from 'react'
-import { arrayOf, bool, func, object, objectOf, string } from 'prop-types'
+import React, { useContext } from 'react'
+import { bool, func, object, string } from 'prop-types'
 import { Padding } from 'styles'
+import { MetadataContext } from 'contexts'
 import {
     TextInput,
     RadioInput,
@@ -9,8 +10,8 @@ import {
     DateInput,
 } from 'inputs'
 
-export const DataElement = props => {
-    const { dataElement, value, onChange, completed, optionSets } = props
+export const DataElement = ({ dataElement, value, onChange, completed }) => {
+    const { optionSets } = useContext(MetadataContext)
     return (
         <Padding>
             {dataElement.optionSetValue ? (
@@ -78,6 +79,5 @@ DataElement.propTypes = {
     dataElement: object.isRequired,
     onChange: func.isRequired,
     value: string.isRequired,
-    optionSets: objectOf(arrayOf(object)).isRequired,
     completed: bool,
 }

@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import { bool, object } from 'prop-types'
+import React, { useContext, useEffect } from 'react'
 import {
     ModalPopup,
     PersonForm,
@@ -10,6 +9,7 @@ import {
 } from 'modules'
 import { deleteEvent, setEventStatus, newRecord, existingRecord } from 'api'
 import { ButtonRow } from 'inputs'
+import { ConfigContext, MetadataContext } from 'contexts'
 import { Margin } from 'styles'
 import { hook } from './hook'
 
@@ -22,7 +22,8 @@ export const RecordSections = props => {
         stageLists,
         programOrganisms,
         orgUnits,
-    } = props.metadata
+    } = useContext(MetadataContext)
+    const { isApproval } = useContext(ConfigContext)
     const event = props.match.params.event
     const orgUnit = props.match.params.orgUnit
 
@@ -58,7 +59,7 @@ export const RecordSections = props => {
         const getExistingRecord = async () => {
             dispatch({
                 type: types.EXISTING_RECORD,
-                ...(await existingRecord(programs, event, props.isApproval)),
+                ...(await existingRecord(programs, event, isApproval)),
             })
         }
         if (event) getExistingRecord()
@@ -99,7 +100,7 @@ export const RecordSections = props => {
     const onSubmit = async addMore => {
         dispatch({ type: types.DISABLE_BUTTON, buttonDisabled: true })
 
-        await setEventStatus(eventId, true, props.isApproval)
+        await setEventStatus(eventId, true, isApproval)
 
         if (addMore) dispatch({ type: types.ADD_MORE })
         else props.history.goBack()
@@ -179,7 +180,6 @@ export const RecordSections = props => {
                 <RecordForm
                     programStage={programStage}
                     rules={rules}
-                    optionSets={optionSets}
                     values={eventValues}
                     eventId={eventId}
                     status={status}
@@ -258,9 +258,4 @@ export const RecordSections = props => {
             />
         </Margin>
     )
-}
-
-RecordSections.propTypes = {
-    metadata: object.isRequired,
-    isApproval: bool,
 }
