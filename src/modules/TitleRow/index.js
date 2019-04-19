@@ -7,7 +7,7 @@ export const TitleRow = props => (
     <Row>
         {props.history && (
             <IconButton
-                name="arrow_back"
+                tooltip="Go back"
                 icon="arrow_back"
                 onClick={props.history.goBack}
             />

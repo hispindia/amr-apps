@@ -6,14 +6,14 @@ import { IconContainer } from './style'
 /**
  * Icon Button.
  */
-export const IconButton = props => (
-    <IconContainer onClick={props.onClick}>
-        <Icon name={props.name} className={props.icon} />
+export const IconButton = ({ tooltip, onClick, icon }) => (
+    <IconContainer title={tooltip} onClick={onClick}>
+        <Icon name={icon} className={icon} />
     </IconContainer>
 )
 
 IconButton.propTypes = {
+    tooltip: string.isRequired,
     onClick: func.isRequired,
-    name: string.isRequired,
     icon: string.isRequired,
 }
