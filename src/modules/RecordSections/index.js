@@ -14,15 +14,9 @@ import { Margin } from 'styles'
 import { hook } from './hook'
 
 export const RecordSections = props => {
-    const {
-        optionSets,
-        person,
-        programs,
-        programList,
-        stageLists,
-        programOrganisms,
-        orgUnits,
-    } = useContext(MetadataContext)
+    const { optionSets, person, programs, programList, orgUnits } = useContext(
+        MetadataContext
+    )
     const { isApproval } = useContext(ConfigContext)
     const event = props.match.params.event
     const orgUnit = props.match.params.orgUnit
@@ -43,7 +37,6 @@ export const RecordSections = props => {
         status,
         programStage,
         eventInvalid,
-        resetSwitch,
         buttonDisabled,
         loading,
         rules,
@@ -166,10 +159,6 @@ export const RecordSections = props => {
                     programs={programList.filter(p =>
                         p.orgUnits.includes(orgUnit)
                     )}
-                    programStages={stageLists}
-                    programOrganisms={programOrganisms}
-                    optionSets={optionSets}
-                    resetSwitch={resetSwitch}
                     passValues={action =>
                         dispatch({ type: types.SET_PANEL, ...action })
                     }
