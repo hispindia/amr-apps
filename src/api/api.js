@@ -372,7 +372,7 @@ export async function newRecord(
 ) {
     let initialValues = {
         [_organismsDataElementId]: orgaCode,
-        [_amrDataElement]: await generateAmrId(orgUnitCode),
+        [_amrDataElement]: await generateAmrId(ou, orgUnitCode),
     }
     const { entityId, eventId } = eId
         ? await addEvent(
