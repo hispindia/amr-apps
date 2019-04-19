@@ -141,10 +141,7 @@ export const RecordSections = props => {
                 id={entityId}
                 values={entityValues}
                 valid={entityValid}
-                attributes={person.trackedEntityTypeAttributes}
-                optionSets={optionSets}
                 showEdit={!event && !panelValid}
-                rules={person.rules}
                 passValues={action =>
                     dispatch({ type: types.SET_ENTITY, ...action })
                 }

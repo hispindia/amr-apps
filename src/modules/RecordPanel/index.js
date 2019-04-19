@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
+import { arrayOf, bool, func, shape, string } from 'prop-types'
 import { Card } from '@dhis2/ui/core/Card'
 import { Grid } from '@material-ui/core'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
@@ -153,4 +154,19 @@ export const RecordPanel = ({
             </Card>
         </MarginBottom>
     )
+}
+
+RecordPanel.prototypes = {
+    programId: string,
+    programStageId: string,
+    organism: string,
+    sampleDate: string,
+    programs: arrayOf(
+        shape({
+            label: string,
+            value: string,
+        })
+    ).isRequired,
+    passValues: func.isRequired,
+    disabled: bool.isRequired,
 }
