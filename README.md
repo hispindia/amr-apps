@@ -1,18 +1,6 @@
 # AMR Data Entry and Approval
 
 ### TODO
-- [x] Deleting records
-- [x] Editing person values
-- [x] Numbers only text fields
-- [x] Deselectable radio buttons
-- [x] Disabling field after ASSIGN rule action
-- [x] Storing incomplete records
-- [x] Susceptibility colors based on result
-- [x] Yellow and red DD/MIC colors more distinguishable
-- [x] Getting metadata at startup
-- [x] Hide result section
-- [x] Same sections on approval screen as on entry screen
-- [x] Modals
 - [x] Warning/error program rule action
 - [ ] Automatic duplication check
 - [ ] Hashing patient registration number

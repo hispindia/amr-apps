@@ -3,6 +3,5 @@
  * @param {string} dateTime DateTime string.
  * @returns {string} Date string.
  */
-export function removeTime(dateTime) {
-    return dateTime.substring(0, dateTime.indexOf('T'))
-}
+export const removeTime = dateTime =>
+    dateTime.substring(0, dateTime.indexOf('T'))
