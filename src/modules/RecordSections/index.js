@@ -161,7 +161,9 @@ export const RecordSections = props => {
                     }
                     disabled={panelValid}
                     onReset={
-                        eventId && (() => dispatch({ type: types.ADD_MORE }))
+                        !event && eventId
+                            ? () => dispatch({ type: types.ADD_MORE })
+                            : null
                     }
                 />
             )}
