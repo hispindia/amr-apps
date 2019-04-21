@@ -1,10 +1,5 @@
 import { get, postData, del, put, setBaseUrl } from './crud'
-import {
-    getProgramStage,
-    getEventValues,
-    getEntityRules,
-    generateAmrId,
-} from './internal'
+import { getProgramStage, getEventValues, generateAmrId } from './internal'
 
 export const _organismsDataElementId = 'SaQe2REkGVw'
 export const _testResultDataElementId = 'bSgpKbkbVGL'
@@ -27,18 +22,6 @@ let _isL1User
 let _isL2User
 
 let _username = ''
-
-/**
- * Gets user accesses.
- * @returns {Object} User accesses.
- */
-export function getUserAccess() {
-    return {
-        isDeoUser: _isDeoUser,
-        isL1User: _isL1User,
-        isL2User: _isL2User,
-    }
-}
 
 /**
  * Sets the base URL, username, and user groups.
@@ -389,7 +372,7 @@ export async function newRecord(
 ) {
     let initialValues = {
         [_organismsDataElementId]: orgaCode,
-        [_amrDataElement]: await generateAmrId(orgUnitCode),
+        [_amrDataElement]: await generateAmrId(ou, orgUnitCode),
     }
     const { entityId, eventId } = eId
         ? await addEvent(

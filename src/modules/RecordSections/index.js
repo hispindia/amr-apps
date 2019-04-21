@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import { bool, object } from 'prop-types'
+import React, { useContext, useEffect } from 'react'
 import {
     ModalPopup,
     PersonForm,
@@ -10,19 +9,15 @@ import {
 } from 'modules'
 import { deleteEvent, setEventStatus, newRecord, existingRecord } from 'api'
 import { ButtonRow } from 'inputs'
+import { ConfigContext, MetadataContext } from 'contexts'
 import { Margin } from 'styles'
 import { hook } from './hook'
 
 export const RecordSections = props => {
-    const {
-        optionSets,
-        person,
-        programs,
-        programList,
-        stageLists,
-        programOrganisms,
-        orgUnits,
-    } = props.metadata
+    const { optionSets, person, programs, programList, orgUnits } = useContext(
+        MetadataContext
+    )
+    const { isApproval } = useContext(ConfigContext)
     const event = props.match.params.event
     const orgUnit = props.match.params.orgUnit
 
@@ -42,7 +37,6 @@ export const RecordSections = props => {
         status,
         programStage,
         eventInvalid,
-        resetSwitch,
         buttonDisabled,
         loading,
         rules,
@@ -58,7 +52,7 @@ export const RecordSections = props => {
         const getExistingRecord = async () => {
             dispatch({
                 type: types.EXISTING_RECORD,
-                ...(await existingRecord(programs, event, props.isApproval)),
+                ...(await existingRecord(programs, event, isApproval)),
             })
         }
         if (event) getExistingRecord()
@@ -99,7 +93,7 @@ export const RecordSections = props => {
     const onSubmit = async addMore => {
         dispatch({ type: types.DISABLE_BUTTON, buttonDisabled: true })
 
-        await setEventStatus(eventId, true, props.isApproval)
+        await setEventStatus(eventId, true, isApproval)
 
         if (addMore) dispatch({ type: types.ADD_MORE })
         else props.history.goBack()
@@ -147,10 +141,7 @@ export const RecordSections = props => {
                 id={entityId}
                 values={entityValues}
                 valid={entityValid}
-                attributes={person.trackedEntityTypeAttributes}
-                optionSets={optionSets}
                 showEdit={!event && !panelValid}
-                rules={person.rules}
                 passValues={action =>
                     dispatch({ type: types.SET_ENTITY, ...action })
                 }
@@ -165,10 +156,6 @@ export const RecordSections = props => {
                     programs={programList.filter(p =>
                         p.orgUnits.includes(orgUnit)
                     )}
-                    programStages={stageLists}
-                    programOrganisms={programOrganisms}
-                    optionSets={optionSets}
-                    resetSwitch={resetSwitch}
                     passValues={action =>
                         dispatch({ type: types.SET_PANEL, ...action })
                     }
@@ -179,7 +166,6 @@ export const RecordSections = props => {
                 <RecordForm
                     programStage={programStage}
                     rules={rules}
-                    optionSets={optionSets}
                     values={eventValues}
                     eventId={eventId}
                     status={status}
@@ -258,9 +244,4 @@ export const RecordSections = props => {
             />
         </Margin>
     )
-}
-
-RecordSections.propTypes = {
-    metadata: object.isRequired,
-    isApproval: bool,
 }

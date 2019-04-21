@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
-import { arrayOf, bool, object } from 'prop-types'
 import { Menu } from '@dhis2/ui/core'
 import { getCounts } from 'api'
+import { ConfigContext } from 'contexts'
 import { CustomMenu } from './style'
 
 /**
  * Sidebar menu.
  */
-const SidebarMenu = props => {
+const SidebarMenu = ({ selected, location, history }) => {
     const [menuItems, setMenuItems] = useState(null)
     const [force, setForce] = useState(false)
+    const { items, isApproval } = useContext(ConfigContext)
 
     useEffect(() => {
-        updateCounts(props.items)
-    }, [props.selected, props.location])
+        updateCounts(items)
+    }, [selected, location])
 
     /**
      * Updates count number in menu.
      */
     const updateCounts = async items => {
-        items = await getCounts(items, props.selected, props.userOnly)
+        items = await getCounts(items, selected, !isApproval)
         items.forEach(
             item =>
                 (item.label = item.label.replace(/\(\d*\)/, `(${item.count})`))
@@ -33,16 +34,11 @@ const SidebarMenu = props => {
         <CustomMenu>
             <Menu
                 size="dense"
-                list={menuItems ? menuItems : props.items}
-                onClick={path => props.history.push(path)}
+                list={menuItems ? menuItems : items}
+                onClick={path => history.push(path)}
             />
         </CustomMenu>
     )
-}
-
-SidebarMenu.propTypes = {
-    items: arrayOf(object).isRequired,
-    userOnly: bool,
 }
 
 export default withRouter(SidebarMenu)

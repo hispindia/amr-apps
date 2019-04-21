@@ -19,7 +19,6 @@ export const SectionContent = ({
     renderType,
     half,
     childHalf,
-    optionSets,
     childSections,
     completed,
 }) => {
@@ -30,7 +29,6 @@ export const SectionContent = ({
             value={values[dataElement.id]}
             onChange={onChange}
             completed={completed}
-            optionSets={optionSets}
         />
     )
 
@@ -41,7 +39,6 @@ export const SectionContent = ({
             values={values}
             onChange={onChange}
             completed={completed}
-            optionSets={optionSets}
         />
     )
 
@@ -101,7 +98,6 @@ SectionContent.propTypes = {
     renderType: string.isRequired,
     half: number.isRequired,
     childHalf: number.isRequired,
-    optionSets: objectOf(arrayOf(object)).isRequired,
     childSections: arrayOf(object).isRequired,
     completed: bool,
 }

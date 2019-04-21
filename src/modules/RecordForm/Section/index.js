@@ -25,7 +25,6 @@ export const Section = props => (
                     renderType={props.renderType}
                     completed={props.completed}
                     onChange={props.onChange}
-                    optionSets={props.optionSets}
                     values={props.values}
                     {...getProps(props.dataElements, props.childSections)}
                 />
@@ -41,6 +40,5 @@ Section.propTypes = {
     values: objectOf(string).isRequired,
     dataElements: arrayOf(object).isRequired,
     childSections: arrayOf(object).isRequired,
-    optionSets: objectOf(arrayOf(object)).isRequired,
     completed: bool,
 }

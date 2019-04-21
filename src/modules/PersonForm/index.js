@@ -1,87 +1,78 @@
 /* eslint no-eval: 0 */
 
-import React, { Component } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import { bool, func, objectOf, string } from 'prop-types'
 import { Grid } from '@material-ui/core'
 import { Card, Button } from '@dhis2/ui/core'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { getPersonValues, checkUnique } from 'api'
 import { TextInput, AgeInput, RadioInput, SelectInput } from 'inputs'
-import { ProgressSection } from '../ProgressSection'
+import { MetadataContext } from 'contexts'
 import { ModalPopup } from 'modules'
+import { ProgressSection } from '../ProgressSection'
 import { ButtonPositioned } from './style'
 
 /**
  * Entity information section.
  */
-export class PersonForm extends Component {
-    state = {
-        values: {}, // Current or new values.
-        uniques: [], // Unique textfield values are validated.
-        entityId: null,
-        editing: false,
-        loading: true,
-        modal: null,
-    }
+export const PersonForm = props => {
+    const { optionSets, person } = useContext(MetadataContext)
+    const [uniques, setUniques] = useState([])
+    const [editing, setEditing] = useState(false)
+    const [loading, setLoading] = useState(props.loading)
+    const [modal, setModal] = useState(null)
+    const [half] = useState(
+        Math.floor(person.trackedEntityTypeAttributes.length / 2)
+    )
+    const [attributes, setAttributes] = useState(
+        person.trackedEntityTypeAttributes
+    )
 
-    componentDidMount = async () => {
-        let { attributes, values, uniques, rules, loading } = this.props
-        this.checkRules(values, attributes, rules)
-        this.setState({
-            uniques: uniques,
-            half: Math.floor(attributes.length / 2),
-            rules: rules,
-            attributes: attributes,
-            values: values,
-            loading: loading,
-        })
-    }
+    useEffect(() => {
+        let newValues = { ...props.values }
+        let newAttributes = [...attributes]
+        checkRules(newValues, newAttributes)
+        setAttributes(newAttributes)
+        onNewValues(newValues, props.id)
+    }, [])
 
-    componentDidUpdate = async prevProps => {
-        const entityId = this.props.id
-        if (entityId && entityId !== prevProps.id) {
-            this.onNewValues(await getPersonValues(entityId), entityId)
-            this.setState({ loading: false })
+    useEffect(() => {
+        const init = async () =>
+            onNewValues(await getPersonValues(props.id), props.id)
+        if (props.id) {
+            init()
+            setLoading(false)
         }
-    }
+    }, [props.id])
 
     /**
      * Called on every input field change.
      */
-    onChange = (name, value) => {
-        let values = { ...this.state.values }
-        if (values[name] === value) return
-        values[name] = value
-        this.onNewValues(values)
+    const onChange = (name, value) => {
+        let newValues = { ...props.values }
+        if (newValues[name] === value) return
+        newValues[name] = value
+        onNewValues(newValues)
     }
 
-    onNewValues = (values, entityId) => {
-        const { rules, uniques, entityId: currentEntityId } = this.state
-        entityId = entityId ? entityId : currentEntityId
-        let attributes = [...this.state.attributes]
-        this.checkRules(values, attributes, rules)
-        this.setState({
+    const onNewValues = (values, entityId) => {
+        let newAttributes = [...attributes]
+        checkRules(values, newAttributes)
+        setAttributes(newAttributes)
+        props.passValues({
             values: values,
-            attributes: attributes,
-            entityId: entityId,
-        })
-        this.props.passValues({
-            values: values,
-            id: entityId,
-            valid: this.validate(attributes, values, uniques),
+            id: entityId ? entityId : props.id,
+            valid: validate(newAttributes, values, uniques),
         })
     }
-
-    onEdit = () => this.setState({ editing: true })
 
     /**
      * Checks that no required field is empty and that uniques are validated.
      */
-    validate = (attributes, values, uniques) => {
+    const validate = (attr, values) => {
         if (
-            attributes.find(
-                attribute =>
-                    attribute.mandatory &&
-                    values[attribute.trackedEntityAttribute.id] === ''
+            attr.find(
+                a => a.mandatory && values[a.trackedEntityAttribute.id] === ''
             )
         )
             return false
@@ -96,33 +87,28 @@ export class PersonForm extends Component {
      * @param {string} label - Attribute label.
      * @returns {boolean} True if valid.
      */
-    validateUnique = async (id, value, label) => {
+    const validateUnique = async (id, value, label) => {
         const entityId = await checkUnique(id, value)
-        let uniques = { ...this.state.uniques }
+        let uniques = { ...uniques }
         uniques[id] = entityId ? false : true
-        if (!entityId) {
-            this.setState({ uniques: uniques })
-            return true
-        }
-        this.setState({
-            uniques: uniques,
-            modal: {
-                id: id,
-                label: label,
-                value: value,
-                entityId: entityId,
-            },
+        setUniques(uniques)
+        if (!entityId) return true
+        setModal({
+            id: id,
+            label: label,
+            value: value,
+            entityId: entityId,
         })
         return false
     }
 
-    checkRules = (values, attributes, rules) => {
-        rules.forEach(rule => {
+    const checkRules = (values, attr) => {
+        person.rules.forEach(rule => {
             rule.programRuleActions.forEach(r => {
                 switch (r.programRuleActionType) {
                     case 'SHOWOPTIONGROUP':
                         if (eval(rule.condition)) {
-                            let affectedAttribute = attributes.find(
+                            let affectedAttribute = attr.find(
                                 attribute =>
                                     attribute.trackedEntityAttribute.id ===
                                     r.trackedEntityAttribute.id
@@ -136,7 +122,7 @@ export class PersonForm extends Component {
                                 }
                                 // Only reset selected value if the options do not include current value.
                                 if (
-                                    !this.props.optionSets[
+                                    !optionSets[
                                         affectedAttribute.trackedEntityAttribute
                                             .optionSet.id
                                     ].find(
@@ -156,7 +142,7 @@ export class PersonForm extends Component {
                         break
                     case 'HIDEFIELD':
                         const hide = eval(rule.condition)
-                        let affectedAttribute = attributes.find(
+                        let affectedAttribute = attr.find(
                             attribute =>
                                 attribute.trackedEntityAttribute.id ===
                                 r.trackedEntityAttribute.id
@@ -179,11 +165,11 @@ export class PersonForm extends Component {
     /**
      * Returns appropriate input type.
      */
-    getInput = attribute => {
+    const getInput = attribute => {
         if (attribute.hide) return null
 
-        const { values, entityId, editing, uniques } = this.state
-        const disabled = entityId && !editing ? true : false
+        const { values, id } = props
+        const disabled = id && !editing ? true : false
 
         return (
             <Padding key={attribute.trackedEntityAttribute.id}>
@@ -194,17 +180,16 @@ export class PersonForm extends Component {
                         name={attribute.trackedEntityAttribute.id}
                         label={attribute.trackedEntityAttribute.displayName}
                         value={values[attribute.trackedEntityAttribute.id]}
-                        onChange={this.onChange}
+                        onChange={onChange}
                         disabled={disabled}
                     />
                 ) : attribute.trackedEntityAttribute.optionSetValue ? (
-                    this.props.optionSets[
-                        attribute.trackedEntityAttribute.optionSet.id
-                    ].length < 4 ? (
+                    optionSets[attribute.trackedEntityAttribute.optionSet.id]
+                        .length < 4 ? (
                         <RadioInput
                             required={attribute.mandatory}
                             objects={
-                                this.props.optionSets[
+                                optionSets[
                                     attribute.trackedEntityAttribute.optionSet
                                         .id
                                 ]
@@ -212,14 +197,14 @@ export class PersonForm extends Component {
                             name={attribute.trackedEntityAttribute.id}
                             label={attribute.trackedEntityAttribute.displayName}
                             value={values[attribute.trackedEntityAttribute.id]}
-                            onChange={this.onChange}
+                            onChange={onChange}
                             disabled={disabled}
                         />
                     ) : (
                         <SelectInput
                             required={attribute.mandatory}
                             objects={
-                                this.props.optionSets[
+                                optionSets[
                                     attribute.trackedEntityAttribute.optionSet
                                         .id
                                 ]
@@ -227,7 +212,7 @@ export class PersonForm extends Component {
                             name={attribute.trackedEntityAttribute.id}
                             label={attribute.trackedEntityAttribute.displayName}
                             value={values[attribute.trackedEntityAttribute.id]}
-                            onChange={this.onChange}
+                            onChange={onChange}
                             disabled={disabled}
                         />
                     )
@@ -239,15 +224,14 @@ export class PersonForm extends Component {
                             uniques &&
                             uniques[attribute.trackedEntityAttribute.id]
                         }
-                        validateUnique={this.validateUnique}
+                        validateUnique={validateUnique}
                         name={attribute.trackedEntityAttribute.id}
                         label={attribute.trackedEntityAttribute.displayName}
                         value={values[attribute.trackedEntityAttribute.id]}
-                        onChange={this.onChange}
+                        onChange={onChange}
                         disabled={
                             disabled ||
-                            (entityId &&
-                                attribute.trackedEntityAttribute.unique)
+                            (id && attribute.trackedEntityAttribute.unique)
                         }
                         type={
                             attribute.trackedEntityAttribute.valueType ===
@@ -261,76 +245,71 @@ export class PersonForm extends Component {
         )
     }
 
-    onModalClick = async yes => {
-        const { id, entityId } = this.state.modal
-        let uniques = { ...this.state.uniques }
+    const onModalClick = async yes => {
+        const { id, entityId } = modal
+        let uniques = { ...uniques }
         uniques[id] = yes
+        setUniques(uniques)
 
-        if (yes) this.onNewValues(await getPersonValues(entityId), entityId)
+        if (yes) onNewValues(await getPersonValues(entityId), entityId)
 
-        this.setState({ uniques: uniques, modal: null })
+        setModal(null)
     }
 
-    render() {
-        const {
-            attributes,
-            half,
-            entityId,
-            editing,
-            loading,
-            modal,
-        } = this.state
+    if (loading) return <ProgressSection />
 
-        if (loading) return <ProgressSection />
-
-        return (
-            <MarginBottom>
-                {modal && (
-                    <ModalPopup
-                        heading="Person found"
-                        text={
-                            <span>
-                                A person with <em>{modal.label}</em>{' '}
-                                {modal.value} is already registered. Do you want
-                                to get this person?
-                            </span>
-                        }
-                        label="Import"
-                        icon="person"
-                        kind="primary"
-                        onClick={this.onModalClick}
-                    />
-                )}
-                <Card>
-                    <Margin>
-                        {entityId && !editing && this.props.showEdit && (
-                            <ButtonPositioned>
-                                <Button
-                                    kind="secondary"
-                                    onClick={this.onEdit}
-                                    icon="edit"
-                                    size="small"
-                                >
-                                    Edit
-                                </Button>
-                            </ButtonPositioned>
-                        )}
-                        <Heading>Person</Heading>
-                        <Grid container spacing={0}>
-                            <Grid item xs>
-                                {attributes
-                                    .slice(0, half)
-                                    .map(attribute => this.getInput(attribute))}
-                            </Grid>
-                            <Grid item xs>
-                                {attributes
-                                    .slice(half)
-                                    .map(attribute => this.getInput(attribute))}
-                            </Grid>
+    return (
+        <MarginBottom>
+            {modal && (
+                <ModalPopup
+                    heading="Person found"
+                    text={
+                        <span>
+                            A person with <em>{modal.label}</em> {modal.value}{' '}
+                            is already registered. Do you want to get this
+                            person?
+                        </span>
+                    }
+                    label="Import"
+                    icon="person"
+                    kind="primary"
+                    onClick={onModalClick}
+                />
+            )}
+            <Card>
+                <Margin>
+                    {props.id && !editing && props.showEdit && (
+                        <ButtonPositioned>
+                            <Button
+                                kind="secondary"
+                                onClick={() => setEditing(true)}
+                                icon="edit"
+                                size="small"
+                            >
+                                Edit
+                            </Button>
+                        </ButtonPositioned>
+                    )}
+                    <Heading>Person</Heading>
+                    <Grid container spacing={0}>
+                        <Grid item xs>
+                            {attributes.slice(0, half).map(a => getInput(a))}
                         </Grid>
-                    </Margin>
-                </Card>
-            </MarginBottom>
-        )
-    }
+                        <Grid item xs>
+                            {attributes.slice(half).map(a => getInput(a))}
+                        </Grid>
+                    </Grid>
+                </Margin>
+            </Card>
+        </MarginBottom>
+    )
+}
+
+PersonForm.prototypes = {
+    values: objectOf(string),
+    valid: bool.isRequired,
+    showEdit: bool.isRequired,
+    passValues: func.isRequired,
+    loading: bool.isRequired,
+    id: string,
 }

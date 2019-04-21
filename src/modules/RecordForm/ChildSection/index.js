@@ -1,5 +1,5 @@
 import React from 'react'
-import { arrayOf, bool, func, object, objectOf, string } from 'prop-types'
+import { bool, func, object, objectOf, string } from 'prop-types'
 import { Label, Padding } from 'styles'
 import { CheckboxInput } from 'inputs'
 import { DataElement } from '../DataElement'
@@ -10,8 +10,7 @@ import { ChildSectionLabel } from './style'
  * @param {Object} childSection - Child section.
  * @returns {Component} Child section component.
  */
-export const ChildSection = props => {
-    const { childSection, completed, onChange, values, optionSets } = props
+export const ChildSection = ({ childSection, completed, onChange, values }) => {
     // If all, or all but one, of the data elements are of type TRUE_ONLY,
     // the section is rendered as a group of checkboxes.
     if (
@@ -55,7 +54,6 @@ export const ChildSection = props => {
                             value={values[dataElement.id]}
                             onChange={onChange}
                             completed={completed}
-                            optionSets={optionSets}
                         />
                     ))}
             </>
@@ -76,7 +74,6 @@ export const ChildSection = props => {
                         value={values[dataElement.id]}
                         onChange={onChange}
                         completed={completed}
-                        optionSets={optionSets}
                     />
                 ))}
         </>
@@ -87,6 +84,5 @@ ChildSection.propTypes = {
     childSection: object.isRequired,
     onChange: func.isRequired,
     values: objectOf(string).isRequired,
-    optionSets: objectOf(arrayOf(object)).isRequired,
     completed: bool,
 }

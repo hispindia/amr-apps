@@ -1,22 +1,25 @@
-import React, { useState, useEffect } from 'react'
-import { arrayOf, bool, object, string } from 'prop-types'
+import React, { useContext, useEffect, useState } from 'react'
+import { string } from 'prop-types'
 import { Card } from '@dhis2/ui/core'
 import { getEvents } from 'api'
 import { Margin } from 'styles'
 import { RecordTable, ProgressSection, TitleRow } from 'modules'
+import { ConfigContext, MetadataContext } from 'contexts'
 import { titles, headers } from './config'
 
 /**
  * Shows events by status.
  */
 export const RecordsOverview = props => {
+    const { tables, isApproval } = useContext(ConfigContext)
+    const { programList } = useContext(MetadataContext)
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(true)
     const [addButtonDisabled, setAddButtonDisabled] = useState(true)
 
     useEffect(() => {
-        if (props.isApproval) return
-        const noProgram = !props.programs.find(p =>
+        if (isApproval) return
+        const noProgram = !programList.find(p =>
             p.orgUnits.includes(props.selected)
         )
         if (noProgram !== addButtonDisabled)
@@ -31,9 +34,9 @@ export const RecordsOverview = props => {
     const init = async () => {
         setData({
             rows: await getEvents(
-                props.tables[props.match.params.status],
+                tables[props.match.params.status],
                 props.selected,
-                !props.isApproval
+                !isApproval
             ),
             headers: headers,
         })
@@ -62,9 +65,8 @@ export const RecordsOverview = props => {
                     <RecordTable
                         data={data}
                         onEventClick={onEventClick}
-                        title=""
                         onAddClick={onAddClick}
-                        addButton={!props.isApproval}
+                        addButton={!isApproval}
                         addButtonDisabled={addButtonDisabled}
                     />
                 </Card>
@@ -73,8 +75,4 @@ export const RecordsOverview = props => {
     )
 }
 
-RecordsOverview.propTypes = {
-    programs: arrayOf(object).isRequired,
-    selected: string.isRequired,
-    isApproval: bool,
-}
+RecordsOverview.propTypes = { selected: string.isRequired }

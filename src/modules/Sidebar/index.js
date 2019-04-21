@@ -12,12 +12,7 @@ export const Sidebar = props => (
     <Col>
         <Margin>
             <MarginBottom margin={12}>
-                <SidebarMenu
-                    selected={props.selected.id}
-                    items={props.menuItems.items}
-                    userOnly={props.menuItems.userOnly}
-                    counts={props.counts}
-                />
+                <SidebarMenu selected={props.selected.id} />
             </MarginBottom>
             <MarginBottom margin={12}>
                 <Route
@@ -28,7 +23,6 @@ export const Sidebar = props => (
                             {...compProps}
                             onSelect={props.onSelect}
                             selected={props.selected}
-                            orgUnits={props.orgUnits}
                         />
                     )}
                 />
@@ -39,7 +33,6 @@ export const Sidebar = props => (
                             {...compProps}
                             onSelect={props.onSelect}
                             selected={props.selected}
-                            orgUnits={props.orgUnits}
                         />
                     )}
                 />
@@ -50,13 +43,8 @@ export const Sidebar = props => (
 
 Sidebar.propTypes = {
     onSelect: func.isRequired,
-    orgUnits: arrayOf(object).isRequired,
     selected: shape({
         id: string.isRequired,
         path: string.isRequired,
-    }).isRequired,
-    menuItems: shape({
-        items: arrayOf(object).isRequired,
-        userOnly: bool,
     }).isRequired,
 }

@@ -8,7 +8,7 @@ import TableToolbar from '../../inputs/TableToolbar'
  */
 export const RecordTable = props => (
     <MUIDataTable
-        title={props.title}
+        title=""
         data={props.data.rows}
         columns={props.data.headers}
         options={{
@@ -29,7 +29,6 @@ export const RecordTable = props => (
 )
 
 RecordTable.propTypes = {
-    title: string.isRequired,
     onEventClick: func.isRequired,
     onAddClick: func,
     addButtonDisabled: bool,

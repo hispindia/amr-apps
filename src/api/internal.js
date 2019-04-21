@@ -38,7 +38,7 @@ export const getEventValues = async eventId => {
  * @param {string} orgUnitId - Organisation unit ID.
  * @returns {string} AMR Id.
  */
-export const generateAmrId = async orgUnitCode => {
+export const generateAmrId = async (orgUnitId, orgUnitCode) => {
     const newId = () =>
         orgUnitCode + (Math.floor(Math.random() * 90000) + 10000)
 

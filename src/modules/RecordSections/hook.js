@@ -98,7 +98,6 @@ const reducer = (state, action) => {
                 eventData: null,
                 eventInvalid: invalidReason.required,
                 eventId: null,
-                resetSwitch: !state.resetSwitch,
                 buttonDisabled: false,
             }
         }
@@ -174,7 +173,6 @@ export const hook = (rules, personValues) => {
         programStage: null,
         rules: null,
         eventInvalid: invalidReason.required,
-        resetSwitch: false,
         buttonDisabled: false,
         loading: false,
         deleteClicked: false,
