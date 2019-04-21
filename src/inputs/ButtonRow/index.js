@@ -8,7 +8,7 @@ import { ButtonPadding, SpaceBetween } from './style'
  * Row of buttons.
  */
 export const ButtonRow = props => (
-    <MarginTop>
+    <MarginTop className={props.className}>
         <SpaceBetween unspaced={props.unspaced}>
             {props.buttons.map(button => (
                 <ButtonPadding
@@ -25,6 +25,7 @@ export const ButtonRow = props => (
                         onClick={button.onClick}
                         disabled={button.disabled}
                         icon={button.icon}
+                        size={button.size ? button.size : 'medium'}
                     >
                         {button.label}
                     </Button>
@@ -46,6 +47,7 @@ ButtonRow.propTypes = {
             disabled: bool,
             kind: oneOf(['basic', 'primary', 'secondary', 'destructive'])
                 .isRequired,
+            size: oneOf(['small', 'medium', 'large']),
         })
     ).isRequired,
 }

@@ -5,6 +5,7 @@ import { Grid } from '@material-ui/core'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { SelectInput, RadioInput, DateInput } from 'inputs'
 import { MetadataContext } from 'contexts'
+import { CustomButtonRow } from './style'
 
 /**
  * Contains event panal.
@@ -17,6 +18,7 @@ export const RecordPanel = ({
     passValues,
     programs,
     disabled,
+    onReset,
 }) => {
     const { stageLists, programOrganisms, optionSets } = useContext(
         MetadataContext
@@ -137,6 +139,21 @@ export const RecordPanel = ({
         <MarginBottom>
             <Card>
                 <Margin>
+                    {onReset !== null && (
+                        <CustomButtonRow
+                            unspaced
+                            buttons={[
+                                {
+                                    label: 'Reset',
+                                    onClick: onReset,
+                                    icon: 'clear',
+                                    tooltip: 'Reset',
+                                    kind: 'secondary',
+                                    size: 'small',
+                                },
+                            ]}
+                        />
+                    )}
                     <Heading>Panel</Heading>
                     <Grid container spacing={0}>
                         <Grid item xs>
@@ -169,4 +186,5 @@ RecordPanel.prototypes = {
     ).isRequired,
     passValues: func.isRequired,
     disabled: bool.isRequired,
+    onReset: func,
 }

@@ -30,7 +30,7 @@ export const TextInput = props => {
 
     useEffect(() => {
         if (props.value !== value) setValue(props.value)
-    }, [props.valid])
+    }, [props.value])
 
     useEffect(() => {
         if (
