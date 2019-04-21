@@ -3,14 +3,14 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { bool, func, objectOf, string } from 'prop-types'
 import { Grid } from '@material-ui/core'
-import { Card, Button } from '@dhis2/ui/core'
+import { Card } from '@dhis2/ui/core'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { getPersonValues, checkUnique } from 'api'
-import { TextInput, AgeInput, RadioInput, SelectInput } from 'inputs'
+import { TextInput, AgeInput, RadioInput, SelectInput, ButtonRow } from 'inputs'
 import { MetadataContext } from 'contexts'
 import { ModalPopup } from 'modules'
 import { ProgressSection } from '../ProgressSection'
-import { ButtonPositioned } from './style'
+import { CustomButtonRow } from './style'
 
 /**
  * Entity information section.
@@ -256,6 +256,17 @@ export const PersonForm = props => {
         setModal(null)
     }
 
+    const reset = () => {
+        setAttributes(person.trackedEntityTypeAttributes)
+        setUniques([])
+        setEditing(false)
+        props.passValues({
+            values: {},
+            id: null,
+            valid: false,
+        })
+    }
+
     if (loading) return <ProgressSection />
 
     return (
@@ -279,16 +290,27 @@ export const PersonForm = props => {
             <Card>
                 <Margin>
                     {props.id && !editing && props.showEdit && (
-                        <ButtonPositioned>
-                            <Button
-                                kind="secondary"
-                                onClick={() => setEditing(true)}
-                                icon="edit"
-                                size="small"
-                            >
-                                Edit
-                            </Button>
-                        </ButtonPositioned>
+                        <CustomButtonRow
+                            unspaced
+                            buttons={[
+                                {
+                                    label: 'Edit',
+                                    onClick: () => setEditing(true),
+                                    icon: 'edit',
+                                    tooltip: 'Edit',
+                                    kind: 'secondary',
+                                    size: 'small',
+                                },
+                                {
+                                    label: 'Reset',
+                                    onClick: reset,
+                                    icon: 'clear',
+                                    tooltip: 'Reset',
+                                    kind: 'secondary',
+                                    size: 'small',
+                                },
+                            ]}
+                        />
                     )}
                     <Heading>Person</Heading>
                     <Grid container spacing={0}>

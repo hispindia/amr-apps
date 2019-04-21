@@ -1,6 +1,6 @@
 {
     "name": "amr-apps",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "description": "AMR apps for DHIS2",
     "main": "index.js",
     "author": "Terje Uglebakken <terjeug@ifi.uio.no>",
