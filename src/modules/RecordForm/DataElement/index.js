@@ -10,7 +10,13 @@ import {
     DateInput,
 } from 'inputs'
 
-export const DataElement = ({ dataElement, value, onChange, completed }) => {
+export const DataElement = ({
+    dataElement,
+    value,
+    onChange,
+    completed,
+    error,
+}) => {
     const { optionSets } = useContext(MetadataContext)
     return (
         <Padding>
@@ -68,7 +74,7 @@ export const DataElement = ({ dataElement, value, onChange, completed }) => {
                     }
                     color={dataElement.color}
                     warning={dataElement.warning}
-                    error={dataElement.error}
+                    error={error ? error : dataElement.error}
                 />
             )}
         </Padding>
@@ -80,4 +86,5 @@ DataElement.propTypes = {
     onChange: func.isRequired,
     value: string.isRequired,
     completed: bool,
+    error: string,
 }

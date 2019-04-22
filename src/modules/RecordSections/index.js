@@ -7,16 +7,28 @@ import {
     RecordPanel,
     TitleRow,
 } from 'modules'
-import { deleteEvent, setEventStatus, newRecord, existingRecord } from 'api'
+import {
+    deleteEvent,
+    setEventStatus,
+    newRecord,
+    existingRecord,
+    isDuplicate,
+} from 'api'
 import { ButtonRow } from 'inputs'
 import { ConfigContext, MetadataContext } from 'contexts'
 import { Margin } from 'styles'
 import { hook } from './hook'
 
 export const RecordSections = props => {
-    const { optionSets, person, programs, programList, orgUnits } = useContext(
-        MetadataContext
-    )
+    const {
+        optionSets,
+        programOrganisms,
+        person,
+        programs,
+        programList,
+        orgUnits,
+        constants,
+    } = useContext(MetadataContext)
     const { isApproval } = useContext(ConfigContext)
     const event = props.match.params.event
     const orgUnit = props.match.params.orgUnit
@@ -43,10 +55,15 @@ export const RecordSections = props => {
         deleteClicked,
         deleteConfirmation,
         code,
+        duplicate,
     } = state
 
     const disabled =
-        buttonDisabled || eventInvalid !== false || !entityValid || !panelValid
+        buttonDisabled ||
+        eventInvalid !== false ||
+        !entityValid ||
+        !panelValid ||
+        duplicate
 
     useEffect(() => {
         const getExistingRecord = async () => {
@@ -123,6 +140,23 @@ export const RecordSections = props => {
         }
     }
 
+    const checkDuplicate = async sampleId => {
+        if (!constants.days) return
+        dispatch({
+            type: types.SET_DUPLICATE,
+            duplicate: await isDuplicate(
+                eventId,
+                entityId,
+                optionSets[programOrganisms[programId]].find(
+                    o => o.value === organism
+                ).label,
+                sampleId,
+                sampleDate,
+                constants.days
+            ),
+        })
+    }
+
     return (
         <Margin>
             {deleteClicked && (
@@ -177,6 +211,8 @@ export const RecordSections = props => {
                     passValues={valid =>
                         dispatch({ type: types.EVENT_VALID, invalid: valid })
                     }
+                    checkDuplicate={checkDuplicate}
+                    duplicate={duplicate}
                 />
             )}
             {loading && <ProgressSection />}
@@ -213,7 +249,9 @@ export const RecordSections = props => {
                                       tooltip: status.completed
                                           ? 'Edit record'
                                           : 'Submit record',
-                                      disabledTooltip: status.completed
+                                      disabledTooltip: duplicate
+                                          ? 'A different record exists for the same person, with the same organism and lab sample ID, within 15 days'
+                                          : status.completed
                                           ? 'Records with this approval status cannot be edited'
                                           : eventInvalid
                                           ? eventInvalid

@@ -13,6 +13,7 @@ const types = {
     DELETE_CONFIRMED: 8,
     SET_LOADING: 9,
     SET_CODE: 10,
+    SET_DUPLICATE: 11,
 }
 
 const invalidReason = {
@@ -150,6 +151,12 @@ const reducer = (state, action) => {
                 code: action.code,
             }
         }
+        case types.SET_DUPLICATE: {
+            return {
+                ...state,
+                duplicate: action.duplicate,
+            }
+        }
         default: {
             return state
         }
@@ -177,6 +184,7 @@ export const hook = (rules, personValues) => {
         loading: false,
         deleteClicked: false,
         deleteConfirmation: null,
+        duplicate: false,
     })
 
     return [state, dispatch, types]

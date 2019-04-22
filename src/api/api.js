@@ -1,10 +1,11 @@
+import moment from 'moment'
 import { get, postData, del, put, setBaseUrl } from './crud'
 import { getProgramStage, getEventValues, generateAmrId } from './internal'
 
 export const _organismsDataElementId = 'SaQe2REkGVw'
 export const _testResultDataElementId = 'bSgpKbkbVGL'
+export const _sampleIdElementId = 'GpAu5HjWAEz'
 const _amrDataElement = 'lIkk661BLpG'
-const _sampleDateElementId = 'JRUa0qYKQDF'
 
 const _personTypeId = 'tOJvIFXsB5V'
 
@@ -644,4 +645,38 @@ export async function getCounts(items, orgUnit, userOnly) {
                     (userOnly ? '&var=username:' + _username : '')
             )).listGrid.rows[0][0]
     return items
+}
+
+export async function isDuplicate(
+    event,
+    entity,
+    organism,
+    sampleId,
+    date,
+    days
+) {
+    let events = (await get(
+        'events.json?trackedEntityInstance=' +
+            entity +
+            '&filter=' +
+            _sampleIdElementId +
+            ':eq:' +
+            sampleId +
+            ',' +
+            _organismsDataElementId +
+            ':eq:' +
+            organism +
+            '&paging=false&fields=event,eventDate'
+    )).events
+    events = events.filter(e => e.event !== event)
+    if (events.length < 1) return false
+    days = parseInt(days)
+    date = moment(date)
+    const min = date.clone().subtract(days, 'days')
+    const max = date.clone().add(days, 'days')
+    return (
+        events.find(
+            e => moment(e.eventDate) > min && moment(e.eventDate) < max
+        ) !== null
+    )
 }
