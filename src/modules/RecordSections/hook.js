@@ -119,6 +119,7 @@ const reducer = (state, action) => {
             }
         }
         case types.EVENT_VALID: {
+            if (state.duplicate) return state
             return {
                 ...state,
                 eventInvalid: action.invalid,
@@ -155,6 +156,9 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 duplicate: action.duplicate,
+                eventInvalid: action.duplicate
+                    ? invalidReason.error
+                    : state.eventInvalid,
             }
         }
         default: {

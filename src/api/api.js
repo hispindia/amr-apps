@@ -668,6 +668,7 @@ export async function isDuplicate(
             organism +
             '&paging=false&fields=event,eventDate,created&order=created:asc'
     )).events
+    if (!events) return false
     if (events.length < 1) return false
     if (events[0].event === event) return false
     events = events.filter(e => e.event !== event)

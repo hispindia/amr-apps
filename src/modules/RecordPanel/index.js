@@ -1,28 +1,26 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { arrayOf, bool, func, shape, string } from 'prop-types'
+import { arrayOf, func, shape, string } from 'prop-types'
 import { Card } from '@dhis2/ui/core/Card'
 import { Grid } from '@material-ui/core'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { SelectInput, RadioInput, DateInput } from 'inputs'
-import { MetadataContext } from 'contexts'
+import { MetadataContext, RecordContext } from 'contexts'
 import { CustomButtonRow } from './style'
 
 /**
  * Contains event panal.
  */
-export const RecordPanel = ({
-    programId,
-    programStageId,
-    organism,
-    sampleDate,
-    passValues,
-    programs,
-    disabled,
-    onReset,
-}) => {
+export const RecordPanel = ({ passValues, programs, onReset }) => {
     const { stageLists, programOrganisms, optionSets } = useContext(
         MetadataContext
     )
+    const {
+        programId,
+        programStageId,
+        organism,
+        sampleDate,
+        panelValid,
+    } = useContext(RecordContext)
     const [organisms, setOrganisms] = useState(null)
 
     useEffect(() => {
@@ -126,11 +124,11 @@ export const RecordPanel = ({
     const getInput = dataElement => (
         <Padding key={dataElement.id}>
             {!dataElement.objects ? (
-                <DateInput {...dataElement} disabled={disabled} required />
+                <DateInput {...dataElement} disabled={panelValid} required />
             ) : dataElement.objects.length < 4 ? (
-                <RadioInput {...dataElement} disabled={disabled} required />
+                <RadioInput {...dataElement} disabled={panelValid} required />
             ) : (
-                <SelectInput {...dataElement} disabled={disabled} required />
+                <SelectInput {...dataElement} disabled={panelValid} required />
             )}
         </Padding>
     )
@@ -174,10 +172,6 @@ export const RecordPanel = ({
 }
 
 RecordPanel.prototypes = {
-    programId: string,
-    programStageId: string,
-    organism: string,
-    sampleDate: string,
     programs: arrayOf(
         shape({
             label: string,
@@ -185,6 +179,5 @@ RecordPanel.prototypes = {
         })
     ).isRequired,
     passValues: func.isRequired,
-    disabled: bool.isRequired,
     onReset: func,
 }

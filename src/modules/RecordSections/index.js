@@ -15,7 +15,7 @@ import {
     isDuplicate,
 } from 'api'
 import { ButtonRow } from 'inputs'
-import { ConfigContext, MetadataContext } from 'contexts'
+import { ConfigContext, MetadataContext, RecordContextProvider } from 'contexts'
 import { Margin } from 'styles'
 import { hook } from './hook'
 
@@ -45,13 +45,10 @@ export const RecordSections = props => {
         sampleDate,
         panelValid,
         eventId,
-        eventValues,
         status,
-        programStage,
         eventInvalid,
         buttonDisabled,
         loading,
-        rules,
         deleteClicked,
         deleteConfirmation,
         code,
@@ -157,6 +154,17 @@ export const RecordSections = props => {
         })
     }
 
+    const onPersonValues = values =>
+        dispatch({ type: types.SET_ENTITY, ...values })
+
+    const onPanelValues = values =>
+        dispatch({ type: types.SET_PANEL, ...values })
+
+    const onPanelReset = () => dispatch({ type: types.ADD_MORE })
+
+    const onRecordValues = valid =>
+        dispatch({ type: types.EVENT_VALID, invalid: valid })
+
     return (
         <Margin>
             {deleteClicked && (
@@ -171,50 +179,28 @@ export const RecordSections = props => {
                 />
             )}
             <TitleRow title="Record" history={props.history} />
-            <PersonForm
-                id={entityId}
-                values={entityValues}
-                valid={entityValid}
-                showEdit={!event && !panelValid}
-                passValues={action =>
-                    dispatch({ type: types.SET_ENTITY, ...action })
-                }
-                loading={event && !eventId}
-            />
-            {entityValid && (
-                <RecordPanel
-                    programId={programId}
-                    programStageId={programStageId}
-                    organism={organism}
-                    sampleDate={sampleDate}
-                    programs={programList.filter(p =>
-                        p.orgUnits.includes(orgUnit)
-                    )}
-                    passValues={action =>
-                        dispatch({ type: types.SET_PANEL, ...action })
-                    }
-                    disabled={panelValid}
-                    onReset={
-                        !event && eventId
-                            ? () => dispatch({ type: types.ADD_MORE })
-                            : null
-                    }
+            <RecordContextProvider state={state}>
+                <PersonForm
+                    showEdit={!event && !panelValid}
+                    passValues={onPersonValues}
+                    loading={event && !eventId}
                 />
-            )}
-            {eventId && (
-                <RecordForm
-                    programStage={programStage}
-                    rules={rules}
-                    values={eventValues}
-                    eventId={eventId}
-                    status={status}
-                    passValues={valid =>
-                        dispatch({ type: types.EVENT_VALID, invalid: valid })
-                    }
-                    checkDuplicate={checkDuplicate}
-                    duplicate={duplicate}
-                />
-            )}
+                {entityValid && (
+                    <RecordPanel
+                        programs={programList.filter(p =>
+                            p.orgUnits.includes(orgUnit)
+                        )}
+                        passValues={onPanelValues}
+                        onReset={!event && eventId ? onPanelReset : null}
+                    />
+                )}
+                {eventId && (
+                    <RecordForm
+                        passValues={onRecordValues}
+                        checkDuplicate={checkDuplicate}
+                    />
+                )}
+            </RecordContextProvider>
             {loading && <ProgressSection />}
             <ButtonRow
                 buttons={
@@ -251,9 +237,7 @@ export const RecordSections = props => {
                                           : 'Submit record',
                                       disabledTooltip: status.completed
                                           ? 'Records with this approval status cannot be edited'
-                                          : duplicate
-                                          ? 'A different record exists for the same person, with the same organism and lab sample ID, within 15 days'
-                                          : eventInvalid
+                                          : duplicate || eventInvalid
                                           ? eventInvalid
                                           : undefined,
                                   },
@@ -267,11 +251,10 @@ export const RecordSections = props => {
                                   kind: 'primary',
                                   tooltip:
                                       'Submit record and add new record for the same person',
-                                  disabledTooltip: duplicate
-                                      ? 'A different record exists for the same person, with the same organism and lab sample ID, within 15 days'
-                                      : eventInvalid
-                                      ? eventInvalid
-                                      : undefined,
+                                  disabledTooltip:
+                                      duplicate || eventInvalid
+                                          ? eventInvalid
+                                          : undefined,
                               },
                               {
                                   label: 'Submit',
@@ -280,11 +263,10 @@ export const RecordSections = props => {
                                   icon: 'done',
                                   kind: 'primary',
                                   tooltip: 'Submit record',
-                                  disabledTooltip: duplicate
-                                      ? 'A different record exists for the same person, with the same organism and lab sample ID, within 15 days'
-                                      : eventInvalid
-                                      ? eventInvalid
-                                      : undefined,
+                                  disabledTooltip:
+                                      duplicate || eventInvalid
+                                          ? eventInvalid
+                                          : undefined,
                               },
                           ]
                 }

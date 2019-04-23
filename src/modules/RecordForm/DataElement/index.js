@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { bool, func, object, string } from 'prop-types'
 import { Padding } from 'styles'
-import { MetadataContext } from 'contexts'
+import { MetadataContext, RecordContext } from 'contexts'
 import {
     TextInput,
     RadioInput,
@@ -10,14 +10,9 @@ import {
     DateInput,
 } from 'inputs'
 
-export const DataElement = ({
-    dataElement,
-    value,
-    onChange,
-    completed,
-    error,
-}) => {
+export const DataElement = ({ dataElement, value, onChange, error }) => {
     const { optionSets } = useContext(MetadataContext)
+    const { status } = useContext(RecordContext)
     return (
         <Padding>
             {dataElement.optionSetValue ? (
@@ -29,7 +24,7 @@ export const DataElement = ({
                         value={value}
                         onChange={onChange}
                         required={dataElement.required}
-                        disabled={dataElement.disabled || completed}
+                        disabled={dataElement.disabled || status.completed}
                     />
                 ) : (
                     <SelectInput
@@ -39,7 +34,7 @@ export const DataElement = ({
                         value={value}
                         onChange={onChange}
                         required={dataElement.required}
-                        disabled={dataElement.disabled || completed}
+                        disabled={dataElement.disabled || status.completed}
                     />
                 )
             ) : dataElement.valueType === 'TRUE_ONLY' ? (
@@ -50,7 +45,7 @@ export const DataElement = ({
                     onChange={onChange}
                     required={dataElement.required}
                     value={value}
-                    disabled={dataElement.disabled || completed}
+                    disabled={dataElement.disabled || status.completed}
                 />
             ) : dataElement.valueType === 'DATE' ? (
                 <DateInput
@@ -59,7 +54,7 @@ export const DataElement = ({
                     value={value}
                     required={dataElement.required}
                     onChange={onChange}
-                    disabled={dataElement.disabled || completed}
+                    disabled={dataElement.disabled || status.completed}
                 />
             ) : (
                 <TextInput
@@ -68,7 +63,7 @@ export const DataElement = ({
                     value={value}
                     required={dataElement.required}
                     onChange={onChange}
-                    disabled={dataElement.disabled || completed}
+                    disabled={dataElement.disabled || status.completed}
                     type={
                         dataElement.valueType === 'NUMBER' ? 'number' : 'text'
                     }
@@ -85,6 +80,5 @@ DataElement.propTypes = {
     dataElement: object.isRequired,
     onChange: func.isRequired,
     value: string.isRequired,
-    completed: bool,
     error: string,
 }
