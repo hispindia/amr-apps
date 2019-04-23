@@ -666,8 +666,10 @@ export async function isDuplicate(
             _organismsDataElementId +
             ':eq:' +
             organism +
-            '&paging=false&fields=event,eventDate'
+            '&paging=false&fields=event,eventDate,created&order=created:asc'
     )).events
+    if (events.length < 1) return false
+    if (events[0].event === event) return false
     events = events.filter(e => e.event !== event)
     if (events.length < 1) return false
     days = parseInt(days)

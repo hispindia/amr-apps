@@ -249,10 +249,10 @@ export const RecordSections = props => {
                                       tooltip: status.completed
                                           ? 'Edit record'
                                           : 'Submit record',
-                                      disabledTooltip: duplicate
-                                          ? 'A different record exists for the same person, with the same organism and lab sample ID, within 15 days'
-                                          : status.completed
+                                      disabledTooltip: status.completed
                                           ? 'Records with this approval status cannot be edited'
+                                          : duplicate
+                                          ? 'A different record exists for the same person, with the same organism and lab sample ID, within 15 days'
                                           : eventInvalid
                                           ? eventInvalid
                                           : undefined,
@@ -267,7 +267,9 @@ export const RecordSections = props => {
                                   kind: 'primary',
                                   tooltip:
                                       'Submit record and add new record for the same person',
-                                  disabledTooltip: eventInvalid
+                                  disabledTooltip: duplicate
+                                      ? 'A different record exists for the same person, with the same organism and lab sample ID, within 15 days'
+                                      : eventInvalid
                                       ? eventInvalid
                                       : undefined,
                               },
@@ -278,7 +280,9 @@ export const RecordSections = props => {
                                   icon: 'done',
                                   kind: 'primary',
                                   tooltip: 'Submit record',
-                                  disabledTooltip: eventInvalid
+                                  disabledTooltip: duplicate
+                                      ? 'A different record exists for the same person, with the same organism and lab sample ID, within 15 days'
+                                      : eventInvalid
                                       ? eventInvalid
                                       : undefined,
                               },
