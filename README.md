@@ -2,7 +2,7 @@
 
 ### TODO
 - [x] Warning/error program rule action
-- [ ] Automatic duplication check
+- [x] Automatic duplication check
 - [ ] Hashing patient registration number
 - [ ] DD not have color when MIC has value
 - [ ] Special characters in test values
