@@ -21,6 +21,7 @@ export const SectionContent = ({
     childHalf,
     childSections,
     completed,
+    errors,
 }) => {
     const getDataElement = dataElement => (
         <DataElement
@@ -29,6 +30,7 @@ export const SectionContent = ({
             value={values[dataElement.id]}
             onChange={onChange}
             completed={completed}
+            error={errors[dataElement.id]}
         />
     )
 
@@ -39,6 +41,7 @@ export const SectionContent = ({
             values={values}
             onChange={onChange}
             completed={completed}
+            errors={errors}
         />
     )
 
@@ -100,4 +103,5 @@ SectionContent.propTypes = {
     childHalf: number.isRequired,
     childSections: arrayOf(object).isRequired,
     completed: bool,
+    errors: objectOf(string),
 }

@@ -10,7 +10,13 @@ import { ChildSectionLabel } from './style'
  * @param {Object} childSection - Child section.
  * @returns {Component} Child section component.
  */
-export const ChildSection = ({ childSection, completed, onChange, values }) => {
+export const ChildSection = ({
+    childSection,
+    completed,
+    onChange,
+    values,
+    errors,
+}) => {
     // If all, or all but one, of the data elements are of type TRUE_ONLY,
     // the section is rendered as a group of checkboxes.
     if (
@@ -54,6 +60,7 @@ export const ChildSection = ({ childSection, completed, onChange, values }) => {
                             value={values[dataElement.id]}
                             onChange={onChange}
                             completed={completed}
+                            error={errors[dataElement.id]}
                         />
                     ))}
             </>
@@ -74,6 +81,7 @@ export const ChildSection = ({ childSection, completed, onChange, values }) => {
                         value={values[dataElement.id]}
                         onChange={onChange}
                         completed={completed}
+                        error={errors[dataElement.id]}
                     />
                 ))}
         </>
@@ -85,4 +93,5 @@ ChildSection.propTypes = {
     onChange: func.isRequired,
     values: objectOf(string).isRequired,
     completed: bool,
+    errors: objectOf(string),
 }

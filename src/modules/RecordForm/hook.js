@@ -1,8 +1,13 @@
 import { useReducer } from 'react'
+import { _sampleIdElementId } from 'api'
+
+const sampleDateError =
+    'A different record exists for the same person, with the same organism and lab sample ID, within 15 days'
 
 const types = {
     LOADING: 0,
     SET: 1,
+    SET_ERROR: 2,
 }
 
 const reducer = (state, action) => {
@@ -21,6 +26,14 @@ const reducer = (state, action) => {
                 loading: true,
             }
         }
+        case types.SET_ERROR: {
+            return {
+                ...state,
+                errors: {
+                    [_sampleIdElementId]: action.error ? sampleDateError : null,
+                },
+            }
+        }
         default: {
             return state
         }
@@ -32,6 +45,7 @@ export const hook = () => {
         loading: true,
         programStage: null,
         values: null,
+        errors: { [_sampleIdElementId]: null },
     })
 
     return [state, dispatch, types]

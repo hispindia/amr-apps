@@ -2,7 +2,11 @@
 
 import React, { useContext, useEffect } from 'react'
 import { arrayOf, func, object, objectOf, string } from 'prop-types'
-import { updateEventValue, _testResultDataElementId } from 'api'
+import {
+    updateEventValue,
+    _testResultDataElementId,
+    _sampleIdElementId,
+} from 'api'
 import { MarginBottom } from 'styles'
 import { MetadataContext } from 'contexts'
 import { ProgressSection } from '../'
@@ -19,8 +23,19 @@ export const RecordForm = props => {
     const { optionSets } = useContext(MetadataContext)
 
     useEffect(() => {
+        if (!state.values) return
+        const sampleId = state.values[_sampleIdElementId]
+        if (sampleId) props.checkDuplicate(sampleId)
+    }, [state.values && state.values[_sampleIdElementId]])
+
+    useEffect(() => {
         init()
     }, [props.programStage, props.values, props.status])
+
+    useEffect(() => {
+        if (!props.duplicate !== !state.errors[_sampleIdElementId])
+            dispatch({ type: types.SET_ERROR, error: props.duplicate })
+    }, [props.duplicate])
 
     const init = async () => {
         dispatch({ type: types.LOADING })
@@ -248,6 +263,7 @@ export const RecordForm = props => {
                         completed={props.status.completed}
                         onChange={onChange}
                         values={state.values}
+                        errors={state.errors}
                     />
                 ))}
         </MarginBottom>

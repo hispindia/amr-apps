@@ -27,6 +27,7 @@ export const Section = props => (
                     onChange={props.onChange}
                     values={props.values}
                     {...getProps(props.dataElements, props.childSections)}
+                    errors={props.errors}
                 />
             </Margin>
         </Card>
@@ -41,4 +42,5 @@ Section.propTypes = {
     dataElements: arrayOf(object).isRequired,
     childSections: arrayOf(object).isRequired,
     completed: bool,
+    error: objectOf(string),
 }
