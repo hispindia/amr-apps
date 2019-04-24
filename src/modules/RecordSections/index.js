@@ -23,9 +23,7 @@ export const RecordSections = props => {
     const {
         optionSets,
         programOrganisms,
-        person,
         programs,
-        programList,
         orgUnits,
         constants,
     } = useContext(MetadataContext)
@@ -33,7 +31,7 @@ export const RecordSections = props => {
     const event = props.match.params.event
     const orgUnit = props.match.params.orgUnit
 
-    const [state, dispatch, types] = hook(programs.rules, person.values)
+    const [state, dispatch, types] = hook(orgUnit)
 
     const {
         entityId,
@@ -183,13 +181,10 @@ export const RecordSections = props => {
                 <PersonForm
                     showEdit={!event && !panelValid}
                     passValues={onPersonValues}
-                    loading={event && !eventId}
+                    initLoading={event && !eventId}
                 />
                 {entityValid && (
                     <RecordPanel
-                        programs={programList.filter(p =>
-                            p.orgUnits.includes(orgUnit)
-                        )}
                         passValues={onPanelValues}
                         onReset={!event && eventId ? onPanelReset : null}
                     />

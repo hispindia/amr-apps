@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { arrayOf, func, shape, string } from 'prop-types'
+import { func } from 'prop-types'
 import { Card } from '@dhis2/ui/core/Card'
 import { Grid } from '@material-ui/core'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
@@ -10,7 +10,7 @@ import { CustomButtonRow } from './style'
 /**
  * Contains event panal.
  */
-export const RecordPanel = ({ passValues, programs, onReset }) => {
+export const RecordPanel = ({ passValues, onReset }) => {
     const { stageLists, programOrganisms, optionSets } = useContext(
         MetadataContext
     )
@@ -20,6 +20,7 @@ export const RecordPanel = ({ passValues, programs, onReset }) => {
         organism,
         sampleDate,
         panelValid,
+        panelPrograms,
     } = useContext(RecordContext)
     const [organisms, setOrganisms] = useState(null)
 
@@ -81,7 +82,7 @@ export const RecordPanel = ({ passValues, programs, onReset }) => {
                     id: 'programId',
                     name: 'programId',
                     label: 'Organism group',
-                    objects: programs,
+                    objects: panelPrograms,
                     onChange: onProgramChange,
                     value: programId,
                 })
@@ -172,12 +173,6 @@ export const RecordPanel = ({ passValues, programs, onReset }) => {
 }
 
 RecordPanel.prototypes = {
-    programs: arrayOf(
-        shape({
-            label: string,
-            value: string,
-        })
-    ).isRequired,
     passValues: func.isRequired,
     onReset: func,
 }

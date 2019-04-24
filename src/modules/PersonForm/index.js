@@ -15,12 +15,12 @@ import { CustomButtonRow } from './style'
 /**
  * Entity information section.
  */
-export const PersonForm = props => {
+export const PersonForm = ({ initLoading, showEdit, passValues }) => {
     const { optionSets, person } = useContext(MetadataContext)
     const { entityId, entityValues } = useContext(RecordContext)
     const [uniques, setUniques] = useState([])
     const [editing, setEditing] = useState(false)
-    const [loading, setLoading] = useState(props.loading)
+    const [loading, setLoading] = useState(initLoading)
     const [modal, setModal] = useState(null)
     const [half] = useState(
         Math.floor(person.trackedEntityTypeAttributes.length / 2)
@@ -60,7 +60,7 @@ export const PersonForm = props => {
         let newAttributes = [...attributes]
         checkRules(values, newAttributes)
         setAttributes(newAttributes)
-        props.passValues({
+        passValues({
             values: values,
             id: newEntityId ? newEntityId : entityId,
             valid: validate(newAttributes, values, uniques),
@@ -273,7 +273,7 @@ export const PersonForm = props => {
         setAttributes(person.trackedEntityTypeAttributes)
         setUniques([])
         setEditing(false)
-        props.passValues({
+        passValues({
             values: {},
             id: null,
             valid: false,
@@ -302,7 +302,7 @@ export const PersonForm = props => {
             )}
             <Card>
                 <Margin>
-                    {entityId && !editing && props.showEdit && (
+                    {entityId && !editing && showEdit && (
                         <CustomButtonRow
                             unspaced
                             buttons={[
@@ -343,5 +343,5 @@ export const PersonForm = props => {
 PersonForm.prototypes = {
     showEdit: bool.isRequired,
     passValues: func.isRequired,
-    loading: bool.isRequired,
+    initLoading: bool,
 }

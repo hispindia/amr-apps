@@ -1,4 +1,5 @@
-import { useReducer } from 'react'
+import { useReducer, useContext } from 'react'
+import { MetadataContext } from 'contexts'
 import { _organismsDataElementId } from '../../'
 
 const types = {
@@ -167,11 +168,12 @@ const reducer = (state, action) => {
     }
 }
 
-export const hook = (rules, personValues) => {
+export const hook = orgUnit => {
+    const { programs, person, programList } = useContext(MetadataContext)
     const [state, dispatch] = useReducer(reducer, {
-        allRules: rules,
+        allRules: programs.rules,
         entityId: null,
-        entityValues: personValues,
+        entityValues: person.values,
         entityValid: false,
         programId: null,
         programStageId: null,
@@ -189,6 +191,7 @@ export const hook = (rules, personValues) => {
         deleteClicked: false,
         deleteConfirmation: null,
         duplicate: false,
+        panelPrograms: programList.filter(p => p.orgUnits.includes(orgUnit)),
     })
 
     return [state, dispatch, types]
