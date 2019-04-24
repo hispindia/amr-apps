@@ -4,7 +4,7 @@ export const menuItems = [
         value: '/approval/ALL',
         icon: 'home',
         status: 'ALL',
-        countView: 'odg5FpAc79x',
+        sqlView: 'odg5FpAc79x',
         count: 0,
     },
     {
@@ -12,7 +12,7 @@ export const menuItems = [
         value: '/approval/Resend',
         icon: 'error_outline',
         status: 'Resend',
-        countView: 'xFyCgPnxGHg',
+        sqlView: 'xFyCgPnxGHg',
         count: 0,
     },
     {
@@ -20,7 +20,7 @@ export const menuItems = [
         value: '/approval/Rejected',
         icon: 'highlight_off',
         status: 'Rejected',
-        countView: 'UUTmMThacVx',
+        sqlView: 'UUTmMThacVx',
         count: 0,
     },
     {
@@ -28,7 +28,7 @@ export const menuItems = [
         value: '/approval/Approved',
         icon: 'check_circle_outline',
         status: 'Approved',
-        countView: 'FHBxLVMynGb',
+        sqlView: 'FHBxLVMynGb',
         count: 0,
     },
     {
@@ -36,7 +36,7 @@ export const menuItems = [
         value: '/approval/Validate',
         icon: 'help_outline',
         status: 'Validate',
-        countView: 'Xraki4mz5B8',
+        sqlView: 'Xraki4mz5B8',
         count: 0,
     },
     {
@@ -44,7 +44,7 @@ export const menuItems = [
         value: '/approval/Incomplete',
         icon: 'pause_circle_outline',
         status: 'Incomplete',
-        countView: 'NmiQ8wvL2fD',
+        sqlView: 'NmiQ8wvL2fD',
         count: 0,
     },
 ]

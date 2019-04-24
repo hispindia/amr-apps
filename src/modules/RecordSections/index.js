@@ -38,6 +38,7 @@ export const RecordSections = props => {
         entityValues,
         entityValid,
         programId,
+        programStage,
         programStageId,
         organism,
         sampleDate,
@@ -142,6 +143,7 @@ export const RecordSections = props => {
             duplicate: await isDuplicate(
                 eventId,
                 entityId,
+                programStage.id,
                 optionSets[programOrganisms[programId]].find(
                     o => o.value === organism
                 ).label,
