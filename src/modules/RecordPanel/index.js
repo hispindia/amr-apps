@@ -1,28 +1,27 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { arrayOf, bool, func, shape, string } from 'prop-types'
+import { func } from 'prop-types'
 import { Card } from '@dhis2/ui/core/Card'
 import { Grid } from '@material-ui/core'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { SelectInput, RadioInput, DateInput } from 'inputs'
-import { MetadataContext } from 'contexts'
+import { MetadataContext, RecordContext } from 'contexts'
 import { CustomButtonRow } from './style'
 
 /**
  * Contains event panal.
  */
-export const RecordPanel = ({
-    programId,
-    programStageId,
-    organism,
-    sampleDate,
-    passValues,
-    programs,
-    disabled,
-    onReset,
-}) => {
+export const RecordPanel = ({ passValues, onReset }) => {
     const { stageLists, programOrganisms, optionSets } = useContext(
         MetadataContext
     )
+    const {
+        programId,
+        programStageId,
+        organism,
+        sampleDate,
+        panelValid,
+        panelPrograms,
+    } = useContext(RecordContext)
     const [organisms, setOrganisms] = useState(null)
 
     useEffect(() => {
@@ -49,7 +48,7 @@ export const RecordPanel = ({
             programStageId:
                 stageLists[value].length > 1 ? '' : stageLists[value][0].value,
             organism: '',
-            sampleDate: '',
+            sampleDate: sampleDate,
         })
     }
 
@@ -72,6 +71,11 @@ export const RecordPanel = ({
     const onNewValues = values =>
         passValues({ ...values, valid: !Object.values(values).includes('') })
 
+    const resetValues = () => {
+        setOrganisms(null)
+        onReset()
+    }
+
     /**
      * Gets the data elements to be rendered.
      * @returns {Object[]} Data elements.
@@ -83,7 +87,7 @@ export const RecordPanel = ({
                     id: 'programId',
                     name: 'programId',
                     label: 'Organism group',
-                    objects: programs,
+                    objects: panelPrograms,
                     onChange: onProgramChange,
                     value: programId,
                 })
@@ -126,11 +130,11 @@ export const RecordPanel = ({
     const getInput = dataElement => (
         <Padding key={dataElement.id}>
             {!dataElement.objects ? (
-                <DateInput {...dataElement} disabled={disabled} required />
+                <DateInput {...dataElement} disabled={panelValid} required />
             ) : dataElement.objects.length < 4 ? (
-                <RadioInput {...dataElement} disabled={disabled} required />
+                <RadioInput {...dataElement} disabled={panelValid} required />
             ) : (
-                <SelectInput {...dataElement} disabled={disabled} required />
+                <SelectInput {...dataElement} disabled={panelValid} required />
             )}
         </Padding>
     )
@@ -145,7 +149,7 @@ export const RecordPanel = ({
                             buttons={[
                                 {
                                     label: 'Reset',
-                                    onClick: onReset,
+                                    onClick: resetValues,
                                     icon: 'clear',
                                     tooltip: 'Reset',
                                     kind: 'secondary',
@@ -164,7 +168,7 @@ export const RecordPanel = ({
                         </Grid>
                         <Grid item xs>
                             {organisms && getDataElement('organism')}
-                            {organism && getDataElement('sampleDate')}
+                            {getDataElement('sampleDate')}
                         </Grid>
                     </Grid>
                 </Margin>
@@ -174,17 +178,6 @@ export const RecordPanel = ({
 }
 
 RecordPanel.prototypes = {
-    programId: string,
-    programStageId: string,
-    organism: string,
-    sampleDate: string,
-    programs: arrayOf(
-        shape({
-            label: string,
-            value: string,
-        })
-    ).isRequired,
     passValues: func.isRequired,
-    disabled: bool.isRequired,
     onReset: func,
 }

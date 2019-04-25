@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { bool, func, object, objectOf, string } from 'prop-types'
 import { Label, Padding } from 'styles'
 import { CheckboxInput } from 'inputs'
+import { RecordContext } from 'contexts'
 import { DataElement } from '../DataElement'
 import { ChildSectionLabel } from './style'
 
@@ -10,13 +11,7 @@ import { ChildSectionLabel } from './style'
  * @param {Object} childSection - Child section.
  * @returns {Component} Child section component.
  */
-export const ChildSection = ({
-    childSection,
-    completed,
-    onChange,
-    values,
-    errors,
-}) => {
+export const ChildSection = ({ childSection, onChange, values, errors }) => {
     // If all, or all but one, of the data elements are of type TRUE_ONLY,
     // the section is rendered as a group of checkboxes.
     if (
@@ -25,6 +20,7 @@ export const ChildSection = ({
         ).length >
         childSection.dataElements.length - 2
     ) {
+        const { status } = useContext(RecordContext)
         let objects = {}
         let boxValues = {}
         childSection.dataElements
@@ -32,7 +28,7 @@ export const ChildSection = ({
             .forEach(dataElement => {
                 objects[dataElement.id] = {
                     label: dataElement.displayFormName,
-                    disabled: dataElement.disabled || completed,
+                    disabled: dataElement.disabled || status.completed,
                 }
                 boxValues[dataElement.id] = values[dataElement.id]
             })
@@ -59,7 +55,6 @@ export const ChildSection = ({
                             dataElement={dataElement}
                             value={values[dataElement.id]}
                             onChange={onChange}
-                            completed={completed}
                             error={errors[dataElement.id]}
                         />
                     ))}
@@ -80,7 +75,6 @@ export const ChildSection = ({
                         dataElement={dataElement}
                         value={values[dataElement.id]}
                         onChange={onChange}
-                        completed={completed}
                         error={errors[dataElement.id]}
                     />
                 ))}
@@ -92,6 +86,5 @@ ChildSection.propTypes = {
     childSection: object.isRequired,
     onChange: func.isRequired,
     values: objectOf(string).isRequired,
-    completed: bool,
     errors: objectOf(string),
 }

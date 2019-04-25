@@ -1,4 +1,5 @@
-import { useReducer } from 'react'
+import { useReducer, useContext } from 'react'
+import { MetadataContext } from 'contexts'
 import { _organismsDataElementId } from '../../'
 
 const types = {
@@ -14,6 +15,7 @@ const types = {
     SET_LOADING: 9,
     SET_CODE: 10,
     SET_DUPLICATE: 11,
+    SET_ENTITY_VALUE: 12,
 }
 
 const invalidReason = {
@@ -37,6 +39,15 @@ const reducer = (state, action) => {
                 entityValues: action.values,
                 entityId: action.id,
                 entityValid: action.valid,
+            }
+        }
+        case types.SET_ENTITY_VALUE: {
+            return {
+                ...state,
+                entityValues: {
+                    ...state.entityValues,
+                    [action.key]: action.value,
+                },
             }
         }
         case types.SET_PANEL: {
@@ -91,10 +102,10 @@ const reducer = (state, action) => {
         case types.ADD_MORE: {
             return {
                 ...state,
-                programId: null,
-                programStageId: null,
-                organism: null,
-                sampleDate: null,
+                programId: '',
+                programStageId: '',
+                organism: '',
+                sampleDate: '',
                 panelValid: false,
                 eventData: null,
                 eventInvalid: invalidReason.required,
@@ -119,6 +130,7 @@ const reducer = (state, action) => {
             }
         }
         case types.EVENT_VALID: {
+            if (state.duplicate) return state
             return {
                 ...state,
                 eventInvalid: action.invalid,
@@ -134,7 +146,6 @@ const reducer = (state, action) => {
         case types.DELETE_CONFIRMED: {
             return {
                 ...state,
-                buttonDisabled: false,
                 deleteClicked: false,
                 deleteConfirmation: action.delete,
             }
@@ -155,6 +166,9 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 duplicate: action.duplicate,
+                eventInvalid: action.duplicate
+                    ? invalidReason.error
+                    : state.eventInvalid,
             }
         }
         default: {
@@ -163,16 +177,17 @@ const reducer = (state, action) => {
     }
 }
 
-export const hook = (rules, personValues) => {
+export const hook = orgUnit => {
+    const { programs, person, programList } = useContext(MetadataContext)
     const [state, dispatch] = useReducer(reducer, {
-        allRules: rules,
+        allRules: programs.rules,
         entityId: null,
-        entityValues: personValues,
+        entityValues: person.values,
         entityValid: false,
-        programId: null,
-        programStageId: null,
-        organism: null,
-        sampleDate: null,
+        programId: '',
+        programStageId: '',
+        organism: '',
+        sampleDate: '',
         panelValid: false,
         eventId: null,
         eventValues: null,
@@ -185,6 +200,7 @@ export const hook = (rules, personValues) => {
         deleteClicked: false,
         deleteConfirmation: null,
         duplicate: false,
+        panelPrograms: programList.filter(p => p.orgUnits.includes(orgUnit)),
     })
 
     return [state, dispatch, types]

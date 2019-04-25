@@ -15,7 +15,7 @@ import {
     isDuplicate,
 } from 'api'
 import { ButtonRow } from 'inputs'
-import { ConfigContext, MetadataContext } from 'contexts'
+import { ConfigContext, MetadataContext, RecordContextProvider } from 'contexts'
 import { Margin } from 'styles'
 import { hook } from './hook'
 
@@ -23,9 +23,7 @@ export const RecordSections = props => {
     const {
         optionSets,
         programOrganisms,
-        person,
         programs,
-        programList,
         orgUnits,
         constants,
     } = useContext(MetadataContext)
@@ -33,25 +31,23 @@ export const RecordSections = props => {
     const event = props.match.params.event
     const orgUnit = props.match.params.orgUnit
 
-    const [state, dispatch, types] = hook(programs.rules, person.values)
+    const [state, dispatch, types] = hook(orgUnit)
 
     const {
         entityId,
         entityValues,
         entityValid,
         programId,
+        programStage,
         programStageId,
         organism,
         sampleDate,
         panelValid,
         eventId,
-        eventValues,
         status,
-        programStage,
         eventInvalid,
         buttonDisabled,
         loading,
-        rules,
         deleteClicked,
         deleteConfirmation,
         code,
@@ -105,6 +101,7 @@ export const RecordSections = props => {
             props.history.goBack()
         }
         if (deleteConfirmation) deleteAndExit()
+        else dispatch({ type: types.DISABLE_BUTTON, buttonDisabled: false })
     }, [deleteConfirmation])
 
     const onSubmit = async addMore => {
@@ -147,6 +144,7 @@ export const RecordSections = props => {
             duplicate: await isDuplicate(
                 eventId,
                 entityId,
+                programStage.id,
                 optionSets[programOrganisms[programId]].find(
                     o => o.value === organism
                 ).label,
@@ -156,6 +154,20 @@ export const RecordSections = props => {
             ),
         })
     }
+
+    const onPersonValues = values =>
+        dispatch({ type: types.SET_ENTITY, ...values })
+
+    const onUniqueValue = values =>
+        dispatch({ type: types.SET_ENTITY_VALUE, ...values })
+
+    const onPanelValues = values =>
+        dispatch({ type: types.SET_PANEL, ...values })
+
+    const onPanelReset = () => dispatch({ type: types.ADD_MORE })
+
+    const onRecordValues = valid =>
+        dispatch({ type: types.EVENT_VALID, invalid: valid })
 
     return (
         <Margin>
@@ -171,50 +183,26 @@ export const RecordSections = props => {
                 />
             )}
             <TitleRow title="Record" history={props.history} />
-            <PersonForm
-                id={entityId}
-                values={entityValues}
-                valid={entityValid}
-                showEdit={!event && !panelValid}
-                passValues={action =>
-                    dispatch({ type: types.SET_ENTITY, ...action })
-                }
-                loading={event && !eventId}
-            />
-            {entityValid && (
-                <RecordPanel
-                    programId={programId}
-                    programStageId={programStageId}
-                    organism={organism}
-                    sampleDate={sampleDate}
-                    programs={programList.filter(p =>
-                        p.orgUnits.includes(orgUnit)
-                    )}
-                    passValues={action =>
-                        dispatch({ type: types.SET_PANEL, ...action })
-                    }
-                    disabled={panelValid}
-                    onReset={
-                        !event && eventId
-                            ? () => dispatch({ type: types.ADD_MORE })
-                            : null
-                    }
+            <RecordContextProvider state={state}>
+                <PersonForm
+                    showEdit={!event && !panelValid}
+                    passValues={onPersonValues}
+                    onUniqueValue={onUniqueValue}
+                    initLoading={event && !eventId}
                 />
-            )}
-            {eventId && (
-                <RecordForm
-                    programStage={programStage}
-                    rules={rules}
-                    values={eventValues}
-                    eventId={eventId}
-                    status={status}
-                    passValues={valid =>
-                        dispatch({ type: types.EVENT_VALID, invalid: valid })
-                    }
-                    checkDuplicate={checkDuplicate}
-                    duplicate={duplicate}
-                />
-            )}
+                {entityValid && (
+                    <RecordPanel
+                        passValues={onPanelValues}
+                        onReset={!event && eventId ? onPanelReset : null}
+                    />
+                )}
+                {eventId && (
+                    <RecordForm
+                        passValues={onRecordValues}
+                        checkDuplicate={checkDuplicate}
+                    />
+                )}
+            </RecordContextProvider>
             {loading && <ProgressSection />}
             <ButtonRow
                 buttons={
@@ -251,9 +239,7 @@ export const RecordSections = props => {
                                           : 'Submit record',
                                       disabledTooltip: status.completed
                                           ? 'Records with this approval status cannot be edited'
-                                          : duplicate
-                                          ? 'A different record exists for the same person, with the same organism and lab sample ID, within 15 days'
-                                          : eventInvalid
+                                          : duplicate || eventInvalid
                                           ? eventInvalid
                                           : undefined,
                                   },
@@ -267,11 +253,10 @@ export const RecordSections = props => {
                                   kind: 'primary',
                                   tooltip:
                                       'Submit record and add new record for the same person',
-                                  disabledTooltip: duplicate
-                                      ? 'A different record exists for the same person, with the same organism and lab sample ID, within 15 days'
-                                      : eventInvalid
-                                      ? eventInvalid
-                                      : undefined,
+                                  disabledTooltip:
+                                      duplicate || eventInvalid
+                                          ? eventInvalid
+                                          : undefined,
                               },
                               {
                                   label: 'Submit',
@@ -280,11 +265,10 @@ export const RecordSections = props => {
                                   icon: 'done',
                                   kind: 'primary',
                                   tooltip: 'Submit record',
-                                  disabledTooltip: duplicate
-                                      ? 'A different record exists for the same person, with the same organism and lab sample ID, within 15 days'
-                                      : eventInvalid
-                                      ? eventInvalid
-                                      : undefined,
+                                  disabledTooltip:
+                                      duplicate || eventInvalid
+                                          ? eventInvalid
+                                          : undefined,
                               },
                           ]
                 }

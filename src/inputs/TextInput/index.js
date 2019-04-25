@@ -51,7 +51,7 @@ export const TextInput = props => {
     const passValue = async value => {
         const didValidate = await validate(value)
         setError(didValidate)
-        props.onChange(props.name, value)
+        props.onChange(props.name, value, props.unique)
     }
 
     /**
@@ -71,6 +71,10 @@ export const TextInput = props => {
         return error
     }
 
+    const onInput = (n, v) => {
+        if (!validating) setValue(v)
+    }
+
     return (
         <Input>
             <CustomInputField color={props.color}>
@@ -79,7 +83,7 @@ export const TextInput = props => {
                     name={props.name}
                     label={props.label}
                     value={value}
-                    onChange={(n, v) => setValue(v)}
+                    onChange={onInput}
                     kind={'outlined'}
                     status={
                         validating

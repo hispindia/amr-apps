@@ -30,7 +30,7 @@ ConfigContextProvider.propTypes = {
             value: string,
             icon: string,
             status: string,
-            countView: oneOfType([string, object]).isRequired,
+            sqlView: oneOfType([string, object]).isRequired,
             count: number,
         })
     ).isRequired,

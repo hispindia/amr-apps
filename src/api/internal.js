@@ -9,13 +9,38 @@ const _l2ApprovalStatus = 'sXDQT6Yaf77'
 const _l2RejectionReason = 'pz8SoHBO6RL'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
+export const request = (
+    endpoint,
+    { fields, filters, order, options, paging = false }
+) => {
+    let url = `${endpoint}?paging=${paging}`
+
+    if (fields) url += `&fields=${fields}`
+    if (filters) url += `&filter=${filters}`
+    if (order) url += `&order=${order}`
+    if (options) url += `&${options.join('&')}`
+
+    return url
+}
+
+export const getSqlView = async (sqlView, orgUnit, { user, status }) =>
+    (await get(
+        request(`sqlViews/${sqlView}/data`, {
+            options: [
+                `var=orgunit:${orgUnit}`,
+                ...(user ? [`var=username:${user}`] : []),
+                ...(status ? [`var=status:${status}`] : []),
+            ],
+        })
+    )).listGrid.rows
+
 /**
  * Gets values for a single event.
  * @param {string} eventId - AMR Id.
  * @returns {Object} Event values.
  */
 export const getEventValues = async eventId => {
-    const event = await get('events/' + eventId)
+    const event = await get(`events/${eventId}`)
     let values = {}
 
     if (event.dataValues)
@@ -34,6 +59,31 @@ export const getEventValues = async eventId => {
 }
 
 /**
+ * Adds values to event.
+ * @param {Object} event - Event.
+ * @param {Object} values - New values.
+ * @param {Object} testFields - Test fields meta data.
+ * @returns {Object} Event.
+ */
+export const setEventValues = async (event, values) => {
+    if (!event.dataValues) event.dataValues = []
+
+    for (let dataElement in values) {
+        const dataE = event.dataValues.find(
+            dataValue => dataValue.dataElement === dataElement
+        )
+        !dataE
+            ? event.dataValues.push({
+                  dataElement: dataElement,
+                  value: values[dataElement],
+              })
+            : (dataE.value = values[dataElement])
+    }
+
+    return event
+}
+
+/**
  * Generates AMR Id consisting of OU code and a random integer.
  * @param {string} orgUnitId - Organisation unit ID.
  * @returns {string} AMR Id.
@@ -45,12 +95,11 @@ export const generateAmrId = async (orgUnitId, orgUnitCode) => {
     let amrId = newId()
     while (
         (await get(
-            'events.json?paging=false&fields=event&orgUnit=' +
-                orgUnitId +
-                '&filter=' +
-                _amrDataElement +
-                ':eq:' +
-                amrId
+            request('events', {
+                fields: 'event',
+                filters: `${_amrDataElement}:eq:${amrId}`,
+                options: [`orgUnit=${orgUnitId}`],
+            })
         )).events.length !== 0
     )
         amrId = newId()

@@ -1,6 +1,13 @@
 import moment from 'moment'
-import { get, postData, del, put, setBaseUrl } from './crud'
-import { getProgramStage, getEventValues, generateAmrId } from './internal'
+import { get, post, del, put, setBaseUrl } from './crud'
+import {
+    getProgramStage,
+    getEventValues,
+    setEventValues,
+    generateAmrId,
+    request,
+    getSqlView,
+} from './internal'
 
 export const _organismsDataElementId = 'SaQe2REkGVw'
 export const _testResultDataElementId = 'bSgpKbkbVGL'
@@ -28,11 +35,9 @@ let _username = ''
  * Sets the base URL, username, and user groups.
  * @param {String} baseUrl - Base URL.
  */
-export async function init(baseUrl) {
-    setBaseUrl(baseUrl)
-}
+export const init = baseUrl => setBaseUrl(baseUrl)
 
-export async function initMetadata() {
+export const initMetadata = async () => {
     // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
     const programCondition = c => {
         const original = c
@@ -78,7 +83,9 @@ export async function initMetadata() {
     }
 
     const user = await get(
-        'me.json?fields=organisationUnits,userGroups,userCredentials[username]'
+        request('me', {
+            fields: 'organisationUnits,userGroups,userCredentials[username]',
+        })
     )
     _username = user.userCredentials.username
     const userGroups = user.userGroups.map(userGroup => userGroup.id)
@@ -88,20 +95,49 @@ export async function initMetadata() {
     const userOrgUnits = user.organisationUnits.map(uo => uo.id)
 
     let data = await get(
-        'metadata.json?' +
-            'options=true&programs=true&optionSets=true&optionGroups=true&constants=true&organisationUnits=true' +
-            '&programRuleVariables=true&programRules=true&trackedEntityTypes=true&dataElements=true' +
-            '&fields=id,name,displayName,code,path,children,options,dataElement,program,organisationUnits,' +
-            'formName,value,programStage,programStages[id,displayName,programStageDataElements[' +
-            'dataElement[id],compulsory],programStageSections[id,name,' +
-            'displayName,renderType,dataElements[id,displayFormName,code,' +
-            'valueType,optionSetValue,optionSet]]],programRuleActions[' +
-            'programRuleActionType,dataElement,optionGroup,content,' +
-            'trackedEntityAttribute,programStageSection,data],condition,' +
-            'trackedEntityTypeAttributes[name,id,displayName,valueType,unique,' +
-            'optionSetValue,optionSet]trackedEntityTypeAttributes[mandatory,' +
-            'trackedEntityAttribute[name,id,displayName,valueType,unique,' +
-            'optionSetValue,optionSet]],priority&order=level:asc'
+        request('metadata', {
+            order: 'level:asc',
+            fields: [
+                'children',
+                'condition',
+                'code',
+                'dataElement',
+                'displayName',
+                'formName',
+                'id',
+                'name',
+                'options',
+                'organisationUnits',
+                'path',
+                'priority',
+                'program',
+                `programRuleActions[programRuleActionType,dataElement,
+                    optionGroup,content,trackedEntityAttribute,
+                    programStageSection,data]`,
+                'programStage',
+                `programStages[id,displayName,programStageDataElements[
+                    dataElement[id],compulsory],programStageSections[id,name,
+                    displayName,renderType,dataElements[id,displayFormName,
+                    code,valueType,optionSetValue,optionSet]]]`,
+                `trackedEntityTypeAttributes[name,id,displayName,valueType,
+                    unique,optionSetValue,optionSet,mandatory,
+                    trackedEntityAttribute[name,id,displayName,valueType,
+                    unique,optionSetValue,optionSet]]`,
+                'value',
+            ],
+            options: [
+                'constants=true',
+                'dataElements=true',
+                'optionGroups=true',
+                'options=true',
+                'optionSets=true',
+                'organisationUnits=true',
+                'programRules=true',
+                'programRuleVariables=true',
+                'programs=true',
+                'trackedEntityTypes=true',
+            ],
+        })
     )
 
     let orgUnits = []
@@ -281,15 +317,16 @@ export async function initMetadata() {
  * @param {string} value - Value.
  * @returns {boolean} - False if unique, tracked entity instance ID otherwise.
  */
-export async function checkUnique(property, value) {
+export const checkUnique = async (property, value) => {
     const entities = (await get(
-        'trackedEntityInstances.json?ouMode=ACCESSIBLE&paging=false&' +
-            'fields=trackedEntityInstance&trackedEntityType=' +
-            _personTypeId +
-            '&filter=' +
-            property +
-            ':eq:' +
-            value
+        request('trackedEntityInstances', {
+            fields: 'trackedEntityInstance',
+            filters: `${property}:eq:${value}`,
+            options: [
+                'ouMode=ACCESSIBLE',
+                `trackedEntityType=${_personTypeId}`,
+            ],
+        })
     )).trackedEntityInstances
     return !entities
         ? false
@@ -303,20 +340,18 @@ export async function checkUnique(property, value) {
  * @param {string} entityId - Tracked entity instance ID.
  * @returns {Object} Values.
  */
-export async function getPersonValues(entityId) {
-    const data = await get(
-        'trackedEntityInstances/' +
-            entityId +
-            '.json?ouMode=ALL&fields=attributes[code,displayName,' +
-            'valueType,attribute,value]'
-    )
+export const getPersonValues = async entityId => {
+    const attributes = (await get(
+        request(`trackedEntityInstances/${entityId}`, {
+            fields: 'attributes[code,displayName,valueType,attribute,value]',
+            options: ['ouMode=ALL'],
+        })
+    )).attributes
 
-    if (!data) return null
+    if (!attributes) return null
 
     let values = {}
-    data.attributes.forEach(
-        attribute => (values[attribute.attribute] = attribute.value)
-    )
+    attributes.forEach(a => (values[a.attribute] = a.value))
 
     return values
 }
@@ -326,7 +361,7 @@ export async function getPersonValues(entityId) {
  * @param {Object} values - Values
  * @returns {string} Tracked entity instance ID.
  */
-export async function addPerson(values, orgUnit) {
+export const addPerson = async (values, orgUnit) => {
     let data = {
         trackedEntityType: _personTypeId,
         orgUnit: orgUnit,
@@ -335,8 +370,8 @@ export async function addPerson(values, orgUnit) {
     for (let key in values)
         data.attributes.push({ attribute: key, value: values[key] })
 
-    return (await (await postData('trackedEntityInstances/', data)).json())
-        .response.importSummaries[0].reference
+    return (await (await post('trackedEntityInstances', data)).json()).response
+        .importSummaries[0].reference
 }
 
 /**
@@ -344,24 +379,24 @@ export async function addPerson(values, orgUnit) {
  * @param {string} id - Tracked entity instance id.
  * @param {Object} values - Values.
  */
-export async function updatePerson(id, values) {
-    let data = await get('trackedEntityInstances/' + id)
+export const updatePerson = async (id, values) => {
+    const url = `trackedEntityInstances/${id}`
+    let data = await get(url)
     data.attributes = []
     for (let key in values)
         data.attributes.push({ attribute: key, value: values[key] })
 
-    await put('trackedEntityInstances/' + id, data)
+    await put(url, data)
 }
 
 /**
  * Deletes a tracked entity instance.
  * @param {string} id - Tracked entity instance.
  */
-export async function deletePerson(id) {
-    await del('trackedEntityInstances/' + id)
-}
+export const deletePerson = async id =>
+    await del(`trackedEntityInstances/${id}`)
 
-export async function newRecord(
+export const newRecord = async (
     pId,
     pStage,
     orgaCode,
@@ -370,7 +405,7 @@ export async function newRecord(
     eValues,
     sampleDate,
     orgUnitCode
-) {
+) => {
     let initialValues = {
         [_organismsDataElementId]: orgaCode,
         [_amrDataElement]: await generateAmrId(ou, orgUnitCode),
@@ -404,7 +439,7 @@ export async function newRecord(
     return { programStage, eventValues, status, eventId, entityId }
 }
 
-export async function existingRecord(programs, eventId, isApproval) {
+export const existingRecord = async (programs, eventId, isApproval) => {
     let {
         eventValues: initialValues,
         programId,
@@ -437,39 +472,14 @@ export async function existingRecord(programs, eventId, isApproval) {
     }
 }
 
-/**
- * Adds values to event.
- * @param {Object} event - Event.
- * @param {Object} values - New values.
- * @param {Object} testFields - Test fields meta data.
- * @returns {Object} Event.
- */
-async function setEventValues(event, values) {
-    if (!event.dataValues) event.dataValues = []
-
-    for (let dataElement in values) {
-        const dataE = event.dataValues.find(
-            dataValue => dataValue.dataElement === dataElement
-        )
-        !dataE
-            ? event.dataValues.push({
-                  dataElement: dataElement,
-                  value: values[dataElement],
-              })
-            : (dataE.value = values[dataElement])
-    }
-
-    return event
-}
-
-export async function addPersonWithEvent(
+export const addPersonWithEvent = async (
     eventValues,
     programId,
     programStageId,
     orgUnitId,
     entityValues,
     sampleDate
-) {
+) => {
     let event = await setEventValues(
         {
             dataValues: [],
@@ -499,7 +509,7 @@ export async function addPersonWithEvent(
         ],
     }
 
-    const r = await postData('trackedEntityInstances/', data)
+    const r = await post('trackedEntityInstances', data)
 
     return {
         entityId: r.response.importSummaries[0].reference,
@@ -518,7 +528,7 @@ export async function addPersonWithEvent(
  * @param {string} entityId - Tracked entity instance ID.
  * @param {string} entityValues - Entity values.
  */
-export async function addEvent(
+export const addEvent = async (
     eventValues,
     programId,
     programStageId,
@@ -526,7 +536,7 @@ export async function addEvent(
     entityId,
     entityValues,
     sampleDate
-) {
+) => {
     let event = await setEventValues(
         {
             dataValues: [],
@@ -545,12 +555,12 @@ export async function addEvent(
     // Enrolling if not already enrolled.
     let enrollments = []
     enrollments = (await get(
-        'trackedEntityInstances/' +
-            entityId +
-            '.json?fields=enrollments[program]'
+        request(`trackedEntityInstances/${entityId}`, {
+            fields: 'enrollments[program]',
+        })
     )).enrollments
     if (!enrollments.find(enrollment => enrollment.program === programId)) {
-        await postData('enrollments', {
+        await post('enrollments', {
             trackedEntityInstance: entityId,
             orgUnit: orgUnitId,
             program: programId,
@@ -559,7 +569,7 @@ export async function addEvent(
         })
     }
 
-    const r = await postData('events', event)
+    const r = await post('events', event)
 
     return {
         entityId,
@@ -567,8 +577,10 @@ export async function addEvent(
     }
 }
 
-export async function setEventStatus(eventId, completed, isApproval) {
-    let event = await get('events/' + eventId)
+export const setEventStatus = async (eventId, completed, isApproval) => {
+    const url = `events/${eventId}`
+
+    let event = await get(url)
     event.status = completed ? 'COMPLETED' : 'ACTIVE'
     if (!isApproval) {
         let values = {}
@@ -585,100 +597,83 @@ export async function setEventStatus(eventId, completed, isApproval) {
         }
         event = await setEventValues(event, values)
     }
-    await put('events/' + eventId, event)
+    await put(url, event)
 }
 
-export async function updateEventValue(eventId, dataElementId, value) {
-    await put('events/' + eventId + '/' + dataElementId, {
+export const updateEventValue = (eventId, dataElementId, value) =>
+    put(`events/${eventId}/${dataElementId}`, {
         dataValues: [{ dataElement: dataElementId, value: value }],
     })
-}
 
 /**
  * Deletes event.
  * @param {string} eventId - Event ID.
  */
-export async function deleteEvent(eventId) {
-    await del('events/' + eventId)
-}
+export const deleteEvent = async eventId => await del(`events/${eventId}`)
 
-export async function getEvents(config, orgUnit, userOnly) {
-    if (userOnly)
-        return (await get(
-            'sqlViews/' +
-                config.sqlView +
-                '/data.json?paging=false&var=orgunit:' +
-                orgUnit +
-                (config.param ? '&var=status:' + config.status : '') +
-                (userOnly ? '&var=username:' + _username : '')
-        )).listGrid.rows
-    else
-        return (await get(
-            'sqlViews/' +
-                (_isL2User ? config.sqlView.l2 : config.sqlView.l1) +
-                '/data.json?paging=false&var=orgunit:' +
-                orgUnit +
-                (config.param ? '&var=status:' + config.status : '') +
-                (userOnly ? '&var=username:' + _username : '')
-        )).listGrid.rows
-}
+export const getEvents = async (config, orgUnit, userOnly) =>
+    await getSqlView(
+        userOnly
+            ? config.sqlView
+            : _isL2User
+            ? config.sqlView.l2
+            : config.sqlView.l1,
+        orgUnit,
+        {
+            user: userOnly ? _username : false,
+            status: config.param ? config.status : false,
+        }
+    )
 
-export async function getCounts(items, orgUnit, userOnly) {
-    if (userOnly)
-        for (let item of items)
-            item.count = (await get(
-                'sqlViews/' +
-                    item.countView +
-                    '/data.json?paging=false&var=orgunit:' +
-                    orgUnit +
-                    (item.param ? '&var=status:' + item.status : '') +
-                    (userOnly ? '&var=username:' + _username : '')
-            )).listGrid.rows[0][0]
-    else
-        for (let item of items)
-            item.count = (await get(
-                'sqlViews/' +
-                    (_isL2User ? item.countView.l2 : item.countView.l1) +
-                    '/data.json?paging=false&var=orgunit:' +
-                    orgUnit +
-                    (item.param ? '&var=status:' + item.status : '') +
-                    (userOnly ? '&var=username:' + _username : '')
-            )).listGrid.rows[0][0]
+export const getCounts = async (items, orgUnit, userOnly) => {
+    for (let item of items)
+        item.count = (await getSqlView(
+            userOnly
+                ? item.sqlView
+                : _isL2User
+                ? item.sqlView.l2
+                : item.sqlView.l1,
+            orgUnit,
+            {
+                user: userOnly ? _username : false,
+                status: item.param ? item.status : false,
+            }
+        ))[0][0]
     return items
 }
 
-export async function isDuplicate(
+export const isDuplicate = async (
     event,
     entity,
+    programStage,
     organism,
     sampleId,
     date,
     days
-) {
+) => {
     let events = (await get(
-        'events.json?trackedEntityInstance=' +
-            entity +
-            '&filter=' +
-            _sampleIdElementId +
-            ':eq:' +
-            sampleId +
-            ',' +
-            _organismsDataElementId +
-            ':eq:' +
-            organism +
-            '&paging=false&fields=event,eventDate,created&order=created:asc'
-    )).events
+        request('events/query', {
+            order: 'created:asc',
+            filters: [
+                `${_sampleIdElementId}:eq:${sampleId}`,
+                `${_organismsDataElementId}:eq:${organism}`,
+            ],
+            options: [
+                `trackedEntityInstance=${entity}`,
+                `programStage=${programStage}`,
+            ],
+        })
+    )).rows
+
+    if (!events) return false
     if (events.length < 1) return false
-    if (events[0].event === event) return false
-    events = events.filter(e => e.event !== event)
+    if (events[0][0] === event) return false
+    events = events.filter(e => e[0] !== event)
     if (events.length < 1) return false
+
     days = parseInt(days)
     date = moment(date)
     const min = date.clone().subtract(days, 'days')
     const max = date.clone().add(days, 'days')
-    return (
-        events.find(
-            e => moment(e.eventDate) > min && moment(e.eventDate) < max
-        ) !== null
-    )
+    return events.find(e => moment(e[7]) > min && moment(e[7]) < max) !== null
 }

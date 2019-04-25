@@ -1,13 +1,13 @@
 /* eslint no-eval: 0 */
 
 import React, { useContext, useEffect, useState } from 'react'
-import { bool, func, objectOf, string } from 'prop-types'
+import { bool, func } from 'prop-types'
 import { Grid } from '@material-ui/core'
 import { Card } from '@dhis2/ui/core'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { getPersonValues, checkUnique } from 'api'
-import { TextInput, AgeInput, RadioInput, SelectInput, ButtonRow } from 'inputs'
-import { MetadataContext } from 'contexts'
+import { TextInput, AgeInput, RadioInput, SelectInput } from 'inputs'
+import { MetadataContext, RecordContext } from 'contexts'
 import { ModalPopup } from 'modules'
 import { ProgressSection } from '../ProgressSection'
 import { CustomButtonRow } from './style'
@@ -15,11 +15,17 @@ import { CustomButtonRow } from './style'
 /**
  * Entity information section.
  */
-export const PersonForm = props => {
+export const PersonForm = ({
+    initLoading,
+    showEdit,
+    passValues,
+    onUniqueValue,
+}) => {
     const { optionSets, person } = useContext(MetadataContext)
+    const { entityId, entityValues } = useContext(RecordContext)
     const [uniques, setUniques] = useState([])
     const [editing, setEditing] = useState(false)
-    const [loading, setLoading] = useState(props.loading)
+    const [loading, setLoading] = useState(initLoading)
     const [modal, setModal] = useState(null)
     const [half] = useState(
         Math.floor(person.trackedEntityTypeAttributes.length / 2)
@@ -29,39 +35,42 @@ export const PersonForm = props => {
     )
 
     useEffect(() => {
-        let newValues = { ...props.values }
+        let newValues = { ...entityValues }
         let newAttributes = [...attributes]
         checkRules(newValues, newAttributes)
         setAttributes(newAttributes)
-        onNewValues(newValues, props.id)
+        onNewValues(newValues, entityId)
     }, [])
 
     useEffect(() => {
         const init = async () =>
-            onNewValues(await getPersonValues(props.id), props.id)
-        if (props.id) {
+            onNewValues(await getPersonValues(entityId), entityId)
+        if (entityId) {
             init()
             setLoading(false)
         }
-    }, [props.id])
+    }, [entityId])
 
     /**
      * Called on every input field change.
      */
-    const onChange = (name, value) => {
-        let newValues = { ...props.values }
+    const onChange = (name, value, unique) => {
+        let newValues = { ...entityValues }
         if (newValues[name] === value) return
-        newValues[name] = value
-        onNewValues(newValues)
+        if (unique) onUniqueValue({ key: name, value: value })
+        else {
+            newValues[name] = value
+            onNewValues(newValues)
+        }
     }
 
-    const onNewValues = (values, entityId) => {
+    const onNewValues = (values, newEntityId, reset) => {
         let newAttributes = [...attributes]
         checkRules(values, newAttributes)
         setAttributes(newAttributes)
-        props.passValues({
+        passValues({
             values: values,
-            id: entityId ? entityId : props.id,
+            id: reset ? null : newEntityId ? newEntityId : entityId,
             valid: validate(newAttributes, values, uniques),
         })
     }
@@ -88,16 +97,16 @@ export const PersonForm = props => {
      * @returns {boolean} True if valid.
      */
     const validateUnique = async (id, value, label) => {
-        const entityId = await checkUnique(id, value)
+        const newEntityId = await checkUnique(id, value)
         let uniques = { ...uniques }
-        uniques[id] = entityId ? false : true
+        uniques[id] = newEntityId ? false : true
         setUniques(uniques)
-        if (!entityId) return true
+        if (!newEntityId) return true
         setModal({
             id: id,
             label: label,
             value: value,
-            entityId: entityId,
+            entityId: newEntityId,
         })
         return false
     }
@@ -168,8 +177,7 @@ export const PersonForm = props => {
     const getInput = attribute => {
         if (attribute.hide) return null
 
-        const { values, id } = props
-        const disabled = id && !editing ? true : false
+        const disabled = entityId && !editing ? true : false
 
         return (
             <Padding key={attribute.trackedEntityAttribute.id}>
@@ -179,7 +187,9 @@ export const PersonForm = props => {
                         unique={attribute.trackedEntityAttribute.unique}
                         name={attribute.trackedEntityAttribute.id}
                         label={attribute.trackedEntityAttribute.displayName}
-                        value={values[attribute.trackedEntityAttribute.id]}
+                        value={
+                            entityValues[attribute.trackedEntityAttribute.id]
+                        }
                         onChange={onChange}
                         disabled={disabled}
                     />
@@ -196,7 +206,11 @@ export const PersonForm = props => {
                             }
                             name={attribute.trackedEntityAttribute.id}
                             label={attribute.trackedEntityAttribute.displayName}
-                            value={values[attribute.trackedEntityAttribute.id]}
+                            value={
+                                entityValues[
+                                    attribute.trackedEntityAttribute.id
+                                ]
+                            }
                             onChange={onChange}
                             disabled={disabled}
                         />
@@ -211,7 +225,11 @@ export const PersonForm = props => {
                             }
                             name={attribute.trackedEntityAttribute.id}
                             label={attribute.trackedEntityAttribute.displayName}
-                            value={values[attribute.trackedEntityAttribute.id]}
+                            value={
+                                entityValues[
+                                    attribute.trackedEntityAttribute.id
+                                ]
+                            }
                             onChange={onChange}
                             disabled={disabled}
                         />
@@ -227,11 +245,14 @@ export const PersonForm = props => {
                         validateUnique={validateUnique}
                         name={attribute.trackedEntityAttribute.id}
                         label={attribute.trackedEntityAttribute.displayName}
-                        value={values[attribute.trackedEntityAttribute.id]}
+                        value={
+                            entityValues[attribute.trackedEntityAttribute.id]
+                        }
                         onChange={onChange}
                         disabled={
                             disabled ||
-                            (id && attribute.trackedEntityAttribute.unique)
+                            (entityId &&
+                                attribute.trackedEntityAttribute.unique)
                         }
                         type={
                             attribute.trackedEntityAttribute.valueType ===
@@ -246,12 +267,12 @@ export const PersonForm = props => {
     }
 
     const onModalClick = async yes => {
-        const { id, entityId } = modal
         let uniques = { ...uniques }
-        uniques[id] = yes
+        uniques[modal.id] = yes
         setUniques(uniques)
 
-        if (yes) onNewValues(await getPersonValues(entityId), entityId)
+        if (yes)
+            onNewValues(await getPersonValues(modal.entityId), modal.entityId)
 
         setModal(null)
     }
@@ -260,11 +281,9 @@ export const PersonForm = props => {
         setAttributes(person.trackedEntityTypeAttributes)
         setUniques([])
         setEditing(false)
-        props.passValues({
-            values: {},
-            id: null,
-            valid: false,
-        })
+        let values = {}
+        Object.keys(entityValues).forEach(v => (values[v] = ''))
+        onNewValues(values, null, true)
     }
 
     if (loading) return <ProgressSection />
@@ -289,7 +308,7 @@ export const PersonForm = props => {
             )}
             <Card>
                 <Margin>
-                    {props.id && !editing && props.showEdit && (
+                    {entityId && !editing && showEdit && (
                         <CustomButtonRow
                             unspaced
                             buttons={[
@@ -328,10 +347,8 @@ export const PersonForm = props => {
 }
 
 PersonForm.prototypes = {
-    values: objectOf(string),
-    valid: bool.isRequired,
     showEdit: bool.isRequired,
     passValues: func.isRequired,
-    loading: bool.isRequired,
-    id: string,
+    onUniqueValue: func.isRequired,
+    initLoading: bool,
 }

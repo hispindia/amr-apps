@@ -1,14 +1,14 @@
 /* eslint no-eval: 0 */
 
 import React, { useContext, useEffect } from 'react'
-import { arrayOf, func, object, objectOf, string } from 'prop-types'
+import { func } from 'prop-types'
 import {
     updateEventValue,
     _testResultDataElementId,
     _sampleIdElementId,
 } from 'api'
 import { MarginBottom } from 'styles'
-import { MetadataContext } from 'contexts'
+import { MetadataContext, RecordContext } from 'contexts'
 import { ProgressSection } from '../'
 import { hook } from './hook'
 import { Section } from './Section'
@@ -18,41 +18,48 @@ const invalidReason = {
     error: 'A field is invalid',
 }
 
-export const RecordForm = props => {
+export const RecordForm = ({ passValues, checkDuplicate }) => {
     const [state, dispatch, types] = hook()
     const { optionSets } = useContext(MetadataContext)
+    const {
+        programStage,
+        eventValues,
+        rules,
+        eventId,
+        status,
+        duplicate,
+    } = useContext(RecordContext)
 
     useEffect(() => {
         if (!state.values) return
         const sampleId = state.values[_sampleIdElementId]
-        if (sampleId) props.checkDuplicate(sampleId)
+        if (sampleId) checkDuplicate(sampleId)
     }, [state.values && state.values[_sampleIdElementId]])
 
     useEffect(() => {
         init()
-    }, [props.programStage, props.values, props.status])
+    }, [programStage, eventValues, status])
 
     useEffect(() => {
-        if (!props.duplicate !== !state.errors[_sampleIdElementId])
-            dispatch({ type: types.SET_ERROR, error: props.duplicate })
-    }, [props.duplicate])
+        if (!duplicate !== !state.errors[_sampleIdElementId])
+            dispatch({ type: types.SET_ERROR, error: duplicate })
+    }, [duplicate])
 
     const init = async () => {
         dispatch({ type: types.LOADING })
-        let { programStage, values, passValues, status } = props
         checkRules(
-            status.completed ? { ...values } : values,
+            status.completed ? { ...eventValues } : eventValues,
             programStage.programStageSections,
             !status.completed
         )
-        dispatch({ type: types.SET, programStage, values })
+        dispatch({ type: types.SET, programStage, values: eventValues })
         if (passValues)
             passValues(
-                validateValues(programStage.programStageSections, values)
+                validateValues(programStage.programStageSections, eventValues)
             )
     }
 
-    const onNewValue = (id, value) => updateEventValue(props.eventId, id, value)
+    const onNewValue = (id, value) => updateEventValue(eventId, id, value)
 
     const onChange = (name, value) => {
         let values = { ...state.values }
@@ -63,17 +70,11 @@ export const RecordForm = props => {
     }
 
     const onNewValues = values => {
-        let programStage = { ...state.programStage }
-        checkRules(
-            values,
-            programStage.programStageSections,
-            !props.status.completed
-        )
-        dispatch({ type: types.SET, programStage, values })
-        if (props.passValues)
-            props.passValues(
-                validateValues(programStage.programStageSections, values)
-            )
+        let stage = { ...state.programStage }
+        checkRules(values, stage.programStageSections, !status.completed)
+        dispatch({ type: types.SET, programStage: stage, values })
+        if (passValues)
+            passValues(validateValues(stage.programStageSections, values))
     }
 
     const validateValues = (sections, values) => {
@@ -177,7 +178,7 @@ export const RecordForm = props => {
             })
         }
 
-        props.rules.forEach(rule => {
+        rules.forEach(rule => {
             rule.programRuleActions.forEach(r => {
                 try {
                     const cond = eval(rule.condition)
@@ -248,7 +249,6 @@ export const RecordForm = props => {
     }
 
     if (state.loading) return <ProgressSection />
-
     return (
         <MarginBottom>
             {state.programStage.programStageSections
@@ -260,7 +260,6 @@ export const RecordForm = props => {
                         renderType={section.renderType.DESKTOP.type}
                         dataElements={section.dataElements}
                         childSections={section.childSections}
-                        completed={props.status.completed}
                         onChange={onChange}
                         values={state.values}
                         errors={state.errors}
@@ -271,11 +270,6 @@ export const RecordForm = props => {
 }
 
 RecordForm.propTypes = {
-    programStage: object.isRequired,
-    values: objectOf(string).isRequired,
     passValues: func.isRequired,
-    status: object.isRequired,
-    rules: arrayOf(object).isRequired,
-    eventId: string,
-    passValues: func,
+    checkDuplicate: func,
 }

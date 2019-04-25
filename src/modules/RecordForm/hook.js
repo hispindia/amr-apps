@@ -1,8 +1,11 @@
-import { useReducer } from 'react'
+import { useReducer, useContext } from 'react'
 import { _sampleIdElementId } from 'api'
+import { MetadataContext } from 'contexts'
 
-const sampleDateError =
-    'A different record exists for the same person, with the same organism and lab sample ID, within 15 days'
+const sampleDateError = days =>
+    `A different record exists for the same person, with the same organism and lab sample ID, within ${days} ${
+        days > 1 ? 'days' : 'day'
+    }`
 
 const types = {
     LOADING: 0,
@@ -30,7 +33,9 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 errors: {
-                    [_sampleIdElementId]: action.error ? sampleDateError : null,
+                    [_sampleIdElementId]: action.error
+                        ? sampleDateError(state.days)
+                        : null,
                 },
             }
         }
@@ -41,11 +46,13 @@ const reducer = (state, action) => {
 }
 
 export const hook = () => {
+    const { constants } = useContext(MetadataContext)
     const [state, dispatch] = useReducer(reducer, {
         loading: true,
         programStage: null,
         values: null,
         errors: { [_sampleIdElementId]: null },
+        days: constants.days,
     })
 
     return [state, dispatch, types]
