@@ -71,6 +71,10 @@ export const TextInput = props => {
         return error
     }
 
+    const onInput = (n, v) => {
+        if (!validating) setValue(v)
+    }
+
     return (
         <Input>
             <CustomInputField color={props.color}>
@@ -79,7 +83,7 @@ export const TextInput = props => {
                     name={props.name}
                     label={props.label}
                     value={value}
-                    onChange={(n, v) => setValue(v)}
+                    onChange={onInput}
                     kind={'outlined'}
                     status={
                         validating
@@ -101,7 +105,7 @@ export const TextInput = props => {
                             ? props.warning
                             : ''
                     }
-                    disabled={props.disabled || validating}
+                    disabled={props.disabled}
                     type={props.type}
                     size="dense"
                 />
