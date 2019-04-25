@@ -59,6 +59,31 @@ export const getEventValues = async eventId => {
 }
 
 /**
+ * Adds values to event.
+ * @param {Object} event - Event.
+ * @param {Object} values - New values.
+ * @param {Object} testFields - Test fields meta data.
+ * @returns {Object} Event.
+ */
+export const setEventValues = async (event, values) => {
+    if (!event.dataValues) event.dataValues = []
+
+    for (let dataElement in values) {
+        const dataE = event.dataValues.find(
+            dataValue => dataValue.dataElement === dataElement
+        )
+        !dataE
+            ? event.dataValues.push({
+                  dataElement: dataElement,
+                  value: values[dataElement],
+              })
+            : (dataE.value = values[dataElement])
+    }
+
+    return event
+}
+
+/**
  * Generates AMR Id consisting of OU code and a random integer.
  * @param {string} orgUnitId - Organisation unit ID.
  * @returns {string} AMR Id.
@@ -72,7 +97,7 @@ export const generateAmrId = async (orgUnitId, orgUnitCode) => {
         (await get(
             request('events', {
                 fields: 'event',
-                filter: `${_amrDataElement}:eq:${amrId}`,
+                filters: `${_amrDataElement}:eq:${amrId}`,
                 options: [`orgUnit=${orgUnitId}`],
             })
         )).events.length !== 0

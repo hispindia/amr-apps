@@ -92,10 +92,10 @@ const reducer = (state, action) => {
         case types.ADD_MORE: {
             return {
                 ...state,
-                programId: null,
-                programStageId: null,
-                organism: null,
-                sampleDate: null,
+                programId: '',
+                programStageId: '',
+                organism: '',
+                sampleDate: '',
                 panelValid: false,
                 eventData: null,
                 eventInvalid: invalidReason.required,
@@ -136,7 +136,6 @@ const reducer = (state, action) => {
         case types.DELETE_CONFIRMED: {
             return {
                 ...state,
-                buttonDisabled: false,
                 deleteClicked: false,
                 deleteConfirmation: action.delete,
             }
@@ -175,10 +174,10 @@ export const hook = orgUnit => {
         entityId: null,
         entityValues: person.values,
         entityValid: false,
-        programId: null,
-        programStageId: null,
-        organism: null,
-        sampleDate: null,
+        programId: '',
+        programStageId: '',
+        organism: '',
+        sampleDate: '',
         panelValid: false,
         eventId: null,
         eventValues: null,

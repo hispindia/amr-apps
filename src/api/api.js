@@ -1,8 +1,9 @@
 import moment from 'moment'
-import { get, postData, del, put, setBaseUrl } from './crud'
+import { get, post, del, put, setBaseUrl } from './crud'
 import {
     getProgramStage,
     getEventValues,
+    setEventValues,
     generateAmrId,
     request,
     getSqlView,
@@ -34,11 +35,9 @@ let _username = ''
  * Sets the base URL, username, and user groups.
  * @param {String} baseUrl - Base URL.
  */
-export async function init(baseUrl) {
-    setBaseUrl(baseUrl)
-}
+export const init = baseUrl => setBaseUrl(baseUrl)
 
-export async function initMetadata() {
+export const initMetadata = async () => {
     // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
     const programCondition = c => {
         const original = c
@@ -318,7 +317,7 @@ export async function initMetadata() {
  * @param {string} value - Value.
  * @returns {boolean} - False if unique, tracked entity instance ID otherwise.
  */
-export async function checkUnique(property, value) {
+export const checkUnique = async (property, value) => {
     const entities = (await get(
         request('trackedEntityInstances', {
             fields: 'trackedEntityInstance',
@@ -341,7 +340,7 @@ export async function checkUnique(property, value) {
  * @param {string} entityId - Tracked entity instance ID.
  * @returns {Object} Values.
  */
-export async function getPersonValues(entityId) {
+export const getPersonValues = async entityId => {
     const attributes = (await get(
         request(`trackedEntityInstances/${entityId}`, {
             fields: 'attributes[code,displayName,valueType,attribute,value]',
@@ -362,7 +361,7 @@ export async function getPersonValues(entityId) {
  * @param {Object} values - Values
  * @returns {string} Tracked entity instance ID.
  */
-export async function addPerson(values, orgUnit) {
+export const addPerson = async (values, orgUnit) => {
     let data = {
         trackedEntityType: _personTypeId,
         orgUnit: orgUnit,
@@ -371,8 +370,8 @@ export async function addPerson(values, orgUnit) {
     for (let key in values)
         data.attributes.push({ attribute: key, value: values[key] })
 
-    return (await (await postData('trackedEntityInstances', data)).json())
-        .response.importSummaries[0].reference
+    return (await (await post('trackedEntityInstances', data)).json()).response
+        .importSummaries[0].reference
 }
 
 /**
@@ -380,7 +379,7 @@ export async function addPerson(values, orgUnit) {
  * @param {string} id - Tracked entity instance id.
  * @param {Object} values - Values.
  */
-export async function updatePerson(id, values) {
+export const updatePerson = async (id, values) => {
     const url = `trackedEntityInstances/${id}`
     let data = await get(url)
     data.attributes = []
@@ -394,11 +393,10 @@ export async function updatePerson(id, values) {
  * Deletes a tracked entity instance.
  * @param {string} id - Tracked entity instance.
  */
-export async function deletePerson(id) {
+export const deletePerson = async id =>
     await del(`trackedEntityInstances/${id}`)
-}
 
-export async function newRecord(
+export const newRecord = async (
     pId,
     pStage,
     orgaCode,
@@ -407,7 +405,7 @@ export async function newRecord(
     eValues,
     sampleDate,
     orgUnitCode
-) {
+) => {
     let initialValues = {
         [_organismsDataElementId]: orgaCode,
         [_amrDataElement]: await generateAmrId(ou, orgUnitCode),
@@ -441,7 +439,7 @@ export async function newRecord(
     return { programStage, eventValues, status, eventId, entityId }
 }
 
-export async function existingRecord(programs, eventId, isApproval) {
+export const existingRecord = async (programs, eventId, isApproval) => {
     let {
         eventValues: initialValues,
         programId,
@@ -474,39 +472,14 @@ export async function existingRecord(programs, eventId, isApproval) {
     }
 }
 
-/**
- * Adds values to event.
- * @param {Object} event - Event.
- * @param {Object} values - New values.
- * @param {Object} testFields - Test fields meta data.
- * @returns {Object} Event.
- */
-async function setEventValues(event, values) {
-    if (!event.dataValues) event.dataValues = []
-
-    for (let dataElement in values) {
-        const dataE = event.dataValues.find(
-            dataValue => dataValue.dataElement === dataElement
-        )
-        !dataE
-            ? event.dataValues.push({
-                  dataElement: dataElement,
-                  value: values[dataElement],
-              })
-            : (dataE.value = values[dataElement])
-    }
-
-    return event
-}
-
-export async function addPersonWithEvent(
+export const addPersonWithEvent = async (
     eventValues,
     programId,
     programStageId,
     orgUnitId,
     entityValues,
     sampleDate
-) {
+) => {
     let event = await setEventValues(
         {
             dataValues: [],
@@ -536,7 +509,7 @@ export async function addPersonWithEvent(
         ],
     }
 
-    const r = await postData('trackedEntityInstances', data)
+    const r = await post('trackedEntityInstances', data)
 
     return {
         entityId: r.response.importSummaries[0].reference,
@@ -555,7 +528,7 @@ export async function addPersonWithEvent(
  * @param {string} entityId - Tracked entity instance ID.
  * @param {string} entityValues - Entity values.
  */
-export async function addEvent(
+export const addEvent = async (
     eventValues,
     programId,
     programStageId,
@@ -563,7 +536,7 @@ export async function addEvent(
     entityId,
     entityValues,
     sampleDate
-) {
+) => {
     let event = await setEventValues(
         {
             dataValues: [],
@@ -587,7 +560,7 @@ export async function addEvent(
         })
     )).enrollments
     if (!enrollments.find(enrollment => enrollment.program === programId)) {
-        await postData('enrollments', {
+        await post('enrollments', {
             trackedEntityInstance: entityId,
             orgUnit: orgUnitId,
             program: programId,
@@ -596,7 +569,7 @@ export async function addEvent(
         })
     }
 
-    const r = await postData('events', event)
+    const r = await post('events', event)
 
     return {
         entityId,
@@ -604,7 +577,7 @@ export async function addEvent(
     }
 }
 
-export async function setEventStatus(eventId, completed, isApproval) {
+export const setEventStatus = async (eventId, completed, isApproval) => {
     const url = `events/${eventId}`
 
     let event = await get(url)
@@ -627,11 +600,10 @@ export async function setEventStatus(eventId, completed, isApproval) {
     await put(url, event)
 }
 
-export async function updateEventValue(eventId, dataElementId, value) {
-    await put(`events/${eventId}/${dataElementId}`, {
+export const updateEventValue = (eventId, dataElementId, value) =>
+    put(`events/${eventId}/${dataElementId}`, {
         dataValues: [{ dataElement: dataElementId, value: value }],
     })
-}
 
 /**
  * Deletes event.
@@ -653,7 +625,7 @@ export const getEvents = async (config, orgUnit, userOnly) =>
         }
     )
 
-export async function getCounts(items, orgUnit, userOnly) {
+export const getCounts = async (items, orgUnit, userOnly) => {
     for (let item of items)
         item.count = (await getSqlView(
             userOnly
@@ -670,7 +642,7 @@ export async function getCounts(items, orgUnit, userOnly) {
     return items
 }
 
-export async function isDuplicate(
+export const isDuplicate = async (
     event,
     entity,
     programStage,
@@ -678,7 +650,7 @@ export async function isDuplicate(
     sampleId,
     date,
     days
-) {
+) => {
     let events = (await get(
         request('events/query', {
             order: 'created:asc',

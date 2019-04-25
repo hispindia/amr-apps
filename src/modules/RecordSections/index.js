@@ -101,6 +101,7 @@ export const RecordSections = props => {
             props.history.goBack()
         }
         if (deleteConfirmation) deleteAndExit()
+        else dispatch({ type: types.DISABLE_BUTTON, buttonDisabled: false })
     }, [deleteConfirmation])
 
     const onSubmit = async addMore => {

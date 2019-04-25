@@ -56,13 +56,13 @@ export const PersonForm = ({ initLoading, showEdit, passValues }) => {
         onNewValues(newValues)
     }
 
-    const onNewValues = (values, newEntityId) => {
+    const onNewValues = (values, newEntityId, reset) => {
         let newAttributes = [...attributes]
         checkRules(values, newAttributes)
         setAttributes(newAttributes)
         passValues({
             values: values,
-            id: newEntityId ? newEntityId : entityId,
+            id: reset ? null : newEntityId ? newEntityId : entityId,
             valid: validate(newAttributes, values, uniques),
         })
     }
@@ -273,11 +273,9 @@ export const PersonForm = ({ initLoading, showEdit, passValues }) => {
         setAttributes(person.trackedEntityTypeAttributes)
         setUniques([])
         setEditing(false)
-        passValues({
-            values: {},
-            id: null,
-            valid: false,
-        })
+        let values = {}
+        Object.keys(entityValues).forEach(v => (values[v] = ''))
+        onNewValues(values, null, true)
     }
 
     if (loading) return <ProgressSection />

@@ -48,7 +48,7 @@ export const RecordPanel = ({ passValues, onReset }) => {
             programStageId:
                 stageLists[value].length > 1 ? '' : stageLists[value][0].value,
             organism: '',
-            sampleDate: '',
+            sampleDate: sampleDate,
         })
     }
 
@@ -70,6 +70,11 @@ export const RecordPanel = ({ passValues, onReset }) => {
 
     const onNewValues = values =>
         passValues({ ...values, valid: !Object.values(values).includes('') })
+
+    const resetValues = () => {
+        setOrganisms(null)
+        onReset()
+    }
 
     /**
      * Gets the data elements to be rendered.
@@ -144,7 +149,7 @@ export const RecordPanel = ({ passValues, onReset }) => {
                             buttons={[
                                 {
                                     label: 'Reset',
-                                    onClick: onReset,
+                                    onClick: resetValues,
                                     icon: 'clear',
                                     tooltip: 'Reset',
                                     kind: 'secondary',
@@ -163,7 +168,7 @@ export const RecordPanel = ({ passValues, onReset }) => {
                         </Grid>
                         <Grid item xs>
                             {organisms && getDataElement('organism')}
-                            {organism && getDataElement('sampleDate')}
+                            {getDataElement('sampleDate')}
                         </Grid>
                     </Grid>
                 </Margin>
