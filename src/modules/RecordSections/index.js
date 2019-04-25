@@ -158,6 +158,9 @@ export const RecordSections = props => {
     const onPersonValues = values =>
         dispatch({ type: types.SET_ENTITY, ...values })
 
+    const onUniqueValue = values =>
+        dispatch({ type: types.SET_ENTITY_VALUE, ...values })
+
     const onPanelValues = values =>
         dispatch({ type: types.SET_PANEL, ...values })
 
@@ -184,6 +187,7 @@ export const RecordSections = props => {
                 <PersonForm
                     showEdit={!event && !panelValid}
                     passValues={onPersonValues}
+                    onUniqueValue={onUniqueValue}
                     initLoading={event && !eventId}
                 />
                 {entityValid && (

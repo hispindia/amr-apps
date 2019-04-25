@@ -15,6 +15,7 @@ const types = {
     SET_LOADING: 9,
     SET_CODE: 10,
     SET_DUPLICATE: 11,
+    SET_ENTITY_VALUE: 12,
 }
 
 const invalidReason = {
@@ -38,6 +39,15 @@ const reducer = (state, action) => {
                 entityValues: action.values,
                 entityId: action.id,
                 entityValid: action.valid,
+            }
+        }
+        case types.SET_ENTITY_VALUE: {
+            return {
+                ...state,
+                entityValues: {
+                    ...state.entityValues,
+                    [action.key]: action.value,
+                },
             }
         }
         case types.SET_PANEL: {

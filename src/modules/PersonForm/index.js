@@ -15,7 +15,12 @@ import { CustomButtonRow } from './style'
 /**
  * Entity information section.
  */
-export const PersonForm = ({ initLoading, showEdit, passValues }) => {
+export const PersonForm = ({
+    initLoading,
+    showEdit,
+    passValues,
+    onUniqueValue,
+}) => {
     const { optionSets, person } = useContext(MetadataContext)
     const { entityId, entityValues } = useContext(RecordContext)
     const [uniques, setUniques] = useState([])
@@ -49,11 +54,14 @@ export const PersonForm = ({ initLoading, showEdit, passValues }) => {
     /**
      * Called on every input field change.
      */
-    const onChange = (name, value) => {
+    const onChange = (name, value, unique) => {
         let newValues = { ...entityValues }
         if (newValues[name] === value) return
-        newValues[name] = value
-        onNewValues(newValues)
+        if (unique) onUniqueValue({ key: name, value: value })
+        else {
+            newValues[name] = value
+            onNewValues(newValues)
+        }
     }
 
     const onNewValues = (values, newEntityId, reset) => {
@@ -341,5 +349,6 @@ export const PersonForm = ({ initLoading, showEdit, passValues }) => {
 PersonForm.prototypes = {
     showEdit: bool.isRequired,
     passValues: func.isRequired,
+    onUniqueValue: func.isRequired,
     initLoading: bool,
 }

@@ -51,7 +51,7 @@ export const TextInput = props => {
     const passValue = async value => {
         const didValidate = await validate(value)
         setError(didValidate)
-        props.onChange(props.name, value)
+        props.onChange(props.name, value, props.unique)
     }
 
     /**
@@ -101,7 +101,7 @@ export const TextInput = props => {
                             ? props.warning
                             : ''
                     }
-                    disabled={props.disabled}
+                    disabled={props.disabled || validating}
                     type={props.type}
                     size="dense"
                 />
