@@ -4,12 +4,12 @@ import styled, { css } from 'styled-components'
 export const Row = styled.div`
     display: flex;
     flex-direction: row;
-    ${props => {
-        if (props.wrapped)
+    ${({ wrapped, reversed }) => {
+        if (wrapped)
             return css`
                 flex-wrap: wrap;
             `
-        if (props.reversed)
+        if (reversed)
             return css`
                 flex-direction: row-reverse;
             `
@@ -23,12 +23,12 @@ Row.propTypes = {
 export const Col = styled.div`
     display: flex;
     flex-direction: column;
-    ${props => {
-        if (props.wrapped)
+    ${({ wrapped, reversed }) => {
+        if (wrapped)
             return css`
                 flex-wrap: wrap;
             `
-        if (props.reversed)
+        if (reversed)
             return css`
                 flex-direction: column-reverse;
             `

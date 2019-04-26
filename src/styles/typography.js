@@ -30,9 +30,9 @@ export const Label = styled.div`
     padding: 0px 12px 12px 16px;
     line-height: 24px;
     font-weight: 500;
-    ${props =>
-        props.required &&
-        !props.disabled &&
+    ${({ required, disabled }) =>
+        required &&
+        !disabled &&
         css`
             ::after {
                 content: '*';
