@@ -29,9 +29,8 @@ export const RecordSections = props => {
     } = useContext(MetadataContext)
     const { isApproval } = useContext(ConfigContext)
     const event = props.match.params.event
-    const orgUnit = props.match.params.orgUnit
 
-    const [state, dispatch, types] = hook(orgUnit)
+    const [state, dispatch, types] = hook(props.match.params.orgUnit)
 
     const {
         entityId,
@@ -52,6 +51,7 @@ export const RecordSections = props => {
         deleteConfirmation,
         code,
         duplicate,
+        orgUnit,
     } = state
 
     const disabled =

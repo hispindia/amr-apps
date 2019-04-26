@@ -201,6 +201,7 @@ export const hook = orgUnit => {
         deleteConfirmation: null,
         duplicate: false,
         panelPrograms: programList.filter(p => p.orgUnits.includes(orgUnit)),
+        orgUnit: orgUnit,
     })
 
     return [state, dispatch, types]

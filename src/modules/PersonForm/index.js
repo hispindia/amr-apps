@@ -22,7 +22,7 @@ export const PersonForm = ({
     onUniqueValue,
 }) => {
     const { optionSets, person } = useContext(MetadataContext)
-    const { entityId, entityValues } = useContext(RecordContext)
+    const { entityId, entityValues, orgUnit } = useContext(RecordContext)
     const [uniques, setUniques] = useState([])
     const [editing, setEditing] = useState(false)
     const [loading, setLoading] = useState(initLoading)
@@ -97,7 +97,7 @@ export const PersonForm = ({
      * @returns {boolean} True if valid.
      */
     const validateUnique = async (id, value, label) => {
-        const newEntityId = await checkUnique(id, value)
+        const newEntityId = await checkUnique(id, value, orgUnit)
         let uniques = { ...uniques }
         uniques[id] = newEntityId ? false : true
         setUniques(uniques)

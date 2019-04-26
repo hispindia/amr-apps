@@ -317,15 +317,12 @@ export const initMetadata = async () => {
  * @param {string} value - Value.
  * @returns {boolean} - False if unique, tracked entity instance ID otherwise.
  */
-export const checkUnique = async (property, value) => {
+export const checkUnique = async (property, value, ou) => {
     const entities = (await get(
         request('trackedEntityInstances', {
             fields: 'trackedEntityInstance',
             filters: `${property}:eq:${value}`,
-            options: [
-                'ouMode=ACCESSIBLE',
-                `trackedEntityType=${_personTypeId}`,
-            ],
+            options: [`ou=${ou}`, `trackedEntityType=${_personTypeId}`],
         })
     )).trackedEntityInstances
     return !entities
