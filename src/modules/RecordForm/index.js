@@ -31,6 +31,10 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
     } = useContext(RecordContext)
 
     useEffect(() => {
+        if (state.runRules !== null) onNewValues()
+    }, [state.runRules])
+
+    useEffect(() => {
         if (!state.values) return
         const sampleId = state.values[_sampleIdElementId]
         if (sampleId) checkDuplicate(sampleId)
@@ -59,17 +63,16 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
             )
     }
 
-    const onNewValue = (id, value) => updateEventValue(eventId, id, value)
+    const updateValue = (id, value) => updateEventValue(eventId, id, value)
 
     const onChange = (name, value) => {
-        let values = { ...state.values }
-        if (values[name] === value) return
-        onNewValue(name, value)
-        values[name] = value
-        onNewValues(values)
+        if (state.values[name] === value) return
+        updateValue(name, value)
+        dispatch({ type: types.SET_VALUE, name, value })
     }
 
-    const onNewValues = values => {
+    const onNewValues = () => {
+        let values = { ...state.values }
         let stage = { ...state.programStage }
         checkRules(values, stage.programStageSections, !status.completed)
         dispatch({ type: types.SET, programStage: stage, values })
@@ -201,7 +204,7 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
                                 values[de.id] !== ''
                             ) {
                                 values[de.id] = ''
-                                if (pushChanges) onNewValue(de.id, '')
+                                if (pushChanges) updateValue(de.id, '')
                             }
                             break
                         case 'HIDEFIELD':
@@ -210,7 +213,7 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
                             de.hide = cond
                             if (values[de.id] !== '') {
                                 values[de.id] = ''
-                                if (pushChanges) onNewValue(de.id, '')
+                                if (pushChanges) updateValue(de.id, '')
                             }
                             break
                         case 'HIDESECTION':
@@ -222,7 +225,7 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
                             // Assigning value.
                             if (values[de.id] !== r.data) {
                                 values[de.id] = r.data
-                                if (pushChanges) onNewValue(de.id, r.data)
+                                if (pushChanges) updateValue(de.id, r.data)
                             }
                             de.disabled = true
                             break

@@ -10,7 +10,8 @@ const sampleDateError = days =>
 const types = {
     LOADING: 0,
     SET: 1,
-    SET_ERROR: 2,
+    SET_VALUE: 2,
+    SET_ERROR: 3,
 }
 
 const reducer = (state, action) => {
@@ -21,6 +22,13 @@ const reducer = (state, action) => {
                 programStage: action.programStage,
                 values: action.values,
                 loading: false,
+            }
+        }
+        case types.SET_VALUE: {
+            return {
+                ...state,
+                values: { ...state.values, [action.name]: action.value },
+                runRules: !state.runRules,
             }
         }
         case types.LOADING: {
@@ -53,6 +61,7 @@ export const hook = () => {
         values: null,
         errors: { [_sampleIdElementId]: null },
         days: constants.days,
+        runRules: null,
     })
 
     return [state, dispatch, types]
