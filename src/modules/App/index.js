@@ -1,13 +1,5 @@
 import React from 'react'
-import {
-    arrayOf,
-    bool,
-    number,
-    object,
-    oneOfType,
-    shape,
-    string,
-} from 'prop-types'
+import { arrayOf, bool, number, shape, string } from 'prop-types'
 import { BrowserRouter, HashRouter } from 'react-router-dom'
 import { MuiThemeProvider } from '@material-ui/core'
 import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
@@ -15,19 +7,18 @@ import { Content } from 'modules'
 import { ConfigContextProvider } from 'contexts'
 import { BodyStyle, theme } from './style'
 
-export const App = props => (
+export const App = ({ appName, categories, isApproval }) => (
     <BrowserRouter>
         <HashRouter>
             <MuiThemeProvider theme={theme}>
                 <>
                     <BodyStyle />
-                    <HeaderBar appName={props.appName} />
+                    <HeaderBar appName={appName} />
                     <ConfigContextProvider
-                        items={props.menuItems}
-                        tables={props.tables}
-                        isApproval={props.isApproval}
+                        categories={categories}
+                        isApproval={isApproval}
                     >
-                        <Content removingThis={props.breaksTheApp} />
+                        <Content removingThisBreaksTheApp={appName} />
                     </ConfigContextProvider>
                 </>
             </MuiThemeProvider>
@@ -37,16 +28,19 @@ export const App = props => (
 
 App.propTypes = {
     appName: string.isRequired,
-    menuItems: arrayOf(
+    categories: arrayOf(
         shape({
-            label: string,
-            value: string,
-            icon: string,
-            status: string,
-            sqlView: oneOfType([string, object]).isRequired,
-            count: number,
+            label: string.isRequired,
+            value: string.isRequired,
+            icon: string.isRequired,
+            status: string.isRequired,
+            sqlViews: shape({
+                count: arrayOf(string).isRequired,
+                table: arrayOf(string).isRequired,
+            }).isRequired,
+            count: number.isRequired,
+            param: bool,
         })
     ).isRequired,
-    tables: object.isRequired,
     isApproval: bool,
 }

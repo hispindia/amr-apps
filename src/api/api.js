@@ -613,11 +613,11 @@ export const deleteEvent = async eventId => await del(`events/${eventId}`)
 
 export const getEvents = async (config, orgUnit, userOnly) =>
     await getSqlView(
-        userOnly
-            ? config.sqlView
+        config.sqlViews.table.length === 1
+            ? config.sqlViews.table[0]
             : _isL2User
-            ? config.sqlView.l2
-            : config.sqlView.l1,
+            ? config.sqlViews.table[1]
+            : config.sqlViews.table[0],
         orgUnit,
         {
             user: userOnly ? _username : false,
@@ -625,21 +625,21 @@ export const getEvents = async (config, orgUnit, userOnly) =>
         }
     )
 
-export const getCounts = async (items, orgUnit, userOnly) => {
-    for (let item of items)
-        item.count = (await getSqlView(
-            userOnly
-                ? item.sqlView
+export const getCounts = async (configs, orgUnit, userOnly) => {
+    for (let config of configs)
+        config.count = (await getSqlView(
+            config.sqlViews.count.length === 1
+                ? config.sqlViews.count[0]
                 : _isL2User
-                ? item.sqlView.l2
-                : item.sqlView.l1,
+                ? config.sqlViews.count[1]
+                : config.sqlViews.count[0],
             orgUnit,
             {
                 user: userOnly ? _username : false,
-                status: item.param ? item.status : false,
+                status: config.param ? config.status : false,
             }
         ))[0][0]
-    return items
+    return configs
 }
 
 export const isDuplicate = async (

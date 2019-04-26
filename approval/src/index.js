@@ -3,21 +3,21 @@ import ReactDOM from 'react-dom'
 import * as serviceWorker from './serviceWorker'
 import { App } from 'modules'
 import { init } from 'api'
-import { menuItems, tables } from './config'
+import { config } from './config'
 
 const developmentServer = 'https://amrtest.icmr.org.in/amrtest'
 const rootElement = document.getElementById('root')
 
-const withBaseUrl = async baseUrl => {
-    baseUrl = `${baseUrl}/api`
-    await init(baseUrl)
+const withBaseUrl = baseUrl => {
+    init(`${baseUrl}/api`)
+    const { appName, isApproval, categories } = config
+    console.log(categories)
 
     ReactDOM.render(
         <App
-            appName="Data Approval"
-            menuItems={menuItems}
-            tables={tables}
-            isApproval
+            appName={appName}
+            categories={categories}
+            isApproval={isApproval}
         />,
         rootElement
     )

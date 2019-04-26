@@ -9,12 +9,12 @@ import { CustomMenu } from './style'
  * Sidebar menu.
  */
 const SidebarMenu = ({ selected, location, history }) => {
+    const { categories, isApproval } = useContext(ConfigContext)
     const [menuItems, setMenuItems] = useState(null)
     const [force, setForce] = useState(false)
-    const { items, isApproval } = useContext(ConfigContext)
 
     useEffect(() => {
-        updateCounts(items)
+        updateCounts(categories)
     }, [selected, location])
 
     /**
@@ -34,7 +34,7 @@ const SidebarMenu = ({ selected, location, history }) => {
         <CustomMenu>
             <Menu
                 size="dense"
-                list={menuItems ? menuItems : items}
+                list={menuItems ? menuItems : categories}
                 onClick={path => history.push(path)}
             />
         </CustomMenu>

@@ -1,40 +1,29 @@
 import React, { createContext } from 'react'
-import {
-    arrayOf,
-    bool,
-    element,
-    number,
-    object,
-    oneOfType,
-    shape,
-    string,
-} from 'prop-types'
+import { arrayOf, bool, element, number, shape, string } from 'prop-types'
 
 export const ConfigContext = createContext()
 
-export const ConfigContextProvider = ({
-    items,
-    tables,
-    isApproval,
-    children,
-}) => (
-    <ConfigContext.Provider value={{ items, tables, isApproval }}>
+export const ConfigContextProvider = ({ categories, isApproval, children }) => (
+    <ConfigContext.Provider value={{ categories, isApproval }}>
         {children}
     </ConfigContext.Provider>
 )
 
 ConfigContextProvider.propTypes = {
-    items: arrayOf(
+    categories: arrayOf(
         shape({
-            label: string,
-            value: string,
-            icon: string,
-            status: string,
-            sqlView: oneOfType([string, object]).isRequired,
-            count: number,
+            label: string.isRequired,
+            value: string.isRequired,
+            icon: string.isRequired,
+            status: string.isRequired,
+            sqlViews: shape({
+                count: arrayOf(string).isRequired,
+                table: arrayOf(string).isRequired,
+            }).isRequired,
+            count: number.isRequired,
+            param: bool,
         })
     ).isRequired,
-    tables: object.isRequired,
-    children: element.isRequired,
     isApproval: bool,
+    children: element.isRequired,
 }

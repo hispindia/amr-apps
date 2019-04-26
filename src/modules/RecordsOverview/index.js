@@ -11,7 +11,7 @@ import { titles, headers } from './config'
  * Shows events by status.
  */
 export const RecordsOverview = props => {
-    const { tables, isApproval } = useContext(ConfigContext)
+    const { categories, isApproval } = useContext(ConfigContext)
     const { programList } = useContext(MetadataContext)
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -34,7 +34,7 @@ export const RecordsOverview = props => {
     const init = async () => {
         setData({
             rows: await getEvents(
-                tables[props.match.params.status],
+                categories.find(c => c.status === props.match.params.status),
                 props.selected,
                 !isApproval
             ),
