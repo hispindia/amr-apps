@@ -10,8 +10,7 @@ const sampleDateError = days =>
 const types = {
     LOADING: 0,
     SET: 1,
-    SET_VALUE: 2,
-    SET_ERROR: 3,
+    SET_ERROR: 2,
 }
 
 const reducer = (state, action) => {
@@ -22,12 +21,6 @@ const reducer = (state, action) => {
                 programStage: action.programStage,
                 values: action.values,
                 loading: false,
-            }
-        }
-        case types.SET_VALUE: {
-            return {
-                ...state,
-                values: { ...state.values, [action.name]: action.value },
             }
         }
         case types.LOADING: {
