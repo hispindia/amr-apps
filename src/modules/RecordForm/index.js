@@ -64,6 +64,7 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
     const onChange = (name, value) => {
         let values = { ...state.values }
         if (values[name] === value) return
+        dispatch({ type: types.SET_VALUE, name, value })
         onNewValue(name, value)
         values[name] = value
         onNewValues(values)
