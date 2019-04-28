@@ -1,44 +1,60 @@
 import React from 'react'
-import { arrayOf, func, object, objectOf, string } from 'prop-types'
+import { arrayOf, bool, func, object, objectOf, string } from 'prop-types'
 import { Card } from '@dhis2/ui/core'
 import { Heading, Margin, MarginBottom } from 'styles'
 import { SectionContent } from '../SectionContent'
 
-const getProps = (dataElements, childSections) => {
-    dataElements = dataElements.filter(
-        dataElement => !dataElement.hide && !dataElement.hideWithValues
-    )
-    childSections = childSections.filter(
-        childSection => !childSection.hide && !childSection.hideWithValues
-    )
-    const childHalf = Math.ceil(childSections.length / 2)
-    const half = Math.ceil(dataElements.length / 2 + childHalf)
-    return { dataElements, childSections, half, childHalf }
-}
+export const Section = ({
+    heading,
+    dataElements,
+    childSections,
+    renderType,
+    values,
+    onChange,
+    errors,
+    elementProps,
+    completed,
+}) => {
+    const getProps = () => {
+        dataElements = dataElements.filter(
+            d => !elementProps[d].hide && !elementProps[d].hideWithValues
+        )
+        childSections = childSections.filter(
+            cs => !cs.hide && !cs.hideWithValues
+        )
+        const childHalf = Math.ceil(childSections.length / 2)
+        const half = Math.ceil(dataElements.length / 2 + childHalf)
+        return { dataElements, childSections, half, childHalf }
+    }
 
-export const Section = props => (
-    <MarginBottom>
-        <Card>
-            <Margin>
-                <Heading>{props.heading}</Heading>
-                <SectionContent
-                    renderType={props.renderType}
-                    onChange={props.onChange}
-                    values={props.values}
-                    errors={props.errors}
-                    {...getProps(props.dataElements, props.childSections)}
-                />
-            </Margin>
-        </Card>
-    </MarginBottom>
-)
+    return (
+        <MarginBottom>
+            <Card>
+                <Margin>
+                    <Heading>{heading}</Heading>
+                    <SectionContent
+                        renderType={renderType}
+                        values={values}
+                        onChange={onChange}
+                        errors={errors}
+                        elementProps={elementProps}
+                        completed={completed}
+                        {...getProps()}
+                    />
+                </Margin>
+            </Card>
+        </MarginBottom>
+    )
+}
 
 Section.propTypes = {
     heading: string.isRequired,
-    renderType: string.isRequired,
-    onChange: func.isRequired,
-    values: objectOf(string).isRequired,
-    dataElements: arrayOf(object).isRequired,
+    dataElements: arrayOf(string).isRequired,
     childSections: arrayOf(object).isRequired,
-    error: objectOf(string),
+    renderType: string.isRequired,
+    values: objectOf(string).isRequired,
+    onChange: func.isRequired,
+    errors: objectOf(string).isRequired,
+    elementProps: objectOf(object).isRequired,
+    completed: bool,
 }

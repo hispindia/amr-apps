@@ -6,22 +6,27 @@ import TableToolbar from '../../inputs/TableToolbar'
 /**
  * Table containg the persons events (records).
  */
-export const RecordTable = props => (
+export const RecordTable = ({
+    rows,
+    headers,
+    onEventClick,
+    addButton,
+    onAddClick,
+    addButtonDisabled,
+}) => (
     <MUIDataTable
         title=""
-        data={props.data.rows}
-        columns={props.data.headers}
+        data={rows}
+        columns={headers}
         options={{
             selectableRows: false,
             elevation: 0,
-            onRowClick: props.onEventClick
-                ? row => props.onEventClick(row)
-                : () => {},
+            onRowClick: onEventClick ? row => onEventClick(row) : () => {},
             customToolbar: () =>
-                props.addButton && (
+                addButton && (
                     <TableToolbar
-                        onAddClick={props.onAddClick}
-                        addButtonDisabled={props.addButtonDisabled}
+                        onAddClick={onAddClick}
+                        addButtonDisabled={addButtonDisabled}
                     />
                 ),
         }}
@@ -32,8 +37,11 @@ RecordTable.propTypes = {
     onEventClick: func.isRequired,
     onAddClick: func,
     addButtonDisabled: bool,
-    data: shape({
-        rows: arrayOf(arrayOf(string)).isRequired,
-        headers: arrayOf(object).isRequired,
-    }).isRequired,
+    rows: arrayOf(arrayOf(string)).isRequired,
+    headers: arrayOf(
+        shape({
+            name: string.isRequired,
+            options: object,
+        })
+    ).isRequired,
 }

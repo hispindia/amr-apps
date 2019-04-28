@@ -1,69 +1,67 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { string } from 'prop-types'
 import { Card } from '@dhis2/ui/core'
 import { getEvents } from 'api'
 import { Margin } from 'styles'
 import { RecordTable, ProgressSection, TitleRow } from 'modules'
 import { ConfigContext, MetadataContext } from 'contexts'
+import { hook } from './hook'
 import { titles, headers } from './config'
 
 /**
  * Shows events by status.
  */
-export const RecordsOverview = props => {
+export const RecordsOverview = ({ selected, match, history }) => {
     const { categories, isApproval } = useContext(ConfigContext)
-    const { programList } = useContext(MetadataContext)
-    const [data, setData] = useState(null)
-    const [loading, setLoading] = useState(true)
-    const [addButtonDisabled, setAddButtonDisabled] = useState(true)
+    const { programList, user } = useContext(MetadataContext)
+    const [{ rows, loading, addButtonDisabled }, dispatch, types] = hook()
 
     useEffect(() => {
         if (isApproval) return
-        const noProgram = !programList.find(p =>
-            p.orgUnits.includes(props.selected)
-        )
+        const noProgram = !programList.find(p => p.orgUnits.includes(selected))
         if (noProgram !== addButtonDisabled)
-            setAddButtonDisabled(!addButtonDisabled)
-    }, [props.selected])
+            dispatch({ type: types.NEW_PROGRAMS, disable: noProgram })
+    }, [selected])
 
     useEffect(() => {
-        setLoading(true)
+        dispatch({ type: types.LOADING })
         init()
-    }, [props.selected, props.match.params.status])
+    }, [selected, match.params.status])
 
-    const init = async () => {
-        setData({
+    const init = async () =>
+        dispatch({
+            type: types.NEW_ROWS,
             rows: await getEvents(
-                categories.find(c => c.status === props.match.params.status),
-                props.selected,
-                !isApproval
+                categories.find(c => c.status === match.params.status),
+                selected,
+                {
+                    username: !isApproval ? user.username : false,
+                    l2Member: user.l2Member,
+                }
             ),
-            headers: headers,
         })
-        setLoading(false)
-    }
 
     /**
      * Called when table row is clicked.
      */
     const onEventClick = row =>
-        props.history.push('/orgUnit/' + row[5] + '/event/' + row[6])
+        history.push('/orgUnit/' + row[5] + '/event/' + row[6])
 
     /**
      * On table add click.
      */
-    const onAddClick = () =>
-        props.history.push('/orgUnit/' + props.selected + '/event/')
+    const onAddClick = () => history.push('/orgUnit/' + selected + '/event/')
 
     return (
         <Margin>
-            <TitleRow title={titles[props.match.params.status]} />
+            <TitleRow title={titles[match.params.status]} />
             {loading ? (
                 <ProgressSection />
             ) : (
                 <Card>
                     <RecordTable
-                        data={data}
+                        rows={rows}
+                        headers={headers}
                         onEventClick={onEventClick}
                         onAddClick={onAddClick}
                         addButton={!isApproval}

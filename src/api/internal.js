@@ -1,27 +1,15 @@
 import { get } from './crud'
-
-const _organismsDataElementId = 'SaQe2REkGVw'
-const _amrDataElement = 'lIkk661BLpG'
-const _l1ApprovalStatus = 'tAyVrNUTVHX'
-const _l1RejectionReason = 'NLmLwjdSHMv'
-const _l1RevisionReason = 'wCNQtIHJRON'
-const _l2ApprovalStatus = 'sXDQT6Yaf77'
-const _l2RejectionReason = 'pz8SoHBO6RL'
-const _l2RevisionReason = 'fEnFVvEFKVc'
-
-export const request = (
-    endpoint,
-    { fields, filters, order, options, paging = false }
-) => {
-    let url = `${endpoint}?paging=${paging}`
-
-    if (fields) url += `&fields=${fields}`
-    if (filters) url += `&filter=${filters}`
-    if (order) url += `&order=${order}`
-    if (options) url += `&${options.join('&')}`
-
-    return url
-}
+import { request } from './request'
+import {
+    _organismsDataElementId,
+    _amrDataElement,
+    _l1ApprovalStatus,
+    _l1RejectionReason,
+    _l1RevisionReason,
+    _l2ApprovalStatus,
+    _l2RejectionReason,
+    _l2RevisionReason,
+} from './constants'
 
 export const getSqlView = async (sqlView, orgUnit, { user, status }) =>
     (await get(
@@ -47,7 +35,6 @@ export const getEventValues = async eventId => {
         event.dataValues.forEach(
             dataValue => (values[dataValue.dataElement] = dataValue.value)
         )
-
     return {
         programId: event.program,
         programStageId: event.programStage,
@@ -115,8 +102,8 @@ export const getProgramStage = async (
     isL1User,
     isL2User
 ) => {
-    const shouldDisable = element => {
-        switch (element.id) {
+    const shouldDisable = id => {
+        switch (id) {
             case _amrDataElement:
                 return values[_amrDataElement] && values[_amrDataElement] !== ''
             case _organismsDataElementId:
@@ -156,17 +143,10 @@ export const getProgramStage = async (
         }
     }
 
-    const setDataElements = (dataElements, psDataElements) =>
-        dataElements.forEach(de => {
-            de.hide = false
-            // Adding missing values.
-            if (!values[de.id]) values[de.id] = ''
-            // Adding required property.
-            de.required = psDataElements.find(
-                psde => psde.dataElement.id === de.id
-            ).compulsory
-            de.disabled = shouldDisable(de)
-        })
+    Object.keys(programStage.dataElements).forEach(id => {
+        programStage.dataElements[id].disabled = shouldDisable(id)
+        if (!values[id]) values[id] = ''
+    })
 
     programStage.programStageSections.forEach(s => {
         s.hideWithValues =
@@ -176,15 +156,6 @@ export const getProgramStage = async (
                 !isL2User &&
                 !values[_l1ApprovalStatus] &&
                 !values[_l2ApprovalStatus])
-
-        setDataElements(s.dataElements, programStage.programStageDataElements)
-        s.childSections.forEach(cs => {
-            cs.hide = false
-            setDataElements(
-                cs.dataElements,
-                programStage.programStageDataElements
-            )
-        })
     })
 
     const status = {

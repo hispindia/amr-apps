@@ -1,11 +1,22 @@
 import moment from 'moment'
 import { get, post, del, put, setBaseUrl } from './crud'
+import { request } from './request'
+import {
+    _organismsDataElementId,
+    _testResultDataElementId,
+    _sampleIdElementId,
+    _amrDataElement,
+    _personTypeId,
+    _l1ApprovalStatus,
+    _l1RevisionReason,
+    _l2ApprovalStatus,
+    _l2RevisionReason,
+} from './constants'
 import {
     getProgramStage,
     getEventValues,
     setEventValues,
     generateAmrId,
-    request,
     getSqlView,
 } from './internal'
 
@@ -21,295 +32,11 @@ const _l1RevisionReason = 'wCNQtIHJRON'
 const _l2ApprovalStatus = 'sXDQT6Yaf77'
 const _l2RevisionReason = 'fEnFVvEFKVc'
 
-const _deoGroup = 'mYdK5QT4ndl'
-const _l1ApprovalGroup = 'jVK9RNKNLus'
-const _l2ApprovalGroup = 'TFmNnLn06Rd'
-
-let _isDeoUser
-let _isL1User
-let _isL2User
-
-let _username = ''
-
 /**
  * Sets the base URL, username, and user groups.
  * @param {String} baseUrl - Base URL.
  */
 export const init = baseUrl => setBaseUrl(baseUrl)
-
-export const initMetadata = async () => {
-    // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
-    const programCondition = c => {
-        const original = c
-        try {
-            const variableDuplicated = c.match(/#\{.*?\}/g)
-            let variables = []
-            if (!variableDuplicated) return c
-            variableDuplicated.forEach(duplicated => {
-                if (variables.indexOf(duplicated) === -1)
-                    variables.push(duplicated)
-            })
-            variables.forEach(variable => {
-                const name = variable.substring(2, variable.length - 1)
-                const id = data.programRuleVariables.find(
-                    ruleVariable => ruleVariable.name === name
-                ).dataElement.id
-                c = c.replace(
-                    new RegExp('#{' + name + '}', 'g'),
-                    "values['" + id + "']"
-                )
-            })
-        } catch {
-            console.warn('Improper condition:', original)
-        }
-        return c
-    }
-
-    // Replaces 'A{xxx}' with 'this.state.values['id of xxx']'
-    const entityCondition = c => {
-        const variableDuplicated = c.match(/A\{.*?\}/g)
-        let variables = []
-        if (!variableDuplicated) return c
-        variableDuplicated.forEach(duplicated => {
-            if (variables.indexOf(duplicated) === -1) variables.push(duplicated)
-        })
-
-        variables.forEach(variable => {
-            const id = attributeIds[variable.substring(2, variable.length - 1)]
-            c = c.replace(/A\{.*?\}/g, "values['" + id + "']")
-        })
-
-        return c
-    }
-
-    const user = await get(
-        request('me', {
-            fields: 'organisationUnits,userGroups,userCredentials[username]',
-        })
-    )
-    _username = user.userCredentials.username
-    const userGroups = user.userGroups.map(userGroup => userGroup.id)
-    _isDeoUser = userGroups.includes(_deoGroup)
-    _isL1User = userGroups.includes(_l1ApprovalGroup)
-    _isL2User = userGroups.includes(_l2ApprovalGroup)
-    const userOrgUnits = user.organisationUnits.map(uo => uo.id)
-
-    let data = await get(
-        request('metadata', {
-            order: 'level:asc',
-            fields: [
-                'children',
-                'condition',
-                'code',
-                'dataElement',
-                'displayName',
-                'formName',
-                'id',
-                'name',
-                'options',
-                'organisationUnits',
-                'path',
-                'priority',
-                'program',
-                `programRuleActions[programRuleActionType,dataElement,
-                    optionGroup,content,trackedEntityAttribute,
-                    programStageSection,data]`,
-                'programStage',
-                `programStages[id,displayName,programStageDataElements[
-                    dataElement[id],compulsory],programStageSections[id,name,
-                    displayName,renderType,dataElements[id,displayFormName,
-                    code,valueType,optionSetValue,optionSet]]]`,
-                `trackedEntityTypeAttributes[name,id,displayName,valueType,
-                    unique,optionSetValue,optionSet,mandatory,
-                    trackedEntityAttribute[name,id,displayName,valueType,
-                    unique,optionSetValue,optionSet]]`,
-                'value',
-            ],
-            options: [
-                'constants=true',
-                'dataElements=true',
-                'optionGroups=true',
-                'options=true',
-                'optionSets=true',
-                'organisationUnits=true',
-                'programRules=true',
-                'programRuleVariables=true',
-                'programs=true',
-                'trackedEntityTypes=true',
-            ],
-        })
-    )
-
-    let orgUnits = []
-    data.organisationUnits
-        .filter(o => userOrgUnits.some(uo => o.path.includes(uo)))
-        .forEach(o => {
-            if (userOrgUnits.includes(o.id)) orgUnits.push(o)
-            else {
-                let ancestors = o.path.split('/').slice(1, -1)
-                let ancestor = ancestors.shift()
-                let parent = orgUnits.find(o => ancestor === o.id)
-                while (ancestors.length > 0) {
-                    ancestor = ancestors.shift()
-                    parent = parent.children.find(o => ancestor === o.id)
-                }
-                if (parent) {
-                    const children = parent.children
-                    children[children.findIndex(s => s.id === o.id)] = o
-                }
-            }
-        })
-
-    // Sorts the children of the OU by display name.
-    const sortChildren = ou => {
-        ou.children.forEach(c => sortChildren(c))
-        ou.children.sort((a, b) =>
-            a.displayName > b.displayName
-                ? 1
-                : b.displayName > a.displayName
-                ? -1
-                : 0
-        )
-    }
-
-    // Sorting descendants of each of the user's OU's.
-    orgUnits.forEach(ou => sortChildren(ou))
-
-    let options = {}
-    data.options.forEach(
-        o =>
-            (options[o.id] = {
-                label: o.displayName,
-                value: o.code,
-            })
-    )
-
-    let optionSets = {}
-    data.optionSets.forEach(
-        os => (optionSets[os.id] = os.options.map(o => options[o.id]))
-    )
-    data.optionGroups.forEach(
-        os => (optionSets[os.id] = os.options.map(o => options[o.id]))
-    )
-
-    let person = data.trackedEntityTypes.find(type => (type.id = _personTypeId))
-
-    person.uniques = {}
-    person.values = {}
-    let attributeIds = {}
-    person.trackedEntityTypeAttributes.forEach(a => {
-        if (a.trackedEntityAttribute.unique)
-            person.uniques[a.trackedEntityAttribute.id] = true
-        person.values[a.trackedEntityAttribute.id] = ''
-        a.hide = false
-        attributeIds[a.trackedEntityAttribute.name] =
-            a.trackedEntityAttribute.id
-    })
-
-    person.rules = []
-    data.programRules
-        .filter(r => r.programRuleActions.find(a => a.trackedEntityAttribute))
-        .forEach(d => {
-            if (!person.rules.find(rule => rule.name === d.name)) {
-                d.condition = entityCondition(d.condition)
-                person.rules.push(d)
-            }
-        })
-
-    let programs = data.programs
-
-    let programList = []
-    let stageLists = {}
-    let programOrganisms = {}
-    programs.forEach(p => {
-        programList.push({
-            value: p.id,
-            label: p.name,
-            orgUnits: p.organisationUnits.map(o => o.id),
-        })
-        let stages = []
-        programOrganisms[p.id] = data.optionGroups.find(
-            og => og.name === p.name
-        ).id
-        let remove = []
-        p.programStages.forEach(ps => {
-            stages.push({
-                value: ps.id,
-                label: ps.displayName,
-            })
-            ps.programStageSections.forEach(pss => {
-                if (pss.dataElements) {
-                    let orgDataElement = pss.dataElements.find(
-                        de => de.id === _organismsDataElementId
-                    )
-                    if (orgDataElement) orgDataElement.hideWithValues = true
-                }
-                let childSections = []
-                ps.programStageSections
-                    .filter(childSection =>
-                        childSection.name.match(
-                            new RegExp('{' + pss.name + '}.*')
-                        )
-                    )
-                    .forEach(childSection => {
-                        remove.push(childSection.id)
-                        childSection.name = childSection.name.replace(
-                            new RegExp('{' + pss.name + '}'),
-                            ''
-                        )
-                        childSections.push(childSection)
-                    })
-                pss.childSections = childSections
-            })
-            ps.programStageSections = ps.programStageSections.filter(
-                s => !remove.includes(s.id)
-            )
-            let resultSection = ps.programStageSections.find(
-                s => s.name === 'Result'
-            )
-            if (resultSection) resultSection.hideWithValues = true
-        })
-        stageLists[p.id] = stages
-    })
-
-    programs.rules = []
-    data.programRules
-        .filter(r =>
-            r.programRuleActions.find(
-                a => a.dataElement || a.programStageSection
-            )
-        )
-        .forEach(d => {
-            d.condition = programCondition(d.condition)
-            programs.rules.push(d)
-        })
-    programs.rules = programs.rules.sort((a, b) =>
-        a.priority > b.priority || !a.priority ? 1 : -1
-    )
-
-    let constants = {}
-    if (data.constants)
-        data.constants.forEach(c => {
-            if (c.code) constants[c.code] = c.value
-        })
-
-    let dataElements = {}
-    data.dataElements.forEach(
-        de => (dataElements[de.id] = de.formName ? de.formName : de.displayName)
-    )
-
-    return {
-        optionSets,
-        person,
-        programs,
-        programList,
-        stageLists,
-        programOrganisms,
-        constants,
-        dataElements,
-        orgUnits,
-    }
-}
 
 /**
  * Checks if any tracked entity instance has property with value.
@@ -436,7 +163,11 @@ export const newRecord = async (
     return { programStage, eventValues, status, eventId, entityId }
 }
 
-export const existingRecord = async (programs, eventId, isApproval) => {
+export const existingRecord = async (
+    programs,
+    eventId,
+    { isApproval, l1Member, l2Member }
+) => {
     let {
         eventValues: initialValues,
         programId,
@@ -445,9 +176,10 @@ export const existingRecord = async (programs, eventId, isApproval) => {
         entityId,
         sampleDate,
     } = await getEventValues(eventId)
-    const pStage = programs
+    const lol = programs
         .find(p => p.id === programId)
         .programStages.find(ps => (ps.id = programStageId))
+    const pStage = { ...lol }
     const { programStage, eventValues, status } = !isApproval
         ? await getProgramStage(pStage, initialValues, completed, false)
         : await getProgramStage(
@@ -455,9 +187,10 @@ export const existingRecord = async (programs, eventId, isApproval) => {
               initialValues,
               completed,
               false,
-              _isL1User,
-              _isL2User
+              l1Member,
+              l2Member
           )
+
     return {
         programId,
         programStage,
@@ -608,31 +341,31 @@ export const updateEventValue = (eventId, dataElementId, value) =>
  */
 export const deleteEvent = async eventId => await del(`events/${eventId}`)
 
-export const getEvents = async (config, orgUnit, userOnly) =>
+export const getEvents = async (config, orgUnit, { username, l2Member }) =>
     await getSqlView(
         config.sqlViews.table.length === 1
             ? config.sqlViews.table[0]
-            : _isL2User
+            : l2Member
             ? config.sqlViews.table[1]
             : config.sqlViews.table[0],
         orgUnit,
         {
-            user: userOnly ? _username : false,
+            user: username ? username : false,
             status: config.param ? config.status : false,
         }
     )
 
-export const getCounts = async (configs, orgUnit, userOnly) => {
+export const getCounts = async (configs, orgUnit, { username, l2Member }) => {
     for (let config of configs)
         config.count = (await getSqlView(
             config.sqlViews.count.length === 1
                 ? config.sqlViews.count[0]
-                : _isL2User
+                : l2Member
                 ? config.sqlViews.count[1]
                 : config.sqlViews.count[0],
             orgUnit,
             {
-                user: userOnly ? _username : false,
+                user: username ? username : false,
                 status: config.param ? config.status : false,
             }
         ))[0][0]

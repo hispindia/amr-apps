@@ -7,12 +7,12 @@ import { ButtonPadding, SpaceBetween } from './style'
 /**
  * Row of buttons.
  */
-export const ButtonRow = props => (
-    <MarginTop className={props.className}>
-        <SpaceBetween unspaced={props.unspaced}>
-            {props.buttons.map(button => (
+export const ButtonRow = ({ className, unspaced, buttons }) => (
+    <MarginTop className={className}>
+        <SpaceBetween unspaced={unspaced}>
+            {buttons.map(button => (
                 <ButtonPadding
-                    unspaced={props.unspaced}
+                    unspaced={unspaced}
                     key={button.label}
                     title={
                         button.disabled

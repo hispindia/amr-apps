@@ -1,8 +1,7 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { bool, func, object, objectOf, string } from 'prop-types'
 import { Label, Padding } from 'styles'
 import { CheckboxInput } from 'inputs'
-import { RecordContext } from 'contexts'
 import { DataElement } from '../DataElement'
 import { ChildSectionLabel } from './style'
 
@@ -11,26 +10,32 @@ import { ChildSectionLabel } from './style'
  * @param {Object} childSection - Child section.
  * @returns {Component} Child section component.
  */
-export const ChildSection = ({ childSection, onChange, values, errors }) => {
+export const ChildSection = ({
+    childSection,
+    onChange,
+    values,
+    errors,
+    elementProps,
+    completed,
+}) => {
     // If all, or all but one, of the data elements are of type TRUE_ONLY,
     // the section is rendered as a group of checkboxes.
     if (
         childSection.dataElements.filter(
-            dataElement => dataElement.valueType === 'TRUE_ONLY'
+            id => elementProps[id].valueType === 'TRUE_ONLY'
         ).length >
         childSection.dataElements.length - 2
     ) {
-        const { status } = useContext(RecordContext)
         let objects = {}
         let boxValues = {}
         childSection.dataElements
-            .filter(dataElement => dataElement.valueType === 'TRUE_ONLY')
-            .forEach(dataElement => {
-                objects[dataElement.id] = {
-                    label: dataElement.displayFormName,
-                    disabled: dataElement.disabled || status.completed,
+            .filter(id => elementProps[id].valueType === 'TRUE_ONLY')
+            .forEach(id => {
+                objects[id] = {
+                    label: elementProps[id].displayFormName,
+                    disabled: elementProps[id].disabled || completed,
                 }
-                boxValues[dataElement.id] = values[dataElement.id]
+                boxValues[id] = values[id]
             })
         return (
             <>
@@ -45,17 +50,18 @@ export const ChildSection = ({ childSection, onChange, values, errors }) => {
                 </Padding>
                 {childSection.dataElements
                     .filter(
-                        dataElement =>
-                            dataElement.valueType === 'TEXT' &&
-                            !dataElement.hide
+                        id =>
+                            elementProps[id].valueType === 'TEXT' &&
+                            !elementProps[id].hide
                     )
-                    .map(dataElement => (
+                    .map(id => (
                         <DataElement
-                            key={dataElement.id}
-                            dataElement={dataElement}
-                            value={values[dataElement.id]}
+                            key={id}
+                            dataElement={elementProps[id]}
+                            value={values[id]}
                             onChange={onChange}
-                            error={errors[dataElement.id]}
+                            error={errors[id]}
+                            disabled={completed}
                         />
                     ))}
             </>
@@ -68,14 +74,15 @@ export const ChildSection = ({ childSection, onChange, values, errors }) => {
                 <Label>{childSection.name}</Label>
             </ChildSectionLabel>
             {childSection.dataElements
-                .filter(dataElement => !dataElement.hide)
-                .map(dataElement => (
+                .filter(id => !elementProps[id].hide)
+                .map(id => (
                     <DataElement
-                        key={dataElement.id}
-                        dataElement={dataElement}
-                        value={values[dataElement.id]}
+                        key={id}
+                        dataElement={elementProps[id]}
+                        value={values[id]}
                         onChange={onChange}
-                        error={errors[dataElement.id]}
+                        error={errors[id]}
+                        disabled={completed}
                     />
                 ))}
         </>
@@ -84,7 +91,9 @@ export const ChildSection = ({ childSection, onChange, values, errors }) => {
 
 ChildSection.propTypes = {
     childSection: object.isRequired,
-    onChange: func.isRequired,
     values: objectOf(string).isRequired,
-    errors: objectOf(string),
+    onChange: func.isRequired,
+    errors: objectOf(string).isRequired,
+    elementProps: objectOf(object).isRequired,
+    completed: bool,
 }

@@ -4,6 +4,19 @@ import { Radio } from '@dhis2/ui/core'
 import { Input, Label, OptionSpacer, Row } from 'styles'
 import { CustomRadio } from './style'
 
+const status = value => {
+    switch (value) {
+        case 'Approved':
+            return 'valid'
+        case 'Resend':
+            return 'warning'
+        case 'Rejected':
+            return 'error'
+        default:
+            return 'default'
+    }
+}
+
 /**
  * Input consisting of a group of radios.
  */
@@ -24,6 +37,7 @@ export const RadioInput = props => {
      * Used to make radio deselectable.
      */
     const onClick = event => {
+        if (props.objects.length === 1) return
         if (value === event.target.value) onChange('')
     }
 
@@ -42,15 +56,7 @@ export const RadioInput = props => {
                                 checked={value === object.value}
                                 onChange={onChange}
                                 disabled={props.disabled}
-                                status={
-                                    object.value === 'Approved'
-                                        ? 'valid'
-                                        : object.value === 'Resend'
-                                        ? 'warning'
-                                        : object.value === 'Rejected'
-                                        ? 'error'
-                                        : 'default'
-                                }
+                                status={status(object.value)}
                             />
                         </CustomRadio>
                     </OptionSpacer>

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Menu } from '@dhis2/ui/core'
 import { getCounts } from 'api'
-import { ConfigContext } from 'contexts'
+import { ConfigContext, MetadataContext } from 'contexts'
 import { CustomMenu } from './style'
 
 /**
@@ -10,6 +10,7 @@ import { CustomMenu } from './style'
  */
 const SidebarMenu = ({ selected, location, history }) => {
     const { categories, isApproval } = useContext(ConfigContext)
+    const { user } = useContext(MetadataContext)
     const [menuItems, setMenuItems] = useState(null)
     const [force, setForce] = useState(false)
 
@@ -21,7 +22,10 @@ const SidebarMenu = ({ selected, location, history }) => {
      * Updates count number in menu.
      */
     const updateCounts = async items => {
-        items = await getCounts(items, selected, !isApproval)
+        items = await getCounts(items, selected, {
+            username: !isApproval ? user.username : false,
+            l2Member: user.l2Member,
+        })
         items.forEach(
             item =>
                 (item.label = item.label.replace(/\(\d*\)/, `(${item.count})`))

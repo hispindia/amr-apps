@@ -1,11 +1,11 @@
 import React, { useContext } from 'react'
-import { object, string } from 'prop-types'
+import { string } from 'prop-types'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import { RecordSections, RecordsOverview } from 'modules'
 import { ConfigContext } from 'contexts'
 import { MainSection } from './style'
 
-export const Main = props => {
+export const Main = ({ selected }) => {
     const { isApproval } = useContext(ConfigContext)
     return (
         <MainSection>
@@ -16,7 +16,7 @@ export const Main = props => {
                     render={componentProps => (
                         <RecordsOverview
                             {...componentProps}
-                            selected={props.selected}
+                            selected={selected}
                         />
                     )}
                 />
@@ -53,7 +53,4 @@ export const Main = props => {
     )
 }
 
-Main.propTypes = {
-    selected: string.isRequired,
-    metadata: object.isRequired,
-}
+Main.propTypes = { selected: string.isRequired }

@@ -26,6 +26,7 @@ export const RecordSections = props => {
         programs,
         orgUnits,
         constants,
+        user,
     } = useContext(MetadataContext)
     const { isApproval } = useContext(ConfigContext)
     const event = props.match.params.event
@@ -65,7 +66,11 @@ export const RecordSections = props => {
         const getExistingRecord = async () => {
             dispatch({
                 type: types.EXISTING_RECORD,
-                ...(await existingRecord(programs, event, isApproval)),
+                ...(await existingRecord(programs, event, {
+                    isApproval,
+                    l1Member: user.l1Member,
+                    l2Member: user.l2Member,
+                })),
             })
         }
         if (event) getExistingRecord()

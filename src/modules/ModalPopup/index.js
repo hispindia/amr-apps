@@ -4,11 +4,11 @@ import { ButtonRow } from 'inputs'
 import { Text } from 'styles'
 import { Background, CustomCard, CustomHeading } from './style'
 
-export const ModalPopup = props => (
+export const ModalPopup = ({ heading, text, onClick, label, icon, kind }) => (
     <Background>
         <CustomCard>
-            <CustomHeading>{props.heading}</CustomHeading>
-            <Text>{props.text}</Text>
+            <CustomHeading>{heading}</CustomHeading>
+            <Text>{text}</Text>
             <ButtonRow
                 unspaced
                 buttons={[
@@ -16,13 +16,13 @@ export const ModalPopup = props => (
                         label: 'Cancel',
                         icon: 'clear',
                         kind: 'secondary',
-                        onClick: () => props.onClick(false),
+                        onClick: () => onClick(false),
                     },
                     {
-                        label: props.label,
-                        icon: props.icon,
-                        kind: props.kind,
-                        onClick: () => props.onClick(true),
+                        label: label,
+                        icon: icon,
+                        kind: kind,
+                        onClick: () => onClick(true),
                     },
                 ]}
             />

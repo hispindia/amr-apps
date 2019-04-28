@@ -1,18 +1,28 @@
 import React from 'react'
+import {
+    arrayOf,
+    number,
+    object,
+    string,
+    objectOf,
+    func,
+    bool,
+} from 'prop-types'
 import { Grid } from '@material-ui/core'
 import { DataElement } from '../DataElement'
 import { ChildSection } from '../ChildSection'
-import { arrayOf, func, number, object, objectOf, string } from 'prop-types'
 
 export const SectionContent = ({
     dataElements,
-    values,
-    onChange,
-    renderType,
     half,
     childHalf,
     childSections,
+    renderType,
+    values,
+    onChange,
     errors,
+    elementProps,
+    completed,
 }) => {
     const getDataElement = dataElement => (
         <DataElement
@@ -21,6 +31,7 @@ export const SectionContent = ({
             value={values[dataElement.id]}
             onChange={onChange}
             error={errors[dataElement.id]}
+            disabled={completed}
         />
     )
 
@@ -28,9 +39,11 @@ export const SectionContent = ({
         <ChildSection
             key={childSection.id}
             childSection={childSection}
-            values={values}
             onChange={onChange}
+            values={values}
             errors={errors}
+            elementProps={elementProps}
+            completed={completed}
         />
     )
 
@@ -38,9 +51,9 @@ export const SectionContent = ({
         if (renderType === 'MATRIX')
             return (
                 <Grid container spacing={0}>
-                    {dataElements.map(dataElement => (
-                        <Grid item key={dataElement.id}>
-                            {getDataElement(dataElement)}
+                    {dataElements.map(id => (
+                        <Grid item key={id}>
+                            {getDataElement(elementProps[id])}
                         </Grid>
                     ))}
                 </Grid>
@@ -51,12 +64,12 @@ export const SectionContent = ({
                     <Grid item xs>
                         {dataElements
                             .slice(0, half)
-                            .map(dataElement => getDataElement(dataElement))}
+                            .map(id => getDataElement(elementProps[id]))}
                     </Grid>
                     <Grid item xs>
                         {dataElements
                             .slice(half)
-                            .map(dataElement => getDataElement(dataElement))}
+                            .map(id => getDataElement(elementProps[id]))}
                         {childSections &&
                             childSections.map(childSection =>
                                 getChildSection(childSection)
@@ -84,12 +97,14 @@ export const SectionContent = ({
 }
 
 SectionContent.propTypes = {
-    dataElements: arrayOf(object).isRequired,
-    values: objectOf(string).isRequired,
-    onChange: func.isRequired,
-    renderType: string.isRequired,
+    dataElements: arrayOf(string).isRequired,
     half: number.isRequired,
     childHalf: number.isRequired,
     childSections: arrayOf(object).isRequired,
-    errors: objectOf(string),
+    renderType: string.isRequired,
+    values: objectOf(string).isRequired,
+    onChange: func.isRequired,
+    errors: objectOf(string).isRequired,
+    elementProps: objectOf(object).isRequired,
+    completed: bool,
 }

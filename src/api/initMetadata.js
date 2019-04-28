@@ -1,0 +1,294 @@
+import { get } from './crud'
+import { request } from './request'
+import {
+    _organismsDataElementId,
+    _testResultDataElementId,
+    _sampleIdElementId,
+    _personTypeId,
+    _deoGroup,
+    _l1ApprovalGroup,
+    _l2ApprovalGroup,
+} from './constants'
+
+export const initMetadata = async () => {
+    // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
+    const programCondition = c => {
+        const original = c
+        try {
+            const variableDuplicated = c.match(/#\{.*?\}/g)
+            let variables = []
+            if (!variableDuplicated) return c
+            variableDuplicated.forEach(duplicated => {
+                if (variables.indexOf(duplicated) === -1)
+                    variables.push(duplicated)
+            })
+            variables.forEach(variable => {
+                const name = variable.substring(2, variable.length - 1)
+                const id = data.programRuleVariables.find(
+                    ruleVariable => ruleVariable.name === name
+                ).dataElement.id
+                c = c.replace(
+                    new RegExp('#{' + name + '}', 'g'),
+                    "values['" + id + "']"
+                )
+            })
+        } catch {
+            console.warn('Improper condition:', original)
+        }
+        return c
+    }
+
+    // Replaces 'A{xxx}' with 'this.state.values['id of xxx']'
+    const entityCondition = c => {
+        const variableDuplicated = c.match(/A\{.*?\}/g)
+        let variables = []
+        if (!variableDuplicated) return c
+        variableDuplicated.forEach(duplicated => {
+            if (variables.indexOf(duplicated) === -1) variables.push(duplicated)
+        })
+
+        variables.forEach(variable => {
+            const id = attributeIds[variable.substring(2, variable.length - 1)]
+            c = c.replace(/A\{.*?\}/g, "values['" + id + "']")
+        })
+
+        return c
+    }
+
+    const userData = await get(
+        request('me', {
+            fields: 'organisationUnits,userGroups,userCredentials[username]',
+        })
+    )
+    const userGroups = userData.userGroups.map(userGroup => userGroup.id)
+    const user = {
+        username: userData.userCredentials.username,
+        deoMember: userGroups.includes(_deoGroup),
+        l1Member: userGroups.includes(_l1ApprovalGroup),
+        l2Member: userGroups.includes(_l2ApprovalGroup),
+    }
+    const userOrgUnits = userData.organisationUnits.map(uo => uo.id)
+
+    let data = await get(
+        request('metadata', {
+            order: 'level:asc',
+            fields: [
+                'children',
+                'condition',
+                'code',
+                'dataElement',
+                'displayName',
+                'formName',
+                'id',
+                'name',
+                'options',
+                'organisationUnits',
+                'path',
+                'priority',
+                'program',
+                `programRuleActions[programRuleActionType,dataElement,
+                    optionGroup,content,trackedEntityAttribute,
+                    programStageSection,data]`,
+                'programStage',
+                `programStages[id,displayName,programStageDataElements[
+                    dataElement[id],compulsory],programStageSections[id,name,
+                    displayName,renderType,dataElements[id,displayFormName,
+                    code,valueType,optionSetValue,optionSet]]]`,
+                `trackedEntityTypeAttributes[name,id,displayName,valueType,
+                    unique,optionSetValue,optionSet,mandatory,
+                    trackedEntityAttribute[name,id,displayName,valueType,
+                    unique,optionSetValue,optionSet]]`,
+                'value',
+            ],
+            options: [
+                'constants=true',
+                'dataElements=true',
+                'optionGroups=true',
+                'options=true',
+                'optionSets=true',
+                'organisationUnits=true',
+                'programRules=true',
+                'programRuleVariables=true',
+                'programs=true',
+                'trackedEntityTypes=true',
+            ],
+        })
+    )
+
+    let orgUnits = []
+    data.organisationUnits
+        .filter(o => userOrgUnits.some(uo => o.path.includes(uo)))
+        .forEach(o => {
+            if (userOrgUnits.includes(o.id)) orgUnits.push(o)
+            else {
+                let ancestors = o.path.split('/').slice(1, -1)
+                let ancestor = ancestors.shift()
+                let parent = orgUnits.find(o => ancestor === o.id)
+                while (ancestors.length > 0) {
+                    ancestor = ancestors.shift()
+                    parent = parent.children.find(o => ancestor === o.id)
+                }
+                if (parent) {
+                    const children = parent.children
+                    children[children.findIndex(s => s.id === o.id)] = o
+                }
+            }
+        })
+
+    // Sorting descendants of each of the user's OU's.
+    orgUnits.forEach(ou => {
+        const sortChildren = ou => {
+            ou.children.forEach(c => sortChildren(c))
+            ou.children.sort((a, b) =>
+                a.displayName > b.displayName
+                    ? 1
+                    : b.displayName > a.displayName
+                    ? -1
+                    : 0
+            )
+        }
+        sortChildren(ou)
+    })
+
+    let options = {}
+    data.options.forEach(
+        o =>
+            (options[o.id] = {
+                label: o.displayName,
+                value: o.code,
+            })
+    )
+
+    let optionSets = {}
+    data.optionSets.forEach(
+        os => (optionSets[os.id] = os.options.map(o => options[o.id]))
+    )
+    data.optionGroups.forEach(
+        os => (optionSets[os.id] = os.options.map(o => options[o.id]))
+    )
+
+    let person = data.trackedEntityTypes.find(type => (type.id = _personTypeId))
+
+    person.uniques = {}
+    person.values = {}
+    let attributeIds = {}
+    person.trackedEntityTypeAttributes.forEach(a => {
+        if (a.trackedEntityAttribute.unique)
+            person.uniques[a.trackedEntityAttribute.id] = true
+        person.values[a.trackedEntityAttribute.id] = ''
+        a.hide = false
+        attributeIds[a.trackedEntityAttribute.name] =
+            a.trackedEntityAttribute.id
+    })
+
+    person.rules = []
+    data.programRules
+        .filter(r => r.programRuleActions.find(a => a.trackedEntityAttribute))
+        .forEach(d => {
+            if (!person.rules.find(rule => rule.name === d.name)) {
+                d.condition = entityCondition(d.condition)
+                person.rules.push(d)
+            }
+        })
+
+    let programs = data.programs
+
+    let programList = []
+    let stageLists = {}
+    let programOrganisms = {}
+    programs.forEach(p => {
+        programList.push({
+            value: p.id,
+            label: p.name,
+            orgUnits: p.organisationUnits.map(o => o.id),
+        })
+        let stages = []
+        programOrganisms[p.id] = data.optionGroups.find(
+            og => og.name === p.name
+        ).id
+        let remove = []
+        p.programStages.forEach(ps => {
+            stages.push({
+                value: ps.id,
+                label: ps.displayName,
+            })
+            ps.dataElements = {}
+            ps.programStageDataElements.forEach(
+                d =>
+                    (ps.dataElements[d.dataElement.id] = {
+                        required: d.compulsory,
+                        hide: false,
+                    })
+            )
+            if (ps.dataElements[_organismsDataElementId])
+                ps.dataElements[_organismsDataElementId].hideWithValues = true
+            ps.programStageSections.forEach(pss => {
+                pss.dataElements.forEach(
+                    d =>
+                        (ps.dataElements[d.id] = {
+                            ...ps.dataElements[d.id],
+                            ...d,
+                        })
+                )
+                pss.dataElements = pss.dataElements.map(d => d.id)
+                let childSections = []
+                ps.programStageSections
+                    .filter(cs =>
+                        cs.name.match(new RegExp('{' + pss.name + '}.*'))
+                    )
+                    .forEach(cs => {
+                        remove.push(cs.id)
+                        cs.name = cs.name.replace(
+                            new RegExp('{' + pss.name + '}'),
+                            ''
+                        )
+                        childSections.push(cs)
+                    })
+                pss.childSections = childSections
+            })
+            ps.programStageSections = ps.programStageSections.filter(
+                s => !remove.includes(s.id)
+            )
+        })
+        stageLists[p.id] = stages
+    })
+
+    programs.rules = []
+    data.programRules
+        .filter(r =>
+            r.programRuleActions.find(
+                a => a.dataElement || a.programStageSection
+            )
+        )
+        .forEach(d => {
+            d.condition = programCondition(d.condition)
+            programs.rules.push(d)
+        })
+    programs.rules = programs.rules.sort((a, b) =>
+        a.priority > b.priority || !a.priority ? 1 : -1
+    )
+
+    let constants = {}
+    if (data.constants)
+        data.constants.forEach(c => {
+            if (c.code) constants[c.code] = c.value
+        })
+
+    let dataElements = {}
+    data.dataElements.forEach(
+        de => (dataElements[de.id] = de.formName ? de.formName : de.displayName)
+    )
+
+    return {
+        optionSets,
+        person,
+        programs,
+        programList,
+        stageLists,
+        programOrganisms,
+        constants,
+        dataElements,
+        orgUnits,
+        user,
+    }
+}

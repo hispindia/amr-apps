@@ -38,7 +38,7 @@ export const Content = () => {
                     }
                     selected={selected}
                 />
-                <Main selected={selected.id} metadata={metadata} />
+                <Main selected={selected.id} />
             </MetadataContextProvider>
         </Row>
     )

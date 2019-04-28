@@ -3,16 +3,16 @@ import { string } from 'prop-types'
 import { Row, Title } from 'styles'
 import { IconButton } from 'inputs'
 
-export const TitleRow = props => (
+export const TitleRow = ({ title, history }) => (
     <Row>
-        {props.history && (
+        {history && (
             <IconButton
                 tooltip="Go back"
                 icon="arrow_back"
-                onClick={props.history.goBack}
+                onClick={history.goBack}
             />
         )}
-        <Title>{props.title}</Title>
+        <Title>{title}</Title>
     </Row>
 )
 

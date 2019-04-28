@@ -5,22 +5,21 @@ import AddIcon from '@material-ui/icons/Add'
 import { withStyles } from '@material-ui/core/styles'
 import { IconContainer } from './style'
 
+const title = {
+    true: 'You cannot add records for the selected organisation unit',
+    false: 'Add new record',
+}
+
 /**
  * Adds an extra add button to the table toolbar.
  */
-const TableToolbar = props => (
+const TableToolbar = ({ addButtonDisabled, onAddClick }) => (
     <>
-        <Tooltip
-            title={
-                props.addButtonDisabled
-                    ? 'You cannot add records for the selected organisation unit'
-                    : 'Add new record'
-            }
-        >
+        <Tooltip title={title[addButtonDisabled]}>
             <span>
                 <IconContainer
-                    onClick={props.onAddClick}
-                    disabled={props.addButtonDisabled}
+                    onClick={onAddClick}
+                    disabled={addButtonDisabled}
                 >
                     <AddIcon />
                 </IconContainer>

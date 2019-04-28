@@ -11,7 +11,6 @@ const rootElement = document.getElementById('root')
 const withBaseUrl = baseUrl => {
     init(`${baseUrl}/api`)
     const { appName, isApproval, categories } = config
-    console.log(categories)
 
     ReactDOM.render(
         <App
