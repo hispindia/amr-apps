@@ -1,3 +1,3 @@
 export * from './api'
-export * from './crud'
+export * from './constants'
 export * from './initMetadata'

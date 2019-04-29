@@ -55,8 +55,21 @@ export const checkRules = (
         const variables = getVariables(condition)
         variables.forEach(id => {
             let dataElement = stage.dataElements[id]
-            dataElement.color =
-                values[id] === '' || !testValue ? '' : getColor(testValue)
+            if (
+                values[id] &&
+                /\d/.test(dataElement.displayFormName) &&
+                variables.find(
+                    v => v !== dataElement.id && values[v] && values[v] !== ''
+                )
+            ) {
+                dataElement.color = ''
+                dataElement.warning = 'MIC is prioritized over DD'
+            } else {
+                dataElement.color =
+                    values[id] === '' || !testValue ? '' : getColor(testValue)
+                if ((dataElement.warning = 'MIC is prioritized over DD'))
+                    dataElement.warning = ''
+            }
         })
     }
 

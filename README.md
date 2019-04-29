@@ -3,8 +3,8 @@
 ### TODO
 - [x] Warning/error program rule action
 - [x] Automatic duplication check
+- [x] DD not have color when MIC has value
 - [ ] Hashing patient registration number
-- [ ] DD not have color when MIC has value
 - [ ] Special characters in test values
 
 ### Installation
