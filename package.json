@@ -17,6 +17,7 @@
         "clean": "rm -rf ./build/*",
         "clean:node": "rm -rf ./node_modules/*",
         "format": "d2-style js apply",
+        "launch": "./scripts/konsole/launch.sh",
         "manifest:approval": "d2-manifest approval/manifest.json approval/public/manifest.webapp",
         "manifest:entry": "d2-manifest entry/manifest.json entry/public/manifest.webapp",
         "postbuild:approval": "yarn zip:approval",

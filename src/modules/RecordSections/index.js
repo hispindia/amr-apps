@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useCallback } from 'react'
 import {
     ModalPopup,
     PersonForm,
@@ -160,19 +160,30 @@ export const RecordSections = props => {
         })
     }
 
-    const onPersonValues = values =>
-        dispatch({ type: types.SET_ENTITY, ...values })
+    const onPersonValues = useCallback(
+        values => dispatch({ type: types.SET_ENTITY, ...values }),
+        []
+    )
 
-    const onUniqueValue = values =>
-        dispatch({ type: types.SET_ENTITY_VALUE, ...values })
+    const onUniqueValue = useCallback(
+        values => dispatch({ type: types.SET_ENTITY_VALUE, ...values }),
+        []
+    )
 
-    const onPanelValues = values =>
-        dispatch({ type: types.SET_PANEL, ...values })
+    const onPanelValues = useCallback(
+        values => dispatch({ type: types.SET_PANEL, ...values }),
+        []
+    )
 
-    const onPanelReset = () => dispatch({ type: types.ADD_MORE })
+    const onPanelReset = useCallback(
+        () => dispatch({ type: types.ADD_MORE }),
+        []
+    )
 
-    const onRecordValues = valid =>
-        dispatch({ type: types.EVENT_VALID, invalid: valid })
+    const onRecordValues = useCallback(
+        valid => dispatch({ type: types.EVENT_VALID, invalid: valid }),
+        []
+    )
 
     return (
         <Margin>

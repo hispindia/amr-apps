@@ -20,18 +20,6 @@ import {
     getSqlView,
 } from './internal'
 
-export const _organismsDataElementId = 'SaQe2REkGVw'
-export const _testResultDataElementId = 'bSgpKbkbVGL'
-export const _sampleIdElementId = 'GpAu5HjWAEz'
-const _amrDataElement = 'lIkk661BLpG'
-
-const _personTypeId = 'tOJvIFXsB5V'
-
-const _l1ApprovalStatus = 'tAyVrNUTVHX'
-const _l1RevisionReason = 'wCNQtIHJRON'
-const _l2ApprovalStatus = 'sXDQT6Yaf77'
-const _l2RevisionReason = 'fEnFVvEFKVc'
-
 /**
  * Sets the base URL, username, and user groups.
  * @param {String} baseUrl - Base URL.

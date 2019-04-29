@@ -15,5 +15,8 @@
         "react": "link:../node_modules/react",
         "react-dom": "link:../node_modules/react-dom",
         "react-scripts": "^2.1.8"
+    },
+    "devDependencies": {
+        "@welldone-software/why-did-you-render": "^3.0.6"
     }
 }
