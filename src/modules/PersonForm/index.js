@@ -19,7 +19,7 @@ export const PersonForm = ({
     initLoading,
     showEdit,
     passValues,
-    onUniqueValue,
+    onPersonValue,
 }) => {
     const { optionSets, person } = useContext(MetadataContext)
     const { entityId, entityValues, orgUnit } = useContext(RecordContext)
@@ -37,10 +37,13 @@ export const PersonForm = ({
     useEffect(() => {
         let newValues = { ...entityValues }
         let newAttributes = [...attributes]
-        checkRules(newValues, newAttributes)
         setAttributes(newAttributes)
         onNewValues(newValues, entityId)
     }, [])
+
+    useEffect(() => {
+        onNewValues(entityValues)
+    }, [entityValues])
 
     useEffect(() => {
         const init = async () =>
@@ -54,14 +57,9 @@ export const PersonForm = ({
     /**
      * Called on every input field change.
      */
-    const onChange = (name, value, unique) => {
-        let newValues = { ...entityValues }
-        if (newValues[name] === value) return
-        if (unique) onUniqueValue({ key: name, value: value })
-        else {
-            newValues[name] = value
-            onNewValues(newValues)
-        }
+    const onChange = (name, value) => {
+        if (entityValues[name] === value) return
+        onPersonValue({ key: name, value: value })
     }
 
     const onNewValues = (values, newEntityId, reset) => {

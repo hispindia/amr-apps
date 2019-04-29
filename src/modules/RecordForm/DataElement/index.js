@@ -89,5 +89,3 @@ DataElement.propTypes = {
     error: string,
     disabled: bool,
 }
-
-//DataElement.whyDidYouRender = true

@@ -38,7 +38,6 @@ export const RecordSections = props => {
         entityValues,
         entityValid,
         programId,
-        programStage,
         programStageId,
         organism,
         sampleDate,
@@ -149,7 +148,6 @@ export const RecordSections = props => {
             duplicate: await isDuplicate(
                 eventId,
                 entityId,
-                programStage.id,
                 optionSets[programOrganisms[programId]].find(
                     o => o.value === organism
                 ).label,
@@ -165,7 +163,7 @@ export const RecordSections = props => {
         []
     )
 
-    const onUniqueValue = useCallback(
+    const onPersonValue = useCallback(
         values => dispatch({ type: types.SET_ENTITY_VALUE, ...values }),
         []
     )
@@ -203,7 +201,7 @@ export const RecordSections = props => {
                 <PersonForm
                     showEdit={!event && !panelValid}
                     passValues={onPersonValues}
-                    onUniqueValue={onUniqueValue}
+                    onPersonValue={onPersonValue}
                     initLoading={event && !eventId}
                 />
                 {entityValid && (

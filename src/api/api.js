@@ -363,35 +363,40 @@ export const getCounts = async (configs, orgUnit, { username, l2Member }) => {
 export const isDuplicate = async (
     event,
     entity,
-    programStage,
     organism,
     sampleId,
     date,
     days
 ) => {
     let events = (await get(
-        request('events/query', {
+        request('events', {
             order: 'created:asc',
-            filters: [
-                `${_sampleIdElementId}:eq:${sampleId}`,
-                `${_organismsDataElementId}:eq:${organism}`,
-            ],
-            options: [
-                `trackedEntityInstance=${entity}`,
-                `programStage=${programStage}`,
-            ],
+            fields: 'event,eventDate,dataValues[dataElement,value]',
+            filters: [`${_organismsDataElementId}:eq:${organism}`],
+            options: [`trackedEntityInstance=${entity}`],
         })
-    )).rows
+    )).events
 
     if (!events) return false
+    events = events.filter(e => {
+        const dv = e.dataValues.find(
+            dv => dv.dataElement === _sampleIdElementId
+        )
+        return !dv ? false : dv.value === sampleId ? true : false
+    })
     if (events.length < 1) return false
-    if (events[0][0] === event) return false
-    events = events.filter(e => e[0] !== event)
+    if (events[0].event === event) return false
+    events = events.filter(e => e.event !== event)
     if (events.length < 1) return false
 
     days = parseInt(days)
     date = moment(date)
     const min = date.clone().subtract(days, 'days')
     const max = date.clone().add(days, 'days')
-    return events.find(e => moment(e[7]) > min && moment(e[7]) < max) !== null
+
+    return (
+        events.find(
+            e => moment(e.eventDate) > min && moment(e.eventDate) < max
+        ) !== null
+    )
 }

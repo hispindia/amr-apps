@@ -5,11 +5,6 @@ import { init } from 'api'
 import { App } from 'modules'
 import { config } from './config'
 
-/*if (process.env.NODE_ENV !== 'production') {
-    const whyDidYouRender = require('@welldone-software/why-did-you-render');
-    whyDidYouRender(React);
-}*/
-
 const developmentServer = 'https://amrtest.icmr.org.in/amrtest'
 const rootElement = document.getElementById('root')
 
