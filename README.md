@@ -4,7 +4,7 @@
 - [x] Warning/error program rule action
 - [x] Automatic duplication check
 - [x] DD not have color when MIC has value
-- [ ] Hashing patient registration number
+- [x] Hashing patient registration number
 - [ ] Special characters in test values
 
 ### Installation

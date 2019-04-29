@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
 import InputField from '@dhis2/ui/core/InputField'
 import { Input } from 'styles'
+import { hash } from 'helpers'
 import { debounced } from './debounced'
 import { CustomInputField } from './style'
 
@@ -25,11 +26,13 @@ export const TextInput = props => {
     //const [warning, setWarning] = useState(null)
     const [error, setError] = useState(null)
     const [validating, setValidating] = useState(false)
+    const [hashedValue, setHashedValue] = useState('')
 
     const debouncedValue = debounced(value, 2000)
 
     useEffect(() => {
-        if (props.value !== value) setValue(props.value)
+        if (props.value !== value && props.value !== hashedValue)
+            setValue(props.value)
     }, [props.value])
 
     useEffect(() => {
@@ -49,6 +52,10 @@ export const TextInput = props => {
      * Passes the value to parent component after 1 sec.
      */
     const passValue = async value => {
+        if (props.unique) {
+            value = hash(value)
+            setHashedValue(value)
+        }
         const didValidate = await validate(value)
         setError(didValidate)
         props.onChange(props.name, value, props.unique)
@@ -82,7 +89,11 @@ export const TextInput = props => {
                     required={props.required}
                     name={props.name}
                     label={props.label}
-                    value={value}
+                    value={
+                        props.disabled && props.unique
+                            ? '[confidential]'
+                            : value
+                    }
                     onChange={onInput}
                     kind={'outlined'}
                     status={

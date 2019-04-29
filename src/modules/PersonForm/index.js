@@ -105,7 +105,6 @@ export const PersonForm = ({
         setModal({
             id: id,
             label: label,
-            value: value,
             entityId: newEntityId,
         })
         return false
@@ -295,9 +294,8 @@ export const PersonForm = ({
                     heading="Person found"
                     text={
                         <span>
-                            A person with <em>{modal.label}</em> {modal.value}{' '}
-                            is already registered. Do you want to get this
-                            person?
+                            A person with the same <em>{modal.label}</em> is
+                            already registered. Do you want to get this person?
                         </span>
                     }
                     label="Import"
