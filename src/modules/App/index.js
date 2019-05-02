@@ -5,7 +5,8 @@ import { MuiThemeProvider } from '@material-ui/core'
 import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
 import { Content } from 'modules'
 import { ConfigContextProvider } from 'contexts'
-import { BodyStyle, theme } from './style'
+import { Fixed, BodyStyle, theme } from './style'
+import { MarginTop } from 'styles'
 
 export const App = ({ appName, categories, isApproval }) => (
     <BrowserRouter>
@@ -13,12 +14,16 @@ export const App = ({ appName, categories, isApproval }) => (
             <MuiThemeProvider theme={theme}>
                 <>
                     <BodyStyle />
-                    <HeaderBar appName={appName} />
+                    <Fixed>
+                        <HeaderBar appName={appName} />
+                    </Fixed>
                     <ConfigContextProvider
                         categories={categories}
                         isApproval={isApproval}
                     >
-                        <Content removingThisBreaksTheApp={appName} />
+                        <MarginTop margin={48}>
+                            <Content removingThisBreaksTheApp={appName} />
+                        </MarginTop>
                     </ConfigContextProvider>
                 </>
             </MuiThemeProvider>

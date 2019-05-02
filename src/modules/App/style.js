@@ -1,6 +1,14 @@
 import { createMuiTheme } from '@material-ui/core'
-import { createGlobalStyle } from 'styled-components'
+import styled, { createGlobalStyle } from 'styled-components'
+import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
 import 'typeface-roboto'
+
+export const Fixed = styled.div`
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    top: 0;
+`
 
 export const BodyStyle = createGlobalStyle`
     body {
