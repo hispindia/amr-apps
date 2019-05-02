@@ -1,27 +1,7 @@
 import { useReducer, useContext } from 'react'
 import { MetadataContext } from 'contexts'
-import { _organismsDataElementId } from '../../'
-
-const types = {
-    SET_ENTITY: 0,
-    SET_PANEL: 1,
-    NEW_RECORD: 2,
-    EXISTING_RECORD: 3,
-    EDIT: 4,
-    DISABLE_BUTTON: 5,
-    EVENT_VALID: 6,
-    DELETE_CLICKED: 7,
-    DELETE_CONFIRMED: 8,
-    SET_LOADING: 9,
-    SET_CODE: 10,
-    SET_DUPLICATE: 11,
-    SET_ENTITY_VALUE: 12,
-}
-
-const invalidReason = {
-    required: 'A required field is empty',
-    error: 'A field is invalid',
-}
+import { _organismsDataElementId } from 'api'
+import { invalidReason, types } from './constants'
 
 const getRules = (rules, programId, programStageId) =>
     rules.filter(
@@ -97,6 +77,7 @@ const reducer = (state, action) => {
                     action.programId,
                     action.programStage.id
                 ),
+                duplicate: false,
             }
         }
         case types.ADD_MORE: {
@@ -130,7 +111,6 @@ const reducer = (state, action) => {
             }
         }
         case types.EVENT_VALID: {
-            if (state.duplicate) return state
             return {
                 ...state,
                 eventInvalid: action.invalid,
@@ -165,10 +145,7 @@ const reducer = (state, action) => {
         case types.SET_DUPLICATE: {
             return {
                 ...state,
-                duplicate: action.duplicate,
-                eventInvalid: action.duplicate
-                    ? invalidReason.error
-                    : state.eventInvalid,
+                duplicate: action.duplicate ? action.duplicate : false,
             }
         }
         default: {
@@ -204,5 +181,5 @@ export const hook = orgUnit => {
         orgUnit: orgUnit,
     })
 
-    return [state, dispatch, types]
+    return [state, dispatch]
 }

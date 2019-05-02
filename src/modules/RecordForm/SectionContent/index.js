@@ -3,6 +3,7 @@ import {
     arrayOf,
     number,
     object,
+    oneOf,
     string,
     objectOf,
     func,
@@ -20,9 +21,9 @@ export const SectionContent = ({
     renderType,
     values,
     onChange,
-    errors,
     elementProps,
     completed,
+    duplicate,
 }) => {
     const getDataElement = dataElement => (
         <DataElement
@@ -30,8 +31,8 @@ export const SectionContent = ({
             dataElement={dataElement}
             value={values[dataElement.id]}
             onChange={onChange}
-            error={errors[dataElement.id]}
             disabled={completed}
+            duplicate={duplicate}
         />
     )
 
@@ -41,9 +42,9 @@ export const SectionContent = ({
             childSection={childSection}
             onChange={onChange}
             values={values}
-            errors={errors}
             elementProps={elementProps}
             completed={completed}
+            duplicate={duplicate}
         />
     )
 
@@ -104,7 +105,7 @@ SectionContent.propTypes = {
     renderType: string.isRequired,
     values: objectOf(string).isRequired,
     onChange: func.isRequired,
-    errors: objectOf(string).isRequired,
     elementProps: objectOf(object).isRequired,
+    duplicate: oneOf([false, 'ERROR', 'WARNING']),
     completed: bool,
 }

@@ -94,7 +94,7 @@ export const PersonForm = ({
      * @param {string} label - Attribute label.
      * @returns {boolean} True if valid.
      */
-    const validateUnique = async (id, value, label) => {
+    const onValidation = async (id, value, label) => {
         const newEntityId = await checkUnique(id, value, orgUnit)
         let uniques = { ...uniques }
         uniques[id] = newEntityId ? false : true
@@ -239,7 +239,8 @@ export const PersonForm = ({
                             uniques &&
                             uniques[attribute.trackedEntityAttribute.id]
                         }
-                        validateUnique={validateUnique}
+                        validateUnique
+                        onValidation={onValidation}
                         name={attribute.trackedEntityAttribute.id}
                         label={attribute.trackedEntityAttribute.displayName}
                         value={

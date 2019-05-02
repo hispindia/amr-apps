@@ -39,11 +39,6 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
         })
     }, [programStage, eventValues, status])
 
-    useEffect(() => {
-        if (!duplicate !== !state.errors[_sampleIdElementId])
-            dispatch({ type: types.SET_ERROR, error: duplicate })
-    }, [duplicate])
-
     const validateValues = (sections, values) => {
         if (!sections) sections = state.programStage.programStageSections
         if (!values) values = state.values
@@ -81,6 +76,7 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
                         values={state.values}
                         errors={state.errors}
                         completed={status.completed}
+                        duplicate={duplicate}
                     />
                 ))}
         </MarginBottom>

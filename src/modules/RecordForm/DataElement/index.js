@@ -1,7 +1,9 @@
-import React, { useContext, memo } from 'react'
+import React, { useContext } from 'react'
 import { func, object, string, bool } from 'prop-types'
 import { Padding } from 'styles'
+import { _sampleIdElementId } from 'api'
 import { MetadataContext } from 'contexts'
+import { error, warning } from './constants'
 import {
     TextInput,
     RadioInput,
@@ -14,11 +16,10 @@ export const DataElement = ({
     dataElement,
     value,
     onChange,
-    error,
     disabled,
+    duplicate,
 }) => {
     const { optionSets } = useContext(MetadataContext)
-
     return (
         <Padding>
             {dataElement.optionSetValue ? (
@@ -74,8 +75,19 @@ export const DataElement = ({
                         dataElement.valueType === 'NUMBER' ? 'number' : 'text'
                     }
                     color={dataElement.color}
-                    warning={dataElement.warning}
-                    error={error ? error : dataElement.error}
+                    warning={
+                        dataElement.id === _sampleIdElementId &&
+                        duplicate === 'WARNING'
+                            ? warning
+                            : dataElement.warning
+                    }
+                    error={
+                        dataElement.id === _sampleIdElementId &&
+                        duplicate === 'ERROR'
+                            ? error
+                            : dataElement.error
+                    }
+                    unique={dataElement.id === _sampleIdElementId}
                 />
             )}
         </Padding>
@@ -86,6 +98,5 @@ DataElement.propTypes = {
     dataElement: object.isRequired,
     onChange: func.isRequired,
     value: string.isRequired,
-    error: string,
     disabled: bool,
 }

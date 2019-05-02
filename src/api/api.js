@@ -1,4 +1,4 @@
-import moment from 'moment'
+//import moment from 'moment'
 import { get, post, del, put, setBaseUrl } from './crud'
 import { request } from './request'
 import {
@@ -360,7 +360,35 @@ export const getCounts = async (configs, orgUnit, { username, l2Member }) => {
     return configs
 }
 
-export const isDuplicate = async (
+export const isDuplicateRecord = async (event, entity, organism, sampleId) => {
+    let events = (await get(
+        request('events', {
+            order: 'created:asc',
+            fields: 'event,dataValues[dataElement,value]',
+            filters: `${_sampleIdElementId}:eq:${sampleId}`,
+            options: [`trackedEntityInstance=${entity}`],
+        })
+    )).events
+
+    if (!events) return false
+    if (events.length < 1) return false
+    if (events[0].event === event) return false
+    events = events.filter(e => e.event !== event)
+    if (events.length < 1) return false
+    return events.find(e =>
+        e.dataValues.find(
+            dv =>
+                dv.dataElement === _organismsDataElementId &&
+                dv.value === organism
+        )
+    )
+        ? 'ERROR'
+        : 'WARNING'
+}
+
+//export const isUnique
+
+/*export const isDuplicate = async (
     event,
     entity,
     organism,
@@ -372,18 +400,15 @@ export const isDuplicate = async (
         request('events', {
             order: 'created:asc',
             fields: 'event,eventDate,dataValues[dataElement,value]',
-            filters: [`${_organismsDataElementId}:eq:${organism}`],
+            filters: [
+                `${_organismsDataElementId}:eq:${organism}`,
+                `${_sampleIdElementId}:eq:${sampleId}`,
+            ],
             options: [`trackedEntityInstance=${entity}`],
         })
     )).events
 
     if (!events) return false
-    events = events.filter(e => {
-        const dv = e.dataValues.find(
-            dv => dv.dataElement === _sampleIdElementId
-        )
-        return !dv ? false : dv.value === sampleId ? true : false
-    })
     if (events.length < 1) return false
     if (events[0].event === event) return false
     events = events.filter(e => e.event !== event)
@@ -399,4 +424,4 @@ export const isDuplicate = async (
             e => moment(e.eventDate) > min && moment(e.eventDate) < max
         ) !== null
     )
-}
+}*/

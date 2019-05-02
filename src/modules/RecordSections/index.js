@@ -12,26 +12,20 @@ import {
     setEventStatus,
     newRecord,
     existingRecord,
-    isDuplicate,
+    isDuplicateRecord,
 } from 'api'
 import { ButtonRow } from 'inputs'
 import { ConfigContext, MetadataContext, RecordContextProvider } from 'contexts'
 import { Margin } from 'styles'
+import { invalidReason, types } from './constants'
 import { hook } from './hook'
 
 export const RecordSections = props => {
-    const {
-        optionSets,
-        programOrganisms,
-        programs,
-        orgUnits,
-        constants,
-        user,
-    } = useContext(MetadataContext)
+    const { programs, orgUnits, constants, user } = useContext(MetadataContext)
     const { isApproval } = useContext(ConfigContext)
     const event = props.match.params.event
 
-    const [state, dispatch, types] = hook(props.match.params.orgUnit)
+    const [state, dispatch] = hook(props.match.params.orgUnit)
 
     const {
         entityId,
@@ -59,7 +53,7 @@ export const RecordSections = props => {
         eventInvalid !== false ||
         !entityValid ||
         !panelValid ||
-        duplicate
+        duplicate === 'ERROR'
 
     useEffect(() => {
         const getExistingRecord = async () => {
@@ -145,15 +139,11 @@ export const RecordSections = props => {
         if (!constants.days) return
         dispatch({
             type: types.SET_DUPLICATE,
-            duplicate: await isDuplicate(
+            duplicate: await isDuplicateRecord(
                 eventId,
                 entityId,
-                optionSets[programOrganisms[programId]].find(
-                    o => o.value === organism
-                ).label,
-                sampleId,
-                sampleDate,
-                constants.days
+                organism,
+                sampleId
             ),
         })
     }
@@ -253,7 +243,9 @@ export const RecordSections = props => {
                                           : 'Submit record',
                                       disabledTooltip: status.completed
                                           ? 'Records with this approval status cannot be edited'
-                                          : duplicate || eventInvalid
+                                          : duplicate === 'ERROR'
+                                          ? invalidReason.error
+                                          : eventInvalid
                                           ? eventInvalid
                                           : undefined,
                                   },
@@ -268,7 +260,9 @@ export const RecordSections = props => {
                                   tooltip:
                                       'Submit record and add new record for the same person',
                                   disabledTooltip:
-                                      duplicate || eventInvalid
+                                      duplicate === 'ERROR'
+                                          ? invalidReason.error
+                                          : eventInvalid
                                           ? eventInvalid
                                           : undefined,
                               },
@@ -280,7 +274,9 @@ export const RecordSections = props => {
                                   kind: 'primary',
                                   tooltip: 'Submit record',
                                   disabledTooltip:
-                                      duplicate || eventInvalid
+                                      duplicate === 'ERROR'
+                                          ? invalidReason.error
+                                          : eventInvalid
                                           ? eventInvalid
                                           : undefined,
                               },

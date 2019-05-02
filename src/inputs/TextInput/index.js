@@ -1,38 +1,23 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
 import InputField from '@dhis2/ui/core/InputField'
 import { Input } from 'styles'
 import { hash } from 'helpers'
+import { hook } from './hook'
+import { types, texts, statuses } from './constants'
 import { debounced } from './debounced'
 import { CustomInputField } from './style'
-
-const texts = {
-    required: 'This field is required',
-    unique: 'This field requires a unique value',
-    validate: 'Validating',
-}
-
-const statuses = {
-    default: 'default',
-    warning: 'warning',
-    error: 'error',
-}
 
 /**
  * Textfield input.
  */
 export const TextInput = props => {
-    const [value, setValue] = useState('')
-    //const [warning, setWarning] = useState(null)
-    const [error, setError] = useState(null)
-    const [validating, setValidating] = useState(false)
-    const [hashedValue, setHashedValue] = useState('')
-
+    const [{ value, hashedValue, validating, error }, dispatch] = hook()
     const debouncedValue = debounced(value, 2000)
 
     useEffect(() => {
         if (props.value !== value && props.value !== hashedValue)
-            setValue(props.value)
+            dispatch({ type: types.VALUE_PROP, value: props.value })
     }, [props.value])
 
     useEffect(() => {
@@ -45,19 +30,20 @@ export const TextInput = props => {
     }, [debouncedValue])
 
     useEffect(() => {
-        if (props.uniqueValid && error === texts.unique) setError(props.error)
+        if (props.uniqueValid && error === texts.unique)
+            dispatch({ type: types.SET_ERROR, value: props.error })
     }, [props.uniqueValid])
 
     /**
      * Passes the value to parent component after 1 sec.
      */
     const passValue = async value => {
-        if (props.unique) {
+        if (props.unique && value !== '') {
             value = hash(value)
-            setHashedValue(value)
+            dispatch({ type: types.SET_HASHED_VALUE, value: value })
         }
         const didValidate = await validate(value)
-        setError(didValidate)
+        dispatch({ type: types.SET_ERROR, error: didValidate })
         props.onChange(props.name, value, props.unique)
     }
 
@@ -66,20 +52,21 @@ export const TextInput = props => {
      * @returns Appropriate error text. Empty if valid.
      */
     const validate = async value => {
-        const { name, label, required, unique } = props
+        const { name, label, required, unique, validateUnique } = props
         let error
         if (required && !value) error = texts.required
-        if (unique && value) {
-            setValidating(true)
-            if (!(await props.validateUnique(name, value, label)))
+        if (unique && validateUnique && value) {
+            dispatch({ type: types.SET_VALIDATING, validating: true })
+            if (!(await props.onValidation(name, value, label)))
                 error = texts.unique
-            setValidating(false)
+            dispatch({ type: types.SET_VALIDATING, validating: false })
         }
         return error
     }
 
     const onInput = (n, v) => {
-        if (!validating) setValue(v)
+        if (!validating && v.length < 128)
+            dispatch({ type: types.SET_VALUE, value: v })
     }
 
     return (
@@ -89,11 +76,7 @@ export const TextInput = props => {
                     required={props.required}
                     name={props.name}
                     label={props.label}
-                    value={
-                        props.disabled && props.unique
-                            ? '[confidential]'
-                            : value
-                    }
+                    value={value && value.length > 127 ? '' : value}
                     onChange={onInput}
                     kind={'outlined'}
                     status={
@@ -119,6 +102,9 @@ export const TextInput = props => {
                     disabled={props.disabled}
                     type={props.type}
                     size="dense"
+                    placeholder={
+                        value && value.length > 127 ? '<Confidential>' : ''
+                    }
                 />
             </CustomInputField>
         </Input>
@@ -137,5 +123,6 @@ TextInput.propTypes = {
     warning: string,
     error: string,
     uniqueValid: bool,
-    validateUnique: func,
+    validateUnique: bool,
+    onValidation: func,
 }
