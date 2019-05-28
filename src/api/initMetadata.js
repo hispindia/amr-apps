@@ -16,7 +16,7 @@ export const initMetadata = async () => {
         const original = c
         try {
             const variableDuplicated = c.match(/#\{.*?\}/g)
-            let variables = []
+            const variables = []
             if (!variableDuplicated) return c
             variableDuplicated.forEach(duplicated => {
                 if (variables.indexOf(duplicated) === -1)
@@ -41,7 +41,7 @@ export const initMetadata = async () => {
     // Replaces 'A{xxx}' with 'this.state.values['id of xxx']'
     const entityCondition = c => {
         const variableDuplicated = c.match(/A\{.*?\}/g)
-        let variables = []
+        const variables = []
         if (!variableDuplicated) return c
         variableDuplicated.forEach(duplicated => {
             if (variables.indexOf(duplicated) === -1) variables.push(duplicated)
@@ -69,7 +69,7 @@ export const initMetadata = async () => {
     }
     const userOrgUnits = userData.organisationUnits.map(uo => uo.id)
 
-    let data = await get(
+    const data = await get(
         request('metadata', {
             order: 'level:asc',
             fields: [
@@ -115,13 +115,13 @@ export const initMetadata = async () => {
         })
     )
 
-    let orgUnits = []
+    const orgUnits = []
     data.organisationUnits
         .filter(o => userOrgUnits.some(uo => o.path.includes(uo)))
         .forEach(o => {
             if (userOrgUnits.includes(o.id)) orgUnits.push(o)
             else {
-                let ancestors = o.path.split('/').slice(1, -1)
+                const ancestors = o.path.split('/').slice(1, -1)
                 let ancestor = ancestors.shift()
                 let parent = orgUnits.find(o => ancestor === o.id)
                 while (ancestors.length > 0) {
@@ -150,7 +150,7 @@ export const initMetadata = async () => {
         sortChildren(ou)
     })
 
-    let options = {}
+    const options = {}
     data.options.forEach(
         o =>
             (options[o.id] = {
@@ -159,7 +159,7 @@ export const initMetadata = async () => {
             })
     )
 
-    let optionSets = {}
+    const optionSets = {}
     data.optionSets.forEach(
         os => (optionSets[os.id] = os.options.map(o => options[o.id]))
     )
@@ -167,11 +167,13 @@ export const initMetadata = async () => {
         os => (optionSets[os.id] = os.options.map(o => options[o.id]))
     )
 
-    let person = data.trackedEntityTypes.find(type => (type.id = _personTypeId))
+    const person = data.trackedEntityTypes.find(
+        type => (type.id = _personTypeId)
+    )
 
     person.uniques = {}
     person.values = {}
-    let attributeIds = {}
+    const attributeIds = {}
     person.trackedEntityTypeAttributes.forEach(a => {
         if (a.trackedEntityAttribute.unique)
             person.uniques[a.trackedEntityAttribute.id] = true
@@ -191,22 +193,22 @@ export const initMetadata = async () => {
             }
         })
 
-    let programs = data.programs
+    const programs = data.programs.filter(p => p.name !== 'AMR (WHONET import)')
 
-    let programList = []
-    let stageLists = {}
-    let programOrganisms = {}
+    const programList = []
+    const stageLists = {}
+    const programOrganisms = {}
     programs.forEach(p => {
         programList.push({
             value: p.id,
             label: p.name,
             orgUnits: p.organisationUnits.map(o => o.id),
         })
-        let stages = []
+        const stages = []
         programOrganisms[p.id] = data.optionGroups.find(
             og => og.name === p.name
         ).id
-        let remove = []
+        const remove = []
         p.programStages.forEach(ps => {
             stages.push({
                 value: ps.id,
@@ -231,7 +233,7 @@ export const initMetadata = async () => {
                         })
                 )
                 pss.dataElements = pss.dataElements.map(d => d.id)
-                let childSections = []
+                const childSections = []
                 ps.programStageSections
                     .filter(cs =>
                         cs.name.match(new RegExp('{' + pss.name + '}.*'))
@@ -268,13 +270,13 @@ export const initMetadata = async () => {
         a.priority > b.priority || !a.priority ? 1 : -1
     )
 
-    let constants = {}
+    const constants = {}
     if (data.constants)
         data.constants.forEach(c => {
             if (c.code) constants[c.code] = c.value
         })
 
-    let dataElements = {}
+    const dataElements = {}
     data.dataElements.forEach(
         de => (dataElements[de.id] = de.formName ? de.formName : de.displayName)
     )
