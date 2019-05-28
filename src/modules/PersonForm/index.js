@@ -3,7 +3,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { bool, func } from 'prop-types'
 import { Grid } from '@material-ui/core'
-import { Card } from '@dhis2/ui/core'
+import { Card } from '@dhis2/ui-core'
 import { ModalPopup } from 'modules'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { getPersonValues, checkUnique } from 'api'
@@ -299,7 +299,7 @@ export const PersonForm = ({
                     }
                     label="Import"
                     icon="person"
-                    kind="primary"
+                    primary
                     onClick={onModalClick}
                 />
             )}

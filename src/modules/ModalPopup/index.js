@@ -1,10 +1,18 @@
 import React from 'react'
-import { element, func, oneOf, oneOfType, string } from 'prop-types'
+import { func, string, bool } from 'prop-types'
 import { ButtonRow } from 'inputs'
 import { Text } from 'styles'
 import { Background, CustomCard, CustomHeading } from './style'
 
-export const ModalPopup = ({ heading, text, onClick, label, icon, kind }) => (
+export const ModalPopup = ({
+    heading,
+    text,
+    onClick,
+    label,
+    icon,
+    primary,
+    destructive,
+}) => (
     <Background>
         <CustomCard>
             <CustomHeading>{heading}</CustomHeading>
@@ -15,14 +23,15 @@ export const ModalPopup = ({ heading, text, onClick, label, icon, kind }) => (
                     {
                         label: 'Cancel',
                         icon: 'clear',
-                        kind: 'secondary',
                         onClick: () => onClick(false),
+                        secondary: true,
                     },
                     {
                         label: label,
                         icon: icon,
-                        kind: kind,
                         onClick: () => onClick(true),
+                        primary: primary,
+                        destructive: destructive,
                     },
                 ]}
             />
@@ -35,7 +44,6 @@ ModalPopup.propTypes = {
     onClick: func.isRequired,
     label: string.isRequired,
     icon: string.isRequired,
-    text: oneOfType([string, element]).isRequired,
-    kind: oneOf(['default', 'basic', 'secondary', 'primary', 'destructive'])
-        .isRequired,
+    primary: bool,
+    destructive: bool,
 }

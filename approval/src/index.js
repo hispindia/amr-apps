@@ -17,6 +17,7 @@ const withBaseUrl = baseUrl => {
             appName={appName}
             categories={categories}
             isApproval={isApproval}
+            baseUrl={baseUrl}
         />,
         rootElement
     )

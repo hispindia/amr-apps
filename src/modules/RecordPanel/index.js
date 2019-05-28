@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { func } from 'prop-types'
-import { Card } from '@dhis2/ui/core/Card'
+import { Card } from '@dhis2/ui-core'
 import { Grid } from '@material-ui/core'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { SelectInput, RadioInput, DateInput } from 'inputs'

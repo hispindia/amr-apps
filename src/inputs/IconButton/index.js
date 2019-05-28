@@ -1,6 +1,6 @@
 import React from 'react'
 import { func, string } from 'prop-types'
-import { Icon } from '@dhis2/ui/core'
+import { Icon } from 'components'
 import { IconContainer } from './style'
 
 /**
@@ -8,7 +8,7 @@ import { IconContainer } from './style'
  */
 export const IconButton = ({ tooltip, onClick, icon }) => (
     <IconContainer title={tooltip} onClick={onClick}>
-        <Icon name={icon} className={icon} />
+        <Icon icon={icon} large />
     </IconContainer>
 )
 

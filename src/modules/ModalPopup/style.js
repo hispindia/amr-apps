@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Card } from '@dhis2/ui/core'
+import { Card } from '@dhis2/ui-core'
 import { Heading } from 'styles'
 
 export const Background = styled.div`

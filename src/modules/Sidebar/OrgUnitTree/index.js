@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { func, shape, string } from 'prop-types'
-import { Card } from '@dhis2/ui/core'
+import { Card } from '@dhis2/ui-core'
 import { Margin } from 'styles'
 import { MetadataContext } from 'contexts'
 import { OrgUnitNode } from './OrgUnitNode'

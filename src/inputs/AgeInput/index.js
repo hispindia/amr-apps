@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
-import InputField from '@dhis2/ui/core/InputField'
+import { Help, InputField } from '@dhis2/ui-core'
 import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
 import MomentUtils from '@date-io/moment'
 import moment from 'moment'
@@ -70,17 +70,24 @@ export const AgeInput = props => {
      * @param {string} name - Field name.
      * @param {string} v - Value.
      */
-    const onAge = async (n, v) => {
-        let newValues = { value, years, months, days }
+    const onAge = async event => {
+        let v = event.target.value
         if (!v) v = '0'
         v = parseInt(v)
-        switch (n) {
+        console.log(moment())
+        const unit = event.target.name
+        const oldValue = value ? value : moment()
+        console.log(oldValue.get(unit))
+        const newValue = oldValue
+            .add(oldValue.get(unit) - v, unit)
+            .format('YYYY-MM-DD')
+        /*switch (event.target.name) {
             case 'years':
                 if (v < 0 || v > 118) return
                 newValues.years = v
                 break
             case 'months':
-                if (v < 0 || v > 11) return
+                if (v < 0 || v > 12 || (v === 12 && days > 0)) return
                 newValues.months = v
                 break
             case 'days':
@@ -89,15 +96,17 @@ export const AgeInput = props => {
                 break
             default:
                 break
-        }
+        }*/
+        console.log('hi')
 
-        newValues.value = moment()
+        /*newValues.value = moment()
             .add(-newValues.years, 'years')
             .add(-newValues.months, 'months')
             .add(-newValues.days, 'days')
             .format('YYYY-MM-DD')
-        setValues(newValues.value)
-        props.onChange(props.name, newValues.value)
+        console.log(newValues)*/
+        setValues(newValue)
+        props.onChange(props.name, newValue)
     }
 
     /**
@@ -114,9 +123,8 @@ export const AgeInput = props => {
                 label={'Date of Birth'}
                 value={value !== '' ? moment(value).format('LL') : value}
                 onChange={() => {}}
-                kind={'outlined'}
                 disabled={props.disabled}
-                size="dense"
+                dense
             />
         </MarginTop>
     )
@@ -131,9 +139,9 @@ export const AgeInput = props => {
                         label={'Years'}
                         value={years}
                         onChange={onAge}
-                        kind={'outlined'}
                         disabled={props.disabled}
-                        size="dense"
+                        type="number"
+                        dense
                     />
                 </UnitContainer>
                 <UnitContainer>
@@ -142,9 +150,9 @@ export const AgeInput = props => {
                         label={'Months'}
                         value={months}
                         onChange={onAge}
-                        kind={'outlined'}
                         disabled={props.disabled}
-                        size="dense"
+                        type="number"
+                        dense
                     />
                 </UnitContainer>
                 <UnitContainer>
@@ -153,9 +161,9 @@ export const AgeInput = props => {
                         label={'Days'}
                         value={days}
                         onChange={onAge}
-                        kind={'outlined'}
                         disabled={props.disabled}
-                        size="dense"
+                        type="number"
+                        dense
                     />
                 </UnitContainer>
             </Row>
@@ -169,6 +177,11 @@ export const AgeInput = props => {
                     ref={node => setPicker(node)}
                 />
             </MuiPickersUtilsProvider>
+            {(props.error || props.warning) && (
+                <Help warning={!!props.warning} error={!!props.error}>
+                    {props.error ? props.error : props.warning}
+                </Help>
+            )}
         </Input>
     )
 }

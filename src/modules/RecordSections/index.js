@@ -182,7 +182,7 @@ export const RecordSections = props => {
                     onClick={onDeleteConfirmed}
                     label="Delete"
                     icon="delete"
-                    kind="destructive"
+                    destructive
                     deletion
                 />
             )}
@@ -220,7 +220,7 @@ export const RecordSections = props => {
                                       disabled:
                                           !status.deletable || buttonDisabled,
                                       icon: 'delete',
-                                      kind: 'destructive',
+                                      destructive: true,
                                       tooltip: 'Permanently delete record',
                                       disabledTooltip:
                                           'You cannot delete records with an approval status',
@@ -237,7 +237,7 @@ export const RecordSections = props => {
                                           ? !status.editable
                                           : disabled,
                                       icon: status.completed ? 'edit' : 'done',
-                                      kind: 'primary',
+                                      primary: true,
                                       tooltip: status.completed
                                           ? 'Edit record'
                                           : 'Submit record',
@@ -256,7 +256,7 @@ export const RecordSections = props => {
                                   onClick: () => onSubmit(true),
                                   disabled: disabled,
                                   icon: 'add',
-                                  kind: 'primary',
+                                  primary: true,
                                   tooltip:
                                       'Submit record and add new record for the same person',
                                   disabledTooltip:
@@ -271,7 +271,7 @@ export const RecordSections = props => {
                                   onClick: () => onSubmit(false),
                                   disabled: disabled,
                                   icon: 'done',
-                                  kind: 'primary',
+                                  primary: true,
                                   tooltip: 'Submit record',
                                   disabledTooltip:
                                       duplicate === 'ERROR'

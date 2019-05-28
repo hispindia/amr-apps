@@ -1,5 +1,6 @@
 export * from './App'
 export * from './Content'
+export * from './Header'
 export * from './Main'
 export * from './ModalPopup'
 export * from './PersonForm'

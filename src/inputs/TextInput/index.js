@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
-import InputField from '@dhis2/ui/core/InputField'
+import { Help, InputField } from '@dhis2/ui-core'
 import { Input } from 'styles'
 import { hash } from 'helpers'
 import { hook } from './hook'
-import { types, texts, statuses } from './constants'
+import { types, texts } from './constants'
 import { debounced } from './debounced'
 import { CustomInputField } from './style'
 
@@ -64,9 +64,10 @@ export const TextInput = props => {
         return error
     }
 
-    const onInput = (n, v) => {
-        if (!validating && v.length < 128)
-            dispatch({ type: types.SET_VALUE, value: v })
+    const onInput = event => {
+        const value = event.target.value
+        if (!validating && value.length < 128)
+            dispatch({ type: types.SET_VALUE, value: value })
     }
 
     return (
@@ -78,16 +79,9 @@ export const TextInput = props => {
                     label={props.label}
                     value={value && value.length > 127 ? '' : value}
                     onChange={onInput}
-                    kind={'outlined'}
-                    status={
-                        validating
-                            ? statuses.warning
-                            : error || props.error
-                            ? statuses.error
-                            : props.warning
-                            ? statuses.warning
-                            : statuses.default
-                    }
+                    loading={validating}
+                    warning={!!props.warning}
+                    error={!!error || !!props.error}
                     help={
                         validating
                             ? texts.validate
@@ -101,11 +95,25 @@ export const TextInput = props => {
                     }
                     disabled={props.disabled}
                     type={props.type}
-                    size="dense"
+                    dense
                     placeholder={
                         value && value.length > 127 ? '<Confidential>' : ''
                     }
                 />
+                {(validating || error || props.error || props.warning) && (
+                    <Help
+                        warning={!!props.warning}
+                        error={!!error || !!props.error}
+                    >
+                        {validating
+                            ? texts.validate
+                            : error
+                            ? error
+                            : props.error
+                            ? props.error
+                            : props.warning}
+                    </Help>
+                )}
             </CustomInputField>
         </Input>
     )

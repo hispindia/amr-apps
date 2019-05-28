@@ -1,8 +1,9 @@
 import React from 'react'
-import { arrayOf, bool, func, oneOf, shape, string } from 'prop-types'
-import { Button } from '@dhis2/ui/core'
+import { arrayOf, bool, func, shape, string } from 'prop-types'
+import { Button } from '@dhis2/ui-core'
 import { MarginTop } from 'styles'
 import { ButtonPadding, SpaceBetween } from './style'
+import { Icon } from 'components'
 
 /**
  * Row of buttons.
@@ -21,11 +22,14 @@ export const ButtonRow = ({ className, unspaced, buttons }) => (
                     }
                 >
                     <Button
-                        kind={button.kind}
+                        primary={button.primary}
+                        secondary={button.secondary}
+                        destructive={button.destructive}
                         onClick={button.onClick}
                         disabled={button.disabled}
-                        icon={button.icon}
-                        size={button.size ? button.size : 'medium'}
+                        icon={button.icon && <Icon icon={button.icon} />}
+                        small={button.small}
+                        large={button.large}
                     >
                         {button.label}
                     </Button>
@@ -45,9 +49,11 @@ ButtonRow.propTypes = {
             tooltip: string,
             disabledTooltip: string,
             disabled: bool,
-            kind: oneOf(['basic', 'primary', 'secondary', 'destructive'])
-                .isRequired,
-            size: oneOf(['small', 'medium', 'large']),
+            small: bool,
+            large: bool,
+            primary: bool,
+            secondary: bool,
+            destructive: bool,
         })
     ).isRequired,
 }

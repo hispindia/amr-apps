@@ -2,21 +2,18 @@ import React from 'react'
 import { arrayOf, bool, number, shape, string } from 'prop-types'
 import { BrowserRouter, HashRouter } from 'react-router-dom'
 import { MuiThemeProvider } from '@material-ui/core'
-import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
-import { Content } from 'modules'
+import { Content, Header } from 'modules'
 import { ConfigContextProvider } from 'contexts'
-import { Fixed, BodyStyle, theme } from './style'
+import { BodyStyle, theme } from './style'
 import { MarginTop } from 'styles'
 
-export const App = ({ appName, categories, isApproval }) => (
+export const App = ({ appName, categories, isApproval, baseUrl }) => (
     <BrowserRouter>
         <HashRouter>
             <MuiThemeProvider theme={theme}>
                 <>
                     <BodyStyle />
-                    <Fixed>
-                        <HeaderBar appName={appName} />
-                    </Fixed>
+                    <Header appName={appName} baseUrl={baseUrl} />
                     <ConfigContextProvider
                         categories={categories}
                         isApproval={isApproval}

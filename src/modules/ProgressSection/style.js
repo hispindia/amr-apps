@@ -1,5 +1,8 @@
 import styled from 'styled-components'
 
-export const WithHeight = styled.div`
-    height: 100px;
+export const Container = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
 `
