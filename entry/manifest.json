@@ -8,7 +8,7 @@
     },
     "appType": "APP",
     "name": "AMR Data Entry",
-    "version": "0.1.10",
+    "version": "0.1.12",
     "description": "AMR data entry app for DHIS2",
     "icons": {
         "48": "icon.png"

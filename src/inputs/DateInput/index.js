@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
-import { Help, InputField } from '@dhis2/ui-core'
-import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
-import MomentUtils from '@date-io/moment'
-import moment from 'moment'
+import InputField from '@dhis2/ui/core/InputField'
+import { DatePicker } from 'material-ui-pickers'
+import dayjs from 'dayjs'
 import { Input } from 'styles'
 
 /**
@@ -52,8 +51,9 @@ export const DateInput = props => {
             <InputField
                 name={props.name}
                 label={props.label}
-                value={value !== '' ? moment(value).format('LL') : value}
+                value={value !== '' ? dayjs(value).format('YYYY-MM-DD') : value}
                 onChange={() => {}}
+                kind="outlined"
                 disabled={props.disabled}
                 dense
                 required={props.required}
@@ -69,18 +69,13 @@ export const DateInput = props => {
     )
 
     return (
-        <>
-            <MuiPickersUtilsProvider utils={MomentUtils}>
-                <DatePicker
-                    value={value}
-                    onChange={setDate}
-                    showTodayButton
-                    TextFieldComponent={getField}
-                    maxDate={moment()}
-                    ref={node => setPicker(node)}
-                />
-            </MuiPickersUtilsProvider>
-        </>
+        <DatePicker
+            value={value}
+            onChange={setDate}
+            TextFieldComponent={getField}
+            disableFuture
+            ref={node => setPicker(node)}
+        />
     )
 }
 

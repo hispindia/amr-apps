@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
-import { Help, InputField } from '@dhis2/ui-core'
-import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
-import MomentUtils from '@date-io/moment'
-import moment from 'moment'
+import InputField from '@dhis2/ui/core/InputField'
+import { DatePicker } from 'material-ui-pickers'
+import dayjs from 'dayjs'
 import { Input, Label, MarginTop, Row } from 'styles'
 import { UnitContainer } from './style'
 
@@ -23,32 +22,45 @@ export const AgeInput = props => {
             setYears('0')
             setMonths('0')
             setDays('0')
-        } else if (props.value !== value) setValues(props.value)
+        } else if (props.value !== value) setValues(dayjs(props.value))
     }, [props.value])
 
+    /**
+     * Called on input from age fields.
+     * @param {string} name - Field name.
+     * @param {string} v - Value.
+     */
+    const onAge = async (n, v) => {
+        const newValues = { value, years, months, days }
+
+        if (!v) v = '0'
+        v = parseInt(v)
+        if (v < 0) return
+        newValues[n] = v - newValues[n]
+
+        newValues.value = (newValues.value
+            ? dayjs(newValues.value)
+            : dayjs()
+        ).add(-newValues[n], n)
+        setValues(newValues.value)
+    }
+
     const setValues = date => {
-        date = moment(date)
-        const now = moment()
+        const now = dayjs()
+        let newDate = date
 
-        const years = now.diff(date, 'year')
-        date.add(years, 'years')
-        const months = now.diff(date, 'months')
-        date.add(months, 'months')
-        const days = now.diff(date, 'days')
+        const years = now.diff(newDate, 'year')
+        newDate = newDate.add(years, 'year')
+        const months = now.diff(newDate, 'month')
+        newDate = newDate.add(months, 'month')
+        const days = now.diff(newDate, 'day')
 
-        setValue(date.add(-months, 'months').add(-years, 'years'))
+        date = date.format('YYYY-MM-DD')
+        setValue(date)
         setYears(years.toString())
         setMonths(months.toString())
         setDays(days.toString())
-    }
-
-    /**
-     * Called on date picker input.
-     * @param {string} - New date.
-     */
-    const setDate = date => {
-        setValues(date)
-        props.onChange(props.name, date.format('YYYY-MM-DD'))
+        if (date !== props.value) props.onChange(props.name, date)
     }
 
     /**
@@ -66,50 +78,6 @@ export const AgeInput = props => {
     }
 
     /**
-     * Called on input from age fields.
-     * @param {string} name - Field name.
-     * @param {string} v - Value.
-     */
-    const onAge = async event => {
-        let v = event.target.value
-        if (!v) v = '0'
-        v = parseInt(v)
-        console.log(moment())
-        const unit = event.target.name
-        const oldValue = value ? value : moment()
-        console.log(oldValue.get(unit))
-        const newValue = oldValue
-            .add(oldValue.get(unit) - v, unit)
-            .format('YYYY-MM-DD')
-        /*switch (event.target.name) {
-            case 'years':
-                if (v < 0 || v > 118) return
-                newValues.years = v
-                break
-            case 'months':
-                if (v < 0 || v > 12 || (v === 12 && days > 0)) return
-                newValues.months = v
-                break
-            case 'days':
-                if (v < 0 || v > 31) return
-                newValues.days = v
-                break
-            default:
-                break
-        }*/
-        console.log('hi')
-
-        /*newValues.value = moment()
-            .add(-newValues.years, 'years')
-            .add(-newValues.months, 'months')
-            .add(-newValues.days, 'days')
-            .format('YYYY-MM-DD')
-        console.log(newValues)*/
-        setValues(newValue)
-        props.onChange(props.name, newValue)
-    }
-
-    /**
      * Gets input field used for date picker.
      * @returns {Component} Input field.
      */
@@ -120,9 +88,10 @@ export const AgeInput = props => {
         >
             <InputField
                 name={props.name}
-                label={'Date of Birth'}
-                value={value !== '' ? moment(value).format('LL') : value}
+                label="Date of Birth"
+                value={value !== '' ? dayjs(value).format('YYYY-MM-DD') : value}
                 onChange={() => {}}
+                kind="outlined"
                 disabled={props.disabled}
                 dense
             />
@@ -135,53 +104,50 @@ export const AgeInput = props => {
             <Row wrapped>
                 <UnitContainer>
                     <InputField
-                        name={'years'}
-                        label={'Years'}
+                        name="years"
+                        label="Years"
                         value={years}
                         onChange={onAge}
+                        kind="outlined"
                         disabled={props.disabled}
+                        size="dense"
                         type="number"
-                        dense
                     />
                 </UnitContainer>
                 <UnitContainer>
                     <InputField
-                        name={'months'}
-                        label={'Months'}
+                        name="months"
+                        label="Months"
                         value={months}
                         onChange={onAge}
+                        kind="outlined"
                         disabled={props.disabled}
+                        size="dense"
                         type="number"
-                        dense
                     />
                 </UnitContainer>
                 <UnitContainer>
                     <InputField
-                        name={'days'}
-                        label={'Days'}
+                        name="days"
+                        label="Days"
                         value={days}
                         onChange={onAge}
+                        kind="outlined"
                         disabled={props.disabled}
+                        size="dense"
                         type="number"
-                        dense
                     />
                 </UnitContainer>
             </Row>
-            <MuiPickersUtilsProvider utils={MomentUtils}>
-                <DatePicker
-                    value={value}
-                    onChange={setDate}
-                    showTodayButton
-                    TextFieldComponent={getField}
-                    maxDate={moment()}
-                    ref={node => setPicker(node)}
-                />
-            </MuiPickersUtilsProvider>
-            {(props.error || props.warning) && (
-                <Help warning={!!props.warning} error={!!props.error}>
-                    {props.error ? props.error : props.warning}
-                </Help>
-            )}
+            <DatePicker
+                value={value}
+                onChange={setValues}
+                TextFieldComponent={getField}
+                openTo="year"
+                views={['year', 'month', 'day']}
+                disableFuture
+                ref={node => setPicker(node)}
+            />
         </Input>
     )
 }

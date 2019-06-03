@@ -2,7 +2,10 @@ import React from 'react'
 import { arrayOf, bool, number, shape, string } from 'prop-types'
 import { BrowserRouter, HashRouter } from 'react-router-dom'
 import { MuiThemeProvider } from '@material-ui/core'
-import { Content, Header } from 'modules'
+import { MuiPickersUtilsProvider } from 'material-ui-pickers'
+import DayjsUtils from '@date-io/dayjs'
+import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
+import { Content } from 'modules'
 import { ConfigContextProvider } from 'contexts'
 import { BodyStyle, theme } from './style'
 import { MarginTop } from 'styles'
@@ -11,18 +14,22 @@ export const App = ({ appName, categories, isApproval, baseUrl }) => (
     <BrowserRouter>
         <HashRouter>
             <MuiThemeProvider theme={theme}>
-                <>
-                    <BodyStyle />
-                    <Header appName={appName} baseUrl={baseUrl} />
-                    <ConfigContextProvider
-                        categories={categories}
-                        isApproval={isApproval}
-                    >
-                        <MarginTop margin={48}>
-                            <Content removingThisBreaksTheApp={appName} />
-                        </MarginTop>
-                    </ConfigContextProvider>
-                </>
+                <MuiPickersUtilsProvider utils={DayjsUtils}>
+                    <>
+                        <BodyStyle />
+                        <Fixed>
+                            <HeaderBar appName={appName} />
+                        </Fixed>
+                        <ConfigContextProvider
+                            categories={categories}
+                            isApproval={isApproval}
+                        >
+                            <MarginTop margin={48}>
+                                <Content removingThisBreaksTheApp={appName} />
+                            </MarginTop>
+                        </ConfigContextProvider>
+                    </>
+                </MuiPickersUtilsProvider>
             </MuiThemeProvider>
         </HashRouter>
     </BrowserRouter>

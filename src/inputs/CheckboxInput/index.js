@@ -17,8 +17,9 @@ export const CheckboxInput = props => {
      * Called on checkbox click.
      */
     const onChange = event => {
-        let { name, checked } = event.target
-        let newValues = { ...values }
+        const name = event.target.name
+        let checked = event.target.checked
+        const newValues = { ...values }
         checked = checked ? 'true' : ''
         newValues[name] = checked
         setValues(newValues)
