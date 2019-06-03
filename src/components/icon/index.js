@@ -26,5 +26,6 @@ Icon.propTypes = {
         'yellow',
         'green',
         'white',
+        'black',
     ]),
 }

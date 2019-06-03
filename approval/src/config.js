@@ -3,7 +3,7 @@ export const config = {
     isApproval: true,
     categories: [
         {
-            label: 'Records for validation (0)',
+            label: 'Records for validation',
             value: '/approval/Validate',
             icon: 'home',
             status: 'Validate',
@@ -12,9 +12,10 @@ export const config = {
                 table: ['d1gMq0frCpA', 'COjhfA8oF1s'],
             },
             count: 0,
+            color: 'primary',
         },
         {
-            label: 'Records for revision (0)',
+            label: 'Records for revision',
             value: '/approval/Resend',
             icon: 'error_outline',
             status: 'Resend',
@@ -23,10 +24,11 @@ export const config = {
                 table: ['Zfd5ceEo2Pw', 'rszxQdl3Yve'],
             },
             count: 0,
+            color: 'yellow',
             param: true,
         },
         {
-            label: 'Rejected records (0)',
+            label: 'Rejected records',
             value: '/approval/Rejected',
             icon: 'highlight_off',
             status: 'Rejected',
@@ -35,10 +37,11 @@ export const config = {
                 table: ['Zfd5ceEo2Pw', 'rszxQdl3Yve'],
             },
             count: 0,
+            color: 'red',
             param: true,
         },
         {
-            label: 'Accepted records (0)',
+            label: 'Accepted records',
             value: '/approval/Approved',
             icon: 'check_circle_outline',
             status: 'Approved',
@@ -47,11 +50,12 @@ export const config = {
                 table: ['Zfd5ceEo2Pw', 'rszxQdl3Yve'],
             },
             count: 0,
+            color: 'green',
             param: true,
         },
 
         {
-            label: 'Incomplete records (0)',
+            label: 'Incomplete records',
             value: '/approval/Incomplete',
             icon: 'pause_circle_outline',
             status: 'Incomplete',
@@ -60,6 +64,7 @@ export const config = {
                 table: ['vgwCVic3G4T', 'V0PVJtu2XZx'],
             },
             count: 0,
+            color: 'black',
         },
     ],
 }

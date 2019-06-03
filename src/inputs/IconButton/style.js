@@ -4,8 +4,10 @@ import { theme } from '@dhis2/ui-core'
 export const IconContainer = styled.div`
     display: flex;
     align-items: center;
-    height: 72px;
-    width: 72px;
+    margin-top: auto;
+    margin-bottom: auto;
+    height: 64px;
+    width: 64px;
     border-radius: 50%;
     cursor: pointer;
     &:hover {

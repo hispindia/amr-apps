@@ -3,7 +3,7 @@ export const config = {
     isApproval: false,
     categories: [
         {
-            label: 'My records (0)',
+            label: 'My records',
             value: '/approval/ALL',
             icon: 'home',
             status: 'ALL',
@@ -12,9 +12,10 @@ export const config = {
                 table: ['gPZgVJOeHk4'],
             },
             count: 0,
+            color: 'primary',
         },
         {
-            label: 'Records for revision (0)',
+            label: 'Records for revision',
             value: '/approval/Resend',
             icon: 'error_outline',
             status: 'Resend',
@@ -24,9 +25,10 @@ export const config = {
             },
             count: 0,
             param: true,
+            color: 'yellow',
         },
         {
-            label: 'Rejected records (0)',
+            label: 'Rejected records',
             value: '/approval/Rejected',
             icon: 'highlight_off',
             status: 'Rejected',
@@ -36,9 +38,10 @@ export const config = {
             },
             count: 0,
             param: true,
+            color: 'red',
         },
         {
-            label: 'Accepted records (0)',
+            label: 'Accepted records',
             value: '/approval/Approved',
             icon: 'check_circle_outline',
             status: 'Approved',
@@ -48,9 +51,10 @@ export const config = {
             },
             count: 0,
             param: true,
+            color: 'green',
         },
         {
-            label: 'Records for validation (0)',
+            label: 'Records for validation',
             value: '/approval/Validate',
             icon: 'help_outline',
             status: 'Validate',
@@ -59,9 +63,10 @@ export const config = {
                 table: ['k4Or0pHTmPN'],
             },
             count: 0,
+            color: 'secondary',
         },
         {
-            label: 'Incomplete records (0)',
+            label: 'Incomplete records',
             value: '/approval/Incomplete',
             icon: 'pause_circle_outline',
             status: 'Incomplete',
@@ -70,6 +75,7 @@ export const config = {
                 table: ['nwO7eOjAqmu'],
             },
             count: 0,
+            color: 'black',
         },
     ],
 }

@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components'
 import { bool, oneOf } from 'prop-types'
 import { colors, theme } from '@dhis2/ui-core'
 
-const colors = {
+const themeColors = {
     primary: theme.primary600,
     secondary: theme.secondary600,
     blue: colors.blue600,
@@ -11,21 +11,23 @@ const colors = {
     yellow: colors.yellow600,
     green: colors.green600,
     white: colors.white,
+    black: colors.grey900,
 }
 
 export const StyledSvg = styled.svg`
     width: 24px;
     height: 24px;
-    margin: auto;
+    /*margin: auto;*/
     ${({ large, color }) => {
         if (large)
             return css`
+                margin: auto;
                 width: 48px;
                 height: 48px;
             `
         if (color)
             return css`
-                fill: ${colors[color]};
+                fill: ${themeColors[color]};
             `
     }}
 `
@@ -41,5 +43,6 @@ StyledSvg.propTypes = {
         'yellow',
         'green',
         'white',
+        'black',
     ]),
 }

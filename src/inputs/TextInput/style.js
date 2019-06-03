@@ -8,19 +8,19 @@ export const CustomInputField = styled.div`
         switch (props.color) {
             case 'red':
                 return css`
-                    .ui_inputfield_flatline_kvrmz {
+                    .content {
                         background-color: rgba(255, 0, 0, 0.082) !important;
                     }
                 `
             case 'yellow':
                 return css`
-                    .ui_inputfield_flatline_kvrmz {
+                    .content {
                         background-color: rgba(255, 255, 0, 0.082) !important;
                     }
                 `
             case 'green':
                 return css`
-                    .ui_inputfield_flatline_kvrmz {
+                    .content {
                         background-color: rgba(0, 255, 0, 0.082) !important;
                     }
                 `

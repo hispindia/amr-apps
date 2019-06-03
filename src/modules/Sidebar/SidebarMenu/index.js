@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Menu, MenuItem } from '@dhis2/ui-core'
+import { Menu } from '@dhis2/ui-core'
 import { getCounts } from 'api'
 import { Icon } from 'components'
 import { ConfigContext, MetadataContext } from 'contexts'
-import { CustomMenu } from './style'
+import { StyledMenuItem, Title, Count } from './style'
 
 /**
  * Sidebar menu.
@@ -27,10 +27,6 @@ const SidebarMenu = ({ selected, location, history }) => {
             username: !isApproval ? user.username : false,
             l2Member: user.l2Member,
         })
-        items.forEach(
-            item =>
-                (item.label = item.label.replace(/\(\d*\)/, `(${item.count})`))
-        )
         setMenuItems(items)
         setForce(!force)
     }
@@ -38,15 +34,16 @@ const SidebarMenu = ({ selected, location, history }) => {
     return (
         <Menu>
             {(menuItems ? menuItems : categories).map(m => (
-                <MenuItem
+                <StyledMenuItem
                     dense
                     key={m.value}
                     value={m.value}
                     onClick={history.push}
                     label={
                         <>
-                            <Icon icon={m.icon} />
-                            {m.label}
+                            <Icon icon={m.icon} color={m.color} />
+                            <Title>{m.label}</Title>
+                            <Count>{m.count}</Count>
                         </>
                     }
                 />
