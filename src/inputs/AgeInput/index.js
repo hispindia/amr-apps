@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
-import InputField from '@dhis2/ui/core/InputField'
+import { InputField } from '@dhis2/ui-core'
 import { DatePicker } from 'material-ui-pickers'
 import dayjs from 'dayjs'
 import { Input, Label, MarginTop, Row } from 'styles'
@@ -30,7 +30,9 @@ export const AgeInput = props => {
      * @param {string} name - Field name.
      * @param {string} v - Value.
      */
-    const onAge = async (n, v) => {
+    const onAge = async event => {
+        const n = event.target.name
+        let v = event.target.value
         const newValues = { value, years, months, days }
 
         if (!v) v = '0'
@@ -91,7 +93,6 @@ export const AgeInput = props => {
                 label="Date of Birth"
                 value={value !== '' ? dayjs(value).format('YYYY-MM-DD') : value}
                 onChange={() => {}}
-                kind="outlined"
                 disabled={props.disabled}
                 dense
             />
@@ -108,9 +109,8 @@ export const AgeInput = props => {
                         label="Years"
                         value={years}
                         onChange={onAge}
-                        kind="outlined"
                         disabled={props.disabled}
-                        size="dense"
+                        dense
                         type="number"
                     />
                 </UnitContainer>
@@ -120,9 +120,8 @@ export const AgeInput = props => {
                         label="Months"
                         value={months}
                         onChange={onAge}
-                        kind="outlined"
                         disabled={props.disabled}
-                        size="dense"
+                        dense
                         type="number"
                     />
                 </UnitContainer>
@@ -132,9 +131,8 @@ export const AgeInput = props => {
                         label="Days"
                         value={days}
                         onChange={onAge}
-                        kind="outlined"
                         disabled={props.disabled}
-                        size="dense"
+                        dense
                         type="number"
                     />
                 </UnitContainer>
@@ -143,8 +141,6 @@ export const AgeInput = props => {
                 value={value}
                 onChange={setValues}
                 TextFieldComponent={getField}
-                openTo="year"
-                views={['year', 'month', 'day']}
                 disableFuture
                 ref={node => setPicker(node)}
             />

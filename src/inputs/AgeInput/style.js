@@ -2,5 +2,5 @@ import styled from 'styled-components'
 
 export const UnitContainer = styled.div`
     margin-right: 16px;
-    width: 70px;
+    width: 98px;
 `

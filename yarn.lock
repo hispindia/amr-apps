@@ -1398,6 +1398,11 @@
   dependencies:
     "@date-io/core" "^1.2.0"
 
+"@dhis2/app-runtime@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@dhis2/app-runtime/-/app-runtime-1.2.0.tgz#87e22d817a13d45a7d89d854e6152cfd959ec55d"
+  integrity sha512-2JOKPYIdNVpb6vVwuqmO+1ERelUdOYqFgWJDD2xnMNWYhNOPxvqi8v5rPLaOfTsUWeQ0RgBukPfRRJbBSqkipw==
+
 "@dhis2/cli-helpers-engine@1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@dhis2/cli-helpers-engine/-/cli-helpers-engine-1.2.0.tgz#ffec930cf57668aa29c91de3d871d7898ac915b7"
@@ -1443,32 +1448,23 @@
     classnames "^2.2.6"
     styled-jsx "^3.2.1"
 
-"@dhis2/ui-core@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@dhis2/ui-core/-/ui-core-2.1.0.tgz#2902164e4c4b8b5daca1890f23d159e74603a39b"
-  integrity sha512-b59304F/q0RsgpSr/LuGQU/oV2zxRblg+ojWFQVPU/l4x7l0fMcbvvGp2ij8X0hmpIv/wIXOAA2iyuOcw1yoXg==
+"@dhis2/ui-core@^2.5.1":
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@dhis2/ui-core/-/ui-core-2.5.1.tgz#da24154f6ca02659ecc6725dfafc5a16c77dfb12"
+  integrity sha512-WnfVTxACo/Y9Iy1o5Usj+wbRYpgWePEuRFZ067VAPZhwVp6uekj7V2ONa1DpvUOLcRP8Z/DtlSN6EAaKzKhF+A==
   dependencies:
     classnames "^2.2.6"
     styled-jsx "^3.2.1"
 
-"@dhis2/ui-widgets@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@dhis2/ui-widgets/-/ui-widgets-1.0.2.tgz#4eca5a7f840dbaf5e1956c8c70cc1e742081a820"
-  integrity sha512-SuGWzrWim1GaY/oENRs+28tRuZsJofZ2uiki96MisHSbVKXJIE7QQIlzOHG5uqsrL8z/DmIHhTvF0enaSP5IDA==
+"@dhis2/ui-widgets@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@dhis2/ui-widgets/-/ui-widgets-1.0.3.tgz#e18925ac2e18086ac97280652e5ad8d461f6b9df"
+  integrity sha512-eTFEvXib5I5Mol/mMEUD9p9C1euHA/a/ks38q8i6CNiV2B3C0mGWIzTuhAYSRNGAImhpj4IsmQKxESJ9VLgMpQ==
   dependencies:
     "@dhis2/d2-i18n" "1.0.4"
     "@dhis2/ui-core" "2.0.2"
     classnames "^2.2.6"
     styled-jsx "^3.2.1"
-
-"@dhis2/ui@^1.0.0-beta.12":
-  version "1.0.0-beta.12"
-  resolved "https://registry.yarnpkg.com/@dhis2/ui/-/ui-1.0.0-beta.12.tgz#bd78835a1e165d1879e12be93790948016819c90"
-  integrity sha512-bpeDxVXqj4R6YqguH5Jt9i3pLtg5VpAWiwNmb/Cf7YqFDJHJ4RNTW01qYB+oV5SHwbAYNKmPpvYfpPOtiOFuuQ==
-  dependencies:
-    classnames "^2.2.6"
-    material-design-icons-iconfont "^4.0.2"
-    typeface-roboto "^0.0.54"
 
 "@emotion/is-prop-valid@^0.7.3":
   version "0.7.3"
@@ -7524,11 +7520,6 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-material-design-icons-iconfont@^4.0.2:
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/material-design-icons-iconfont/-/material-design-icons-iconfont-4.0.5.tgz#4107ba3b8a9d688a3d9325fc7363af51b17d3aee"
-  integrity sha512-ByJJ1yz8+RfCx2uNiC5WjVCR7K3UWRb8ytWV3RMaoFRzQLNr/J5x7+Wg1+3OlIZahNXrId9Hu+BfXfQIo01v7g==
-
 material-ui-pickers@^2.2.4:
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/material-ui-pickers/-/material-ui-pickers-2.2.4.tgz#8b33cfc55cbc5b2d520db45abf4b3dc94090dd3c"
@@ -7825,6 +7816,11 @@ mkdirp@0.5.1, mkdirp@0.5.x, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@
   integrity sha1-MAV0OOrGz3+MR2fzhkjWaX11yQM=
   dependencies:
     minimist "0.0.8"
+
+moment@^2.24.0:
+  version "2.24.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
+  integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
 
 move-concurrently@^1.0.1:
   version "1.0.1"

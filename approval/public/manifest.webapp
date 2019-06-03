@@ -1,0 +1,21 @@
+{
+  "launch_path": "index.html",
+  "default_locale": "en",
+  "activities": {
+    "dhis": {
+      "href": "../../.."
+    }
+  },
+  "appType": "APP",
+  "name": "AMR Data Approval",
+  "version": "0.1.11",
+  "description": "AMR data approval app for DHIS2",
+  "icons": {
+    "48": "icon.png"
+  },
+  "developer": {
+    "name": "Terje Uglebakken",
+    "company": "HISP India"
+  },
+  "manifest_generated_at": "Thu May 16 2019 22:57:37 GMT+0200 (Central European Summer Time)"
+}
