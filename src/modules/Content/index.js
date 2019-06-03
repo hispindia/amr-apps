@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { CircularProgress } from '@dhis2/ui/core'
+import { OverlayedSpinner } from 'components'
 import { Main, Sidebar } from 'modules'
 import { Row } from 'styles'
 import { initMetadata } from 'api'
@@ -23,7 +23,7 @@ export const Content = () => {
         getMetaData()
     }, [])
 
-    if (!metadata) return <CircularProgress size="large" overlay />
+    if (!metadata) return <OverlayedSpinner />
 
     return (
         <Row>

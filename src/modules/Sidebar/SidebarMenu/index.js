@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Menu } from '@dhis2/ui/core'
+import { Menu, MenuItem } from '@dhis2/ui-core'
 import { getCounts } from 'api'
+import { Icon } from 'components'
 import { ConfigContext, MetadataContext } from 'contexts'
 import { CustomMenu } from './style'
 
@@ -35,13 +36,22 @@ const SidebarMenu = ({ selected, location, history }) => {
     }
 
     return (
-        <CustomMenu>
-            <Menu
-                size="dense"
-                list={menuItems ? menuItems : categories}
-                onClick={path => history.push(path)}
-            />
-        </CustomMenu>
+        <Menu>
+            {(menuItems ? menuItems : categories).map(m => (
+                <MenuItem
+                    dense
+                    key={m.value}
+                    value={m.value}
+                    onClick={history.push}
+                    label={
+                        <>
+                            <Icon icon={m.icon} />
+                            {m.label}
+                        </>
+                    }
+                />
+            ))}
+        </Menu>
     )
 }
 

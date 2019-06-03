@@ -1,14 +1,14 @@
 import React from 'react'
-import { Card, CircularProgress } from '@dhis2/ui'
+import { Card, CircularProgress } from '@dhis2/ui-core'
 import { MarginBottom } from 'styles'
-import { WithHeight } from './style'
+import { Container } from './style'
 
 export const ProgressSection = () => (
     <MarginBottom>
         <Card>
-            <WithHeight>
-                <CircularProgress overlay />
-            </WithHeight>
+            <Container>
+                <CircularProgress />
+            </Container>
         </Card>
     </MarginBottom>
 )

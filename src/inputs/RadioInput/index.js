@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { arrayOf, bool, func, shape, string } from 'prop-types'
-import { Radio } from '@dhis2/ui/core'
+import { Radio } from '@dhis2/ui-core'
 import { Input, Label, OptionSpacer, Row } from 'styles'
 import { CustomRadio } from './style'
 
@@ -24,13 +24,15 @@ export const RadioInput = props => {
     const [value, setValue] = useState('')
 
     useEffect(() => {
-        if (props.objects.length === 1) onChange(props.objects[0].value)
+        if (props.objects.length === 1)
+            onChange({ target: { value: props.objects[0].value } })
         else if (props.value !== value) setValue(props.value)
     }, [props.value])
 
-    const onChange = v => {
-        setValue(v)
-        props.onChange(props.name, v)
+    const onChange = event => {
+        const value = event.target.value
+        setValue(value)
+        props.onChange(props.name, value)
     }
 
     /**
@@ -38,7 +40,7 @@ export const RadioInput = props => {
      */
     const onClick = event => {
         if (props.objects.length === 1) return
-        if (value === event.target.value) onChange('')
+        if (value === event.target.value) onChange({ target: { value: '' } })
     }
 
     return (
@@ -56,6 +58,9 @@ export const RadioInput = props => {
                                 checked={value === object.value}
                                 onChange={onChange}
                                 disabled={props.disabled}
+                                valid={object.value === 'Approved'}
+                                warning={object.value === 'Resend'}
+                                error={object.value === 'Rejected'}
                                 status={status(object.value)}
                             />
                         </CustomRadio>

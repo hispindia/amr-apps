@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { func } from 'prop-types'
-import { Card } from '@dhis2/ui/core/Card'
+import { Card } from '@dhis2/ui-core'
 import { Grid } from '@material-ui/core'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { SelectInput, RadioInput, DateInput } from 'inputs'
@@ -29,7 +29,7 @@ export const RecordPanel = ({ passValues, onReset }) => {
     }, [])
 
     const getOrganisms = newProgramId => {
-        let newOrganisms = []
+        const newOrganisms = []
         optionSets[programOrganisms[newProgramId]].forEach(o => {
             if (!newOrganisms.find(org => org.value === o.value))
                 newOrganisms.push(o)
@@ -56,7 +56,7 @@ export const RecordPanel = ({ passValues, onReset }) => {
      * Called when a new program stage or organism is selected.
      */
     const onChange = (name, value) => {
-        let values = {
+        const values = {
             organisms,
             programId,
             programStageId,

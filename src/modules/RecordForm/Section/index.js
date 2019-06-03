@@ -8,7 +8,7 @@ import {
     string,
     oneOf,
 } from 'prop-types'
-import { Card } from '@dhis2/ui/core'
+import { Card } from '@dhis2/ui-core'
 import { Heading, Margin, MarginBottom } from 'styles'
 import { SectionContent } from '../SectionContent'
 

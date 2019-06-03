@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react'
 import { string } from 'prop-types'
-import { Card } from '@dhis2/ui/core'
+import { Card } from '@dhis2/ui-core'
 import { getEvents } from 'api'
 import { Margin } from 'styles'
 import { RecordTable, ProgressSection, TitleRow } from 'modules'

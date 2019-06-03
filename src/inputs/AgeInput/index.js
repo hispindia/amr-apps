@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
+<<<<<<< HEAD
 import InputField from '@dhis2/ui/core/InputField'
 import { DatePicker } from 'material-ui-pickers'
 import dayjs from 'dayjs'
+=======
+import { Help, InputField } from '@dhis2/ui-core'
+import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
+import MomentUtils from '@date-io/moment'
+import moment from 'moment'
+>>>>>>> origin/ui-update
 import { Input, Label, MarginTop, Row } from 'styles'
 import { UnitContainer } from './style'
 
@@ -78,6 +85,53 @@ export const AgeInput = props => {
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Called on input from age fields.
+     * @param {string} name - Field name.
+     * @param {string} v - Value.
+     */
+    const onAge = async event => {
+        let v = event.target.value
+        if (!v) v = '0'
+        v = parseInt(v)
+        console.log(moment())
+        const unit = event.target.name
+        const oldValue = value ? value : moment()
+        console.log(oldValue.get(unit))
+        const newValue = oldValue
+            .add(oldValue.get(unit) - v, unit)
+            .format('YYYY-MM-DD')
+        /*switch (event.target.name) {
+            case 'years':
+                if (v < 0 || v > 118) return
+                newValues.years = v
+                break
+            case 'months':
+                if (v < 0 || v > 12 || (v === 12 && days > 0)) return
+                newValues.months = v
+                break
+            case 'days':
+                if (v < 0 || v > 31) return
+                newValues.days = v
+                break
+            default:
+                break
+        }*/
+        console.log('hi')
+
+        /*newValues.value = moment()
+            .add(-newValues.years, 'years')
+            .add(-newValues.months, 'months')
+            .add(-newValues.days, 'days')
+            .format('YYYY-MM-DD')
+        console.log(newValues)*/
+        setValues(newValue)
+        props.onChange(props.name, newValue)
+    }
+
+    /**
+>>>>>>> origin/ui-update
      * Gets input field used for date picker.
      * @returns {Component} Input field.
      */
@@ -91,9 +145,12 @@ export const AgeInput = props => {
                 label="Date of Birth"
                 value={value !== '' ? dayjs(value).format('YYYY-MM-DD') : value}
                 onChange={() => {}}
+<<<<<<< HEAD
                 kind="outlined"
+=======
+>>>>>>> origin/ui-update
                 disabled={props.disabled}
-                size="dense"
+                dense
             />
         </MarginTop>
     )
@@ -108,10 +165,16 @@ export const AgeInput = props => {
                         label="Years"
                         value={years}
                         onChange={onAge}
+<<<<<<< HEAD
                         kind="outlined"
                         disabled={props.disabled}
                         size="dense"
                         type="number"
+=======
+                        disabled={props.disabled}
+                        type="number"
+                        dense
+>>>>>>> origin/ui-update
                     />
                 </UnitContainer>
                 <UnitContainer>
@@ -120,10 +183,16 @@ export const AgeInput = props => {
                         label="Months"
                         value={months}
                         onChange={onAge}
+<<<<<<< HEAD
                         kind="outlined"
                         disabled={props.disabled}
                         size="dense"
                         type="number"
+=======
+                        disabled={props.disabled}
+                        type="number"
+                        dense
+>>>>>>> origin/ui-update
                     />
                 </UnitContainer>
                 <UnitContainer>
@@ -132,6 +201,7 @@ export const AgeInput = props => {
                         label="Days"
                         value={days}
                         onChange={onAge}
+<<<<<<< HEAD
                         kind="outlined"
                         disabled={props.disabled}
                         size="dense"
@@ -148,6 +218,29 @@ export const AgeInput = props => {
                 disableFuture
                 ref={node => setPicker(node)}
             />
+=======
+                        disabled={props.disabled}
+                        type="number"
+                        dense
+                    />
+                </UnitContainer>
+            </Row>
+            <MuiPickersUtilsProvider utils={MomentUtils}>
+                <DatePicker
+                    value={value}
+                    onChange={setDate}
+                    showTodayButton
+                    TextFieldComponent={getField}
+                    maxDate={moment()}
+                    ref={node => setPicker(node)}
+                />
+            </MuiPickersUtilsProvider>
+            {(props.error || props.warning) && (
+                <Help warning={!!props.warning} error={!!props.error}>
+                    {props.error ? props.error : props.warning}
+                </Help>
+            )}
+>>>>>>> origin/ui-update
         </Input>
     )
 }

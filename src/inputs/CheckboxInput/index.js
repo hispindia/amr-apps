@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { bool, func, object, objectOf, string } from 'prop-types'
-import { Checkbox } from '@dhis2/ui/core'
+import { Checkbox } from '@dhis2/ui-core'
 import { Label, OptionSpacer, Row } from 'styles'
 
 /**
@@ -16,12 +16,14 @@ export const CheckboxInput = props => {
     /**
      * Called on checkbox click.
      */
-    const onChange = (n, v) => {
-        let newValues = { ...values }
-        v = v ? 'true' : ''
-        newValues[n] = v
+    const onChange = event => {
+        const name = event.target.name
+        let checked = event.target.checked
+        const newValues = { ...values }
+        checked = checked ? 'true' : ''
+        newValues[name] = checked
         setValues(newValues)
-        props.onChange(n, v)
+        props.onChange(name, checked)
     }
 
     return (
@@ -32,7 +34,6 @@ export const CheckboxInput = props => {
                     <OptionSpacer key={id}>
                         <Checkbox
                             name={id}
-                            value={id}
                             label={props.objects[id].label}
                             checked={values[id] === 'true'}
                             onChange={onChange}

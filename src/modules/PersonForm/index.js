@@ -3,7 +3,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { bool, func } from 'prop-types'
 import { Grid } from '@material-ui/core'
-import { Card } from '@dhis2/ui/core'
+import { Card } from '@dhis2/ui-core'
 import { ModalPopup } from 'modules'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { getPersonValues, checkUnique } from 'api'
@@ -35,8 +35,8 @@ export const PersonForm = ({
     )
 
     useEffect(() => {
-        let newValues = { ...entityValues }
-        let newAttributes = [...attributes]
+        const newValues = { ...entityValues }
+        const newAttributes = [...attributes]
         setAttributes(newAttributes)
         onNewValues(newValues, entityId)
     }, [])
@@ -63,7 +63,7 @@ export const PersonForm = ({
     }
 
     const onNewValues = (values, newEntityId, reset) => {
-        let newAttributes = [...attributes]
+        const newAttributes = [...attributes]
         checkRules(values, newAttributes)
         setAttributes(newAttributes)
         passValues({
@@ -83,7 +83,7 @@ export const PersonForm = ({
             )
         )
             return false
-        for (let key in uniques) if (!uniques[key]) return false
+        for (const key in uniques) if (!uniques[key]) return false
         return true
     }
 
@@ -96,7 +96,7 @@ export const PersonForm = ({
      */
     const onValidation = async (id, value, label) => {
         const newEntityId = await checkUnique(id, value, orgUnit)
-        let uniques = { ...uniques }
+        const uniques = { ...uniques }
         uniques[id] = newEntityId ? false : true
         setUniques(uniques)
         if (!newEntityId) return true
@@ -114,7 +114,7 @@ export const PersonForm = ({
                 switch (r.programRuleActionType) {
                     case 'SHOWOPTIONGROUP':
                         if (eval(rule.condition)) {
-                            let affectedAttribute = attr.find(
+                            const affectedAttribute = attr.find(
                                 attribute =>
                                     attribute.trackedEntityAttribute.id ===
                                     r.trackedEntityAttribute.id
@@ -148,7 +148,7 @@ export const PersonForm = ({
                         break
                     case 'HIDEFIELD':
                         const hide = eval(rule.condition)
-                        let affectedAttribute = attr.find(
+                        const affectedAttribute = attr.find(
                             attribute =>
                                 attribute.trackedEntityAttribute.id ===
                                 r.trackedEntityAttribute.id
@@ -265,7 +265,7 @@ export const PersonForm = ({
     }
 
     const onModalClick = async yes => {
-        let uniques = { ...uniques }
+        const uniques = { ...uniques }
         uniques[modal.id] = yes
         setUniques(uniques)
 
@@ -279,7 +279,7 @@ export const PersonForm = ({
         setAttributes(person.trackedEntityTypeAttributes)
         setUniques([])
         setEditing(false)
-        let values = {}
+        const values = {}
         Object.keys(entityValues).forEach(v => (values[v] = ''))
         onNewValues(values, null, true)
     }
@@ -299,7 +299,7 @@ export const PersonForm = ({
                     }
                     label="Import"
                     icon="person"
-                    kind="primary"
+                    primary
                     onClick={onModalClick}
                 />
             )}

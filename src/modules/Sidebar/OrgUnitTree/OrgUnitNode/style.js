@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components'
+import { theme } from '@dhis2/ui-core'
 
 export const Caret = styled.span`
     cursor: pointer;
@@ -10,7 +11,7 @@ export const Caret = styled.span`
         margin-right: 5px;
     }
     :hover::before {
-        color: var(--primary800);
+        color: ${theme.primary600};
     }
     ${props =>
         props.opened &&
@@ -34,12 +35,12 @@ export const OrgUnitText = styled.span`
     cursor: pointer;
     user-select: none;
     &:hover {
-        color: var(--primary800);
+        color: ${theme.primary600};
     }
     ${props =>
         props.isSelected &&
         css`
-            color: var(--primary800);
+            color: ${theme.primary600};
         `}
 `
 

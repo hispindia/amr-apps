@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { arrayOf, bool, func, shape, string } from 'prop-types'
-import SelectField from '@dhis2/ui/core/SelectField'
+import { SelectField } from '@dhis2/ui-core'
 import { Input } from 'styles'
 import { CustomSelectField } from './style'
 
@@ -14,9 +14,10 @@ export const SelectInput = props => {
         if (props.value != value) setValue(props.value)
     }, [props.value])
 
-    const onChange = (n, v) => {
-        setValue(v)
-        props.onChange(props.name, v)
+    const onChange = event => {
+        const value = event.target.value
+        setValue(value)
+        props.onChange(props.name, value)
     }
 
     return (
@@ -24,16 +25,20 @@ export const SelectInput = props => {
             <CustomSelectField>
                 <SelectField
                     name={props.name}
-                    kind="outlined"
-                    list={props.objects}
                     value={value}
                     label={props.label}
                     help={props.disabled ? props.helperText : null}
                     onChange={onChange}
                     disabled={props.disabled}
-                    size="dense"
                     required={props.required}
-                />
+                    dense
+                >
+                    {props.objects.map(o => (
+                        <option key={o.value} value={o.value}>
+                            {o.label}
+                        </option>
+                    ))}
+                </SelectField>
             </CustomSelectField>
         </Input>
     )

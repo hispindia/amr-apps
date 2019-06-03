@@ -1,5 +1,6 @@
 import { bool } from 'prop-types'
 import styled, { css } from 'styled-components'
+import { colors } from '@dhis2/ui-core'
 
 export const Title = styled.h1`
     display: block;
@@ -25,7 +26,7 @@ export const Text = styled.div`
 `
 
 export const Label = styled.div`
-    color: var(--grey700);
+    color: ${colors.grey700};
     white-space: nowrap;
     padding: 0px 12px 12px 16px;
     line-height: 24px;
@@ -36,7 +37,7 @@ export const Label = styled.div`
         css`
             ::after {
                 content: '*';
-                color: var(--red600);
+                color: ${colors.red600};
                 padding-left: 4px;
             }
         `}
