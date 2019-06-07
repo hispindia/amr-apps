@@ -1,9 +1,9 @@
 import React from 'react'
-import { CircularProgress } from '@dhis2/ui-core'
+import { CircularLoader } from '@dhis2/ui-core'
 import { Overlay } from './style'
 
 export const OverlayedSpinner = () => (
     <Overlay>
-        <CircularProgress large />
+        <CircularLoader large />
     </Overlay>
 )
