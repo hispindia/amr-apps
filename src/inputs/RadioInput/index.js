@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { arrayOf, bool, func, shape, string } from 'prop-types'
-import { Radio } from '@dhis2/ui-core'
 import { Input, Label, OptionSpacer, Row } from 'styles'
 import { CustomRadio } from './style'
 
@@ -49,21 +48,19 @@ export const RadioInput = props => {
             <Row wrapped>
                 {props.objects.map(object => (
                     <OptionSpacer key={object.value} onClick={onClick}>
-                        <CustomRadio>
-                            <Radio
-                                key={object.value}
-                                name={object.value}
-                                value={object.value}
-                                label={object.label}
-                                checked={value === object.value}
-                                onChange={onChange}
-                                disabled={props.disabled}
-                                valid={object.value === 'Approved'}
-                                warning={object.value === 'Resend'}
-                                error={object.value === 'Rejected'}
-                                status={status(object.value)}
-                            />
-                        </CustomRadio>
+                        <CustomRadio
+                            key={object.value}
+                            name={object.value}
+                            value={object.value}
+                            label={object.label}
+                            checked={value === object.value}
+                            onChange={onChange}
+                            disabled={props.disabled}
+                            valid={object.value === 'Approved'}
+                            warning={object.value === 'Resend'}
+                            error={object.value === 'Rejected'}
+                            status={status(object.value)}
+                        />
                     </OptionSpacer>
                 ))}
             </Row>

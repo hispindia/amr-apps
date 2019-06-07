@@ -1,10 +1,10 @@
 import styled from 'styled-components'
-import { colors } from '@dhis2/ui-core'
+import { Radio, colors } from '@dhis2/ui-core'
 
 /**
  * Green valid.
  */
-export const CustomRadio = styled.div`
+export const CustomRadio = styled(Radio)`
     .valid {
         fill: ${colors.green600} !important;
     }

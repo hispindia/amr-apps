@@ -5,10 +5,9 @@ import 'typeface-roboto'
 export const BodyStyle = createGlobalStyle`
     body {
         background-color: rgb(240, 240, 240);
-        margin: 0;
-        padding: 0;
-        font-family: Roboto;
-        letter-spacing: 0.0075em;
+    }
+    .required span::after {
+        color: #c62828;
     }
 `
 

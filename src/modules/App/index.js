@@ -4,6 +4,7 @@ import { BrowserRouter, HashRouter } from 'react-router-dom'
 import { MuiThemeProvider } from '@material-ui/core'
 import { MuiPickersUtilsProvider } from 'material-ui-pickers'
 import DayjsUtils from '@date-io/dayjs'
+import { CssReset } from '@dhis2/ui-core'
 import { Content, Header } from 'modules'
 import { ConfigContextProvider } from 'contexts'
 import { BodyStyle, theme } from './style'
@@ -15,6 +16,7 @@ export const App = ({ appName, categories, isApproval, baseUrl }) => (
             <MuiThemeProvider theme={theme}>
                 <MuiPickersUtilsProvider utils={DayjsUtils}>
                     <>
+                        <CssReset />
                         <BodyStyle />
                         <Header appName={appName} baseUrl={baseUrl} />
                         <ConfigContextProvider
