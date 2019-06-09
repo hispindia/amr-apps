@@ -1,45 +1,33 @@
 import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { OverlayedSpinner } from 'components'
 import { Main, Sidebar } from 'modules'
 import { Row } from 'styles'
-import { initMetadata } from 'api'
-import { MetadataContextProvider } from 'contexts'
-import { hook } from './hook'
+import { setMetadata, setOrgUnit } from '../../actions'
+import { READY } from '../../constants/statuses'
 
-export const Content = () => {
-    const [state, dispatch, types] = hook()
-    const { metadata, selected } = state
+export const Content = ({ removingThisBreaksTheApp }) => {
+    const dispatch = useDispatch()
+    const metadata = useSelector(state => state.metadata)
+    const selected = useSelector(state => state.selectedOrgUnit)
 
     useEffect(() => {
-        const getMetaData = async () => {
-            const data = await initMetadata()
-            dispatch({
-                type: types.INIT,
-                metadata: data,
-                id: data.orgUnits[0].id,
-                path: data.orgUnits[0].path,
-            })
-        }
-        getMetaData()
+        dispatch(setMetadata())
     }, [])
 
-    if (!metadata) return <OverlayedSpinner />
+    useEffect(() => {
+        if (metadata.status === READY)
+            dispatch(
+                setOrgUnit(metadata.orgUnits[0].id, metadata.orgUnits[0].path)
+            )
+    }, [metadata.status])
+
+    if (!selected) return <OverlayedSpinner />
 
     return (
         <Row>
-            <MetadataContextProvider metadata={metadata}>
-                <Sidebar
-                    onSelect={(id, path) =>
-                        dispatch({
-                            type: types.SELECTED,
-                            id: id,
-                            path: path,
-                        })
-                    }
-                    selected={selected}
-                />
-                <Main selected={selected.id} />
-            </MetadataContextProvider>
+            <Sidebar removingThisBreaksTheApp={removingThisBreaksTheApp} />
+            <Main removingThisBreaksTheApp={removingThisBreaksTheApp} />
         </Row>
     )
 }

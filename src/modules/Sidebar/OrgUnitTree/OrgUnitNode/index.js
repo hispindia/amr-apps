@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { func, object, shape, string } from 'prop-types'
+import { useSelector, useDispatch } from 'react-redux'
+import { object } from 'prop-types'
 import { Row } from 'styles'
+import { setOrgUnit } from '../../../../actions'
 import { Caret, ChildTree, OrgUnitText, NoCaret } from './style'
 
 /**
  * Organisation unit node.
  */
-export const OrgUnitNode = props => {
-    const { selected, orgUnit, onSelect } = props
+export const OrgUnitNode = ({ orgUnit }) => {
+    const dispatch = useDispatch()
+    const selected = useSelector(state => state.selectedOrgUnit)
     const [opened, setOpened] = useState(false)
 
     useEffect(() => {
@@ -15,6 +18,8 @@ export const OrgUnitNode = props => {
     }, [])
 
     const onCarretClick = () => setOpened(!opened)
+
+    const onOrgUnitClick = () => dispatch(setOrgUnit(orgUnit.id, orgUnit.path))
 
     return (
         <li key={orgUnit.id}>
@@ -26,7 +31,7 @@ export const OrgUnitNode = props => {
                 )}
                 <OrgUnitText
                     isSelected={selected.id === orgUnit.id}
-                    onClick={() => onSelect(orgUnit.id, orgUnit.path)}
+                    onClick={onOrgUnitClick}
                 >
                     {orgUnit.displayName}
                 </OrgUnitText>
@@ -34,12 +39,7 @@ export const OrgUnitNode = props => {
             {orgUnit.children.length > 0 && opened ? (
                 <ChildTree opened={opened}>
                     {orgUnit.children.map(child => (
-                        <OrgUnitNode
-                            orgUnit={child}
-                            key={child.id}
-                            onSelect={onSelect}
-                            selected={selected}
-                        />
+                        <OrgUnitNode orgUnit={child} key={child.id} />
                     ))}
                 </ChildTree>
             ) : null}
@@ -47,11 +47,4 @@ export const OrgUnitNode = props => {
     )
 }
 
-OrgUnitNode.propTypes = {
-    onSelect: func.isRequired,
-    orgUnit: object.isRequired,
-    selected: shape({
-        id: string.isRequired,
-        path: string.isRequired,
-    }).isRequired,
-}
+OrgUnitNode.propTypes = { orgUnit: object.isRequired }

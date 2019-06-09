@@ -1,5 +1,5 @@
-import { useReducer, useContext } from 'react'
-import { MetadataContext } from 'contexts'
+import { useReducer } from 'react'
+import { useSelector } from 'react-redux'
 import { _organismsDataElementId } from 'api'
 import { invalidReason, types } from './constants'
 
@@ -58,6 +58,7 @@ const reducer = (state, action) => {
             }
         }
         case types.EXISTING_RECORD: {
+            console.log(action)
             return {
                 ...state,
                 entityId: action.entityId,
@@ -155,7 +156,9 @@ const reducer = (state, action) => {
 }
 
 export const hook = orgUnit => {
-    const { programs, person, programList } = useContext(MetadataContext)
+    const { programs, person, programList } = useSelector(
+        state => state.metadata
+    )
     const [state, dispatch] = useReducer(reducer, {
         allRules: programs.rules,
         entityId: null,

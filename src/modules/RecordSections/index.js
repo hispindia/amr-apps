@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import {
     ModalPopup,
     PersonForm,
@@ -15,17 +16,21 @@ import {
     isDuplicateRecord,
 } from 'api'
 import { ButtonRow } from 'inputs'
-import { ConfigContext, MetadataContext, RecordContextProvider } from 'contexts'
+import { RecordContextProvider } from 'contexts'
 import { Margin } from 'styles'
 import { invalidReason, types } from './constants'
 import { hook } from './hook'
+import { getExistingEvent, submitEvent } from '../../actions'
 
 export const RecordSections = props => {
-    const { programs, orgUnits, constants, user } = useContext(MetadataContext)
-    const { isApproval } = useContext(ConfigContext)
+    const dispatch = useDispatch()
+    const { programs, orgUnits, constants, user } = useSelector(
+        state => state.metadata
+    )
+    const isApproval = useSelector(state => state.appConfig.isApproval)
     const event = props.match.params.event
 
-    const [state, dispatch] = hook(props.match.params.orgUnit)
+    const [state, dispatchlol] = hook(props.match.params.orgUnit)
 
     const {
         entityId,
@@ -56,25 +61,15 @@ export const RecordSections = props => {
         duplicate === 'ERROR'
 
     useEffect(() => {
-        const getExistingRecord = async () => {
-            dispatch({
-                type: types.EXISTING_RECORD,
-                ...(await existingRecord(programs, event, {
-                    isApproval,
-                    l1Member: user.l1Member,
-                    l2Member: user.l2Member,
-                })),
-            })
-        }
-        if (event) getExistingRecord()
-        else dispatch({ type: types.SET_CODE, code: getCode(orgUnits) })
+        if (event) dispatch(getExistingEvent(event))
+        //else dispatchlol({ type: types.SET_CODE, code: getCode(orgUnits) })
     }, [])
 
-    useEffect(() => {
+    /*useEffect(() => {
         const getNewRecord = async () => {
-            dispatch({ type: types.DISABLE_BUTTON, buttonDisabled: true })
-            dispatch({ type: types.SET_LOADING })
-            dispatch({
+            dispatchlol({ type: types.DISABLE_BUTTON, buttonDisabled: true })
+            dispatchlol({ type: types.SET_LOADING })
+            dispatchlol({
                 type: types.NEW_RECORD,
                 ...(await newRecord(
                     programId,
@@ -91,53 +86,39 @@ export const RecordSections = props => {
             })
         }
         if (panelValid && !event) getNewRecord()
-    }, [panelValid])
+    }, [panelValid])*/
 
-    useEffect(() => {
+    /*useEffect(() => {
         const deleteAndExit = async () => {
             await deleteEvent(eventId)
             props.history.goBack()
         }
         if (deleteConfirmation) deleteAndExit()
-        else dispatch({ type: types.DISABLE_BUTTON, buttonDisabled: false })
-    }, [deleteConfirmation])
+        else dispatchlol({ type: types.DISABLE_BUTTON, buttonDisabled: false })
+    }, [deleteConfirmation])*/
 
     const onSubmit = async addMore => {
-        dispatch({ type: types.DISABLE_BUTTON, buttonDisabled: true })
-
-        await setEventStatus(eventId, true, isApproval)
-
-        if (addMore) dispatch({ type: types.ADD_MORE })
-        else props.history.goBack()
+        await dispatch(submitEvent())
+        if (!addMore) props.history.goBack()
     }
 
     const onEdit = async () => {
-        dispatch({ type: types.DISABLE_BUTTON, buttonDisabled: true })
+        dispatchlol({ type: types.DISABLE_BUTTON, buttonDisabled: true })
         await setEventStatus(eventId)
-        dispatch({ type: types.EDIT })
+        dispatchlol({ type: types.EDIT })
     }
 
-    const onDelete = () => dispatch({ type: types.DELETE_CLICKED })
+    const onDelete = () => dispatchlol({ type: types.DELETE_CLICKED })
 
     const onDeleteConfirmed = yes =>
-        dispatch({
+        dispatchlol({
             type: types.DELETE_CONFIRMED,
             delete: yes,
         })
 
-    const getCode = ous => {
-        for (const ou of ous) {
-            if (ou.id === orgUnit) return ou.code
-            if (ou.children) {
-                const code = getCode(ou.children)
-                if (code) return code
-            }
-        }
-    }
-
     const checkDuplicate = async sampleId => {
         if (!constants.days) return
-        dispatch({
+        dispatchlol({
             type: types.SET_DUPLICATE,
             duplicate: await isDuplicateRecord(
                 eventId,
@@ -149,27 +130,27 @@ export const RecordSections = props => {
     }
 
     const onPersonValues = useCallback(
-        values => dispatch({ type: types.SET_ENTITY, ...values }),
+        values => dispatchlol({ type: types.SET_ENTITY, ...values }),
         []
     )
 
     const onPersonValue = useCallback(
-        values => dispatch({ type: types.SET_ENTITY_VALUE, ...values }),
+        values => dispatchlol({ type: types.SET_ENTITY_VALUE, ...values }),
         []
     )
 
     const onPanelValues = useCallback(
-        values => dispatch({ type: types.SET_PANEL, ...values }),
+        values => dispatchlol({ type: types.SET_PANEL, ...values }),
         []
     )
 
     const onPanelReset = useCallback(
-        () => dispatch({ type: types.ADD_MORE }),
+        () => dispatchlol({ type: types.ADD_MORE }),
         []
     )
 
     const onRecordValues = useCallback(
-        valid => dispatch({ type: types.EVENT_VALID, invalid: valid }),
+        valid => dispatchlol({ type: types.EVENT_VALID, invalid: valid }),
         []
     )
 

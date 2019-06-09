@@ -1,90 +1,44 @@
 /* eslint no-eval: 0 */
 
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { bool, func } from 'prop-types'
 import { Grid } from '@material-ui/core'
 import { Card } from '@dhis2/ui-core'
 import { ModalPopup } from 'modules'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
-import { getPersonValues, checkUnique } from 'api'
 import { TextInput, AgeInput, RadioInput, SelectInput } from 'inputs'
-import { MetadataContext, RecordContext } from 'contexts'
-import { ProgressSection } from '../ProgressSection'
+//import { ProgressSection } from '../ProgressSection'
 import { CustomButtonRow } from './style'
+import {
+    setEntityValue,
+    removeModal,
+    validateUnique,
+    resetEntity,
+} from '../../actions'
 
 /**
  * Entity information section.
  */
-export const PersonForm = ({
-    initLoading,
-    showEdit,
-    passValues,
-    onPersonValue,
-}) => {
-    const { optionSets, person } = useContext(MetadataContext)
-    const { entityId, entityValues, orgUnit } = useContext(RecordContext)
-    const [uniques, setUniques] = useState([])
-    const [editing, setEditing] = useState(false)
-    const [loading, setLoading] = useState(initLoading)
-    const [modal, setModal] = useState(null)
+export const PersonForm = ({ initLoading, showEdit }) => {
+    const dispatch = useDispatch()
+    const { optionSets, person } = useSelector(state => state.metadata)
+    const { id, values, attributes, uniques, modal, editing } = useSelector(
+        state => state.data.entity
+    )
+
+    //const [loading, setLoading] = useState(initLoading)
     const [half] = useState(
         Math.floor(person.trackedEntityTypeAttributes.length / 2)
     )
-    const [attributes, setAttributes] = useState(
-        person.trackedEntityTypeAttributes
-    )
-
-    useEffect(() => {
-        const newValues = { ...entityValues }
-        const newAttributes = [...attributes]
-        setAttributes(newAttributes)
-        onNewValues(newValues, entityId)
-    }, [])
-
-    useEffect(() => {
-        onNewValues(entityValues)
-    }, [entityValues])
-
-    useEffect(() => {
-        const init = async () =>
-            onNewValues(await getPersonValues(entityId), entityId)
-        if (entityId) {
-            init()
-            setLoading(false)
-        }
-    }, [entityId])
 
     /**
      * Called on every input field change.
      */
     const onChange = (name, value) => {
-        if (entityValues[name] === value) return
-        onPersonValue({ key: name, value: value })
-    }
-
-    const onNewValues = (values, newEntityId, reset) => {
-        const newAttributes = [...attributes]
-        checkRules(values, newAttributes)
-        setAttributes(newAttributes)
-        passValues({
-            values: values,
-            id: reset ? null : newEntityId ? newEntityId : entityId,
-            valid: validate(newAttributes, values, uniques),
-        })
-    }
-
-    /**
-     * Checks that no required field is empty and that uniques are validated.
-     */
-    const validate = (attr, values) => {
-        if (
-            attr.find(
-                a => a.mandatory && values[a.trackedEntityAttribute.id] === ''
-            )
-        )
-            return false
-        for (const key in uniques) if (!uniques[key]) return false
-        return true
+        if (values[name] === value) return
+        dispatch(setEntityValue(name, value))
+        //onPersonValue({ key: name, value: value })
     }
 
     /**
@@ -94,79 +48,14 @@ export const PersonForm = ({
      * @param {string} label - Attribute label.
      * @returns {boolean} True if valid.
      */
-    const onValidation = async (id, value, label) => {
-        const newEntityId = await checkUnique(id, value, orgUnit)
-        const uniques = { ...uniques }
-        uniques[id] = newEntityId ? false : true
-        setUniques(uniques)
-        if (!newEntityId) return true
-        setModal({
-            id: id,
-            label: label,
-            entityId: newEntityId,
-        })
-        return false
-    }
+    const onValidation = async (name, value, label) =>
+        await dispatch(validateUnique(name, value, label))
 
-    const checkRules = (values, attr) => {
-        person.rules.forEach(rule => {
-            rule.programRuleActions.forEach(r => {
-                switch (r.programRuleActionType) {
-                    case 'SHOWOPTIONGROUP':
-                        if (eval(rule.condition)) {
-                            const affectedAttribute = attr.find(
-                                attribute =>
-                                    attribute.trackedEntityAttribute.id ===
-                                    r.trackedEntityAttribute.id
-                            )
-                            if (
-                                affectedAttribute.trackedEntityAttribute
-                                    .optionSet.id !== r.optionGroup.id
-                            ) {
-                                affectedAttribute.trackedEntityAttribute.optionSet = {
-                                    id: r.optionGroup.id,
-                                }
-                                // Only reset selected value if the options do not include current value.
-                                if (
-                                    !optionSets[
-                                        affectedAttribute.trackedEntityAttribute
-                                            .optionSet.id
-                                    ].find(
-                                        option =>
-                                            option.value ===
-                                            values[
-                                                affectedAttribute
-                                                    .trackedEntityAttribute.id
-                                            ]
-                                    )
-                                )
-                                    values[
-                                        affectedAttribute.trackedEntityAttribute.id
-                                    ] = ''
-                            }
-                        }
-                        break
-                    case 'HIDEFIELD':
-                        const hide = eval(rule.condition)
-                        const affectedAttribute = attr.find(
-                            attribute =>
-                                attribute.trackedEntityAttribute.id ===
-                                r.trackedEntityAttribute.id
-                        )
-                        if (hide !== affectedAttribute.hide) {
-                            affectedAttribute.hide = hide
-                            if (hide)
-                                values[
-                                    affectedAttribute.trackedEntityAttribute.id
-                                ] = ''
-                        }
-                        break
-                    default:
-                        break
-                }
-            })
-        })
-    }
+    const onModalClick = getEntity => dispatch(removeModal(getEntity))
+
+    const onEditClick = () => dispatch(setEditing())
+
+    const reset = () => dispatch(resetEntity())
 
     /**
      * Returns appropriate input type.
@@ -174,7 +63,7 @@ export const PersonForm = ({
     const getInput = attribute => {
         if (attribute.hide) return null
 
-        const disabled = entityId && !editing ? true : false
+        const disabled = id && !editing ? true : false
 
         return (
             <Padding key={attribute.trackedEntityAttribute.id}>
@@ -184,9 +73,7 @@ export const PersonForm = ({
                         unique={attribute.trackedEntityAttribute.unique}
                         name={attribute.trackedEntityAttribute.id}
                         label={attribute.trackedEntityAttribute.displayName}
-                        value={
-                            entityValues[attribute.trackedEntityAttribute.id]
-                        }
+                        value={values[attribute.trackedEntityAttribute.id]}
                         onChange={onChange}
                         disabled={disabled}
                     />
@@ -203,11 +90,7 @@ export const PersonForm = ({
                             }
                             name={attribute.trackedEntityAttribute.id}
                             label={attribute.trackedEntityAttribute.displayName}
-                            value={
-                                entityValues[
-                                    attribute.trackedEntityAttribute.id
-                                ]
-                            }
+                            value={values[attribute.trackedEntityAttribute.id]}
                             onChange={onChange}
                             disabled={disabled}
                         />
@@ -222,11 +105,7 @@ export const PersonForm = ({
                             }
                             name={attribute.trackedEntityAttribute.id}
                             label={attribute.trackedEntityAttribute.displayName}
-                            value={
-                                entityValues[
-                                    attribute.trackedEntityAttribute.id
-                                ]
-                            }
+                            value={values[attribute.trackedEntityAttribute.id]}
                             onChange={onChange}
                             disabled={disabled}
                         />
@@ -243,14 +122,11 @@ export const PersonForm = ({
                         onValidation={onValidation}
                         name={attribute.trackedEntityAttribute.id}
                         label={attribute.trackedEntityAttribute.displayName}
-                        value={
-                            entityValues[attribute.trackedEntityAttribute.id]
-                        }
+                        value={values[attribute.trackedEntityAttribute.id]}
                         onChange={onChange}
                         disabled={
                             disabled ||
-                            (entityId &&
-                                attribute.trackedEntityAttribute.unique)
+                            (id && attribute.trackedEntityAttribute.unique)
                         }
                         type={
                             attribute.trackedEntityAttribute.valueType ===
@@ -264,27 +140,7 @@ export const PersonForm = ({
         )
     }
 
-    const onModalClick = async yes => {
-        const uniques = { ...uniques }
-        uniques[modal.id] = yes
-        setUniques(uniques)
-
-        if (yes)
-            onNewValues(await getPersonValues(modal.entityId), modal.entityId)
-
-        setModal(null)
-    }
-
-    const reset = () => {
-        setAttributes(person.trackedEntityTypeAttributes)
-        setUniques([])
-        setEditing(false)
-        const values = {}
-        Object.keys(entityValues).forEach(v => (values[v] = ''))
-        onNewValues(values, null, true)
-    }
-
-    if (loading) return <ProgressSection />
+    //if (loading) return <ProgressSection />
 
     return (
         <MarginBottom>
@@ -305,13 +161,13 @@ export const PersonForm = ({
             )}
             <Card>
                 <Margin>
-                    {entityId && !editing && showEdit && (
+                    {id && !editing && showEdit && (
                         <CustomButtonRow
                             unspaced
                             buttons={[
                                 {
                                     label: 'Edit',
-                                    onClick: () => setEditing(true),
+                                    onClick: onEditClick,
                                     icon: 'edit',
                                     tooltip: 'Edit',
                                     kind: 'secondary',
@@ -345,7 +201,5 @@ export const PersonForm = ({
 
 PersonForm.prototypes = {
     showEdit: bool.isRequired,
-    passValues: func.isRequired,
-    onUniqueValue: func.isRequired,
     initLoading: bool,
 }

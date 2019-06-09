@@ -1,80 +1,39 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { func } from 'prop-types'
+import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { Card } from '@dhis2/ui-core'
 import { Grid } from '@material-ui/core'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { SelectInput, RadioInput, DateInput } from 'inputs'
-import { MetadataContext, RecordContext } from 'contexts'
 import { CustomButtonRow } from './style'
+import { setProgram, setPanelValue, resetPanel } from '../../actions'
 
 /**
- * Contains event panal.
+ * Contains event panel.
  */
-export const RecordPanel = ({ passValues, onReset }) => {
-    const { stageLists, programOrganisms, optionSets } = useContext(
-        MetadataContext
-    )
+export const RecordPanel = () => {
+    const dispatch = useDispatch()
+    const { stageLists } = useSelector(state => state.metadata)
     const {
-        programId,
-        programStageId,
+        program,
+        programStage,
         organism,
         sampleDate,
-        panelValid,
-        panelPrograms,
-    } = useContext(RecordContext)
-    const [organisms, setOrganisms] = useState(null)
-
-    useEffect(() => {
-        if (programId) setOrganisms(getOrganisms(programId))
-    }, [])
-
-    const getOrganisms = newProgramId => {
-        const newOrganisms = []
-        optionSets[programOrganisms[newProgramId]].forEach(o => {
-            if (!newOrganisms.find(org => org.value === o.value))
-                newOrganisms.push(o)
-        })
-        return newOrganisms
-    }
+        valid,
+        programs,
+        organisms,
+    } = useSelector(state => state.data.panel)
 
     /**
      * Called when a new program is selected.
      */
-    const onProgramChange = async (name, value) => {
-        setOrganisms(getOrganisms(value))
-        onNewValues({
-            organisms: getOrganisms(value),
-            programId: value,
-            programStageId:
-                stageLists[value].length > 1 ? '' : stageLists[value][0].value,
-            organism: '',
-            sampleDate: sampleDate,
-        })
-    }
+    const onProgramChange = async (name, value) => dispatch(setProgram(value))
 
     /**
-     * Called when a new program stage or organism is selected.
+     * Called when something other than program is changed
      */
-    const onChange = (name, value) => {
-        const values = {
-            organisms,
-            programId,
-            programStageId,
-            organism,
-            sampleDate,
-        }
-        if (values[name] === value) return
-        values[name] = value
-        onNewValues(values)
-    }
+    const onChange = (name, value) => dispatch(setPanelValue(name, value))
 
-    const onNewValues = values =>
-        passValues({ ...values, valid: !Object.values(values).includes('') })
-
-    const resetValues = () => {
-        setOrganisms(null)
-        onReset()
-    }
+    const onReset = () => dispatch(resetPanel())
 
     /**
      * Gets the data elements to be rendered.
@@ -87,18 +46,18 @@ export const RecordPanel = ({ passValues, onReset }) => {
                     id: 'programId',
                     name: 'programId',
                     label: 'Organism group',
-                    objects: panelPrograms,
+                    objects: programs,
                     onChange: onProgramChange,
-                    value: programId,
+                    value: program,
                 })
             case 'programStageId':
                 return getInput({
                     id: 'programStageId',
                     name: 'programStageId',
                     label: 'Type',
-                    objects: stageLists[programId],
+                    objects: stageLists[program],
                     onChange: onChange,
-                    value: programStageId,
+                    value: programStage,
                 })
             case 'organism':
                 return getInput({
@@ -130,11 +89,11 @@ export const RecordPanel = ({ passValues, onReset }) => {
     const getInput = dataElement => (
         <Padding key={dataElement.id}>
             {!dataElement.objects ? (
-                <DateInput {...dataElement} disabled={panelValid} required />
+                <DateInput {...dataElement} disabled={valid} required />
             ) : dataElement.objects.length < 4 ? (
-                <RadioInput {...dataElement} disabled={panelValid} required />
+                <RadioInput {...dataElement} disabled={valid} required />
             ) : (
-                <SelectInput {...dataElement} disabled={panelValid} required />
+                <SelectInput {...dataElement} disabled={valid} required />
             )}
         </Padding>
     )
@@ -143,13 +102,13 @@ export const RecordPanel = ({ passValues, onReset }) => {
         <MarginBottom>
             <Card>
                 <Margin>
-                    {onReset !== null && (
+                    {true && (
                         <CustomButtonRow
                             unspaced
                             buttons={[
                                 {
                                     label: 'Reset',
-                                    onClick: resetValues,
+                                    onClick: onReset,
                                     icon: 'clear',
                                     tooltip: 'Reset',
                                     kind: 'secondary',
@@ -162,8 +121,8 @@ export const RecordPanel = ({ passValues, onReset }) => {
                     <Grid container spacing={0}>
                         <Grid item xs>
                             {getDataElement('programId')}
-                            {programId &&
-                                stageLists[programId].length > 1 &&
+                            {program &&
+                                stageLists[program].length > 1 &&
                                 getDataElement('programStageId')}
                         </Grid>
                         <Grid item xs>
@@ -175,9 +134,4 @@ export const RecordPanel = ({ passValues, onReset }) => {
             </Card>
         </MarginBottom>
     )
-}
-
-RecordPanel.prototypes = {
-    passValues: func.isRequired,
-    onReset: func,
 }

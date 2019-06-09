@@ -1,12 +1,11 @@
-import React, { useContext } from 'react'
-import { string } from 'prop-types'
+import React from 'react'
+import { useSelector } from 'react-redux'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import { RecordSections, RecordsOverview } from 'modules'
-import { ConfigContext } from 'contexts'
 import { MainSection } from './style'
 
-export const Main = ({ selected }) => {
-    const { isApproval } = useContext(ConfigContext)
+export const Main = () => {
+    const isApproval = useSelector(state => state.appConfig.isApproval)
     return (
         <MainSection>
             <Switch>
@@ -14,10 +13,7 @@ export const Main = ({ selected }) => {
                     exact
                     path={'/approval/:status'}
                     render={componentProps => (
-                        <RecordsOverview
-                            {...componentProps}
-                            selected={selected}
-                        />
+                        <RecordsOverview {...componentProps} />
                     )}
                 />
                 {(isApproval
@@ -52,5 +48,3 @@ export const Main = ({ selected }) => {
         </MainSection>
     )
 }
-
-Main.propTypes = { selected: string.isRequired }

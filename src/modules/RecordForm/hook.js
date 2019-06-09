@@ -1,6 +1,7 @@
 import { useReducer, useContext } from 'react'
+import { useSelector } from 'react-redux'
 import { _sampleIdElementId, updateEventValue } from 'api'
-import { MetadataContext, RecordContext } from 'contexts'
+import { RecordContext } from 'contexts'
 import { checkRules } from './checkRules'
 
 const types = {
@@ -66,7 +67,8 @@ const reducer = (state, action) => {
 }
 
 export const hook = () => {
-    const { optionSets } = useContext(MetadataContext)
+    const optionSets = useSelector(state => state.metadata.optionSets)
+
     const { rules, eventId } = useContext(RecordContext)
     const [state, dispatch] = useReducer(reducer, {
         loading: true,

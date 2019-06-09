@@ -1,8 +1,8 @@
-import React, { useContext } from 'react'
+import React from 'react'
+import { useSelector } from 'react-redux'
 import { func, object, string, bool } from 'prop-types'
 import { Padding } from 'styles'
 import { _sampleIdElementId } from 'api'
-import { MetadataContext } from 'contexts'
 import { error, warning } from './constants'
 import {
     TextInput,
@@ -19,7 +19,7 @@ export const DataElement = ({
     disabled,
     duplicate,
 }) => {
-    const { optionSets } = useContext(MetadataContext)
+    const optionSets = useSelector(state => state.metadata.optionSets)
     return (
         <Padding>
             {dataElement.optionSetValue ? (

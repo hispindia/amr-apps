@@ -62,7 +62,7 @@ export const getPersonValues = async entityId => {
 
     if (!attributes) return null
 
-    let values = {}
+    const values = {}
     attributes.forEach(a => (values[a.attribute] = a.value))
 
     return values
@@ -74,12 +74,12 @@ export const getPersonValues = async entityId => {
  * @returns {string} Tracked entity instance ID.
  */
 export const addPerson = async (values, orgUnit) => {
-    let data = {
+    const data = {
         trackedEntityType: _personTypeId,
         orgUnit: orgUnit,
         attributes: [],
     }
-    for (let key in values)
+    for (const key in values)
         data.attributes.push({ attribute: key, value: values[key] })
 
     return (await (await post('trackedEntityInstances', data)).json()).response
@@ -93,9 +93,9 @@ export const addPerson = async (values, orgUnit) => {
  */
 export const updatePerson = async (id, values) => {
     const url = `trackedEntityInstances/${id}`
-    let data = await get(url)
+    const data = await get(url)
     data.attributes = []
-    for (let key in values)
+    for (const key in values)
         data.attributes.push({ attribute: key, value: values[key] })
 
     await put(url, data)
@@ -111,14 +111,9 @@ export const deletePerson = async id =>
 export const newRecord = async (
     pId,
     pStage,
-    orgaCode,
-    ou,
-    eId,
-    eValues,
-    sampleDate,
-    orgUnitCode
+    { orgaCode, ou, eId, eValues, sampleDate, orgUnitCode }
 ) => {
-    let initialValues = {
+    const initialValues = {
         [_organismsDataElementId]: orgaCode,
         [_amrDataElement]: await generateAmrId(ou, orgUnitCode),
     }
@@ -156,16 +151,16 @@ export const existingRecord = async (
     eventId,
     { isApproval, l1Member, l2Member }
 ) => {
-    let {
+    const {
         eventValues: initialValues,
-        programId,
+        programId: program,
         programStageId,
         completed,
         entityId,
         sampleDate,
     } = await getEventValues(eventId)
     const lol = programs
-        .find(p => p.id === programId)
+        .find(p => p.id === program)
         .programStages.find(ps => (ps.id = programStageId))
     const pStage = { ...lol }
     const { programStage, eventValues, status } = !isApproval
@@ -178,27 +173,26 @@ export const existingRecord = async (
               l1Member,
               l2Member
           )
+    const entityValues = await getPersonValues(entityId)
 
     return {
-        programId,
+        program,
         programStage,
         eventValues,
         status,
         eventId,
         entityId,
         sampleDate,
+        entityValues,
     }
 }
 
 export const addPersonWithEvent = async (
     eventValues,
     programId,
-    programStageId,
-    orgUnitId,
-    entityValues,
-    sampleDate
+    { programStageId, orgUnitId, entityValues, sampleDate }
 ) => {
-    let event = await setEventValues(
+    const event = await setEventValues(
         {
             dataValues: [],
             eventDate: sampleDate,
@@ -210,7 +204,7 @@ export const addPersonWithEvent = async (
         eventValues
     )
 
-    let data = {
+    const data = {
         trackedEntityType: _personTypeId,
         orgUnit: event.orgUnit,
         attributes: Object.keys(entityValues).map(key => {
@@ -249,13 +243,9 @@ export const addPersonWithEvent = async (
 export const addEvent = async (
     eventValues,
     programId,
-    programStageId,
-    orgUnitId,
-    entityId,
-    entityValues,
-    sampleDate
+    { programStageId, orgUnitId, entityId, entityValues, sampleDate }
 ) => {
-    let event = await setEventValues(
+    const event = await setEventValues(
         {
             dataValues: [],
             eventDate: sampleDate,
@@ -301,7 +291,7 @@ export const setEventStatus = async (eventId, completed, isApproval) => {
     let event = await get(url)
     event.status = completed ? 'COMPLETED' : 'ACTIVE'
     if (!isApproval) {
-        let values = {}
+        const values = {}
         event.dataValues.forEach(
             dataValue => (values[dataValue.dataElement] = dataValue.value)
         )
@@ -344,7 +334,7 @@ export const getEvents = async (config, orgUnit, { username, l2Member }) =>
     )
 
 export const getCounts = async (configs, orgUnit, { username, l2Member }) => {
-    for (let config of configs)
+    for (const config of configs)
         config.count = (await getSqlView(
             config.sqlViews.count.length === 1
                 ? config.sqlViews.count[0]
@@ -357,10 +347,15 @@ export const getCounts = async (configs, orgUnit, { username, l2Member }) => {
                 status: config.param ? config.status : false,
             }
         ))[0][0]
-    return configs
+    return configs.map(config => config.count)
 }
 
-export const isDuplicateRecord = async (event, entity, organism, sampleId) => {
+export const isDuplicateRecord = async ({
+    event,
+    entity,
+    organism,
+    sampleId,
+}) => {
     let events = (await get(
         request('events', {
             order: 'created:asc',

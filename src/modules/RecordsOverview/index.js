@@ -1,19 +1,19 @@
-import React, { useContext, useEffect } from 'react'
-import { string } from 'prop-types'
+import React, { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import { Card } from '@dhis2/ui-core'
 import { getEvents } from 'api'
 import { Margin } from 'styles'
 import { RecordTable, ProgressSection, TitleRow } from 'modules'
-import { ConfigContext, MetadataContext } from 'contexts'
 import { hook } from './hook'
 import { titles, headers } from './config'
 
 /**
  * Shows events by status.
  */
-export const RecordsOverview = ({ selected, match, history }) => {
-    const { categories, isApproval } = useContext(ConfigContext)
-    const { programList, user } = useContext(MetadataContext)
+export const RecordsOverview = ({ match, history }) => {
+    const { categories, isApproval } = useSelector(state => state.appConfig)
+    const { programList, user } = useSelector(state => state.metadata)
+    const selected = useSelector(state => state.selectedOrgUnit.id)
     const [{ rows, loading, addButtonDisabled }, dispatch, types] = hook()
 
     useEffect(() => {
@@ -72,5 +72,3 @@ export const RecordsOverview = ({ selected, match, history }) => {
         </Margin>
     )
 }
-
-RecordsOverview.propTypes = { selected: string.isRequired }
