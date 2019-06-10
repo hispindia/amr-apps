@@ -2,11 +2,10 @@ import { LOADING, READY, ERROR } from '../constants/statuses'
 import { _organismsDataElementId } from 'api'
 import {
     SET_ENTITY,
-    UPDATE_ENTITY,
+    SET_ENTITY_VALUE,
     SET_UNIQUE,
     SET_ENTITY_MODAL_AND_UNIQUES,
     SET_EDITING,
-    RESET_ENTITY,
     SET_PANEL,
     SET_PANEL_VALUE,
     RESET_PANEL,
@@ -14,6 +13,9 @@ import {
     EXISTING_DATA_ERRORED,
     DISABLE_BUTTONS,
     RESET_PANEL_EVENT,
+    SET_INCOMPLETED,
+    SET_DELETE_PROMPT,
+    SET_EVENT_VALUE,
 } from '../actions/types'
 
 const INITIAL_STATE = {
@@ -56,14 +58,13 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     modal: null,
                 },
             }
-        case UPDATE_ENTITY:
+        case SET_ENTITY_VALUE:
             return {
                 ...state,
                 entity: {
                     ...state.entity,
                     values: payload.values,
                     attributes: payload.attributes,
-                    uniques: payload.uniques,
                     valid: payload.valid,
                     modal: null,
                 },
@@ -94,18 +95,6 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                 entity: {
                     ...state.entity,
                     editing: true,
-                },
-            }
-        case RESET_ENTITY:
-            return {
-                ...state,
-                entity: {
-                    values: {},
-                    id: null,
-                    attributes: payload.entityAttributes,
-                    uniques: {},
-                    valid: false,
-                    editing: false,
                 },
             }
         case SET_PANEL:
@@ -187,6 +176,33 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     valid: false,
                 },
                 event: null,
+            }
+        case SET_INCOMPLETED:
+            return {
+                ...state,
+                event: {
+                    ...state.event,
+                    status: {
+                        ...state.event.status,
+                        completed: false,
+                    },
+                },
+            }
+        case SET_DELETE_PROMPT:
+            return {
+                ...state,
+                deletePrompt: payload,
+            }
+        case SET_EVENT_VALUE:
+            return {
+                ...state,
+                event: {
+                    ...state.event,
+                    values: {
+                        ...state.event.values,
+                        [payload.key]: payload.value,
+                    },
+                },
             }
         default:
             return state

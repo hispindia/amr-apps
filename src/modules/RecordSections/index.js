@@ -8,38 +8,31 @@ import {
     RecordPanel,
     TitleRow,
 } from 'modules'
-import {
-    deleteEvent,
-    setEventStatus,
-    newRecord,
-    existingRecord,
-    isDuplicateRecord,
-} from 'api'
+import { newRecord, existingRecord, isDuplicateRecord } from 'api'
 import { ButtonRow } from 'inputs'
 import { RecordContextProvider } from 'contexts'
 import { Margin } from 'styles'
 import { invalidReason, types } from './constants'
 import { hook } from './hook'
-import { getExistingEvent, submitEvent } from '../../actions'
+import {
+    getExistingEvent,
+    submitEvent,
+    editEvent,
+    setDeletePrompt,
+    resetEntity,
+} from '../../actions'
 
 export const RecordSections = props => {
     const dispatch = useDispatch()
-    const { programs, orgUnits, constants, user } = useSelector(
-        state => state.metadata
-    )
-    const isApproval = useSelector(state => state.appConfig.isApproval)
+    const { constants } = useSelector(state => state.metadata)
     const event = props.match.params.event
 
     const [state, dispatchlol] = hook(props.match.params.orgUnit)
 
     const {
         entityId,
-        entityValues,
         entityValid,
-        programId,
-        programStageId,
         organism,
-        sampleDate,
         panelValid,
         eventId,
         status,
@@ -47,10 +40,7 @@ export const RecordSections = props => {
         buttonDisabled,
         loading,
         deleteClicked,
-        deleteConfirmation,
-        code,
         duplicate,
-        orgUnit,
     } = state
 
     const disabled =
@@ -62,6 +52,7 @@ export const RecordSections = props => {
 
     useEffect(() => {
         if (event) dispatch(getExistingEvent(event))
+        else dispatch(resetEntity())
         //else dispatchlol({ type: types.SET_CODE, code: getCode(orgUnits) })
     }, [])
 
@@ -102,19 +93,14 @@ export const RecordSections = props => {
         if (!addMore) props.history.goBack()
     }
 
-    const onEdit = async () => {
-        dispatchlol({ type: types.DISABLE_BUTTON, buttonDisabled: true })
-        await setEventStatus(eventId)
-        dispatchlol({ type: types.EDIT })
+    const onEdit = () => dispatch(editEvent())
+
+    const onDelete = () => dispatch(setDeletePrompt(true))
+
+    const onDeleteConfirmation = async confirmed => {
+        await dispatch(deleteEvent(confirmed))
+        if (confirmed) props.history.goBack()
     }
-
-    const onDelete = () => dispatchlol({ type: types.DELETE_CLICKED })
-
-    const onDeleteConfirmed = yes =>
-        dispatchlol({
-            type: types.DELETE_CONFIRMED,
-            delete: yes,
-        })
 
     const checkDuplicate = async sampleId => {
         if (!constants.days) return
@@ -129,26 +115,6 @@ export const RecordSections = props => {
         })
     }
 
-    const onPersonValues = useCallback(
-        values => dispatchlol({ type: types.SET_ENTITY, ...values }),
-        []
-    )
-
-    const onPersonValue = useCallback(
-        values => dispatchlol({ type: types.SET_ENTITY_VALUE, ...values }),
-        []
-    )
-
-    const onPanelValues = useCallback(
-        values => dispatchlol({ type: types.SET_PANEL, ...values }),
-        []
-    )
-
-    const onPanelReset = useCallback(
-        () => dispatchlol({ type: types.ADD_MORE }),
-        []
-    )
-
     const onRecordValues = useCallback(
         valid => dispatchlol({ type: types.EVENT_VALID, invalid: valid }),
         []
@@ -160,7 +126,7 @@ export const RecordSections = props => {
                 <ModalPopup
                     heading="Delete record"
                     text="Are you sure you want to permanently delete this record?"
-                    onClick={onDeleteConfirmed}
+                    onClick={onDeleteConfirmation}
                     label="Delete"
                     icon="delete"
                     destructive
@@ -171,16 +137,9 @@ export const RecordSections = props => {
             <RecordContextProvider state={state}>
                 <PersonForm
                     showEdit={!event && !panelValid}
-                    passValues={onPersonValues}
-                    onPersonValue={onPersonValue}
                     initLoading={event && !eventId}
                 />
-                {entityValid && (
-                    <RecordPanel
-                        passValues={onPanelValues}
-                        onReset={!event && eventId ? onPanelReset : null}
-                    />
-                )}
+                {entityValid && <RecordPanel />}
                 {eventId && (
                     <RecordForm
                         passValues={onRecordValues}

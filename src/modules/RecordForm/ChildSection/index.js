@@ -1,39 +1,42 @@
 import React from 'react'
-import { bool, func, object, objectOf, oneOf, string } from 'prop-types'
+import { object } from 'prop-types'
 import { Label, Padding } from 'styles'
 import { CheckboxInput } from 'inputs'
 import { DataElement } from '../DataElement'
 import { ChildSectionLabel } from './style'
+
+// TODO: duplicate
 
 /**
  * Gets the child section component.
  * @param {Object} childSection - Child section.
  * @returns {Component} Child section component.
  */
-export const ChildSection = ({
-    childSection,
-    onChange,
-    values,
-    elementProps,
-    completed,
-    duplicate,
-}) => {
+export const ChildSection = ({ childSection, duplicate }) => {
+    const dataElements = useSelector(
+        state => state.data.event.programStage.dataElements
+    )
+    const completed = useSelector(state => state.data.event.status.completed)
+
+    const onChange = (key, value) => dispatch(setEventValue(key, value))
+
     // If all, or all but one, of the data elements are of type TRUE_ONLY,
     // the section is rendered as a group of checkboxes.
     if (
         childSection.dataElements.filter(
-            id => elementProps[id].valueType === 'TRUE_ONLY'
+            id => dataElements[id].valueType === 'TRUE_ONLY'
         ).length >
         childSection.dataElements.length - 2
     ) {
-        let objects = {}
-        let boxValues = {}
+        const values = useSelector(state => state.data.event.values)
+        const objects = {}
+        const boxValues = {}
         childSection.dataElements
-            .filter(id => elementProps[id].valueType === 'TRUE_ONLY')
+            .filter(id => dataElements[id].valueType === 'TRUE_ONLY')
             .forEach(id => {
                 objects[id] = {
-                    label: elementProps[id].displayFormName,
-                    disabled: elementProps[id].disabled || completed,
+                    label: dataElements[id].displayFormName,
+                    disabled: dataElements[id].disabled || completed,
                 }
                 boxValues[id] = values[id]
             })
@@ -51,14 +54,13 @@ export const ChildSection = ({
                 {childSection.dataElements
                     .filter(
                         id =>
-                            elementProps[id].valueType === 'TEXT' &&
-                            !elementProps[id].hide
+                            dataElements[id].valueType === 'TEXT' &&
+                            !dataElements[id].hide
                     )
                     .map(id => (
                         <DataElement
                             key={id}
-                            dataElement={elementProps[id]}
-                            value={values[id]}
+                            dataElement={dataElements[id]}
                             onChange={onChange}
                             disabled={completed}
                             duplicate={duplicate}
@@ -74,26 +76,12 @@ export const ChildSection = ({
                 <Label>{childSection.name}</Label>
             </ChildSectionLabel>
             {childSection.dataElements
-                .filter(id => !elementProps[id].hide)
+                .filter(id => !dataElements[id].hide)
                 .map(id => (
-                    <DataElement
-                        key={id}
-                        dataElement={elementProps[id]}
-                        value={values[id]}
-                        onChange={onChange}
-                        disabled={completed}
-                        duplicate={duplicate}
-                    />
+                    <DataElement key={id} id={id} />
                 ))}
         </>
     )
 }
 
-ChildSection.propTypes = {
-    childSection: object.isRequired,
-    values: objectOf(string).isRequired,
-    onChange: func.isRequired,
-    elementProps: objectOf(object).isRequired,
-    completed: bool,
-    duplicate: oneOf([false, 'ERROR', 'WARNING']),
-}
+ChildSection.propTypes = { childSection: object.isRequired }

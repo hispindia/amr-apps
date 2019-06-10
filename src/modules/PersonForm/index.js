@@ -1,6 +1,6 @@
 /* eslint no-eval: 0 */
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { bool, func } from 'prop-types'
 import { Grid } from '@material-ui/core'
@@ -8,7 +8,7 @@ import { Card } from '@dhis2/ui-core'
 import { ModalPopup } from 'modules'
 import { Heading, Margin, MarginBottom, Padding } from 'styles'
 import { TextInput, AgeInput, RadioInput, SelectInput } from 'inputs'
-//import { ProgressSection } from '../ProgressSection'
+import { ProgressSection } from '../ProgressSection'
 import { CustomButtonRow } from './style'
 import {
     setEntityValue,
@@ -26,11 +26,16 @@ export const PersonForm = ({ initLoading, showEdit }) => {
     const { id, values, attributes, uniques, modal, editing } = useSelector(
         state => state.data.entity
     )
+    console.log(useSelector(state => state.data))
 
     //const [loading, setLoading] = useState(initLoading)
     const [half] = useState(
         Math.floor(person.trackedEntityTypeAttributes.length / 2)
     )
+
+    /*useEffect(() => {
+        dispatch(resetEntity())
+    }, [])*/
 
     /**
      * Called on every input field change.
@@ -140,7 +145,7 @@ export const PersonForm = ({ initLoading, showEdit }) => {
         )
     }
 
-    //if (loading) return <ProgressSection />
+    if (!attributes) return <ProgressSection />
 
     return (
         <MarginBottom>

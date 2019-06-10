@@ -1,13 +1,5 @@
 import React from 'react'
-import {
-    arrayOf,
-    bool,
-    func,
-    object,
-    objectOf,
-    string,
-    oneOf,
-} from 'prop-types'
+import { arrayOf, object, string, oneOf } from 'prop-types'
 import { Card } from '@dhis2/ui-core'
 import { Heading, Margin, MarginBottom } from 'styles'
 import { SectionContent } from '../SectionContent'
@@ -17,10 +9,6 @@ export const Section = ({
     dataElements,
     childSections,
     renderType,
-    values,
-    onChange,
-    elementProps,
-    completed,
     duplicate,
 }) => {
     const getProps = () => {
@@ -42,10 +30,6 @@ export const Section = ({
                     <Heading>{heading}</Heading>
                     <SectionContent
                         renderType={renderType}
-                        values={values}
-                        onChange={onChange}
-                        elementProps={elementProps}
-                        completed={completed}
                         duplicate={duplicate}
                         {...getProps()}
                     />
@@ -60,9 +44,5 @@ Section.propTypes = {
     dataElements: arrayOf(string).isRequired,
     childSections: arrayOf(object).isRequired,
     renderType: string.isRequired,
-    values: objectOf(string).isRequired,
-    onChange: func.isRequired,
-    elementProps: objectOf(object).isRequired,
-    completed: bool,
     duplicate: oneOf([false, 'ERROR', 'WARNING']),
 }

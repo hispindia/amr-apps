@@ -1,6 +1,6 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
-import { func, object, string, bool } from 'prop-types'
+import { useSelector, useDispatch } from 'react-redux'
+import { string } from 'prop-types'
 import { Padding } from 'styles'
 import { _sampleIdElementId } from 'api'
 import { error, warning } from './constants'
@@ -11,15 +11,21 @@ import {
     SwitchInput,
     DateInput,
 } from 'inputs'
+import { setEventValue } from '../../../actions'
 
-export const DataElement = ({
-    dataElement,
-    value,
-    onChange,
-    disabled,
-    duplicate,
-}) => {
+// TODO: duplicate
+
+export const DataElement = ({ duplicate, id }) => {
+    const dispatch = useDispatch()
     const optionSets = useSelector(state => state.metadata.optionSets)
+    const completed = useSelector(state => state.data.event.status.completed)
+    const value = useSelector(state => state.data.event.values[id])
+    const dataElement = useSelector(
+        state => state.data.event.programStage.dataElements[id]
+    )
+
+    const onChange = (key, value) => dispatch(setEventValue(key, value))
+
     return (
         <Padding>
             {dataElement.optionSetValue ? (
@@ -31,7 +37,7 @@ export const DataElement = ({
                         value={value}
                         onChange={onChange}
                         required={dataElement.required}
-                        disabled={dataElement.disabled || disabled}
+                        disabled={dataElement.disabled || completed}
                     />
                 ) : (
                     <SelectInput
@@ -41,7 +47,7 @@ export const DataElement = ({
                         value={value}
                         onChange={onChange}
                         required={dataElement.required}
-                        disabled={dataElement.disabled || disabled}
+                        disabled={dataElement.disabled || completed}
                     />
                 )
             ) : dataElement.valueType === 'TRUE_ONLY' ? (
@@ -52,7 +58,7 @@ export const DataElement = ({
                     onChange={onChange}
                     required={dataElement.required}
                     value={value}
-                    disabled={dataElement.disabled || disabled}
+                    disabled={dataElement.disabled || completed}
                 />
             ) : dataElement.valueType === 'DATE' ? (
                 <DateInput
@@ -61,7 +67,7 @@ export const DataElement = ({
                     value={value}
                     required={dataElement.required}
                     onChange={onChange}
-                    disabled={dataElement.disabled || disabled}
+                    disabled={dataElement.disabled || completed}
                 />
             ) : (
                 <TextInput
@@ -70,7 +76,7 @@ export const DataElement = ({
                     value={value}
                     required={dataElement.required}
                     onChange={onChange}
-                    disabled={dataElement.disabled || disabled}
+                    disabled={dataElement.disabled || completed}
                     type={
                         dataElement.valueType === 'NUMBER' ? 'number' : 'text'
                     }
@@ -94,9 +100,4 @@ export const DataElement = ({
     )
 }
 
-DataElement.propTypes = {
-    dataElement: object.isRequired,
-    onChange: func.isRequired,
-    value: string.isRequired,
-    disabled: bool,
-}
+DataElement.propTypes = { id: string.isRequired }

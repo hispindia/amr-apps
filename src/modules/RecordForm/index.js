@@ -1,10 +1,10 @@
 /* eslint no-eval: 0 */
 
-import React, { useContext, useEffect, useCallback } from 'react'
+import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { func } from 'prop-types'
 import { _testResultDataElementId, _sampleIdElementId } from 'api'
 import { MarginBottom } from 'styles'
-import { RecordContext } from 'contexts'
 import { ProgressSection } from 'modules'
 import { hook } from './hook'
 import { Section } from './Section'
@@ -15,13 +15,15 @@ const invalidReason = {
 }
 
 export const RecordForm = ({ passValues, checkDuplicate }) => {
-    const { programStage, eventValues, status, duplicate } = useContext(
-        RecordContext
+    const { programStage, values, status } = useSelector(
+        state => state.data.event
     )
+
     const [state, dispatch, types] = hook()
 
     useEffect(() => {
-        if (state.runRules !== null) passValues(validateValues())
+        if (state.runRules !== null)
+            passValues(validateValues(programStage.programStageSections))
     }, [state.runRules])
 
     useEffect(() => {
@@ -34,18 +36,15 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
         dispatch({
             type: types.INIT,
             programStage,
-            values: eventValues,
+            values: values,
             completed: status.completed,
         })
-    }, [programStage, eventValues, status])
+    }, [programStage, values, status])
 
-    const validateValues = (sections, values) => {
-        if (!sections) sections = state.programStage.programStageSections
-        if (!values) values = state.values
-
-        for (let s of sections) {
+    const validateValues = sections => {
+        for (const s of sections) {
             if (s.childSections) {
-                const invalid = validateValues(s.childSections, values)
+                const invalid = validateValues(s.childSections)
                 if (invalid) return invalid
             }
             if (s.dataElements.find(d => d.required && values[d.id] === ''))
@@ -54,10 +53,6 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
         }
         return false
     }
-
-    const onChange = useCallback((name, value) =>
-        dispatch({ type: types.SET_VALUE, name, value })
-    )
 
     if (state.loading) return <ProgressSection />
     return (
@@ -71,12 +66,7 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
                         dataElements={s.dataElements}
                         childSections={s.childSections}
                         renderType={s.renderType.DESKTOP.type}
-                        elementProps={state.programStage.dataElements}
-                        onChange={onChange}
-                        values={state.values}
                         errors={state.errors}
-                        completed={status.completed}
-                        duplicate={duplicate}
                     />
                 ))}
         </MarginBottom>
@@ -84,6 +74,5 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
 }
 
 RecordForm.propTypes = {
-    passValues: func.isRequired,
     checkDuplicate: func,
 }
