@@ -31,7 +31,6 @@ export const ChildSection = ({ childSection }) => {
         ).length >
         childSection.dataElements.length - 2
     ) {
-        const values = useSelector(state => state.data.event.values)
         const objects = {}
         const boxValues = {}
         childSection.dataElements
@@ -41,7 +40,9 @@ export const ChildSection = ({ childSection }) => {
                     label: dataElements[id].displayFormName,
                     disabled: dataElements[id].disabled || completed,
                 }
-                boxValues[id] = values[id]
+                boxValues[id] = useSelector(
+                    state => state.data.event.values[id]
+                )
             })
         return (
             <>

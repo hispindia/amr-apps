@@ -1,9 +1,10 @@
 import styled, { css } from 'styled-components'
+import { Help, InputField } from '@dhis2/ui-core'
 
 /**
  * Colored field background.
  */
-export const CustomInputField = styled.div`
+export const StyledInputField = styled(InputField)`
     ${props => {
         switch (props.color) {
             case 'red':

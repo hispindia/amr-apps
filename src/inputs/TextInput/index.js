@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
-import { Help, InputField } from '@dhis2/ui-core'
+import { Help } from '@dhis2/ui-core'
 import { Input } from 'styles'
-import { hash } from 'helpers'
+import { hash } from 'utils'
 import { hook } from './hook'
 import { types, texts } from './constants'
 import { debounced } from './debounced'
-import { CustomInputField } from './style'
+import { StyledInputField } from './style'
 
 /**
  * Textfield input.
@@ -72,49 +72,48 @@ export const TextInput = props => {
 
     return (
         <Input>
-            <CustomInputField color={props.color}>
-                <InputField
-                    required={props.required}
-                    name={props.name}
-                    label={props.label}
-                    value={value && value.length > 127 ? '' : value}
-                    onChange={onInput}
-                    loading={validating}
+            <StyledInputField
+                required={props.required}
+                name={props.name}
+                label={props.label}
+                value={value && value.length > 127 ? '' : value}
+                onChange={onInput}
+                loading={validating}
+                warning={!!props.warning}
+                error={!!error || !!props.error}
+                help={
+                    validating
+                        ? texts.validate
+                        : error
+                        ? error
+                        : props.error
+                        ? props.error
+                        : props.warning
+                        ? props.warning
+                        : ''
+                }
+                disabled={props.disabled}
+                type={props.type}
+                dense
+                placeholder={
+                    value && value.length > 127 ? '<Confidential>' : ''
+                }
+                color={props.color}
+            />
+            {(validating || error || props.error || props.warning) && (
+                <Help
                     warning={!!props.warning}
                     error={!!error || !!props.error}
-                    help={
-                        validating
-                            ? texts.validate
-                            : error
-                            ? error
-                            : props.error
-                            ? props.error
-                            : props.warning
-                            ? props.warning
-                            : ''
-                    }
-                    disabled={props.disabled}
-                    type={props.type}
-                    dense
-                    placeholder={
-                        value && value.length > 127 ? '<Confidential>' : ''
-                    }
-                />
-                {(validating || error || props.error || props.warning) && (
-                    <Help
-                        warning={!!props.warning}
-                        error={!!error || !!props.error}
-                    >
-                        {validating
-                            ? texts.validate
-                            : error
-                            ? error
-                            : props.error
-                            ? props.error
-                            : props.warning}
-                    </Help>
-                )}
-            </CustomInputField>
+                >
+                    {validating
+                        ? texts.validate
+                        : error
+                        ? error
+                        : props.error
+                        ? props.error
+                        : props.warning}
+                </Help>
+            )}
         </Input>
     )
 }

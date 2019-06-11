@@ -21,9 +21,7 @@ export const App = ({ appName, categories, isApproval, baseUrl }) => (
                         <BodyStyle />
                         <Header appName={appName} baseUrl={baseUrl} />
                         <Provider store={store(categories, isApproval)}>
-                            <MarginTop margin={48}>
-                                <Content removingThisBreaksTheApp={appName} />
-                            </MarginTop>
+                            <Content removingThisBreaksTheApp={appName} />
                         </Provider>
                     </>
                 </MuiPickersUtilsProvider>

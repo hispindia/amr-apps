@@ -15,6 +15,8 @@ import {
     newRecord,
     setEventStatus,
     updateEventValue,
+    deleteEvent,
+    _organismSet,
 } from 'api'
 import { entityRules } from './entityRules'
 import { eventRules } from './eventRules'
@@ -61,34 +63,63 @@ const getCode = (orgUnit, orgUnits) => {
     }
 }
 
-export const getExistingEvent = (eventId, orgUnit) => async (
+export const getExistingEvent = (orgUnit, eventId) => async (
     dispatch,
     getState
 ) => {
-    const state = getState().data
+    const state = getState()
     const isApproval = state.appConfig.isApproval
     const { l1Member, l2Member } = state.metadata.user
     const programs = state.metadata.programs
+    const optionSets = state.metadata.optionSets
     const { trackedEntityTypeAttributes, rules } = state.metadata.person
-    try {
-        const data = await existingRecord(programs, eventId, {
-            isApproval,
-            l1Member,
-            l2Member,
-        })
-        const [values, attributes] = entityRules(data.newValues, attributes, {
+    //try {
+    const data = await existingRecord(programs, eventId, {
+        isApproval,
+        l1Member,
+        l2Member,
+    })
+    const [entityValues, attributes] = entityRules(
+        { ...state.metadata.person.values, ...data.entityValues },
+        trackedEntityTypeAttributes,
+        {
             rules,
-            attributes: trackedEntityTypeAttributes,
+            optionSets,
             uniques: [],
-        })
-        data.entityVales = values
-        data.entityAttributes = attributes
-        data.orgUnit = { id: orgUnit, code: getCode(orgUnit, orgUnits) }
-        dispatch(createAction(EXISTING_DATA_RECEIVED, data))
-    } catch (error) {
-        console.error(error)
-        dispatch(createAction(EXISTING_DATA_ERRORED, error))
+        }
+    )
+    data.eventRules = getRules(
+        state.metadata.eventRules,
+        data.program,
+        data.programStage.id
+    )
+    const [eventValues, programStage] = eventRules(
+        data.eventValues,
+        data.programStage,
+        {
+            rules: data.eventRules,
+            optionSets,
+            pushChanges: !data.status.completed,
+            updateValue: (key, value) =>
+                updateEventValue(data.eventId, key, value),
+        }
+    )
+    data.entityValues = entityValues
+    data.entityAttributes = attributes
+    data.eventValues = eventValues
+    data.programStage = programStage
+    data.orgUnit = {
+        id: orgUnit,
+        code: getCode(orgUnit, state.metadata.orgUnits),
     }
+    data.programs = state.metadata.programList
+    data.organisms = optionSets[_organismSet]
+    data.rules = getRules(
+        state.metadata.eventRules,
+        data.program,
+        data.programStage.id
+    )
+    dispatch(createAction(EXISTING_DATA_RECEIVED, data))
 }
 
 // TODO: check if entity values changed (editing)
@@ -158,7 +189,7 @@ export const editEvent = () => async (dispatch, getState) => {
 export const setDeletePrompt = deletePrompt => dispatch =>
     dispatch(createAction(SET_DELETE_PROMPT, deletePrompt))
 
-export const deleteEvent = confirmed => async (dispatch, getState) => {
+export const onDeleteConfirmed = confirmed => async (dispatch, getState) => {
     if (!confirmed) dispatch(setDeletePrompt(false))
     else {
         const eventId = getState().data.event.id
@@ -168,6 +199,7 @@ export const deleteEvent = confirmed => async (dispatch, getState) => {
 
 export const setEventValue = (key, value) => (dispatch, getState) => {
     const event = getState().data.event
+    if (event.values[key] === value) return
     const optionSets = getState().metadata.optionSets
     updateEventValue(event.id, key, value)
     const [values, programStage] = eventRules(

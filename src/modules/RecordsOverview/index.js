@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { Card } from '@dhis2/ui-core'
 import { getEvents } from 'api'
-import { Margin } from 'styles'
 import { RecordTable, ProgressSection, TitleRow } from 'modules'
 import { hook } from './hook'
 import { titles, headers } from './config'
@@ -53,22 +51,20 @@ export const RecordsOverview = ({ match, history }) => {
     const onAddClick = () => history.push('/orgUnit/' + selected + '/event/')
 
     return (
-        <Margin>
+        <>
             <TitleRow title={titles[match.params.status]} />
             {loading ? (
                 <ProgressSection />
             ) : (
-                <Card>
-                    <RecordTable
-                        rows={rows}
-                        headers={headers}
-                        onEventClick={onEventClick}
-                        onAddClick={onAddClick}
-                        addButton={!isApproval}
-                        addButtonDisabled={addButtonDisabled}
-                    />
-                </Card>
+                <RecordTable
+                    rows={rows}
+                    headers={headers}
+                    onEventClick={onEventClick}
+                    onAddClick={onAddClick}
+                    addButton={!isApproval}
+                    addButtonDisabled={addButtonDisabled}
+                />
             )}
-        </Margin>
+        </>
     )
 }

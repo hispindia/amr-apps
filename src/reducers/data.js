@@ -40,7 +40,7 @@ const INITIAL_STATE = {
     event: {
         values: null,
         programStage: null,
-        status: null,
+        status: {},
         id: null,
         rules: null,
         duplicate: false,
@@ -124,6 +124,14 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
         case RESET_PANEL:
             return {
                 ...state,
+                event: {
+                    values: null,
+                    programStage: null,
+                    status: null,
+                    id: null,
+                    rules: null,
+                    duplicate: false,
+                },
                 panel: {
                     ...state.panel,
                     program: '',
@@ -159,12 +167,15 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     attributes: payload.entityAttributes,
                     uniques: {},
                     valid: true,
+                    modal: null,
                 },
                 panel: {
                     program: payload.program,
                     programStage: payload.programStage.id,
                     organism: payload.eventValues[_organismsDataElementId],
                     sampleDate: payload.sampleDate,
+                    programs: payload.programs,
+                    organisms: payload.organisms,
                     valid: true,
                 },
                 event: {

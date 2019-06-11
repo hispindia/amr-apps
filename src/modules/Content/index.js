@@ -2,9 +2,9 @@ import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { OverlayedSpinner } from 'components'
 import { Main, Sidebar } from 'modules'
-import { Row } from 'styles'
 import { setMetadata, setOrgUnit } from '../../actions'
 import { READY } from '../../constants/statuses'
+import { Container } from './style'
 
 export const Content = ({ removingThisBreaksTheApp }) => {
     const dispatch = useDispatch()
@@ -25,9 +25,9 @@ export const Content = ({ removingThisBreaksTheApp }) => {
     if (!selected) return <OverlayedSpinner />
 
     return (
-        <Row>
+        <Container>
             <Sidebar removingThisBreaksTheApp={removingThisBreaksTheApp} />
             <Main removingThisBreaksTheApp={removingThisBreaksTheApp} />
-        </Row>
+        </Container>
     )
 }

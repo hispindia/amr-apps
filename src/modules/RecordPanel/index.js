@@ -1,10 +1,9 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Card } from '@dhis2/ui-core'
 import { Grid } from '@material-ui/core'
-import { Heading, Margin, MarginBottom, Padding } from 'styles'
+import { Heading, Padding } from 'styles'
 import { SelectInput, RadioInput, DateInput } from 'inputs'
-import { CustomButtonRow } from './style'
+import { StyledCard, CustomButtonRow } from './style'
 import { setProgram, setPanelValue, resetPanel } from '../../actions'
 
 /**
@@ -40,9 +39,14 @@ export const RecordPanel = () => {
      * @returns {Object[]} Data elements.
      */
     const getDataElement = id => {
+        const common = {
+            disabled: valid,
+            required: true,
+        }
         switch (id) {
             case 'program':
                 return getInput({
+                    ...common,
                     id: 'program',
                     name: 'program',
                     label: 'Organism group',
@@ -52,6 +56,7 @@ export const RecordPanel = () => {
                 })
             case 'programStage':
                 return getInput({
+                    ...common,
                     id: 'programStage',
                     name: 'programStage',
                     label: 'Type',
@@ -61,6 +66,7 @@ export const RecordPanel = () => {
                 })
             case 'organism':
                 return getInput({
+                    ...common,
                     id: 'organism',
                     name: 'organism',
                     label: 'Organism',
@@ -70,6 +76,7 @@ export const RecordPanel = () => {
                 })
             case 'sampleDate':
                 return getInput({
+                    ...common,
                     id: 'sampleDate',
                     name: 'sampleDate',
                     label: 'Date of Sample',
@@ -89,49 +96,45 @@ export const RecordPanel = () => {
     const getInput = dataElement => (
         <Padding key={dataElement.id}>
             {!dataElement.objects ? (
-                <DateInput {...dataElement} disabled={valid} required />
+                <DateInput {...dataElement} />
             ) : dataElement.objects.length < 4 ? (
-                <RadioInput {...dataElement} disabled={valid} required />
+                <RadioInput {...dataElement} />
             ) : (
-                <SelectInput {...dataElement} disabled={valid} required />
+                <SelectInput {...dataElement} />
             )}
         </Padding>
     )
 
     return (
-        <MarginBottom>
-            <Card>
-                <Margin>
-                    {true && (
-                        <CustomButtonRow
-                            unspaced
-                            buttons={[
-                                {
-                                    label: 'Reset',
-                                    onClick: onReset,
-                                    icon: 'clear',
-                                    tooltip: 'Reset',
-                                    kind: 'secondary',
-                                    small: true,
-                                },
-                            ]}
-                        />
-                    )}
-                    <Heading>Panel</Heading>
-                    <Grid container spacing={0}>
-                        <Grid item xs>
-                            {getDataElement('program')}
-                            {program &&
-                                stageLists[program].length > 1 &&
-                                getDataElement('programStage')}
-                        </Grid>
-                        <Grid item xs>
-                            {program && getDataElement('organism')}
-                            {getDataElement('sampleDate')}
-                        </Grid>
-                    </Grid>
-                </Margin>
-            </Card>
-        </MarginBottom>
+        <StyledCard>
+            {true && (
+                <CustomButtonRow
+                    unspaced
+                    buttons={[
+                        {
+                            label: 'Reset',
+                            onClick: onReset,
+                            icon: 'clear',
+                            tooltip: 'Reset',
+                            kind: 'secondary',
+                            small: true,
+                        },
+                    ]}
+                />
+            )}
+            <Heading>Panel</Heading>
+            <Grid container spacing={0}>
+                <Grid item xs>
+                    {getDataElement('program')}
+                    {program &&
+                        stageLists[program].length > 1 &&
+                        getDataElement('programStage')}
+                </Grid>
+                <Grid item xs>
+                    {program && getDataElement('organism')}
+                    {getDataElement('sampleDate')}
+                </Grid>
+            </Grid>
+        </StyledCard>
     )
 }

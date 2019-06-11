@@ -1,7 +1,13 @@
 import React from 'react'
 import { arrayOf, bool, func, object, shape, string } from 'prop-types'
+import styled from 'styled-components'
+import { Card } from '@dhis2/ui-core'
 import MUIDataTable from 'mui-datatables'
 import TableToolbar from '../../inputs/TableToolbar'
+
+const StyledCard = styled(Card)`
+    height: unset !important;
+`
 
 /**
  * Table containg the persons events (records).
@@ -14,23 +20,25 @@ export const RecordTable = ({
     onAddClick,
     addButtonDisabled,
 }) => (
-    <MUIDataTable
-        title=""
-        data={rows}
-        columns={headers}
-        options={{
-            selectableRows: false,
-            elevation: 0,
-            onRowClick: onEventClick ? row => onEventClick(row) : () => {},
-            customToolbar: () =>
-                addButton && (
-                    <TableToolbar
-                        onAddClick={onAddClick}
-                        addButtonDisabled={addButtonDisabled}
-                    />
-                ),
-        }}
-    />
+    <StyledCard>
+        <MUIDataTable
+            title=""
+            data={rows}
+            columns={headers}
+            options={{
+                selectableRows: false,
+                elevation: 0,
+                onRowClick: onEventClick ? row => onEventClick(row) : () => {},
+                customToolbar: () =>
+                    addButton && (
+                        <TableToolbar
+                            onAddClick={onAddClick}
+                            addButtonDisabled={addButtonDisabled}
+                        />
+                    ),
+            }}
+        />
+    </StyledCard>
 )
 
 RecordTable.propTypes = {

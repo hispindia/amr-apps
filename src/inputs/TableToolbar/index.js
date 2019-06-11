@@ -14,18 +14,13 @@ const title = {
  * Adds an extra add button to the table toolbar.
  */
 const TableToolbar = ({ addButtonDisabled, onAddClick }) => (
-    <>
-        <Tooltip title={title[addButtonDisabled]}>
-            <span>
-                <IconContainer
-                    onClick={onAddClick}
-                    disabled={addButtonDisabled}
-                >
-                    <AddIcon />
-                </IconContainer>
-            </span>
-        </Tooltip>
-    </>
+    <Tooltip title={title[addButtonDisabled]}>
+        <span>
+            <IconContainer onClick={onAddClick} disabled={addButtonDisabled}>
+                <AddIcon />
+            </IconContainer>
+        </span>
+    </Tooltip>
 )
 
 TableToolbar.propTypes = {

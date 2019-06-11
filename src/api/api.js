@@ -155,10 +155,9 @@ export const existingRecord = async (
         entityId,
         sampleDate,
     } = await getEventValues(eventId)
-    const lol = programs
+    const pStage = programs
         .find(p => p.id === program)
         .programStages.find(ps => (ps.id = programStageId))
-    const pStage = { ...lol }
     const { programStage, eventValues, status } = !isApproval
         ? await getProgramStage(pStage, initialValues, completed, false)
         : await getProgramStage(

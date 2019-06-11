@@ -23,8 +23,8 @@ export const RadioInput = props => {
     const [value, setValue] = useState('')
 
     useEffect(() => {
-        if (props.objects.length === 1)
-            onChange({ target: { value: props.objects[0].value } })
+        if (props.objects.length === 1 && props.value === '')
+            props.onChange(props.name, props.objects[0].value)
         else if (props.value !== value) setValue(props.value)
     }, [props.value])
 

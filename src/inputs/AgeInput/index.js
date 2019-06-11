@@ -4,7 +4,7 @@ import { InputField } from '@dhis2/ui-core'
 import { DatePicker } from 'material-ui-pickers'
 import dayjs from 'dayjs'
 import { Input, Label, MarginTop, Row } from 'styles'
-import { UnitContainer } from './style'
+import { StyledInputField } from './style'
 
 /**
  * Age input consisting of date picker and year/month/date input fields.
@@ -103,39 +103,33 @@ export const AgeInput = props => {
         <Input>
             <Label required={props.required}>{props.label}</Label>
             <Row wrapped>
-                <UnitContainer>
-                    <InputField
-                        name="years"
-                        label="Years"
-                        value={years}
-                        onChange={onAge}
-                        disabled={props.disabled}
-                        dense
-                        type="number"
-                    />
-                </UnitContainer>
-                <UnitContainer>
-                    <InputField
-                        name="months"
-                        label="Months"
-                        value={months}
-                        onChange={onAge}
-                        disabled={props.disabled}
-                        dense
-                        type="number"
-                    />
-                </UnitContainer>
-                <UnitContainer>
-                    <InputField
-                        name="days"
-                        label="Days"
-                        value={days}
-                        onChange={onAge}
-                        disabled={props.disabled}
-                        dense
-                        type="number"
-                    />
-                </UnitContainer>
+                <StyledInputField
+                    name="years"
+                    label="Years"
+                    value={years}
+                    onChange={onAge}
+                    disabled={props.disabled}
+                    dense
+                    type="number"
+                />
+                <StyledInputField
+                    name="months"
+                    label="Months"
+                    value={months}
+                    onChange={onAge}
+                    disabled={props.disabled}
+                    dense
+                    type="number"
+                />
+                <StyledInputField
+                    name="days"
+                    label="Days"
+                    value={days}
+                    onChange={onAge}
+                    disabled={props.disabled}
+                    dense
+                    type="number"
+                />
             </Row>
             <DatePicker
                 value={value}

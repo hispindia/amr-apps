@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { arrayOf, bool, func, shape, string } from 'prop-types'
 import { SelectField } from '@dhis2/ui-core'
 import { Input } from 'styles'
-import { CustomSelectField } from './style'
 
 /**
  * Single select field.
@@ -22,24 +21,22 @@ export const SelectInput = props => {
 
     return (
         <Input>
-            <CustomSelectField>
-                <SelectField
-                    name={props.name}
-                    value={value}
-                    label={props.label}
-                    help={props.disabled ? props.helperText : null}
-                    onChange={onChange}
-                    disabled={props.disabled}
-                    required={props.required}
-                    dense
-                >
-                    {props.objects.map(o => (
-                        <option key={o.value} value={o.value}>
-                            {o.label}
-                        </option>
-                    ))}
-                </SelectField>
-            </CustomSelectField>
+            <SelectField
+                name={props.name}
+                value={value}
+                label={props.label}
+                help={props.disabled ? props.helperText : null}
+                onChange={onChange}
+                disabled={props.disabled}
+                required={props.required}
+                dense
+            >
+                {props.objects.map(o => (
+                    <option key={o.value} value={o.value}>
+                        {o.label}
+                    </option>
+                ))}
+            </SelectField>
         </Input>
     )
 }

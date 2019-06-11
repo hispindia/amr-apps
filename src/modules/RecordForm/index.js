@@ -6,7 +6,7 @@ import { func } from 'prop-types'
 import { _testResultDataElementId, _sampleIdElementId } from 'api'
 import { MarginBottom } from 'styles'
 import { ProgressSection } from 'modules'
-import { hook } from './hook'
+//import { hook } from './hook'
 import { Section } from './Section'
 
 const invalidReason = {
