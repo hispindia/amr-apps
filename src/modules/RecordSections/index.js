@@ -8,7 +8,7 @@ import {
     RecordPanel,
     TitleRow,
 } from 'modules'
-import { newRecord, existingRecord, isDuplicateRecord } from 'api'
+import { isDuplicateRecord } from 'api'
 import { ButtonRow } from 'inputs'
 import { RecordContextProvider } from 'contexts'
 import { Margin } from 'styles'
@@ -20,16 +20,22 @@ import {
     editEvent,
     setDeletePrompt,
     resetEntity,
+    initNewEvent,
+    createNewEvent,
 } from '../../actions'
 
 export const RecordSections = props => {
     const dispatch = useDispatch()
-    const { constants } = useSelector(state => state.metadata)
+    const constants = useSelector(state => state.metadata.constants)
+    const entityValid = useSelector(state => state.data.entity.valid)
+    const panelValid = useSelector(state => state.data.panel.valid)
+    const eventId = useSelector(state => state.data.event.id)
+    const orgUnit = props.match.params.orgUnit
     const event = props.match.params.event
 
-    const [state, dispatchlol] = hook(props.match.params.orgUnit)
+    //const [state, dispatchlol] = hook(props.match.params.orgUnit)
 
-    const {
+    /*const {
         entityId,
         entityValid,
         organism,
@@ -41,20 +47,24 @@ export const RecordSections = props => {
         loading,
         deleteClicked,
         duplicate,
-    } = state
+    } = state*/
 
-    const disabled =
+    /*const disabled =
         buttonDisabled ||
         eventInvalid !== false ||
         !entityValid ||
         !panelValid ||
-        duplicate === 'ERROR'
+        duplicate === 'ERROR'*/
 
     useEffect(() => {
         if (event) dispatch(getExistingEvent(event))
-        else dispatch(resetEntity())
+        else dispatch(initNewEvent(orgUnit))
         //else dispatchlol({ type: types.SET_CODE, code: getCode(orgUnits) })
     }, [])
+
+    useEffect(() => {
+        if (panelValid) dispatch(createNewEvent())
+    }, [panelValid])
 
     /*useEffect(() => {
         const getNewRecord = async () => {
@@ -102,7 +112,7 @@ export const RecordSections = props => {
         if (confirmed) props.history.goBack()
     }
 
-    const checkDuplicate = async sampleId => {
+    /*const checkDuplicate = async sampleId => {
         if (!constants.days) return
         dispatchlol({
             type: types.SET_DUPLICATE,
@@ -113,16 +123,16 @@ export const RecordSections = props => {
                 sampleId
             ),
         })
-    }
+    }*/
 
-    const onRecordValues = useCallback(
+    /*const onRecordValues = useCallback(
         valid => dispatchlol({ type: types.EVENT_VALID, invalid: valid }),
         []
-    )
+    )*/
 
     return (
         <Margin>
-            {deleteClicked && (
+            {/*deleteClicked && (
                 <ModalPopup
                     heading="Delete record"
                     text="Are you sure you want to permanently delete this record?"
@@ -132,23 +142,16 @@ export const RecordSections = props => {
                     destructive
                     deletion
                 />
-            )}
+            )*/}
             <TitleRow title="Record" history={props.history} />
-            <RecordContextProvider state={state}>
-                <PersonForm
-                    showEdit={!event && !panelValid}
-                    initLoading={event && !eventId}
-                />
-                {entityValid && <RecordPanel />}
-                {eventId && (
-                    <RecordForm
-                        passValues={onRecordValues}
-                        checkDuplicate={checkDuplicate}
-                    />
-                )}
-            </RecordContextProvider>
-            {loading && <ProgressSection />}
-            <ButtonRow
+            <PersonForm
+                showEdit={!event && !panelValid}
+                initLoading={event && !eventId}
+            />
+            {entityValid && <RecordPanel />}
+            {eventId && <RecordForm />}
+            {/*loading && <ProgressSection />*/}
+            {/*<ButtonRow
                 buttons={
                     event
                         ? !eventId
@@ -222,7 +225,7 @@ export const RecordSections = props => {
                               },
                           ]
                 }
-            />
+            />*/}
         </Margin>
     )
 }

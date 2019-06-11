@@ -15,7 +15,7 @@ import { setEventValue } from '../../../actions'
 
 // TODO: duplicate
 
-export const DataElement = ({ duplicate, id }) => {
+export const DataElement = ({ id }) => {
     const dispatch = useDispatch()
     const optionSets = useSelector(state => state.metadata.optionSets)
     const completed = useSelector(state => state.data.event.status.completed)
@@ -81,18 +81,6 @@ export const DataElement = ({ duplicate, id }) => {
                         dataElement.valueType === 'NUMBER' ? 'number' : 'text'
                     }
                     color={dataElement.color}
-                    warning={
-                        dataElement.id === _sampleIdElementId &&
-                        duplicate === 'WARNING'
-                            ? warning
-                            : dataElement.warning
-                    }
-                    error={
-                        dataElement.id === _sampleIdElementId &&
-                        duplicate === 'ERROR'
-                            ? error
-                            : dataElement.error
-                    }
                     unique={dataElement.id === _sampleIdElementId}
                 />
             )}

@@ -1,4 +1,5 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 import { arrayOf, object, string, oneOf } from 'prop-types'
 import { Card } from '@dhis2/ui-core'
 import { Heading, Margin, MarginBottom } from 'styles'
@@ -9,9 +10,12 @@ export const Section = ({
     dataElements,
     childSections,
     renderType,
-    duplicate,
 }) => {
     const getProps = () => {
+        const elementProps = useSelector(
+            state => state.data.event.programStage.dataElements
+        )
+
         dataElements = dataElements.filter(
             d => !elementProps[d].hide && !elementProps[d].hideWithValues
         )
@@ -28,11 +32,7 @@ export const Section = ({
             <Card>
                 <Margin>
                     <Heading>{heading}</Heading>
-                    <SectionContent
-                        renderType={renderType}
-                        duplicate={duplicate}
-                        {...getProps()}
-                    />
+                    <SectionContent renderType={renderType} {...getProps()} />
                 </Margin>
             </Card>
         </MarginBottom>
@@ -43,6 +43,7 @@ Section.propTypes = {
     heading: string.isRequired,
     dataElements: arrayOf(string).isRequired,
     childSections: arrayOf(object).isRequired,
-    renderType: string.isRequired,
-    duplicate: oneOf([false, 'ERROR', 'WARNING']),
+    renderType:
+        string.isRequired /*,
+    duplicate: oneOf([false, 'ERROR', 'WARNING']),*/,
 }

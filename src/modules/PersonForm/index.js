@@ -26,7 +26,6 @@ export const PersonForm = ({ initLoading, showEdit }) => {
     const { id, values, attributes, uniques, modal, editing } = useSelector(
         state => state.data.entity
     )
-    console.log(useSelector(state => state.data))
 
     //const [loading, setLoading] = useState(initLoading)
     const [half] = useState(
@@ -176,7 +175,7 @@ export const PersonForm = ({ initLoading, showEdit }) => {
                                     icon: 'edit',
                                     tooltip: 'Edit',
                                     kind: 'secondary',
-                                    size: 'small',
+                                    small: true,
                                 },
                                 {
                                     label: 'Reset',
@@ -184,7 +183,7 @@ export const PersonForm = ({ initLoading, showEdit }) => {
                                     icon: 'clear',
                                     tooltip: 'Reset',
                                     kind: 'secondary',
-                                    size: 'small',
+                                    small: true,
                                 },
                             ]}
                         />

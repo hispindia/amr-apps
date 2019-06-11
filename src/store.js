@@ -5,7 +5,7 @@ import { appConfig, metadata, selectedOrgUnit, data } from './reducers'
 
 const middlewares = [ReduxThunk]
 
-const shouldLog = false
+const shouldLog = true
 
 if (process.env.NODE_ENV === 'development' && shouldLog) {
     middlewares.push(logger)

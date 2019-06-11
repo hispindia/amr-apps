@@ -118,23 +118,19 @@ export const newRecord = async (
         [_amrDataElement]: await generateAmrId(ou, orgUnitCode),
     }
     const { entityId, eventId } = eId
-        ? await addEvent(
-              initialValues,
-              pId,
-              pStage.id,
-              ou,
-              eId,
-              eValues,
-              sampleDate
-          )
-        : await addPersonWithEvent(
-              initialValues,
-              pId,
-              pStage.id,
-              ou,
-              eValues,
-              sampleDate
-          )
+        ? await addEvent(initialValues, pId, {
+              programStageId: pStage.id,
+              orgUnitId: ou,
+              entityId: eId,
+              entityValues: eValues,
+              sampleDate,
+          })
+        : await addPersonWithEvent(initialValues, pId, {
+              programStage: pStage.id,
+              orgUnitId: ou,
+              entityValues: eValues,
+              sampleDate,
+          })
 
     const { programStage, eventValues, status } = await getProgramStage(
         pStage,

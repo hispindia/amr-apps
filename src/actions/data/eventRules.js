@@ -1,6 +1,6 @@
 import { _testResultDataElementId, _sampleIdElementId } from 'api'
 
-export const checkRules = (
+export const eventRules = (
     values,
     stage,
     { rules, optionSets, pushChanges, updateValue }
@@ -11,11 +11,10 @@ export const checkRules = (
      * @returns {Object} Section.
      */
     const findSection = id => {
-        let affectedSection
-        for (let section of stage.programStageSections) {
+        for (const section of stage.programStageSections) {
             if (section.id === id) return section
             if (section.childSections) {
-                affectedSection = section.childSections.find(
+                const affectedSection = section.childSections.find(
                     childSection => childSection.id === id
                 )
                 if (affectedSection) return affectedSection
@@ -26,7 +25,7 @@ export const checkRules = (
 
     const getVariables = condition => {
         const variableDuplicated = condition.match(/values\[\'.*?\'\]/g)
-        let variables = []
+        const variables = []
         if (!variableDuplicated) return
         variableDuplicated.forEach(duplicated => {
             if (variables.indexOf(duplicated) === -1) variables.push(duplicated)
@@ -54,7 +53,7 @@ export const checkRules = (
         if (affected.optionSet.id !== _testResultDataElementId) return
         const variables = getVariables(condition)
         variables.forEach(id => {
-            let dataElement = stage.dataElements[id]
+            const dataElement = stage.dataElements[id]
             if (
                 values[id] &&
                 /\d/.test(dataElement.displayFormName) &&
@@ -77,10 +76,10 @@ export const checkRules = (
         rule.programRuleActions.forEach(r => {
             try {
                 const cond = eval(rule.condition)
-                let de = r.dataElement
+                const de = r.dataElement
                     ? stage.dataElements[r.dataElement.id]
                     : null
-                let s = r.programStageSection
+                const s = r.programStageSection
                     ? findSection(r.programStageSection.id)
                     : null
                 switch (r.programRuleActionType) {
@@ -140,5 +139,5 @@ export const checkRules = (
         })
     })
 
-    return { values, stage }
+    return [values, stage]
 }

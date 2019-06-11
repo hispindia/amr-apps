@@ -41,19 +41,19 @@ export const RecordPanel = () => {
      */
     const getDataElement = id => {
         switch (id) {
-            case 'programId':
+            case 'program':
                 return getInput({
-                    id: 'programId',
-                    name: 'programId',
+                    id: 'program',
+                    name: 'program',
                     label: 'Organism group',
                     objects: programs,
                     onChange: onProgramChange,
                     value: program,
                 })
-            case 'programStageId':
+            case 'programStage':
                 return getInput({
-                    id: 'programStageId',
-                    name: 'programStageId',
+                    id: 'programStage',
+                    name: 'programStage',
                     label: 'Type',
                     objects: stageLists[program],
                     onChange: onChange,
@@ -112,7 +112,7 @@ export const RecordPanel = () => {
                                     icon: 'clear',
                                     tooltip: 'Reset',
                                     kind: 'secondary',
-                                    size: 'small',
+                                    small: true,
                                 },
                             ]}
                         />
@@ -120,13 +120,13 @@ export const RecordPanel = () => {
                     <Heading>Panel</Heading>
                     <Grid container spacing={0}>
                         <Grid item xs>
-                            {getDataElement('programId')}
+                            {getDataElement('program')}
                             {program &&
                                 stageLists[program].length > 1 &&
-                                getDataElement('programStageId')}
+                                getDataElement('programStage')}
                         </Grid>
                         <Grid item xs>
-                            {organisms && getDataElement('organism')}
+                            {program && getDataElement('organism')}
                             {getDataElement('sampleDate')}
                         </Grid>
                     </Grid>

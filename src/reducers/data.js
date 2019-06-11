@@ -15,7 +15,10 @@ import {
     RESET_PANEL_EVENT,
     SET_INCOMPLETED,
     SET_DELETE_PROMPT,
+    SET_ENTITY_AND_ORG_UNIT,
     SET_EVENT_VALUE,
+    SET_EVENT_AND_ENTITY,
+    SET_EVENT_VALUES_AND_PROGRAMSTAGE,
 } from '../actions/types'
 
 const INITIAL_STATE = {
@@ -28,10 +31,10 @@ const INITIAL_STATE = {
         valid: false,
     },
     panel: {
-        programId: null,
-        programStageId: null,
-        organism: null,
-        sampleDate: null,
+        program: '',
+        programStage: '',
+        organism: '',
+        sampleDate: '',
         valid: false,
     },
     event: {
@@ -66,7 +69,6 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     values: payload.values,
                     attributes: payload.attributes,
                     valid: payload.valid,
-                    modal: null,
                 },
             }
         case SET_UNIQUE:
@@ -101,10 +103,11 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
             return {
                 ...state,
                 panel: {
-                    program: payload.programId,
-                    programStage: payload.programStageId,
+                    program: payload.program,
+                    programStage: payload.programStage,
                     organism: payload.organism,
                     sampleDate: payload.sampleDate,
+                    programs: state.panel.programs,
                     organisms: payload.organisms,
                     valid: payload.valid,
                 },
@@ -130,6 +133,24 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     valid: false,
                 },
             }
+        case SET_ENTITY_AND_ORG_UNIT: {
+            return {
+                ...state,
+                entity: {
+                    values: payload.values,
+                    id: payload.id,
+                    valid: payload.valid,
+                    attributes: payload.attributes,
+                    uniques: {},
+                    modal: null,
+                },
+                panel: {
+                    ...state.panel,
+                    programs: payload.programs,
+                },
+                orgUnit: payload.orgUnit,
+            }
+        }
         case EXISTING_DATA_RECEIVED:
             return {
                 entity: {
@@ -202,6 +223,31 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                         ...state.event.values,
                         [payload.key]: payload.value,
                     },
+                },
+            }
+        case SET_EVENT_AND_ENTITY:
+            return {
+                ...state,
+                entity: {
+                    ...state.entity,
+                    id: payload.entityId,
+                },
+                event: {
+                    ...state.event,
+                    id: payload.eventId,
+                    programStage: payload.programStage,
+                    rules: payload.rules,
+                    status: payload.status,
+                    values: payload.values,
+                },
+            }
+        case SET_EVENT_VALUES_AND_PROGRAMSTAGE:
+            return {
+                ...state,
+                event: {
+                    ...state.event,
+                    programStage: payload.programStage,
+                    values: payload.values,
                 },
             }
         default:

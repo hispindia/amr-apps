@@ -10,14 +10,9 @@ export const SectionContent = ({
     childHalf,
     childSections,
     renderType,
-    duplicate,
 }) => {
     const getChildSection = childSection => (
-        <ChildSection
-            key={childSection.id}
-            childSection={childSection}
-            duplicate={duplicate}
-        />
+        <ChildSection key={childSection.id} childSection={childSection} />
     )
 
     if (dataElements.length > 0) {
@@ -75,5 +70,5 @@ SectionContent.propTypes = {
     childHalf: number.isRequired,
     childSections: arrayOf(object).isRequired,
     renderType: string.isRequired,
-    duplicate: oneOf([false, 'ERROR', 'WARNING']),
+    /*duplicate: oneOf([false, 'ERROR', 'WARNING']),*/
 }

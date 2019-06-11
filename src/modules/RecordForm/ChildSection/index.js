@@ -1,9 +1,11 @@
 import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { object } from 'prop-types'
 import { Label, Padding } from 'styles'
 import { CheckboxInput } from 'inputs'
 import { DataElement } from '../DataElement'
 import { ChildSectionLabel } from './style'
+import { setEventValue } from '../../../actions'
 
 // TODO: duplicate
 
@@ -12,7 +14,8 @@ import { ChildSectionLabel } from './style'
  * @param {Object} childSection - Child section.
  * @returns {Component} Child section component.
  */
-export const ChildSection = ({ childSection, duplicate }) => {
+export const ChildSection = ({ childSection }) => {
+    const dispatch = useDispatch()
     const dataElements = useSelector(
         state => state.data.event.programStage.dataElements
     )
@@ -58,13 +61,7 @@ export const ChildSection = ({ childSection, duplicate }) => {
                             !dataElements[id].hide
                     )
                     .map(id => (
-                        <DataElement
-                            key={id}
-                            dataElement={dataElements[id]}
-                            onChange={onChange}
-                            disabled={completed}
-                            duplicate={duplicate}
-                        />
+                        <DataElement key={id} id={id} />
                     ))}
             </>
         )

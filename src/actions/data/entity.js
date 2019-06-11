@@ -8,14 +8,15 @@ import {
 import { getPersonValues, checkUnique } from 'api'
 import { entityRules } from './entityRules'
 
-export const getEntity = id => async dispatch => {
+export const getEntity = id => async (dispatch, getState) => {
+    const optionSets = getState().metadata.optionSets
     const { trackedEntityTypeAttributes, rules } = getState().metadata.person
     const [values, attributes] = entityRules(
         await getPersonValues(id),
         trackedEntityTypeAttributes,
         {
             rules,
-            attributes: trackedEntityTypeAttributes,
+            optionSets,
             uniques: {},
         }
     )
@@ -31,13 +32,14 @@ export const getEntity = id => async dispatch => {
 }
 
 export const setEntityValue = (key, value) => (dispatch, getState) => {
+    const optionSets = getState().metadata.optionSets
     const state = getState()
     const [values, attributes, valid] = entityRules(
         { ...state.data.entity.values, [key]: value },
         state.data.entity.attributes,
         {
             rules: state.metadata.person.rules,
-            attributes,
+            optionSets,
             uniques: state.data.entity.uniques,
         }
     )
@@ -49,21 +51,21 @@ export const validateUnique = (id, value, label) => async (
     getState
 ) => {
     const dataState = getState().data
-    const entityId = await checkUnique(id, value, dataState.orgUnit)
+    const entityId = await checkUnique(id, value, dataState.orgUnit.id)
 
     if (entityId)
         dispatch(
             createAction(SET_ENTITY_MODAL_AND_UNIQUES, {
-                modal: { id, label, entityId, uniques },
+                modal: { id, label, entityId },
                 uniques: {
                     ...dataState.entity.uniques,
-                    [dataState.entity.modal.id]: !!entityId,
+                    [id]: !!entityId,
                 },
             })
         )
     else dispatch(createAction(SET_UNIQUE, { key: id, value: !!entityId }))
 
-    return !newEntityId
+    return !entityId
 }
 
 export const removeModal = importEntity => async (dispatch, getState) => {

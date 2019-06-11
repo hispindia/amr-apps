@@ -255,7 +255,7 @@ export const initMetadata = async () => {
         stageLists[p.id] = stages
     })
 
-    programs.rules = []
+    let eventRules = []
     data.programRules
         .filter(r =>
             r.programRuleActions.find(
@@ -264,9 +264,9 @@ export const initMetadata = async () => {
         )
         .forEach(d => {
             d.condition = programCondition(d.condition)
-            programs.rules.push(d)
+            eventRules.push(d)
         })
-    programs.rules = programs.rules.sort((a, b) =>
+    eventRules = eventRules.sort((a, b) =>
         a.priority > b.priority || !a.priority ? 1 : -1
     )
 
@@ -292,5 +292,6 @@ export const initMetadata = async () => {
         dataElements,
         orgUnits,
         user,
+        eventRules,
     }
 }

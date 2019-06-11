@@ -15,33 +15,34 @@ const invalidReason = {
 }
 
 export const RecordForm = ({ passValues, checkDuplicate }) => {
-    const { programStage, values, status } = useSelector(
+    /*const { programStage, values, status } = useSelector(
         state => state.data.event
-    )
+    )*/
+    const programStage = useSelector(state => state.data.event.programStage)
 
-    const [state, dispatch, types] = hook()
+    //const [state, dispatch, types] = hook()
 
-    useEffect(() => {
+    /*useEffect(() => {
         if (state.runRules !== null)
             passValues(validateValues(programStage.programStageSections))
-    }, [state.runRules])
+    }, [state.runRules])*/
 
-    useEffect(() => {
+    /*useEffect(() => {
         if (!state.values) return
         const sampleId = state.values[_sampleIdElementId]
         if (sampleId) checkDuplicate(sampleId)
-    }, [state.values && state.values[_sampleIdElementId]])
+    }, [state.values && state.values[_sampleIdElementId]])*/
 
-    useEffect(() => {
+    /*useEffect(() => {
         dispatch({
             type: types.INIT,
             programStage,
             values: values,
             completed: status.completed,
         })
-    }, [programStage, values, status])
+    }, [programStage, values, status])*/
 
-    const validateValues = sections => {
+    /*const validateValues = sections => {
         for (const s of sections) {
             if (s.childSections) {
                 const invalid = validateValues(s.childSections)
@@ -52,12 +53,12 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
             if (s.dataElements.find(d => d.error)) return invalidReason.error
         }
         return false
-    }
+    }*/
 
-    if (state.loading) return <ProgressSection />
+    //if (state.loading) return <ProgressSection />
     return (
         <MarginBottom>
-            {state.programStage.programStageSections
+            {programStage.programStageSections
                 .filter(s => !s.hide && !s.hideWithValues)
                 .map(s => (
                     <Section
@@ -66,7 +67,6 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
                         dataElements={s.dataElements}
                         childSections={s.childSections}
                         renderType={s.renderType.DESKTOP.type}
-                        errors={state.errors}
                     />
                 ))}
         </MarginBottom>

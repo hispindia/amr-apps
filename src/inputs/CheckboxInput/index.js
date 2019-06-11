@@ -38,6 +38,7 @@ export const CheckboxInput = props => {
                             checked={values[id] === 'true'}
                             onChange={onChange}
                             disabled={props.objects[id].disabled}
+                            value={id}
                         />
                     </OptionSpacer>
                 ))}
