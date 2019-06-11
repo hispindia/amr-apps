@@ -1,6 +1,10 @@
 import styled from 'styled-components'
 import { MenuItem, colors } from '@dhis2/ui-core'
 
+export const StyledMenu = styled.div`
+    height: unset !important;
+`
+
 export const StyledMenuItem = styled(MenuItem)`
     padding-right: 12px !important;
     .label {

@@ -14,23 +14,25 @@ const SidebarMenu = ({ location, history }) => {
     const counts = useCounts(location)
 
     return (
-        <Menu>
-            {categories.map((c, i) => (
-                <StyledMenuItem
-                    dense
-                    key={c.value}
-                    value={c.value}
-                    onClick={history.push}
-                    label={
-                        <>
-                            <Icon icon={c.icon} color={c.color} />
-                            <Title>{c.label}</Title>
-                            <Count>{counts ? counts[i] : 0}</Count>
-                        </>
-                    }
-                />
-            ))}
-        </Menu>
+        <nav>
+            <Menu>
+                {categories.map((c, i) => (
+                    <StyledMenuItem
+                        dense
+                        key={c.value}
+                        value={c.value}
+                        onClick={history.push}
+                        label={
+                            <>
+                                <Icon icon={c.icon} color={c.color} />
+                                <Title>{c.label}</Title>
+                                <Count>{counts ? counts[i] : 0}</Count>
+                            </>
+                        }
+                    />
+                ))}
+            </Menu>
+        </nav>
     )
 }
 

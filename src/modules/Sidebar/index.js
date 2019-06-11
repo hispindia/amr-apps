@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Route } from 'react-router-dom'
-import { MarginBottom } from 'styles'
 import { OrgUnitTree } from './OrgUnitTree'
 import SidebarMenu from './SidebarMenu'
 
@@ -17,16 +16,9 @@ const SidebarContainer = styled.aside`
 export const Sidebar = () => (
     <SidebarContainer>
         <SidebarMenu />
-        <MarginBottom margin={12}>
-            <Route
-                exact
-                path="/"
-                render={compProps => <OrgUnitTree {...compProps} />}
-            />
-            <Route
-                path="/approval"
-                render={compProps => <OrgUnitTree {...compProps} />}
-            />
-        </MarginBottom>
+        <Route
+            path="/approval"
+            render={compProps => <OrgUnitTree {...compProps} />}
+        />
     </SidebarContainer>
 )
