@@ -1,4 +1,5 @@
 import { _testResultDataElementId, _sampleIdElementId } from 'api'
+import * as INVALID_REASONS from '../../constants/invalidReasons'
 
 export const eventRules = (
     values,
@@ -139,5 +140,27 @@ export const eventRules = (
         })
     })
 
-    return [values, stage]
+    const invalid = validateValues(
+        stage.dataElements,
+        values,
+        stage.programStageSections
+    )
+
+    return [values, stage, invalid]
+}
+
+const validateValues = (elements, values, sections) => {
+    const hasRequiredEmpty = dataElements =>
+        dataElements.find(id => elements[id].required && values[id] === '')
+    const hasError = dataElements => dataElements.find(id => elements[id].error)
+
+    for (const s of sections) {
+        if (s.childSections) {
+            const invalid = validateValues(elements, values, s.childSections)
+            if (invalid) return invalid
+        }
+        if (hasRequiredEmpty(s.dataElements)) return INVALID_REASONS.REQUIRED
+        if (hasError(s.dataElements)) return INVALID_REASONS.ERROR
+    }
+    return false
 }

@@ -185,6 +185,7 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     id: payload.eventId,
                     rules: payload.rules,
                     duplicate: false,
+                    invalid: payload.invalid,
                 },
                 orgUnit: payload.orgUnit,
                 status: READY,
@@ -219,6 +220,7 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                         completed: false,
                     },
                 },
+                buttonsDisabled: false,
             }
         case SET_DELETE_PROMPT:
             return {
@@ -250,6 +252,7 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     rules: payload.rules,
                     status: payload.status,
                     values: payload.values,
+                    invalid: payload.invalid,
                 },
             }
         case SET_EVENT_VALUES_AND_PROGRAMSTAGE:
@@ -259,6 +262,7 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     ...state.event,
                     programStage: payload.programStage,
                     values: payload.values,
+                    invalid: payload.invalid,
                 },
             }
         default:

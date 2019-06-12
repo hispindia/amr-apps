@@ -1,13 +1,19 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import styled from 'styled-components'
 import { ButtonRow } from 'inputs'
 import { submitEvent, editEvent, setDeletePrompt } from '../../actions'
+
+const StyledButtonRow = styled(ButtonRow)`
+    margin: 0px;
+`
 
 export const EventButtons = ({ history, eventParam }) => {
     const dispatch = useDispatch()
     const buttonsDisabled = useSelector(state => state.data.buttonsDisabled)
     const status = useSelector(state => state.data.event.status)
     const eventId = useSelector(state => state.data.event.id)
+    const invalid = useSelector(state => state.data.event.invalid)
 
     const onSubmit = async addMore => {
         await dispatch(submitEvent())
@@ -41,11 +47,11 @@ export const EventButtons = ({ history, eventParam }) => {
     const submitAndAddButton = {
         label: 'Submit and add new',
         onClick: () => onSubmit(true),
-        disabled: buttonsDisabled,
+        disabled: buttonsDisabled || !!invalid,
         icon: 'add',
         primary: true,
         tooltip: 'Submit record and add new record for the same person',
-        disabledTooltip: 'SOMETHING IS WRONG',
+        disabledTooltip: invalid ? invalid : '',
         /*duplicate === 'ERROR'
                 ? invalidReason.error
                 : eventInvalid
@@ -56,11 +62,11 @@ export const EventButtons = ({ history, eventParam }) => {
     const submitButton = {
         label: 'Submit',
         onClick: () => onSubmit(false),
-        disabled: buttonsDisabled,
+        disabled: buttonsDisabled || !!invalid,
         icon: 'done',
         primary: true,
         tooltip: 'Submit record',
-        disabledTooltip: 'SOMETHING IS WRONG',
+        disabledTooltip: invalid ? invalid : '',
         /*duplicate === 'ERROR'
                 ? invalidReason.error
                 : eventInvalid
@@ -75,5 +81,5 @@ export const EventButtons = ({ history, eventParam }) => {
                 : [deleteButton, status.completed ? editButton : submitButton]
             : [submitAndAddButton, submitButton]
 
-    return <ButtonRow buttons={buttons()} />
+    return <StyledButtonRow buttons={buttons()} />
 }

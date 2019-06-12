@@ -50,7 +50,6 @@ export const RecordSections = ({ history, match }) => {
     useEffect(() => {
         if (event) dispatch(getExistingEvent(orgUnit, event))
         else dispatch(initNewEvent(orgUnit))
-        //else dispatchlol({ type: types.SET_CODE, code: getCode(orgUnits) })
     }, [])
 
     useEffect(() => {
@@ -111,13 +110,9 @@ export const RecordSections = ({ history, match }) => {
         <>
             {deletePrompt && <EventModal history={history} />}
             <TitleRow title="Record" history={history} />
-            <PersonForm
-                showEdit={!event && !panelValid}
-                initLoading={event && !eventId}
-            />
-            {entityValid && <RecordPanel />}
+            <PersonForm showEdit={!event && !panelValid} />
+            {entityValid && <RecordPanel showEdit={!event} />}
             {eventId && <RecordForm />}
-            {/*loading && <ProgressSection />*/}
             <EventButtons history={history} eventParam={event} />
         </>
     )

@@ -1,12 +1,12 @@
 /* eslint no-eval: 0 */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { bool, func } from 'prop-types'
+import { bool } from 'prop-types'
 import { Grid } from '@material-ui/core'
-import { Card } from '@dhis2/ui-core'
 import { ModalPopup } from 'modules'
-import { Heading, Margin, MarginBottom, Padding } from 'styles'
+import { CardSection } from 'components'
+import { Padding } from 'styles'
 import { TextInput, AgeInput, RadioInput, SelectInput } from 'inputs'
 import { ProgressSection } from '../ProgressSection'
 import { CustomButtonRow } from './style'
@@ -20,7 +20,7 @@ import {
 /**
  * Entity information section.
  */
-export const PersonForm = ({ initLoading, showEdit }) => {
+export const PersonForm = ({ showEdit }) => {
     const dispatch = useDispatch()
     const { optionSets, person } = useSelector(state => state.metadata)
     const { id, values, attributes, uniques, modal, editing } = useSelector(
@@ -31,10 +31,6 @@ export const PersonForm = ({ initLoading, showEdit }) => {
     const [half] = useState(
         Math.floor(person.trackedEntityTypeAttributes.length / 2)
     )
-
-    /*useEffect(() => {
-        dispatch(resetEntity())
-    }, [])*/
 
     /**
      * Called on every input field change.
@@ -147,7 +143,7 @@ export const PersonForm = ({ initLoading, showEdit }) => {
     if (!attributes) return <ProgressSection />
 
     return (
-        <MarginBottom>
+        <CardSection heading="Person">
             {modal && (
                 <ModalPopup
                     heading="Person found"
@@ -163,47 +159,39 @@ export const PersonForm = ({ initLoading, showEdit }) => {
                     onClick={onModalClick}
                 />
             )}
-            <Card>
-                <Margin>
-                    {id && !editing && showEdit && (
-                        <CustomButtonRow
-                            unspaced
-                            buttons={[
-                                {
-                                    label: 'Edit',
-                                    onClick: onEditClick,
-                                    icon: 'edit',
-                                    tooltip: 'Edit',
-                                    kind: 'secondary',
-                                    small: true,
-                                },
-                                {
-                                    label: 'Reset',
-                                    onClick: reset,
-                                    icon: 'clear',
-                                    tooltip: 'Reset',
-                                    kind: 'secondary',
-                                    small: true,
-                                },
-                            ]}
-                        />
-                    )}
-                    <Heading>Person</Heading>
-                    <Grid container spacing={0}>
-                        <Grid item xs>
-                            {attributes.slice(0, half).map(a => getInput(a))}
-                        </Grid>
-                        <Grid item xs>
-                            {attributes.slice(half).map(a => getInput(a))}
-                        </Grid>
-                    </Grid>
-                </Margin>
-            </Card>
-        </MarginBottom>
+            {id && !editing && showEdit && (
+                <CustomButtonRow
+                    unspaced
+                    buttons={[
+                        {
+                            label: 'Edit',
+                            onClick: onEditClick,
+                            icon: 'edit',
+                            tooltip: 'Edit',
+                            kind: 'secondary',
+                            small: true,
+                        },
+                        {
+                            label: 'Reset',
+                            onClick: reset,
+                            icon: 'clear',
+                            tooltip: 'Reset',
+                            kind: 'secondary',
+                            small: true,
+                        },
+                    ]}
+                />
+            )}
+            <Grid container spacing={0}>
+                <Grid item xs>
+                    {attributes.slice(0, half).map(a => getInput(a))}
+                </Grid>
+                <Grid item xs>
+                    {attributes.slice(half).map(a => getInput(a))}
+                </Grid>
+            </Grid>
+        </CardSection>
     )
 }
 
-PersonForm.prototypes = {
-    showEdit: bool.isRequired,
-    initLoading: bool,
-}
+PersonForm.prototypes = { showEdit: bool }

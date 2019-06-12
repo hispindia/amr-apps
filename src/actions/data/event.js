@@ -57,7 +57,7 @@ const getCode = (orgUnit, orgUnits) => {
     for (const ou of orgUnits) {
         if (ou.id === orgUnit) return ou.code
         if (ou.children) {
-            const code = getCode(ou.children)
+            const code = getCode(orgUnit, ou.children)
             if (code) return code
         }
     }
@@ -93,7 +93,7 @@ export const getExistingEvent = (orgUnit, eventId) => async (
         data.program,
         data.programStage.id
     )
-    const [eventValues, programStage] = eventRules(
+    const [eventValues, programStage, invalid] = eventRules(
         data.eventValues,
         data.programStage,
         {
@@ -114,6 +114,7 @@ export const getExistingEvent = (orgUnit, eventId) => async (
     }
     data.programs = state.metadata.programList
     data.organisms = optionSets[_organismSet]
+    data.invalid = invalid
     data.rules = getRules(
         state.metadata.eventRules,
         data.program,
@@ -148,7 +149,7 @@ export const createNewEvent = () => async (dispatch, getState) => {
             orgUnitCode: orgUnit.code,
         }
     )
-    const [values, programStage] = eventRules(
+    const [values, programStage, invalid] = eventRules(
         data.eventValues,
         data.programStage,
         {
@@ -167,6 +168,7 @@ export const createNewEvent = () => async (dispatch, getState) => {
             status: data.status,
             rules,
             entityId: entity.id ? entity.id : data.entityId,
+            invalid,
         })
     )
 }
@@ -202,7 +204,7 @@ export const setEventValue = (key, value) => (dispatch, getState) => {
     if (event.values[key] === value) return
     const optionSets = getState().metadata.optionSets
     updateEventValue(event.id, key, value)
-    const [values, programStage] = eventRules(
+    const [values, programStage, invalid] = eventRules(
         { ...event.values, [key]: value },
         event.programStage,
         {
@@ -216,6 +218,7 @@ export const setEventValue = (key, value) => (dispatch, getState) => {
         createAction(SET_EVENT_VALUES_AND_PROGRAMSTAGE, {
             programStage,
             values,
+            invalid,
         })
     )
 }

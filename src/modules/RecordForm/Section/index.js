@@ -1,8 +1,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { arrayOf, object, string, oneOf } from 'prop-types'
-import { Card } from '@dhis2/ui-core'
-import { Heading, Margin, MarginBottom } from 'styles'
+import { CardSection } from 'components'
 import { SectionContent } from '../SectionContent'
 
 export const Section = ({
@@ -28,14 +27,9 @@ export const Section = ({
     }
 
     return (
-        <MarginBottom>
-            <Card>
-                <Margin>
-                    <Heading>{heading}</Heading>
-                    <SectionContent renderType={renderType} {...getProps()} />
-                </Margin>
-            </Card>
-        </MarginBottom>
+        <CardSection heading={heading}>
+            <SectionContent renderType={renderType} {...getProps()} />
+        </CardSection>
     )
 }
 

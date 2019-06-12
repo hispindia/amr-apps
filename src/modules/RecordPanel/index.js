@@ -1,15 +1,16 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Grid } from '@material-ui/core'
-import { Heading, Padding } from 'styles'
+import { Padding } from 'styles'
+import { CardSection } from 'components'
 import { SelectInput, RadioInput, DateInput } from 'inputs'
-import { StyledCard, CustomButtonRow } from './style'
+import { CustomButtonRow } from './style'
 import { setProgram, setPanelValue, resetPanel } from '../../actions'
 
 /**
  * Contains event panel.
  */
-export const RecordPanel = () => {
+export const RecordPanel = ({ showEdit }) => {
     const dispatch = useDispatch()
     const { stageLists } = useSelector(state => state.metadata)
     const {
@@ -105,24 +106,20 @@ export const RecordPanel = () => {
         </Padding>
     )
 
+    const buttons = [
+        {
+            label: 'Reset',
+            onClick: onReset,
+            icon: 'clear',
+            tooltip: 'Reset',
+            kind: 'secondary',
+            small: true,
+        },
+    ]
+
     return (
-        <StyledCard>
-            {true && (
-                <CustomButtonRow
-                    unspaced
-                    buttons={[
-                        {
-                            label: 'Reset',
-                            onClick: onReset,
-                            icon: 'clear',
-                            tooltip: 'Reset',
-                            kind: 'secondary',
-                            small: true,
-                        },
-                    ]}
-                />
-            )}
-            <Heading>Panel</Heading>
+        <CardSection heading="Panel">
+            {showEdit && <CustomButtonRow unspaced buttons={buttons} />}
             <Grid container spacing={0}>
                 <Grid item xs>
                     {getDataElement('program')}
@@ -135,6 +132,6 @@ export const RecordPanel = () => {
                     {getDataElement('sampleDate')}
                 </Grid>
             </Grid>
-        </StyledCard>
+        </CardSection>
     )
 }

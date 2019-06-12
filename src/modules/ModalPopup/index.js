@@ -2,7 +2,7 @@ import React from 'react'
 import { func, string, bool } from 'prop-types'
 import { ButtonRow } from 'inputs'
 import { Text } from 'styles'
-import { Background, CustomCard, CustomHeading } from './style'
+import { Background, CustomCard, ModalTitle } from './style'
 
 export const ModalPopup = ({
     heading,
@@ -15,7 +15,7 @@ export const ModalPopup = ({
 }) => (
     <Background>
         <CustomCard>
-            <CustomHeading>{heading}</CustomHeading>
+            <ModalTitle>{heading}</ModalTitle>
             <Text>{text}</Text>
             <ButtonRow
                 unspaced

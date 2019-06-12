@@ -57,7 +57,7 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
 
     //if (state.loading) return <ProgressSection />
     return (
-        <MarginBottom>
+        <>
             {programStage.programStageSections
                 .filter(s => !s.hide && !s.hideWithValues)
                 .map(s => (
@@ -69,7 +69,7 @@ export const RecordForm = ({ passValues, checkDuplicate }) => {
                         renderType={s.renderType.DESKTOP.type}
                     />
                 ))}
-        </MarginBottom>
+        </>
     )
 }
 
