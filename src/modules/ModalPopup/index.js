@@ -18,7 +18,6 @@ export const ModalPopup = ({
             <ModalTitle>{heading}</ModalTitle>
             <Text>{text}</Text>
             <ButtonRow
-                unspaced
                 buttons={[
                     {
                         label: 'Cancel',

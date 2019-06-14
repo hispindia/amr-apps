@@ -1,2 +1,2 @@
-export const REQUIRED = 'A required field is empty'
-export const ERROR = 'A field is invalid'
+export const REQUIRED_EMPTY = 'A required field is empty'
+export const INVALID_FIELD = 'A field is invalid'

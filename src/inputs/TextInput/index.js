@@ -29,11 +29,6 @@ export const TextInput = props => {
             passValue(debouncedValue)
     }, [debouncedValue])
 
-    useEffect(() => {
-        if (props.uniqueValid && error === texts.unique)
-            dispatch({ type: types.SET_ERROR, value: props.error })
-    }, [props.uniqueValid])
-
     /**
      * Passes the value to parent component after 1 sec.
      */
@@ -42,8 +37,7 @@ export const TextInput = props => {
             value = hash(value)
             dispatch({ type: types.SET_HASHED_VALUE, value: value })
         }
-        const didValidate = await validate(value)
-        dispatch({ type: types.SET_ERROR, error: didValidate })
+        await validate(value)
         props.onChange(props.name, value, props.unique)
     }
 
@@ -57,8 +51,7 @@ export const TextInput = props => {
         if (required && !value) error = texts.required
         if (unique && validateUnique && value) {
             dispatch({ type: types.SET_VALIDATING, validating: true })
-            if (!(await props.onValidation(name, value, label)))
-                error = texts.unique
+            await props.onValidation(name, value, label)
             dispatch({ type: types.SET_VALIDATING, validating: false })
         }
         return error
@@ -79,18 +72,10 @@ export const TextInput = props => {
                 value={value && value.length > 127 ? '' : value}
                 onChange={onInput}
                 loading={validating}
-                warning={!!props.warning}
-                error={!!error || !!props.error}
-                help={
-                    validating
-                        ? texts.validate
-                        : error
-                        ? error
-                        : props.error
-                        ? props.error
-                        : props.warning
-                        ? props.warning
-                        : ''
+                warning={!validating && !!props.warning}
+                error={
+                    !validating &&
+                    (!!error || props.uniqueInvalid || !!props.error)
                 }
                 disabled={props.disabled}
                 type={props.type}
@@ -100,13 +85,22 @@ export const TextInput = props => {
                 }
                 color={props.color}
             />
-            {(validating || error || props.error || props.warning) && (
+            {(validating ||
+                props.uniqueInvalid ||
+                error ||
+                props.error ||
+                props.warning) && (
                 <Help
-                    warning={!!props.warning}
-                    error={!!error || !!props.error}
+                    warning={!validating && !!props.warning}
+                    error={
+                        !validating &&
+                        (!!error || props.uniqueInvalid || !!props.error)
+                    }
                 >
                     {validating
                         ? texts.validate
+                        : props.uniqueInvalid
+                        ? texts.unique
                         : error
                         ? error
                         : props.error
@@ -129,7 +123,7 @@ TextInput.propTypes = {
     valid: bool,
     warning: string,
     error: string,
-    uniqueValid: bool,
+    uniqueInvalid: bool,
     validateUnique: bool,
     onValidation: func,
 }

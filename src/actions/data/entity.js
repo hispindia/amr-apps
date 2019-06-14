@@ -11,6 +11,8 @@ import { entityRules } from './entityRules'
 export const getEntity = id => async (dispatch, getState) => {
     const optionSets = getState().metadata.optionSets
     const { trackedEntityTypeAttributes, rules } = getState().metadata.person
+    const uniques = getState().data.entity.uniques
+    Object.keys(uniques).forEach(id => (uniques[id] = true))
     const [values, attributes] = entityRules(
         await getPersonValues(id),
         trackedEntityTypeAttributes,
@@ -27,6 +29,7 @@ export const getEntity = id => async (dispatch, getState) => {
             id,
             valid: true,
             attributes,
+            uniques,
         })
     )
 }
@@ -59,13 +62,11 @@ export const validateUnique = (id, value, label) => async (
                 modal: { id, label, entityId },
                 uniques: {
                     ...dataState.entity.uniques,
-                    [id]: !!entityId,
+                    [id]: !entityId,
                 },
             })
         )
-    else dispatch(createAction(SET_UNIQUE, { key: id, value: !!entityId }))
-
-    return !entityId
+    else dispatch(createAction(SET_UNIQUE, { key: id, value: !entityId }))
 }
 
 export const removeModal = importEntity => async (dispatch, getState) => {

@@ -1,19 +1,13 @@
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
-export const SpaceBetween = styled.div`
-    justify-content: space-between;
+export const ButtonContainer = styled.div`
     display: flex;
-    ${props =>
-        props.unspaced &&
-        css`
-            justify-content: flex-end;
-        `}
+    justify-content: flex-end;
+    div:first-child {
+        margin-left: 0px;
+    }
 `
 
 export const ButtonPadding = styled.div`
-    ${props =>
-        props.unspaced &&
-        css`
-            padding-left: 8px;
-        `}
+    margin-left: 16px;
 `

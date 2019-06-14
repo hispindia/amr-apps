@@ -1,6 +1,7 @@
 import { createAction } from '../createAction'
 import {
     SET_ENTITY_AND_ORG_UNIT,
+    RESET_DATA,
     EXISTING_DATA_RECEIVED,
     EXISTING_DATA_ERRORED,
     DISABLE_BUTTONS,
@@ -20,6 +21,8 @@ import {
 } from 'api'
 import { entityRules } from './entityRules'
 import { eventRules } from './eventRules'
+
+export const resetData = () => dispatch => dispatch(createAction(RESET_DATA))
 
 export const disableButtons = () => dispatch =>
     dispatch(createAction(DISABLE_BUTTONS))

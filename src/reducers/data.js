@@ -1,4 +1,5 @@
 import { LOADING, READY, ERROR } from '../constants/statuses'
+import { REQUIRED_EMPTY } from '../constants/invalidReasons'
 import { _organismsDataElementId } from 'api'
 import {
     SET_ENTITY,
@@ -9,6 +10,7 @@ import {
     SET_PANEL,
     SET_PANEL_VALUE,
     RESET_PANEL,
+    RESET_DATA,
     EXISTING_DATA_RECEIVED,
     EXISTING_DATA_ERRORED,
     DISABLE_BUTTONS,
@@ -44,6 +46,7 @@ const INITIAL_STATE = {
         id: null,
         rules: null,
         duplicate: false,
+        invalid: REQUIRED_EMPTY,
     },
 }
 
@@ -57,7 +60,7 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     id: payload.id,
                     valid: payload.valid,
                     attributes: payload.attributes,
-                    uniques: {},
+                    uniques: payload.uniques,
                     modal: null,
                 },
             }
@@ -159,6 +162,8 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                 orgUnit: payload.orgUnit,
             }
         }
+        case RESET_DATA:
+            return INITIAL_STATE
         case EXISTING_DATA_RECEIVED:
             return {
                 entity: {

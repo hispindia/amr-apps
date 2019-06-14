@@ -1,5 +1,3 @@
-/* eslint no-eval: 0 */
-
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { func } from 'prop-types'

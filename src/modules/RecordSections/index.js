@@ -1,20 +1,18 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-    PersonForm,
-    ProgressSection,
-    RecordForm,
-    RecordPanel,
-    TitleRow,
-} from 'modules'
+import { PersonForm, RecordForm, RecordPanel, TitleRow } from 'modules'
 import { isDuplicateRecord } from 'api'
-import { Margin } from 'styles'
-import { invalidReason, types } from './constants'
-import { getExistingEvent, initNewEvent, createNewEvent } from '../../actions'
+import {
+    getExistingEvent,
+    initNewEvent,
+    createNewEvent,
+    resetData,
+} from '../../actions'
 import { EventButtons } from './EventButtons'
 import { EventModal } from './EventModal'
 
 export const RecordSections = ({ history, match }) => {
+    const [isFirstRender, setIsFirstRender] = useState(true)
     const dispatch = useDispatch()
     const constants = useSelector(state => state.metadata.constants)
     const entityValid = useSelector(state => state.data.entity.valid)
@@ -48,45 +46,15 @@ export const RecordSections = ({ history, match }) => {
         duplicate === 'ERROR'*/
 
     useEffect(() => {
+        dispatch(resetData())
         if (event) dispatch(getExistingEvent(orgUnit, event))
         else dispatch(initNewEvent(orgUnit))
+        setIsFirstRender(false)
     }, [])
 
     useEffect(() => {
-        if (panelValid && !event) dispatch(createNewEvent())
+        if (!isFirstRender && panelValid && !event) dispatch(createNewEvent())
     }, [panelValid])
-
-    /*useEffect(() => {
-        const getNewRecord = async () => {
-            dispatchlol({ type: types.DISABLE_BUTTON, buttonDisabled: true })
-            dispatchlol({ type: types.SET_LOADING })
-            dispatchlol({
-                type: types.NEW_RECORD,
-                ...(await newRecord(
-                    programId,
-                    programs
-                        .find(p => p.id === programId)
-                        .programStages.find(s => s.id === programStageId),
-                    organism,
-                    orgUnit,
-                    entityId,
-                    entityValues,
-                    sampleDate,
-                    code
-                )),
-            })
-        }
-        if (panelValid && !event) getNewRecord()
-    }, [panelValid])*/
-
-    /*useEffect(() => {
-        const deleteAndExit = async () => {
-            await deleteEvent(eventId)
-            props.history.goBack()
-        }
-        if (deleteConfirmation) deleteAndExit()
-        else dispatchlol({ type: types.DISABLE_BUTTON, buttonDisabled: false })
-    }, [deleteConfirmation])*/
 
     /*const checkDuplicate = async sampleId => {
         if (!constants.days) return
@@ -101,10 +69,7 @@ export const RecordSections = ({ history, match }) => {
         })
     }*/
 
-    /*const onRecordValues = useCallback(
-        valid => dispatchlol({ type: types.EVENT_VALID, invalid: valid }),
-        []
-    )*/
+    if (isFirstRender) return <TitleRow title="Record" history={history} />
 
     return (
         <>

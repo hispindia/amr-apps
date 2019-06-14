@@ -4,8 +4,8 @@ import { Grid } from '@material-ui/core'
 import { Padding } from 'styles'
 import { CardSection } from 'components'
 import { SelectInput, RadioInput, DateInput } from 'inputs'
-import { CustomButtonRow } from './style'
-import { setProgram, setPanelValue, resetPanel } from '../../actions'
+import { setProgram, setPanelValue } from '../../actions'
+import { PanelButtons } from './PanelButtons'
 
 /**
  * Contains event panel.
@@ -32,8 +32,6 @@ export const RecordPanel = ({ showEdit }) => {
      * Called when something other than program is changed
      */
     const onChange = (name, value) => dispatch(setPanelValue(name, value))
-
-    const onReset = () => dispatch(resetPanel())
 
     /**
      * Gets the data elements to be rendered.
@@ -106,20 +104,9 @@ export const RecordPanel = ({ showEdit }) => {
         </Padding>
     )
 
-    const buttons = [
-        {
-            label: 'Reset',
-            onClick: onReset,
-            icon: 'clear',
-            tooltip: 'Reset',
-            kind: 'secondary',
-            small: true,
-        },
-    ]
-
     return (
         <CardSection heading="Panel">
-            {showEdit && <CustomButtonRow unspaced buttons={buttons} />}
+            {showEdit && <PanelButtons />}
             <Grid container spacing={0}>
                 <Grid item xs>
                     {getDataElement('program')}
