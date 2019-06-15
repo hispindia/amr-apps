@@ -2,7 +2,8 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
-import { RecordSections, EventOverview } from 'modules'
+import { EventForm, EventOverview } from 'modules'
+import { Alert } from './Alert'
 
 const approvalPaths = ['/orgUnit/:orgUnit/event/:event']
 const entryPaths = ['/orgUnit/:orgUnit/event', '/orgUnit/:orgUnit/event/:event']
@@ -31,7 +32,7 @@ export const Main = () => {
                         exact
                         path={path}
                         render={componentProps => (
-                            <RecordSections {...componentProps} />
+                            <EventForm {...componentProps} />
                         )}
                     />
                 ))}
@@ -48,6 +49,7 @@ export const Main = () => {
                     )}
                 />
             </Switch>
+            <Alert />
         </MainSection>
     )
 }

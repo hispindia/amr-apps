@@ -2,7 +2,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import styled from 'styled-components'
 import { ButtonRow } from 'components'
-import { resetPanel } from '../../actions'
+import { resetPanel } from 'actions'
 
 const StyledButtonRow = styled(ButtonRow)`
     position: absolute;

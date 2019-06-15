@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Padding } from 'styles'
 import { TextInput, AgeInput, RadioInput, SelectInput } from 'inputs'
-import { setEntityValue, validateUnique } from '../../actions'
+import { setEntityValue, validateUnique } from 'actions'
 
 /**
  * Entity information section.

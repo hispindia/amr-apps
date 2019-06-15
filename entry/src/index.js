@@ -5,13 +5,23 @@ import { init } from 'api'
 import { App } from 'modules'
 import { config } from './config'
 
+const production = process.env.NODE_ENV === 'production'
 const developmentServer = 'https://amrtest.icmr.org.in/amrtest'
 const rootElement = document.getElementById('root')
+const { appName, isApproval, categories } = config
 
-const withBaseUrl = baseUrl => {
+const productionRender = async () => {
+    try {
+        const manifest = await (await fetch('./manifest.webapp')).json()
+        render(manifest.activities.dhis.href)
+    } catch (error) {
+        console.error('Could not read manifest:', error)
+        ReactDOM.render(<code>No manifest found</code>, rootElement)
+    }
+}
+
+const render = baseUrl => {
     init(`${baseUrl}/api`)
-    const { appName, isApproval, categories } = config
-
     ReactDOM.render(
         <App
             appName={appName}
@@ -24,18 +34,5 @@ const withBaseUrl = baseUrl => {
     serviceWorker.unregister()
 }
 
-if (process.env.NODE_ENV === 'production') {
-    fetch('./manifest.webapp')
-        .then(response => response.json())
-        .then(manifest => {
-            withBaseUrl(`${manifest.activities.dhis.href}`)
-        })
-        .catch(e => {
-            console.error('Could not read manifest:', e)
-            ReactDOM.render(<code>No manifest found</code>, rootElement)
-        })
-} else {
-    const whyDidYouRender = require('@welldone-software/why-did-you-render')
-    whyDidYouRender(React)
-    withBaseUrl(developmentServer)
-}
+if (production) productionRender()
+else render(developmentServer)

@@ -12,7 +12,7 @@ export const BodyStyle = createGlobalStyle`
     }
 `
 
-export const theme = createMuiTheme({
+export const muiTheme = createMuiTheme({
     palette: {
         primary: {
             main: theme.primary700,

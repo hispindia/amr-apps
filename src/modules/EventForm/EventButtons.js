@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
 import { ButtonRow } from 'components'
-import { submitEvent, editEvent, setDeletePrompt } from '../../actions'
+import { submitEvent, editEvent, setDeletePrompt } from 'actions'
 import { ERROR } from '../../constants/duplicacy'
 
 const StyledButtonRow = styled(ButtonRow)`
@@ -18,7 +18,7 @@ export const EventButtons = ({ history, eventParam }) => {
     const duplicate = useSelector(state => state.data.event.duplicate)
 
     const onSubmit = async addMore => {
-        await dispatch(submitEvent())
+        await dispatch(submitEvent(addMore))
         if (!addMore) history.goBack()
     }
 

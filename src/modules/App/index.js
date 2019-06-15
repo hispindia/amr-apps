@@ -7,14 +7,14 @@ import { MuiPickersUtilsProvider } from 'material-ui-pickers'
 import DayjsUtils from '@date-io/dayjs'
 import { CssReset } from '@dhis2/ui-core'
 import { Header } from 'components'
-import { Content } from '../Content'
-import { BodyStyle, theme } from './style'
+import { Content } from './Content'
+import { BodyStyle, muiTheme } from './style'
 import { store } from '../../store'
 
 export const App = ({ appName, categories, isApproval, baseUrl }) => (
     <BrowserRouter>
         <HashRouter>
-            <MuiThemeProvider theme={theme}>
+            <MuiThemeProvider theme={muiTheme}>
                 <MuiPickersUtilsProvider utils={DayjsUtils}>
                     <>
                         <CssReset />

@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import { Label, Padding } from 'styles'
 import { CheckboxInput } from 'inputs'
 import { DataElement } from './DataElement'
-import { setEventValue } from '../../actions'
+import { setEventValue } from 'actions'
 
 const StyledLabel = styled(Label)`
     margin: 16px 16px -16px;

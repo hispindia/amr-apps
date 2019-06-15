@@ -2,17 +2,19 @@ import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { TitleRow } from 'components'
-import { Entity, RecordForm, Panel } from 'modules'
 import {
     getExistingEvent,
     initNewEvent,
     createNewEvent,
     resetData,
-} from '../../actions'
-import { EventButtons } from './EventButtons'
+} from 'actions'
 import { EventModal } from './EventModal'
+import { Entity } from './Entity'
+import { Panel } from './Panel'
+import { Event } from './Event'
+import { EventButtons } from './EventButtons'
 
-export const RecordSections = ({ history, match }) => {
+export const EventForm = ({ history, match }) => {
     const [isFirstRender, setIsFirstRender] = useState(true)
     const dispatch = useDispatch()
     const panelValid = useSelector(state => state.data.panel.valid)
@@ -38,10 +40,10 @@ export const RecordSections = ({ history, match }) => {
             <TitleRow title="Record" history={history} />
             <Entity showEdit={!event && !panelValid} />
             <Panel showEdit={!event} />
-            <RecordForm />
+            <Event />
             <EventButtons history={history} eventParam={event} />
         </>
     )
 }
 
-export default withRouter(RecordSections)
+export default withRouter(EventForm)

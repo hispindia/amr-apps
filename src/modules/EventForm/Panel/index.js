@@ -4,7 +4,7 @@ import { Grid } from '@material-ui/core'
 import { Padding } from 'styles'
 import { CardSection } from 'components'
 import { SelectInput, RadioInput, DateInput } from 'inputs'
-import { setProgram, setPanelValue } from '../../actions'
+import { setProgram, setPanelValue } from 'actions'
 import { PanelButtons } from './PanelButtons'
 
 /**

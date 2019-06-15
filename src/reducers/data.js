@@ -24,6 +24,16 @@ import {
     DUPLICACY,
 } from '../actions/types'
 
+const INITIAL_EVENT = {
+    values: null,
+    programStage: null,
+    status: {},
+    id: null,
+    rules: null,
+    duplicate: false,
+    invalid: REQUIRED_EMPTY,
+}
+
 const INITIAL_STATE = {
     status: LOADING,
     entity: {
@@ -40,15 +50,7 @@ const INITIAL_STATE = {
         sampleDate: '',
         valid: false,
     },
-    event: {
-        values: null,
-        programStage: null,
-        status: {},
-        id: null,
-        rules: null,
-        duplicate: false,
-        invalid: REQUIRED_EMPTY,
-    },
+    event: INITIAL_EVENT,
 }
 
 export const data = (state = INITIAL_STATE, { type, payload }) => {
@@ -128,14 +130,7 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
         case RESET_PANEL:
             return {
                 ...state,
-                event: {
-                    values: null,
-                    programStage: null,
-                    status: null,
-                    id: null,
-                    rules: null,
-                    duplicate: false,
-                },
+                event: INITIAL_EVENT,
                 panel: {
                     ...state.panel,
                     program: '',
@@ -214,7 +209,8 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     sampleDate: '',
                     valid: false,
                 },
-                event: null,
+                event: INITIAL_EVENT,
+                buttonsDisabled: false,
             }
         case SET_INCOMPLETED:
             return {

@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { LoadingSection } from 'components'
 import { Section } from './Section'
 
-export const RecordForm = () => {
+export const Event = () => {
     const programStage = useSelector(state => state.data.event.programStage)
     const eventId = useSelector(state => state.data.event.id)
     const panelValid = useSelector(state => state.data.panel.valid)

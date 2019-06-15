@@ -2,10 +2,9 @@ import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
 import { OverlayedLoader } from 'components'
-//import { Sidebar } from 'modules'
 import { setMetadata, setOrgUnit } from '../../actions'
 import { READY } from '../../constants/statuses'
-import { Main } from '../Main'
+import { Main } from './Main'
 import { Sidebar } from '../Sidebar'
 
 const ContentSection = styled.section`

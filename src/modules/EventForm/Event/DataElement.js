@@ -10,8 +10,8 @@ import {
     SwitchInput,
     DateInput,
 } from 'inputs'
-import { setEventValue } from '../../actions'
-import * as DUPLICACY from '../../constants/duplicacy'
+import { setEventValue } from 'actions'
+import * as DUPLICACY from 'constants/duplicacy'
 
 export const DataElement = props => {
     const id = props.id
@@ -28,6 +28,9 @@ export const DataElement = props => {
     const displayFormName = useSelector(
         state => state.data.event.programStage.dataElements[id].displayFormName
     )
+    const error = useSelector(
+        state => state.data.event.programStage.dataElements[id].error
+    )
     const hide = useSelector(
         state => state.data.event.programStage.dataElements[id].hide
     )
@@ -42,6 +45,9 @@ export const DataElement = props => {
     )
     const valueType = useSelector(
         state => state.data.event.programStage.dataElements[id].valueType
+    )
+    const warning = useSelector(
+        state => state.data.event.programStage.dataElements[id].warning
     )
 
     const duplicate =
@@ -107,14 +113,18 @@ export const DataElement = props => {
                     color={color}
                     unique={id === _sampleIdElementId}
                     error={
-                        id === _sampleIdElementId &&
-                        duplicate === DUPLICACY.ERROR
+                        error
+                            ? error
+                            : id === _sampleIdElementId &&
+                              duplicate === DUPLICACY.ERROR
                             ? duplicate
                             : ''
                     }
                     warning={
-                        id === _sampleIdElementId &&
-                        duplicate === DUPLICACY.WARNING
+                        warning
+                            ? warning
+                            : id === _sampleIdElementId &&
+                              duplicate === DUPLICACY.WARNING
                             ? duplicate
                             : ''
                     }

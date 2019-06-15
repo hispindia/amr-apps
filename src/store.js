@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux'
 import ReduxThunk from 'redux-thunk'
 import logger from 'redux-logger'
-import { appConfig, metadata, selectedOrgUnit, data } from './reducers'
+import { alert, appConfig, metadata, selectedOrgUnit, data } from 'reducers'
 
 const middlewares = [ReduxThunk]
 
@@ -12,6 +12,7 @@ if (process.env.NODE_ENV === 'development' && shouldLog) {
 }
 
 const rootReducer = combineReducers({
+    alert,
     appConfig,
     metadata,
     selectedOrgUnit,

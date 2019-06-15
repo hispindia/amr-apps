@@ -64,6 +64,7 @@ export const eventRules = (
             ) {
                 dataElement.color = ''
                 dataElement.warning = 'MIC is prioritized over DD'
+                console.log(dataElement)
             } else {
                 dataElement.color =
                     values[id] === '' || !testValue ? '' : getColor(testValue)

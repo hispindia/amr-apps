@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { ModalPopup } from 'components'
-import { removeModal } from '../../actions'
+import { removeModal } from 'actions'
 
 export const EntityModal = () => {
     const dispatch = useDispatch()
