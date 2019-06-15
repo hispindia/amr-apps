@@ -21,6 +21,7 @@ import {
     SET_EVENT_VALUE,
     SET_EVENT_AND_ENTITY,
     SET_EVENT_VALUES_AND_PROGRAMSTAGE,
+    DUPLICACY,
 } from '../actions/types'
 
 const INITIAL_STATE = {
@@ -268,6 +269,14 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     programStage: payload.programStage,
                     values: payload.values,
                     invalid: payload.invalid,
+                },
+            }
+        case DUPLICACY:
+            return {
+                ...state,
+                event: {
+                    ...state.event,
+                    duplicate: payload,
                 },
             }
         default:

@@ -1,12 +1,20 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { OverlayedSpinner } from 'components'
-import { Main, Sidebar } from 'modules'
+import styled from 'styled-components'
+import { OverlayedLoader } from 'components'
+//import { Sidebar } from 'modules'
 import { setMetadata, setOrgUnit } from '../../actions'
 import { READY } from '../../constants/statuses'
-import { Container } from './style'
+import { Main } from '../Main'
+import { Sidebar } from '../Sidebar'
 
-export const Content = ({ removingThisBreaksTheApp }) => {
+const ContentSection = styled.section`
+    display: flex;
+    flex-direction: row;
+    margin-top: 48px;
+`
+
+export const Content = () => {
     const dispatch = useDispatch()
     const metadata = useSelector(state => state.metadata)
     const selected = useSelector(state => state.selectedOrgUnit)
@@ -22,12 +30,12 @@ export const Content = ({ removingThisBreaksTheApp }) => {
             )
     }, [metadata.status])
 
-    if (!selected) return <OverlayedSpinner />
+    if (!selected) return <OverlayedLoader />
 
     return (
-        <Container>
-            <Sidebar removingThisBreaksTheApp={removingThisBreaksTheApp} />
-            <Main removingThisBreaksTheApp={removingThisBreaksTheApp} />
-        </Container>
+        <ContentSection>
+            <Sidebar />
+            <Main />
+        </ContentSection>
     )
 }

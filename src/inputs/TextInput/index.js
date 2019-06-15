@@ -71,7 +71,7 @@ export const TextInput = props => {
                 label={props.label}
                 value={value && value.length > 127 ? '' : value}
                 onChange={onInput}
-                loading={validating}
+                loading={props.loading || validating}
                 warning={!validating && !!props.warning}
                 error={
                     !validating &&
@@ -97,7 +97,7 @@ export const TextInput = props => {
                         (!!error || props.uniqueInvalid || !!props.error)
                     }
                 >
-                    {validating
+                    {props.loading || validating
                         ? texts.validate
                         : props.uniqueInvalid
                         ? texts.unique

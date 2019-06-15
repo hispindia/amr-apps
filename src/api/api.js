@@ -19,6 +19,7 @@ import {
     generateAmrId,
     getSqlView,
 } from './internal'
+import * as DUPLICACY from '../constants/duplicacy'
 
 /**
  * Sets the base URL, username, and user groups.
@@ -126,7 +127,7 @@ export const newRecord = async (
               sampleDate,
           })
         : await addPersonWithEvent(initialValues, pId, {
-              programStage: pStage.id,
+              programStageId: pStage.id,
               orgUnitId: ou,
               entityValues: eValues,
               sampleDate,
@@ -372,11 +373,9 @@ export const isDuplicateRecord = async ({
                 dv.value === organism
         )
     )
-        ? 'ERROR'
-        : 'WARNING'
+        ? DUPLICACY.ERROR
+        : DUPLICACY.WARNING
 }
-
-//export const isUnique
 
 /*export const isDuplicate = async (
     event,

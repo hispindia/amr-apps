@@ -6,9 +6,9 @@ import { MuiThemeProvider } from '@material-ui/core'
 import { MuiPickersUtilsProvider } from 'material-ui-pickers'
 import DayjsUtils from '@date-io/dayjs'
 import { CssReset } from '@dhis2/ui-core'
-import { Content, Header } from 'modules'
+import { Header } from 'components'
+import { Content } from '../Content'
 import { BodyStyle, theme } from './style'
-import { MarginTop } from 'styles'
 import { store } from '../../store'
 
 export const App = ({ appName, categories, isApproval, baseUrl }) => (
@@ -21,7 +21,7 @@ export const App = ({ appName, categories, isApproval, baseUrl }) => (
                         <BodyStyle />
                         <Header appName={appName} baseUrl={baseUrl} />
                         <Provider store={store(categories, isApproval)}>
-                            <Content removingThisBreaksTheApp={appName} />
+                            <Content />
                         </Provider>
                     </>
                 </MuiPickersUtilsProvider>

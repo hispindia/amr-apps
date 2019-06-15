@@ -34,8 +34,8 @@ if (process.env.NODE_ENV === 'production') {
             console.error('Could not read manifest:', e)
             ReactDOM.render(<code>No manifest found</code>, rootElement)
         })
-} else withBaseUrl(developmentServer)
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
+} else {
+    const whyDidYouRender = require('@welldone-software/why-did-you-render')
+    whyDidYouRender(React)
+    withBaseUrl(developmentServer)
+}

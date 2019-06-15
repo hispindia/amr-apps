@@ -1,6 +1,6 @@
 import React from 'react'
-import styled from 'styled-components'
 import { Route } from 'react-router-dom'
+import styled from 'styled-components'
 import { OrgUnitTree } from './OrgUnitTree'
 import SidebarMenu from './SidebarMenu'
 

@@ -29,12 +29,11 @@ export const Text = styled.div`
 export const Label = styled.div`
     color: ${colors.grey600};
     white-space: nowrap;
-    padding: 0px 12px 12px 0px;
+    padding-bottom: 12px;
     line-height: 24px;
     font-weight: 500;
-    ${({ required, disabled }) =>
+    ${({ required }) =>
         required &&
-        !disabled &&
         css`
             ::after {
                 content: '*';

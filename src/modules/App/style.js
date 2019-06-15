@@ -1,5 +1,6 @@
 import { createMuiTheme } from '@material-ui/core'
 import { createGlobalStyle } from 'styled-components'
+import { theme } from '@dhis2/ui-core'
 import 'typeface-roboto'
 
 export const BodyStyle = createGlobalStyle`
@@ -14,7 +15,7 @@ export const BodyStyle = createGlobalStyle`
 export const theme = createMuiTheme({
     palette: {
         primary: {
-            main: '#1565c0',
+            main: theme.primary700,
         },
     },
     typography: {

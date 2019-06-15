@@ -2,12 +2,12 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
-import { RecordSections, RecordsOverview } from 'modules'
+import { RecordSections, EventOverview } from 'modules'
 
 const approvalPaths = ['/orgUnit/:orgUnit/event/:event']
 const entryPaths = ['/orgUnit/:orgUnit/event', '/orgUnit/:orgUnit/event/:event']
 
-export const MainSection = styled.main`
+const MainSection = styled.main`
     width: 100%;
     padding: 16px;
 `
@@ -22,7 +22,7 @@ export const Main = () => {
                     exact
                     path={'/approval/:status'}
                     render={componentProps => (
-                        <RecordsOverview {...componentProps} />
+                        <EventOverview {...componentProps} />
                     )}
                 />
                 {(isApproval ? approvalPaths : entryPaths).map(path => (

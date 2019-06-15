@@ -1,8 +1,9 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
-import { ButtonRow } from 'inputs'
+import { ButtonRow } from 'components'
 import { submitEvent, editEvent, setDeletePrompt } from '../../actions'
+import { ERROR } from '../../constants/duplicacy'
 
 const StyledButtonRow = styled(ButtonRow)`
     margin: 0px;
@@ -14,11 +15,16 @@ export const EventButtons = ({ history, eventParam }) => {
     const status = useSelector(state => state.data.event.status)
     const eventId = useSelector(state => state.data.event.id)
     const invalid = useSelector(state => state.data.event.invalid)
+    const duplicate = useSelector(state => state.data.event.duplicate)
 
     const onSubmit = async addMore => {
         await dispatch(submitEvent())
         if (!addMore) history.goBack()
     }
+
+    const submitAndExit = async () => await onSubmit(false)
+
+    const submitAndAdd = async () => await onSubmit(true)
 
     const onEdit = () => dispatch(editEvent())
 
@@ -46,32 +52,22 @@ export const EventButtons = ({ history, eventParam }) => {
 
     const submitAndAddButton = {
         label: 'Submit and add new',
-        onClick: () => onSubmit(true),
+        onClick: submitAndAdd,
         disabled: buttonsDisabled || !!invalid,
         icon: 'add',
         primary: true,
         tooltip: 'Submit record and add new record for the same person',
-        disabledTooltip: invalid ? invalid : '',
-        /*duplicate === 'ERROR'
-                ? invalidReason.error
-                : eventInvalid
-                ? eventInvalid
-                : undefined,*/
+        disabledTooltip: duplicate === ERROR ? ERROR : invalid ? invalid : '',
     }
 
     const submitButton = {
         label: 'Submit',
-        onClick: () => onSubmit(false),
+        onClick: submitAndExit,
         disabled: buttonsDisabled || !!invalid,
         icon: 'done',
         primary: true,
         tooltip: 'Submit record',
-        disabledTooltip: invalid ? invalid : '',
-        /*duplicate === 'ERROR'
-                ? invalidReason.error
-                : eventInvalid
-                ? eventInvalid
-                : undefined,*/
+        disabledTooltip: duplicate === ERROR ? ERROR : invalid ? invalid : '',
     }
 
     const buttons = () =>

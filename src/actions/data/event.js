@@ -10,6 +10,7 @@ import {
     SET_DELETE_PROMPT,
     SET_EVENT_AND_ENTITY,
     SET_EVENT_VALUES_AND_PROGRAMSTAGE,
+    DUPLICACY,
 } from '../types'
 import {
     existingRecord,
@@ -17,10 +18,13 @@ import {
     setEventStatus,
     updateEventValue,
     deleteEvent,
+    isDuplicateRecord,
     _organismSet,
+    _sampleIdElementId,
 } from 'api'
 import { entityRules } from './entityRules'
 import { eventRules } from './eventRules'
+import { CHECKING } from '../../constants/duplicacy'
 
 export const resetData = () => dispatch => dispatch(createAction(RESET_DATA))
 
@@ -147,7 +151,7 @@ export const createNewEvent = () => async (dispatch, getState) => {
             orgaCode: panel.organism,
             ou: orgUnit.id,
             eId: entity.id,
-            eValues: null, //entity.values,
+            eValues: !entity.id || entity.editing ? entity.values : null,
             sampleDate: panel.sampleDate,
             orgUnitCode: orgUnit.code,
         }
@@ -206,7 +210,11 @@ export const setEventValue = (key, value) => (dispatch, getState) => {
     const event = getState().data.event
     if (event.values[key] === value) return
     const optionSets = getState().metadata.optionSets
+
     updateEventValue(event.id, key, value)
+
+    if (key === _sampleIdElementId) dispatch(checkDuplicacy(value))
+
     const [values, programStage, invalid] = eventRules(
         { ...event.values, [key]: value },
         event.programStage,
@@ -217,6 +225,7 @@ export const setEventValue = (key, value) => (dispatch, getState) => {
             updateValue: (key, value) => updateEventValue(event.id, key, value),
         }
     )
+
     dispatch(
         createAction(SET_EVENT_VALUES_AND_PROGRAMSTAGE, {
             programStage,
@@ -224,6 +233,20 @@ export const setEventValue = (key, value) => (dispatch, getState) => {
             invalid,
         })
     )
+}
+
+export const checkDuplicacy = sampleId => async (dispatch, getState) => {
+    dispatch(createAction(DUPLICACY, CHECKING))
+    const event = getState().data.event.id
+    const entity = getState().data.entity.id
+    const organism = getState().data.panel.organism
+    const duplicate = await isDuplicateRecord({
+        event,
+        entity,
+        organism,
+        sampleId,
+    })
+    dispatch(createAction(DUPLICACY, duplicate))
 }
 
 const getRules = (rules, programId, programStageId) =>
