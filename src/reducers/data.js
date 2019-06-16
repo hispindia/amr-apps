@@ -192,7 +192,10 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                 status: READY,
             }
         case EXISTING_DATA_ERRORED:
-            return { status: ERROR }
+            return {
+                ...state,
+                status: ERROR,
+            }
         case DISABLE_BUTTONS:
             return {
                 ...state,

@@ -1,5 +1,5 @@
 import { createAction } from '../createAction'
-import { SET_ALERT, REMOVE_ALERT } from '../types'
+import { ADD_ALERT, REMOVE_ALERT } from '../types'
 
 export const showAlert = (
     content,
@@ -11,7 +11,7 @@ export const showAlert = (
     } = {}
 ) => dispatch =>
     dispatch(
-        createAction(SET_ALERT, {
+        createAction(ADD_ALERT, {
             content,
             success,
             warning,
@@ -20,5 +20,5 @@ export const showAlert = (
         })
     )
 
-export const removeAlert = () => dispatch =>
-    dispatch(createAction(REMOVE_ALERT))
+export const removeAlert = id => dispatch =>
+    dispatch(createAction(REMOVE_ALERT, id))

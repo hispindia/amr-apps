@@ -133,6 +133,7 @@ export const getExistingEvent = (orgUnit, eventId) => async (
     } catch (error) {
         console.error(error)
         dispatch(showAlert('Failed to get record.', { critical: true }))
+        dispatch(createAction(EXISTING_DATA_ERRORED))
     }
 }
 

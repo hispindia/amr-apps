@@ -6,7 +6,7 @@ export const METADATA_ERRORED = 'METADATA_ERRORED'
 export const ORG_UNIT_SELECTED = 'ORG_UNIT_SELECTED'
 
 // ALERT
-export const SET_ALERT = 'SET_ALERT'
+export const ADD_ALERT = 'ADD_ALERT'
 export const REMOVE_ALERT = 'REMOVE_ALERT'
 
 // DATA
