@@ -2,8 +2,8 @@ import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
 import { OverlayedLoader } from 'components'
-import { setMetadata, setOrgUnit } from '../../actions'
-import { READY } from '../../constants/statuses'
+import { setMetadata, setOrgUnit } from 'actions'
+import { READY, ERROR } from 'constants/statuses'
 import { Main } from './Main'
 import { Sidebar } from '../Sidebar'
 
@@ -17,6 +17,7 @@ export const Content = () => {
     const dispatch = useDispatch()
     const metadata = useSelector(state => state.metadata)
     const selected = useSelector(state => state.selectedOrgUnit)
+    const error = useSelector(state => state.metadata.status) === ERROR
 
     useEffect(() => {
         dispatch(setMetadata())
@@ -28,6 +29,8 @@ export const Content = () => {
                 setOrgUnit(metadata.orgUnits[0].id, metadata.orgUnits[0].path)
             )
     }, [metadata.status])
+
+    if (error) return null
 
     if (!selected) return <OverlayedLoader />
 

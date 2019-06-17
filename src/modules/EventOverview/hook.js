@@ -4,6 +4,7 @@ const types = {
     NEW_PROGRAMS: 0,
     LOADING: 1,
     NEW_ROWS: 2,
+    EVENTS_ERRORED: 3,
 }
 
 const reducer = (state, action) => {
@@ -27,6 +28,13 @@ const reducer = (state, action) => {
                 loading: false,
             }
         }
+        case types.EVENTS_ERRORED: {
+            return {
+                ...state,
+                rows: action.rows,
+                error: true,
+            }
+        }
         default: {
             return state
         }
@@ -38,6 +46,7 @@ export const hook = () => {
         rows: null,
         loading: true,
         addButtonDisabled: true,
+        error: false,
     })
 
     return [state, dispatch, types]

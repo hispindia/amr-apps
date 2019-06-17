@@ -212,7 +212,7 @@ export const onDeleteConfirmed = confirmed => async (dispatch, getState) => {
     const eventId = getState().data.event.id
 
     try {
-        const response = (await deleteEvent(getState().data.event.id)).response
+        const response = (await deleteEvent(eventId)).response
         if (response.importCount.deleted !== 1) throw response.description
         dispatch(showAlert('Record deleted successfully.', {}))
         return true

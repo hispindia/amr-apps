@@ -1,6 +1,7 @@
 import { initMetadata } from 'api'
 import { createAction } from '../createAction'
 import { METADATA_RECEIVED, METADATA_ERRORED } from '../types'
+import { showAlert } from '../alert'
 
 export const setMetadata = () => async dispatch => {
     try {
@@ -8,6 +9,7 @@ export const setMetadata = () => async dispatch => {
         dispatch(createAction(METADATA_RECEIVED, metadata))
     } catch (error) {
         console.error(error)
-        dispatch(createAction(METADATA_ERRORED, error))
+        dispatch(createAction(METADATA_ERRORED))
+        dispatch(showAlert('Failed to initiate app.', { critical: true }))
     }
 }

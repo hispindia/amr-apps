@@ -9,6 +9,7 @@ import { CssReset } from '@dhis2/ui-core'
 import { Header } from 'components'
 import { Content } from './Content'
 import { BodyStyle, muiTheme } from './style'
+import { Alerts } from './Alerts'
 import { store } from '../../store'
 
 export const App = ({ appName, categories, isApproval, baseUrl }) => (
@@ -22,6 +23,7 @@ export const App = ({ appName, categories, isApproval, baseUrl }) => (
                         <Header appName={appName} baseUrl={baseUrl} />
                         <Provider store={store(categories, isApproval)}>
                             <Content />
+                            <Alerts />
                         </Provider>
                     </>
                 </MuiPickersUtilsProvider>
