@@ -1,53 +1,59 @@
 export const entityRules = (values, attr, { rules, optionSets, uniques }) => {
     rules.forEach(rule => {
         rule.programRuleActions.forEach(r => {
-            switch (r.programRuleActionType) {
-                case 'SHOWOPTIONGROUP':
-                    if (eval(rule.condition)) {
+            try {
+                switch (r.programRuleActionType) {
+                    case 'SHOWOPTIONGROUP':
+                        if (eval(rule.condition)) {
+                            const affectedAttr = findAttribute(
+                                r.trackedEntityAttribute.id,
+                                attr
+                            )
+                            if (
+                                affectedAttr.trackedEntityAttribute.optionSet
+                                    .id !== r.optionGroup.id
+                            ) {
+                                affectedAttr.trackedEntityAttribute.optionSet = {
+                                    id: r.optionGroup.id,
+                                }
+                                // Only reset selected value if the options do not include current value.
+                                if (
+                                    !optionSets[
+                                        affectedAttr.trackedEntityAttribute
+                                            .optionSet.id
+                                    ].find(
+                                        o =>
+                                            o.value ===
+                                            values[
+                                                affectedAttr
+                                                    .trackedEntityAttribute.id
+                                            ]
+                                    )
+                                )
+                                    values[
+                                        affectedAttr.trackedEntityAttribute.id
+                                    ] = ''
+                            }
+                        }
+                        break
+                    case 'HIDEFIELD':
+                        const hide = eval(rule.condition)
                         const affectedAttr = findAttribute(
                             r.trackedEntityAttribute.id,
                             attr
                         )
-                        if (
-                            affectedAttr.trackedEntityAttribute.optionSet.id !==
-                            r.optionGroup.id
-                        ) {
-                            affectedAttr.trackedEntityAttribute.optionSet = {
-                                id: r.optionGroup.id,
-                            }
-                            // Only reset selected value if the options do not include current value.
-                            if (
-                                !optionSets[
-                                    affectedAttr.trackedEntityAttribute
-                                        .optionSet.id
-                                ].find(
-                                    o =>
-                                        o.value ===
-                                        values[
-                                            affectedAttr.trackedEntityAttribute
-                                                .id
-                                        ]
-                                )
-                            )
+                        if (hide !== affectedAttr.hide) {
+                            affectedAttr.hide = hide
+                            if (hide)
                                 values[affectedAttr.trackedEntityAttribute.id] =
                                     ''
                         }
-                    }
-                    break
-                case 'HIDEFIELD':
-                    const hide = eval(rule.condition)
-                    const affectedAttr = findAttribute(
-                        r.trackedEntityAttribute.id,
-                        attr
-                    )
-                    if (hide !== affectedAttr.hide) {
-                        affectedAttr.hide = hide
-                        if (hide)
-                            values[affectedAttr.trackedEntityAttribute.id] = ''
-                    }
-                    break
-                default:
-                    break
+                        break
+                    default:
+                        break
+                }
+            } catch (error) {
+                console.warn('Failed to evaluate rule:', rule, error)
             }
         })
     })
