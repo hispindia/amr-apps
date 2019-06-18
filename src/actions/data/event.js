@@ -11,6 +11,8 @@ import {
     SET_EVENT_AND_ENTITY,
     SET_EVENT_VALUES_AND_PROGRAMSTAGE,
     DUPLICACY,
+    ENABLE_BUTTONS,
+    EXIT,
 } from '../types'
 import {
     existingRecord,
@@ -190,8 +192,17 @@ export const submitEvent = addMore => async (dispatch, getState) => {
     dispatch(disableButtons())
     const isApproval = getState().appConfig.isApproval
     const eventId = getState().data.event.id
-    await setEventStatus(eventId, true, isApproval)
-    if (addMore) dispatch(createAction(RESET_PANEL_EVENT))
+
+    try {
+        await setEventStatus(eventId, true, isApproval)
+        if (addMore) dispatch(createAction(RESET_PANEL_EVENT))
+        else dispatch(createAction(EXIT))
+        dispatch(showAlert('Record submitted successfully.', { success: true }))
+    } catch (error) {
+        console.error(error)
+        dispatch(showAlert('Failed to submit record.', { critical: true }))
+        dispatch(createAction(ENABLE_BUTTONS))
+    }
 }
 
 export const editEvent = () => async (dispatch, getState) => {

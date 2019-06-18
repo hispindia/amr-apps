@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
 import { ButtonRow } from 'components'
@@ -16,11 +16,13 @@ export const EventButtons = ({ history, eventParam }) => {
     const eventId = useSelector(state => state.data.event.id)
     const invalid = useSelector(state => state.data.event.invalid)
     const duplicate = useSelector(state => state.data.event.duplicate)
+    const exit = useSelector(state => state.data.exit)
 
-    const onSubmit = async addMore => {
-        await dispatch(submitEvent(addMore))
-        if (!addMore) history.goBack()
-    }
+    useEffect(() => {
+        if (exit) history.goBack()
+    }, [exit])
+
+    const onSubmit = async addMore => await dispatch(submitEvent(addMore))
 
     const submitAndExit = async () => await onSubmit(false)
 

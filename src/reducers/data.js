@@ -14,6 +14,7 @@ import {
     EXISTING_DATA_RECEIVED,
     EXISTING_DATA_ERRORED,
     DISABLE_BUTTONS,
+    ENABLE_BUTTONS,
     RESET_PANEL_EVENT,
     SET_INCOMPLETED,
     SET_DELETE_PROMPT,
@@ -22,6 +23,7 @@ import {
     SET_EVENT_AND_ENTITY,
     SET_EVENT_VALUES_AND_PROGRAMSTAGE,
     DUPLICACY,
+    EXIT,
 } from '../actions/types'
 
 const INITIAL_EVENT = {
@@ -36,6 +38,7 @@ const INITIAL_EVENT = {
 
 const INITIAL_STATE = {
     status: LOADING,
+    exit: false,
     entity: {
         values: null,
         id: null,
@@ -201,6 +204,11 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                 ...state,
                 buttonsDisabled: true,
             }
+        case ENABLE_BUTTONS:
+            return {
+                ...state,
+                buttonsDisabled: false,
+            }
         case RESET_PANEL_EVENT:
             return {
                 ...state,
@@ -277,6 +285,11 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     ...state.event,
                     duplicate: payload,
                 },
+            }
+        case EXIT:
+            return {
+                ...state,
+                exit: true,
             }
         default:
             return state
