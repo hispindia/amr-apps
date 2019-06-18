@@ -63,7 +63,7 @@ export const config = {
                 table: ['k4Or0pHTmPN'],
             },
             count: 0,
-            color: 'secondary',
+            color: 'black',
         },
         {
             label: 'Incomplete records',

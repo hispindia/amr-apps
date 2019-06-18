@@ -35,12 +35,12 @@ export const OrgUnitText = styled.span`
     cursor: pointer;
     user-select: none;
     &:hover {
-        color: ${theme.primary600};
+        color: ${theme.secondary600};
     }
     ${props =>
         props.isSelected &&
         css`
-            color: ${theme.primary600};
+            color: ${theme.secondary600};
         `}
 `
 

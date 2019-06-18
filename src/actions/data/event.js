@@ -208,8 +208,15 @@ export const submitEvent = addMore => async (dispatch, getState) => {
 export const editEvent = () => async (dispatch, getState) => {
     dispatch(disableButtons())
     const eventId = getState().data.event.id
-    await setEventStatus(eventId)
-    dispatch(createAction(SET_INCOMPLETED))
+
+    try {
+        await setEventStatus(eventId)
+        dispatch(createAction(SET_INCOMPLETED))
+    } catch (error) {
+        console.error(error)
+        dispatch(showAlert('Failed to edit record.', { critical: true }))
+        dispatch(createAction(ENABLE_BUTTONS))
+    }
 }
 
 export const setDeletePrompt = deletePrompt => dispatch =>

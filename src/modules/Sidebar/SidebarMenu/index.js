@@ -11,7 +11,7 @@ import { useCounts } from './useCounts'
  */
 const SidebarMenu = ({ location, history }) => {
     const { categories } = useSelector(state => state.appConfig)
-    const counts = useCounts(location)
+    const [counts, error] = useCounts(location)
 
     return (
         <nav>
@@ -26,7 +26,9 @@ const SidebarMenu = ({ location, history }) => {
                             <>
                                 <Icon icon={c.icon} color={c.color} />
                                 <Title>{c.label}</Title>
-                                <Count>{counts ? counts[i] : 0}</Count>
+                                <Count>
+                                    {error ? '?' : counts ? counts[i] : 0}
+                                </Count>
                             </>
                         }
                     />
