@@ -1,9 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import * as serviceWorker from './serviceWorker'
 import { init } from 'api'
 import { App } from 'modules'
 import { config } from './config'
+import * as serviceWorker from './serviceWorker'
 
 const production = process.env.NODE_ENV === 'production'
 const developmentServer = 'https://amrtest.icmr.org.in/amrtest'

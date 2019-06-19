@@ -7,6 +7,7 @@ import { OrgUnitNode } from './OrgUnitNode'
 export const StyledCard = styled(Card)`
     margin-top: 12px;
     padding: 8px;
+    height: unset !important;
 `
 
 export const StyledList = styled.ul`

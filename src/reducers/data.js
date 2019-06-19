@@ -6,6 +6,7 @@ import {
     SET_ENTITY_VALUE,
     SET_UNIQUE,
     SET_ENTITY_MODAL_AND_UNIQUES,
+    SET_MODAL_LOADING,
     SET_EDITING,
     SET_PANEL,
     SET_PANEL_VALUE,
@@ -98,6 +99,17 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     ...state.entity,
                     modal: payload.modal,
                     uniques: payload.uniques,
+                },
+            }
+        case SET_MODAL_LOADING:
+            return {
+                ...state,
+                entity: {
+                    ...state.entity,
+                    modal: {
+                        ...state.entity.modal,
+                        loading: payload,
+                    },
                 },
             }
         case SET_EDITING:

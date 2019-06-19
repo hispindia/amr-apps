@@ -12,6 +12,7 @@ export const ModalPopup = ({
     icon,
     primary,
     destructive,
+    disabled,
 }) => (
     <Background>
         <CustomCard>
@@ -24,6 +25,7 @@ export const ModalPopup = ({
                         icon: 'clear',
                         onClick: () => onClick(false),
                         secondary: true,
+                        disabled,
                     },
                     {
                         label: label,
@@ -31,6 +33,7 @@ export const ModalPopup = ({
                         onClick: () => onClick(true),
                         primary: primary,
                         destructive: destructive,
+                        disabled,
                     },
                 ]}
             />
@@ -45,4 +48,5 @@ ModalPopup.propTypes = {
     icon: string.isRequired,
     primary: bool,
     destructive: bool,
+    disabled: bool,
 }

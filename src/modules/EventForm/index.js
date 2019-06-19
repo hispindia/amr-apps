@@ -45,7 +45,7 @@ export const EventForm = ({ history, match }) => {
             <EventModal history={history} />
             <TitleRow title="Record" history={history} />
             <Entity showEdit={!event && !panelValid} />
-            <Panel showEdit={!event} />
+            <Panel showEdit={!event && panelValid} />
             <Event />
             <EventButtons history={history} eventParam={event} />
         </>

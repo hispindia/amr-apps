@@ -24,6 +24,7 @@ export const EntityModal = () => {
             icon="person"
             primary
             onClick={onModalClick}
+            disabled={modal.loading}
         />
     )
 }
