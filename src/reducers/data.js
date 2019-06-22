@@ -14,6 +14,7 @@ import {
     RESET_DATA,
     EXISTING_DATA_RECEIVED,
     EXISTING_DATA_ERRORED,
+    NEW_EVENT_ERRORED,
     DISABLE_BUTTONS,
     ENABLE_BUTTONS,
     RESET_PANEL_EVENT,
@@ -38,7 +39,6 @@ const INITIAL_EVENT = {
 }
 
 const INITIAL_STATE = {
-    status: LOADING,
     exit: false,
     entity: {
         values: null,
@@ -204,9 +204,9 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     invalid: payload.invalid,
                 },
                 orgUnit: payload.orgUnit,
-                status: READY,
             }
         case EXISTING_DATA_ERRORED:
+        case NEW_EVENT_ERRORED:
             return {
                 ...state,
                 status: ERROR,

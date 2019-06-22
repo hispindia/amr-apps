@@ -5,6 +5,7 @@ import {
     SET_ENTITY_MODAL_AND_UNIQUES,
     SET_UNIQUE,
     SET_MODAL_LOADING,
+    SET_EDITING,
 } from '../types'
 import { showAlert } from '../alert'
 import { getPersonValues, checkUnique } from 'api'

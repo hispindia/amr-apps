@@ -3,6 +3,7 @@ import { arrayOf, bool, func, shape, string } from 'prop-types'
 import { Button } from '@dhis2/ui-core'
 import { Icon } from 'components'
 import { ButtonPadding, ButtonContainer } from './style'
+import { LoadingIcon } from './LoadingIcon'
 
 /**
  * Row of buttons.
@@ -21,8 +22,14 @@ export const ButtonRow = ({ buttons, className }) => (
                     secondary={button.secondary}
                     destructive={button.destructive}
                     onClick={button.onClick}
-                    disabled={button.disabled}
-                    icon={button.icon && <Icon icon={button.icon} />}
+                    disabled={button.disabled || button.loading}
+                    icon={
+                        button.loading ? (
+                            <LoadingIcon />
+                        ) : (
+                            button.icon && <Icon icon={button.icon} />
+                        )
+                    }
                     small={button.small}
                     large={button.large}
                 >
@@ -42,6 +49,7 @@ ButtonRow.propTypes = {
             tooltip: string,
             disabledTooltip: string,
             disabled: bool,
+            loading: bool,
             small: bool,
             large: bool,
             primary: bool,

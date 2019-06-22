@@ -13,6 +13,7 @@ export const ModalPopup = ({
     primary,
     destructive,
     disabled,
+    loading,
 }) => (
     <Background>
         <CustomCard>
@@ -34,6 +35,7 @@ export const ModalPopup = ({
                         primary: primary,
                         destructive: destructive,
                         disabled,
+                        loading,
                     },
                 ]}
             />
@@ -49,4 +51,5 @@ ModalPopup.propTypes = {
     primary: bool,
     destructive: bool,
     disabled: bool,
+    loading: bool,
 }

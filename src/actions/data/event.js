@@ -4,6 +4,7 @@ import {
     RESET_DATA,
     EXISTING_DATA_RECEIVED,
     EXISTING_DATA_ERRORED,
+    NEW_EVENT_ERRORED,
     DISABLE_BUTTONS,
     RESET_PANEL_EVENT,
     SET_INCOMPLETED,
@@ -26,13 +27,16 @@ import {
 } from 'api'
 import { entityRules } from './entityRules'
 import { eventRules } from './eventRules'
-import { CHECKING } from '../../constants/duplicacy'
+import { CHECKING } from 'constants/duplicacy'
+import { LOADING, SUCCESS } from 'constants/statuses'
 import { showAlert } from '../alert'
 
 export const resetData = () => dispatch => dispatch(createAction(RESET_DATA))
 
 export const disableButtons = () => dispatch =>
     dispatch(createAction(DISABLE_BUTTONS))
+
+//export const setButtonLoading = buttonStates => dispatch => dispatch(createAction())
 
 export const initNewEvent = orgUnit => (dispatch, getState) => {
     const entityMetadata = getState().metadata.person
@@ -141,6 +145,7 @@ export const getExistingEvent = (orgUnit, eventId) => async (
 
 export const createNewEvent = () => async (dispatch, getState) => {
     dispatch(disableButtons)
+
     const orgUnit = getState().data.orgUnit
     const entity = getState().data.entity
     const panel = getState().data.panel
@@ -150,42 +155,49 @@ export const createNewEvent = () => async (dispatch, getState) => {
         panel.program,
         panel.programStage
     )
-    const data = await newRecord(
-        panel.program,
-        metadata.programs
-            .find(p => p.id === panel.program)
-            .programStages.find(s => s.id === panel.programStage),
-        {
-            orgaCode: panel.organism,
-            ou: orgUnit.id,
-            eId: entity.id,
-            eValues: !entity.id || entity.editing ? entity.values : null,
-            sampleDate: panel.sampleDate,
-            orgUnitCode: orgUnit.code,
-        }
-    )
-    const [values, programStage, invalid] = eventRules(
-        data.eventValues,
-        data.programStage,
-        {
-            rules,
-            optionSets: metadata.optionSets,
-            pushChanges: !data.status.completed,
-            updateValue: (name, value) =>
-                updateEventValue(data.eventId, name, value),
-        }
-    )
-    dispatch(
-        createAction(SET_EVENT_AND_ENTITY, {
-            values,
-            eventId: data.eventId,
-            programStage,
-            status: data.status,
-            rules,
-            entityId: entity.id ? entity.id : data.entityId,
-            invalid,
-        })
-    )
+
+    try {
+        const data = await newRecord(
+            panel.program,
+            metadata.programs
+                .find(p => p.id === panel.program)
+                .programStages.find(s => s.id === panel.programStage),
+            {
+                orgaCode: panel.organism,
+                ou: orgUnit.id,
+                eId: entity.id,
+                eValues: !entity.id || entity.editing ? entity.values : null,
+                sampleDate: panel.sampleDate,
+                orgUnitCode: orgUnit.code,
+            }
+        )
+        const [values, programStage, invalid] = eventRules(
+            data.eventValues,
+            data.programStage,
+            {
+                rules,
+                optionSets: metadata.optionSets,
+                pushChanges: !data.status.completed,
+                updateValue: (name, value) =>
+                    updateEventValue(data.eventId, name, value),
+            }
+        )
+        dispatch(
+            createAction(SET_EVENT_AND_ENTITY, {
+                values,
+                eventId: data.eventId,
+                programStage,
+                status: data.status,
+                rules,
+                entityId: entity.id ? entity.id : data.entityId,
+                invalid,
+            })
+        )
+    } catch (error) {
+        console.error(error)
+        dispatch(showAlert('Failed to create record.', { critical: true }))
+        dispatch(createAction(NEW_EVENT_ERRORED))
+    }
 }
 
 export const submitEvent = addMore => async (dispatch, getState) => {
@@ -223,9 +235,12 @@ export const setDeletePrompt = deletePrompt => dispatch =>
     dispatch(createAction(SET_DELETE_PROMPT, deletePrompt))
 
 export const onDeleteConfirmed = confirmed => async (dispatch, getState) => {
-    dispatch(setDeletePrompt(false))
+    if (!confirmed) {
+        dispatch(setDeletePrompt(false))
+        return
+    }
 
-    if (!confirmed) return true
+    dispatch(setDeletePrompt(LOADING))
 
     const eventId = getState().data.event.id
 
@@ -233,11 +248,11 @@ export const onDeleteConfirmed = confirmed => async (dispatch, getState) => {
         const response = (await deleteEvent(eventId)).response
         if (response.importCount.deleted !== 1) throw response.description
         dispatch(showAlert('Record deleted successfully.', {}))
-        return true
+        dispatch(setDeletePrompt(SUCCESS))
     } catch (error) {
         console.error(error)
         dispatch(showAlert('Failed to delete record.', { critical: true }))
-        return false
+        dispatch(setDeletePrompt(true))
     }
 }
 

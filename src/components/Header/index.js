@@ -9,6 +9,7 @@ export const FixedHeaderBar = styled(HeaderBar)`
     width: 100%;
     z-index: 1000;
     top: 0;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 0px 6px 3px;
 `
 
 export const Header = ({ appName, baseUrl }) => (
