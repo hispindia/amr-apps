@@ -243,6 +243,7 @@ export const editEvent = () => async (dispatch, getState) => {
     try {
         await setEventStatus(eventId)
         dispatch(createAction(SET_INCOMPLETED))
+        dispatch(showAlert('Record is editable.'))
     } catch (error) {
         console.error(error)
         dispatch(showAlert('Failed to edit record.', { critical: true }))
