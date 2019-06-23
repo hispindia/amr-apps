@@ -1,3 +1,4 @@
+import { batch } from 'react-redux'
 import { createAction } from '../createAction'
 import {
     SET_ENTITY_AND_ORG_UNIT,
@@ -14,6 +15,7 @@ import {
     DUPLICACY,
     ENABLE_BUTTONS,
     EXIT,
+    SET_BUTTON_LOADING,
 } from '../types'
 import {
     existingRecord,
@@ -36,7 +38,11 @@ export const resetData = () => dispatch => dispatch(createAction(RESET_DATA))
 export const disableButtons = () => dispatch =>
     dispatch(createAction(DISABLE_BUTTONS))
 
-//export const setButtonLoading = buttonStates => dispatch => dispatch(createAction())
+export const enableButtons = () => dispatch =>
+    dispatch(createAction(ENABLE_BUTTONS))
+
+export const setButtonLoading = payload => dispatch =>
+    dispatch(createAction(SET_BUTTONS, payload))
 
 export const initNewEvent = orgUnit => (dispatch, getState) => {
     const entityMetadata = getState().metadata.person
@@ -201,7 +207,12 @@ export const createNewEvent = () => async (dispatch, getState) => {
 }
 
 export const submitEvent = addMore => async (dispatch, getState) => {
-    dispatch(disableButtons())
+    batch(() => {
+        dispatch(disableButtons())
+        dispatch(
+            createAction(SET_BUTTON_LOADING, addMore ? 'submitAdd' : 'submit')
+        )
+    })
     const isApproval = getState().appConfig.isApproval
     const eventId = getState().data.event.id
 
@@ -214,11 +225,19 @@ export const submitEvent = addMore => async (dispatch, getState) => {
         console.error(error)
         dispatch(showAlert('Failed to submit record.', { critical: true }))
         dispatch(createAction(ENABLE_BUTTONS))
+    } finally {
+        batch(() => {
+            dispatch(enableButtons())
+            dispatch(createAction(SET_BUTTON_LOADING, false))
+        })
     }
 }
 
 export const editEvent = () => async (dispatch, getState) => {
-    dispatch(disableButtons())
+    batch(() => {
+        dispatch(disableButtons())
+        dispatch(createAction(SET_BUTTON_LOADING, 'edit'))
+    })
     const eventId = getState().data.event.id
 
     try {
@@ -227,7 +246,11 @@ export const editEvent = () => async (dispatch, getState) => {
     } catch (error) {
         console.error(error)
         dispatch(showAlert('Failed to edit record.', { critical: true }))
-        dispatch(createAction(ENABLE_BUTTONS))
+    } finally {
+        batch(() => {
+            dispatch(createAction(SET_BUTTON_LOADING, false))
+            dispatch(enableButtons())
+        })
     }
 }
 

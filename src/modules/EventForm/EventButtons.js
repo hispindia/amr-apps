@@ -9,7 +9,7 @@ const StyledButtonRow = styled(ButtonRow)`
     margin: 0px;
 `
 
-export const EventButtons = ({ history, eventParam }) => {
+export const EventButtons = ({ history, existingEvent }) => {
     const dispatch = useDispatch()
     const buttonsDisabled = useSelector(state => state.data.buttonsDisabled)
     const status = useSelector(state => state.data.event.status)
@@ -17,6 +17,7 @@ export const EventButtons = ({ history, eventParam }) => {
     const invalid = useSelector(state => state.data.event.invalid)
     const duplicate = useSelector(state => state.data.event.duplicate)
     const exit = useSelector(state => state.data.exit)
+    const buttonLoading = useSelector(state => state.data.buttonLoading)
 
     useEffect(() => {
         if (exit) history.goBack()
@@ -24,9 +25,9 @@ export const EventButtons = ({ history, eventParam }) => {
 
     const onSubmit = async addMore => await dispatch(submitEvent(addMore))
 
-    const submitAndExit = async () => await onSubmit(false)
+    const submitExit = async () => await onSubmit(false)
 
-    const submitAndAdd = async () => await onSubmit(true)
+    const submitAdd = async () => await onSubmit(true)
 
     const onEdit = () => dispatch(editEvent())
 
@@ -50,34 +51,37 @@ export const EventButtons = ({ history, eventParam }) => {
         primary: true,
         tooltip: 'Edit record',
         disabledTooltip: 'Records with this approval status cannot be edited',
+        loading: buttonLoading === 'edit',
     }
 
-    const submitAndAddButton = {
+    const submitAddButton = {
         label: 'Submit and add new',
-        onClick: submitAndAdd,
+        onClick: submitAdd,
         disabled: buttonsDisabled || !!invalid,
         icon: 'add',
         primary: true,
         tooltip: 'Submit record and add new record for the same person',
         disabledTooltip: duplicate === ERROR ? ERROR : invalid ? invalid : '',
+        loading: buttonLoading === 'submitAdd',
     }
 
     const submitButton = {
         label: 'Submit',
-        onClick: submitAndExit,
+        onClick: submitExit,
         disabled: buttonsDisabled || !!invalid,
         icon: 'done',
         primary: true,
         tooltip: 'Submit record',
         disabledTooltip: duplicate === ERROR ? ERROR : invalid ? invalid : '',
+        loading: buttonLoading === 'submit',
     }
 
     const buttons = () =>
-        eventParam
+        existingEvent
             ? !eventId
                 ? []
                 : [deleteButton, status.completed ? editButton : submitButton]
-            : [submitAndAddButton, submitButton]
+            : [submitAddButton, submitButton]
 
     return <StyledButtonRow buttons={buttons()} />
 }

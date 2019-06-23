@@ -1,4 +1,4 @@
-import { LOADING, READY, ERROR } from '../constants/statuses'
+import { RROR } from '../constants/statuses'
 import { REQUIRED_EMPTY } from '../constants/invalidReasons'
 import { _organismsDataElementId } from 'api'
 import {
@@ -26,6 +26,7 @@ import {
     SET_EVENT_VALUES_AND_PROGRAMSTAGE,
     DUPLICACY,
     EXIT,
+    SET_BUTTON_LOADING,
 } from '../actions/types'
 
 const INITIAL_EVENT = {
@@ -55,6 +56,7 @@ const INITIAL_STATE = {
         valid: false,
     },
     event: INITIAL_EVENT,
+    buttonLoading: false,
 }
 
 export const data = (state = INITIAL_STATE, { type, payload }) => {
@@ -302,6 +304,11 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
             return {
                 ...state,
                 exit: true,
+            }
+        case SET_BUTTON_LOADING:
+            return {
+                ...state,
+                buttonLoading: payload,
             }
         default:
             return state
