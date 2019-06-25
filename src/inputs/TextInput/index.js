@@ -13,7 +13,7 @@ import { StyledInputField } from './style'
  */
 export const TextInput = props => {
     const [{ value, hashedValue, validating, error }, dispatch] = hook()
-    const debouncedValue = debounced(value, 2000)
+    const [debouncedValue, setDebouncedValue] = debounced(value, 2000)
 
     useEffect(() => {
         if (props.value !== value && props.value !== hashedValue)
@@ -57,20 +57,27 @@ export const TextInput = props => {
         return error
     }
 
-    const onInput = event => {
-        const value = event.target.value
+    const onInput = ({ target }) => {
+        const value = target.value
         if (!validating && value.length < 128)
             dispatch({ type: types.SET_VALUE, value: value })
     }
 
+    const onKeyDown = ({ key }) => {
+        if (key === 'Enter') setDebouncedValue(value)
+    }
+
+    const onBlur = () => setDebouncedValue(value)
+
     return (
-        <Input>
+        <Input onKeyDown={onKeyDown}>
             <StyledInputField
                 required={props.required}
                 name={props.name}
                 label={props.label}
                 value={value && value.length > 127 ? '' : value}
                 onChange={onInput}
+                onBlur={onBlur}
                 loading={props.loading || validating}
                 warning={!validating && !!props.warning}
                 error={

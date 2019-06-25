@@ -11,8 +11,8 @@ export const debounced = (value, delay) => {
 
     if (firstUpdate.current) {
         firstUpdate.current = false
-        return null
+        return [null, setDebouncedValue]
     }
 
-    return debouncedValue
+    return [debouncedValue, setDebouncedValue]
 }
