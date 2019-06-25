@@ -14,7 +14,7 @@ export const IconContainer = styled.div`
     border-radius: 50%;
     cursor: pointer;
     &:hover {
-        fill: ${theme.primary700};
+        fill: ${theme.secondary600};
         background-color: rgba(0, 0, 0, 0.08);
     }
 `

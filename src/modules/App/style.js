@@ -15,7 +15,7 @@ export const BodyStyle = createGlobalStyle`
 export const muiTheme = createMuiTheme({
     palette: {
         primary: {
-            main: theme.primary700,
+            main: theme.secondary600,
         },
     },
     typography: {
