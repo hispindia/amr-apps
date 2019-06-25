@@ -37,13 +37,13 @@ export const OrgUnitText = styled.span`
     padding: 0px 5px;
     white-space: nowrap;
     &:hover {
-        background: ${theme.secondary600};
+        background: ${theme.secondary500};
         color: white;
     }
     ${props =>
         props.isSelected &&
         css`
-            background: ${theme.secondary600};
+            background: ${theme.secondary500};
             color: white;
         `}
 `
