@@ -4,14 +4,12 @@ import { theme } from '@dhis2/ui-core'
 export const Caret = styled.span`
     cursor: pointer;
     user-select: none;
+    line-height: 26px;
     &::before {
         content: '\\2023';
         color: black;
         display: inline-block;
         margin-right: 5px;
-    }
-    :hover::before {
-        color: ${theme.primary600};
     }
     ${props =>
         props.opened &&
@@ -34,13 +32,19 @@ export const NoCaret = styled.span`
 export const OrgUnitText = styled.span`
     cursor: pointer;
     user-select: none;
+    border-radius: 3px;
+    line-height: 26px;
+    padding: 0px 5px;
+    white-space: nowrap;
     &:hover {
-        color: ${theme.secondary600};
+        background: ${theme.secondary600};
+        color: white;
     }
     ${props =>
         props.isSelected &&
         css`
-            color: ${theme.secondary600};
+            background: ${theme.secondary600};
+            color: white;
         `}
 `
 
