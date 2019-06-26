@@ -51,7 +51,7 @@ export const eventRules = (
 
     const setColors = (condition, affected, testValue) => {
         if (!affected.optionSetValue) return
-        if (affected.optionSet.id !== _testResultDataElementId) return
+        if (affected.optionSet !== _testResultDataElementId) return
         const variables = getVariables(condition)
         variables.forEach(id => {
             const dataElement = stage.dataElements[id]
@@ -85,11 +85,11 @@ export const eventRules = (
                     : null
                 switch (r.programRuleActionType) {
                     case 'SHOWOPTIONGROUP':
-                        if (!cond || de.optionSet.id === r.optionGroup.id) break
-                        de.optionSet.id = r.optionGroup.id
+                        if (!cond || de.optionSet === r.optionGroup.id) break
+                        de.optionSet = r.optionGroup.id
                         // Only reset selected value if the options do not include current value.
                         if (
-                            !optionSets[de.optionSet.id].find(
+                            !optionSets[de.optionSet].find(
                                 option => option.value === values[de.id]
                             ) &&
                             values[de.id] !== ''

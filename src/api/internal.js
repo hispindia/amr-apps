@@ -141,7 +141,10 @@ export const getProgramStage = async (
     }
 
     Object.keys(programStage.dataElements).forEach(id => {
-        programStage.dataElements[id].disabled = shouldDisable(id)
+        const dataElement = programStage.dataElements[id]
+        dataElement.disabled = shouldDisable(id)
+        if (dataElement.optionSet)
+            dataElement.optionSet = dataElement.optionSet.id
         if (!values[id]) values[id] = ''
     })
 

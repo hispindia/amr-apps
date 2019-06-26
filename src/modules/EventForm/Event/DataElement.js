@@ -61,9 +61,9 @@ export const DataElement = props => {
     return (
         <Padding>
             {optionSetValue ? (
-                optionSets[optionSet.id].length < 5 ? (
+                optionSets[optionSet].length < 5 ? (
                     <RadioInput
-                        objects={optionSets[optionSet.id]}
+                        objects={optionSets[optionSet]}
                         name={id}
                         label={displayFormName}
                         value={value}
@@ -73,7 +73,7 @@ export const DataElement = props => {
                     />
                 ) : (
                     <SelectInput
-                        objects={optionSets[optionSet.id]}
+                        objects={optionSets[optionSet]}
                         name={id}
                         label={displayFormName}
                         value={value}
