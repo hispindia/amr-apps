@@ -16,14 +16,22 @@ export const CheckboxInput = props => {
     /**
      * Called on checkbox click.
      */
-    const onChange = event => {
-        const name = event.target.name
-        let checked = event.target.checked
+    const onChange = ({ target }) => {
+        const name = target.name
+        let checked = target.checked
         const newValues = { ...values }
         checked = checked ? 'true' : ''
         newValues[name] = checked
         setValues(newValues)
         props.onChange(name, checked)
+        console.log(target)
+    }
+
+    const onKeyDown = ({ key, target }) => {
+        if (key === 'Enter')
+            onChange({
+                target: { name: target.name, checked: !values[target.name] },
+            })
     }
 
     return (
@@ -31,7 +39,7 @@ export const CheckboxInput = props => {
             <Label required={props.required}>{props.label}</Label>
             <Row wrapped>
                 {Object.keys(props.objects).map(id => (
-                    <OptionSpacer key={id}>
+                    <OptionSpacer key={id} onKeyDown={onKeyDown}>
                         <Checkbox
                             name={id}
                             label={props.objects[id].label}
