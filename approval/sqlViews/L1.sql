@@ -32,7 +32,10 @@ INNER JOIN dataelement d ON v.dataelementid = d.dataelementid AND d.uid = 'lIkk6
 LEFT JOIN (trackedentitydatavalue v2
 INNER JOIN dataelement d2 ON v2.dataelementid = d2.dataelementid AND d2.uid = 'SaQe2REkGVw'
 INNER JOIN optionvalue ov ON d2.optionsetid = ov.optionsetid AND v2.value = ov.code) ON e.programstageinstanceid = v2.programstageinstanceid
-WHERE o.path LIKE '%${orgunit}%'
+LEFT JOIN (trackedentitydatavalue v3
+INNER JOIN dataelement d3 ON v3.dataelementid = d3.dataelementid AND d3.uid = 'sXDQT6Yaf77') ON e.programstageinstanceid = v3.programstageinstanceid
+WHERE v3.value IS NULL
+AND o.path LIKE '%${orgunit}%'
 AND e.status = 'ACTIVE'
 ORDER BY e.lastupdated DESC
 
@@ -43,7 +46,10 @@ INNER JOIN program pr ON pi.programid = pr.programid
 INNER JOIN organisationunit o ON e.organisationunitid = o.organisationunitid
 INNER JOIN (trackedentitydatavalue v
 INNER JOIN dataelement d ON v.dataelementid = d.dataelementid AND d.uid = 'lIkk661BLpG') ON e.programstageinstanceid = v.programstageinstanceid
-WHERE o.path LIKE '%${orgunit}%'
+LEFT JOIN (trackedentitydatavalue v3
+INNER JOIN dataelement d3 ON v3.dataelementid = d3.dataelementid AND d3.uid = 'sXDQT6Yaf77') ON e.programstageinstanceid = v3.programstageinstanceid
+WHERE v3.value IS NULL
+AND o.path LIKE '%${orgunit}%'
 AND e.status = 'ACTIVE'
 
 -- L1 status:
