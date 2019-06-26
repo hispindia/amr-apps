@@ -1,4 +1,4 @@
-import { RROR } from '../constants/statuses'
+import { ERROR } from '../constants/statuses'
 import { REQUIRED_EMPTY } from '../constants/invalidReasons'
 import { _organismsDataElementId } from 'api'
 import {
