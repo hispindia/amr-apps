@@ -145,7 +145,7 @@ export const newRecord = async (
 export const existingRecord = async (
     programs,
     eventId,
-    { l1Member, l2Member }
+    { isApproval, l1Member, l2Member }
 ) => {
     const {
         eventValues: initialValues,
@@ -159,13 +159,13 @@ export const existingRecord = async (
         .find(p => p.id === program)
         .programStages.find(ps => (ps.id = programStageId))
     const { programStage, eventValues, status } = await getProgramStage(
-        pStage,
+        JSON.parse(JSON.stringify(pStage)),
         initialValues,
         {
             completed,
             newRecord: false,
-            l1Member,
-            l2Member,
+            l1Member: isApproval ? l1Member : false,
+            l2Member: isApproval ? l2Member : false,
         }
     )
     const entityValues = await getPersonValues(entityId)

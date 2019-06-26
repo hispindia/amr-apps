@@ -4,7 +4,7 @@ import { theme } from '@dhis2/ui-core'
 export const Caret = styled.span`
     cursor: pointer;
     user-select: none;
-    line-height: 26px;
+    line-height: 22px;
     &::before {
         content: '\\2023';
         color: black;
@@ -32,19 +32,15 @@ export const NoCaret = styled.span`
 export const OrgUnitText = styled.span`
     cursor: pointer;
     user-select: none;
-    border-radius: 3px;
-    line-height: 26px;
-    padding: 0px 5px;
+    line-height: 22px;
     white-space: nowrap;
     &:hover {
-        background: ${theme.secondary500};
-        color: white;
+        color: ${theme.secondary600};
     }
     ${props =>
         props.isSelected &&
         css`
-            background: ${theme.secondary500};
-            color: white;
+            color: ${theme.secondary600};
         `}
 `
 
