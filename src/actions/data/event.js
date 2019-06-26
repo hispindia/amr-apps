@@ -88,14 +88,12 @@ export const getExistingEvent = (orgUnit, eventId) => async (
     getState
 ) => {
     const state = getState()
-    const isApproval = state.appConfig.isApproval
     const { l1Member, l2Member } = state.metadata.user
     const programs = state.metadata.programs
     const optionSets = state.metadata.optionSets
     const { trackedEntityTypeAttributes, rules } = state.metadata.person
     try {
         const data = await existingRecord(programs, eventId, {
-            isApproval,
             l1Member,
             l2Member,
         })
