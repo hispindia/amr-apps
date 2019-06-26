@@ -44,9 +44,11 @@ export const EventForm = ({ history, match }) => {
         <>
             <EventModal history={history} />
             <TitleRow title="Record" history={history} />
-            <Entity showEdit={!event && !panelValid} />
-            <Panel showEdit={!event && panelValid} />
-            <Event />
+            <form autoComplete="off">
+                <Entity showEdit={!event && !panelValid} />
+                <Panel showEdit={!event && panelValid} />
+                <Event />
+            </form>
             <EventButtons history={history} existingEvent={event} />
         </>
     )
