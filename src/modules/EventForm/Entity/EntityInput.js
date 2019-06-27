@@ -14,6 +14,7 @@ export const EntityInput = ({ attribute }) => {
     const id = attribute.trackedEntityAttribute.id
     const value = useSelector(state => state.data.entity.values[id])
     const unique = useSelector(state => state.data.entity.uniques[id])
+    const modal = useSelector(state => state.data.entity.modal)
     const disabled = entityId && !editing ? true : false
 
     /**
@@ -90,7 +91,8 @@ export const EntityInput = ({ attribute }) => {
                     onChange={onChange}
                     disabled={
                         disabled ||
-                        (entityId && attribute.trackedEntityAttribute.unique)
+                        (attribute.trackedEntityAttribute.unique &&
+                            (entityId || !!modal))
                     }
                     type={
                         attribute.trackedEntityAttribute.valueType === 'NUMBER'
