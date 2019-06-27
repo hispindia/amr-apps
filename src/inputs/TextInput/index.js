@@ -1,19 +1,19 @@
 import React, { useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
-import InputField from '@dhis2/ui/core/InputField'
+import { Help } from '@dhis2/ui-core'
 import { Input } from 'styles'
-import { hash } from 'helpers'
+import { hash } from 'utils'
 import { hook } from './hook'
-import { types, texts, statuses } from './constants'
+import { types, texts } from './constants'
 import { debounced } from './debounced'
-import { CustomInputField } from './style'
+import { StyledInputField } from './style'
 
 /**
  * Textfield input.
  */
 export const TextInput = props => {
     const [{ value, hashedValue, validating, error }, dispatch] = hook()
-    const debouncedValue = debounced(value, 2000)
+    const [debouncedValue, setDebouncedValue] = debounced(value, 2000)
 
     useEffect(() => {
         if (props.value !== value && props.value !== hashedValue)
@@ -29,11 +29,6 @@ export const TextInput = props => {
             passValue(debouncedValue)
     }, [debouncedValue])
 
-    useEffect(() => {
-        if (props.uniqueValid && error === texts.unique)
-            dispatch({ type: types.SET_ERROR, value: props.error })
-    }, [props.uniqueValid])
-
     /**
      * Passes the value to parent component after 1 sec.
      */
@@ -42,8 +37,7 @@ export const TextInput = props => {
             value = hash(value)
             dispatch({ type: types.SET_HASHED_VALUE, value: value })
         }
-        const didValidate = await validate(value)
-        dispatch({ type: types.SET_ERROR, error: didValidate })
+        await validate(value)
         props.onChange(props.name, value, props.unique)
     }
 
@@ -57,56 +51,70 @@ export const TextInput = props => {
         if (required && !value) error = texts.required
         if (unique && validateUnique && value) {
             dispatch({ type: types.SET_VALIDATING, validating: true })
-            if (!(await props.onValidation(name, value, label)))
-                error = texts.unique
+            await props.onValidation(name, value, label)
             dispatch({ type: types.SET_VALIDATING, validating: false })
         }
         return error
     }
 
-    const onInput = (n, v) => {
-        if (!validating && v.length < 128)
-            dispatch({ type: types.SET_VALUE, value: v })
+    const onInput = ({ target }) => {
+        const value = target.value
+        if (!validating && value.length < 128)
+            dispatch({ type: types.SET_VALUE, value: value })
     }
 
+    const onKeyDown = ({ key }) => {
+        if (key === 'Enter') setDebouncedValue(value)
+    }
+
+    const onBlur = () => setDebouncedValue(value)
+
     return (
-        <Input>
-            <CustomInputField color={props.color}>
-                <InputField
-                    required={props.required}
-                    name={props.name}
-                    label={props.label}
-                    value={value && value.length > 127 ? '' : value}
-                    onChange={onInput}
-                    kind={'outlined'}
-                    status={
-                        validating
-                            ? statuses.warning
-                            : error || props.error
-                            ? statuses.error
-                            : props.warning
-                            ? statuses.warning
-                            : statuses.default
+        <Input onKeyDown={onKeyDown}>
+            <StyledInputField
+                required={props.required}
+                name={props.name}
+                label={props.label}
+                value={value && value.length > 127 ? '' : value}
+                onChange={onInput}
+                onBlur={onBlur}
+                loading={props.loading || validating}
+                warning={!validating && !!props.warning}
+                error={
+                    !validating &&
+                    (!!error || props.uniqueInvalid || !!props.error)
+                }
+                disabled={props.disabled}
+                type={props.type}
+                dense
+                placeholder={
+                    value && value.length > 127 ? '<Confidential>' : ''
+                }
+                color={props.color}
+            />
+            {(validating ||
+                props.uniqueInvalid ||
+                error ||
+                props.error ||
+                props.warning) && (
+                <Help
+                    warning={!validating && !!props.warning}
+                    error={
+                        !validating &&
+                        (!!error || props.uniqueInvalid || !!props.error)
                     }
-                    help={
-                        validating
-                            ? texts.validate
-                            : error
-                            ? error
-                            : props.error
-                            ? props.error
-                            : props.warning
-                            ? props.warning
-                            : ''
-                    }
-                    disabled={props.disabled}
-                    type={props.type}
-                    size="dense"
-                    placeholder={
-                        value && value.length > 127 ? '<Confidential>' : ''
-                    }
-                />
-            </CustomInputField>
+                >
+                    {props.loading || validating
+                        ? texts.validate
+                        : props.uniqueInvalid
+                        ? texts.unique
+                        : error
+                        ? error
+                        : props.error
+                        ? props.error
+                        : props.warning}
+                </Help>
+            )}
         </Input>
     )
 }
@@ -122,7 +130,7 @@ TextInput.propTypes = {
     valid: bool,
     warning: string,
     error: string,
-    uniqueValid: bool,
+    uniqueInvalid: bool,
     validateUnique: bool,
     onValidation: func,
 }

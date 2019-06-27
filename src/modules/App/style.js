@@ -1,29 +1,21 @@
 import { createMuiTheme } from '@material-ui/core'
-import styled, { createGlobalStyle } from 'styled-components'
-import HeaderBar from '@dhis2/ui/widgets/HeaderBar'
+import { createGlobalStyle } from 'styled-components'
+import { theme } from '@dhis2/ui-core'
 import 'typeface-roboto'
-
-export const Fixed = styled.div`
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
-    top: 0;
-`
 
 export const BodyStyle = createGlobalStyle`
     body {
         background-color: rgb(240, 240, 240);
-        margin: 0;
-        padding: 0;
-        font-family: Roboto;
-        letter-spacing: 0.0075em;
+    }
+    .required span::after {
+        color: #c62828;
     }
 `
 
-export const theme = createMuiTheme({
+export const muiTheme = createMuiTheme({
     palette: {
         primary: {
-            main: '#1565c0',
+            main: theme.secondary600,
         },
     },
     typography: {

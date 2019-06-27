@@ -59,10 +59,10 @@ export const post = async (endpoint, data) =>
  * @returns Server response.
  */
 export const del = async endpoint =>
-    await fetch(baseUrl + endpoint, {
+    await (await fetch(baseUrl + endpoint, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
             Accept: 'application/json',
         },
-    })
+    })).json()

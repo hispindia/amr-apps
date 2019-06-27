@@ -1,6 +1,10 @@
 import styled from 'styled-components'
+import { InputField } from '@dhis2/ui-core'
 
-export const UnitContainer = styled.div`
+export const StyledInputField = styled(InputField)`
     margin-right: 16px;
-    width: 70px;
+    width: 121px;
+    &:last-child {
+        margin-right: 0px;
+    }
 `

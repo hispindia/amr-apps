@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
-import Switch from '@dhis2/ui/core/Switch'
+import { Switch } from '@dhis2/ui-core'
 
 /**
  * Switch input.
@@ -12,9 +12,10 @@ export const SwitchInput = props => {
         if (props.value !== value) setValue(props.value)
     }, [props.value])
 
-    const onChange = (n, v) => {
-        setValue(v)
-        props.onChange(props.name, v)
+    const onChange = event => {
+        const { checked } = event.target
+        setValue(checked)
+        props.onChange(props.name, checked)
     }
 
     return (

@@ -1,39 +1,33 @@
-import React, { useContext } from 'react'
-import { func, shape, string } from 'prop-types'
-import { Card } from '@dhis2/ui/core'
-import { Margin } from 'styles'
-import { MetadataContext } from 'contexts'
+import React from 'react'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
+import { Card } from '@dhis2/ui-core'
 import { OrgUnitNode } from './OrgUnitNode'
-import { OrgUnitTreeStyle } from './style'
+
+export const StyledCard = styled(Card)`
+    margin-top: 12px;
+    padding: 8px;
+    height: unset !important;
+`
+
+export const StyledList = styled.ul`
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+`
 
 /**
  * Organisation unit tree.
  */
-export const OrgUnitTree = ({ onSelect, selected }) => {
-    const { orgUnits } = useContext(MetadataContext)
+export const OrgUnitTree = () => {
+    const orgUnits = useSelector(state => state.metadata.orgUnits)
     return (
-        <Card>
-            <Margin margin={8}>
-                <OrgUnitTreeStyle>
-                    {orgUnits.map(orgUnit => (
-                        <OrgUnitNode
-                            orgUnit={orgUnit}
-                            key={orgUnit.id}
-                            show={true}
-                            onSelect={onSelect}
-                            selected={selected}
-                        />
-                    ))}
-                </OrgUnitTreeStyle>
-            </Margin>
-        </Card>
+        <StyledCard>
+            <StyledList>
+                {orgUnits.map(orgUnit => (
+                    <OrgUnitNode key={orgUnit.id} orgUnit={orgUnit} />
+                ))}
+            </StyledList>
+        </StyledCard>
     )
-}
-
-OrgUnitTree.propTypes = {
-    onSelect: func.isRequired,
-    selected: shape({
-        id: string.isRequired,
-        path: string.isRequired,
-    }).isRequired,
 }

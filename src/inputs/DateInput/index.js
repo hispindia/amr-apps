@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
-import InputField from '@dhis2/ui/core/InputField'
+import { InputField } from '@dhis2/ui-core'
 import { DatePicker } from 'material-ui-pickers'
 import dayjs from 'dayjs'
 import { Input } from 'styles'
@@ -53,11 +53,17 @@ export const DateInput = props => {
                 label={props.label}
                 value={value !== '' ? dayjs(value).format('YYYY-MM-DD') : value}
                 onChange={() => {}}
-                kind="outlined"
                 disabled={props.disabled}
-                size="dense"
+                dense
                 required={props.required}
+                warning={!!props.warning}
+                error={!!props.error}
             />
+            {(props.error || props.warning) && (
+                <Help warning={!!props.warning} error={!!props.error}>
+                    {props.error ? props.error : props.warning}
+                </Help>
+            )}
         </Input>
     )
 

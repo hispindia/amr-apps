@@ -1,6 +1,6 @@
 {
     "name": "amr-approval",
-    "version": "0.1.12",
+    "version": "0.2.0",
     "description": "AMR data approval app for DHIS2",
     "main": "index.js",
     "license": "BSD-3-Clause",
@@ -13,7 +13,9 @@
     },
     "dependencies": {
         "react": "link:../node_modules/react",
-        "react-dom": "link:../node_modules/react-dom",
-        "react-scripts": "^2.1.8"
+        "react-dom": "link:../node_modules/react-dom"
+    },
+    "devDependencies": {
+        "react-scripts": "^3.0.1"
     }
 }

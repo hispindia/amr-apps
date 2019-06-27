@@ -1,0 +1,21 @@
+{
+  "launch_path": "index.html",
+  "default_locale": "en",
+  "activities": {
+    "dhis": {
+      "href": "../../.."
+    }
+  },
+  "appType": "APP",
+  "name": "AMR Data Entry",
+  "version": "0.2.0",
+  "description": "AMR data entry app for DHIS2",
+  "icons": {
+    "48": "icon.png"
+  },
+  "developer": {
+    "name": "Terje Uglebakken",
+    "company": "HISP India"
+  },
+  "manifest_generated_at": "Thu Jun 27 2019 22:59:17 GMT+0200 (CEST)"
+}

@@ -29,7 +29,7 @@ export const getSqlView = async (sqlView, orgUnit, { user, status }) =>
  */
 export const getEventValues = async eventId => {
     const event = await get(`events/${eventId}`)
-    let values = {}
+    const values = {}
 
     if (event.dataValues)
         event.dataValues.forEach(
@@ -55,7 +55,7 @@ export const getEventValues = async eventId => {
 export const setEventValues = async (event, values) => {
     if (!event.dataValues) event.dataValues = []
 
-    for (let dataElement in values) {
+    for (const dataElement in values) {
         const dataE = event.dataValues.find(
             dataValue => dataValue.dataElement === dataElement
         )
@@ -97,10 +97,7 @@ export const generateAmrId = async (orgUnitId, orgUnitCode) => {
 export const getProgramStage = async (
     programStage,
     values,
-    completed,
-    newRecord,
-    isL1User,
-    isL2User
+    { completed, newRecord, l1Member, l2Member }
 ) => {
     const shouldDisable = id => {
         switch (id) {
@@ -115,7 +112,7 @@ export const getProgramStage = async (
             case _l1RejectionReason:
             case _l1RevisionReason:
                 return (
-                    !isL1User ||
+                    !l1Member ||
                     values[_l1ApprovalStatus] === 'Approved' ||
                     values[_l1ApprovalStatus] === 'Rejected' ||
                     values[_l2ApprovalStatus] === 'Rejected'
@@ -124,14 +121,14 @@ export const getProgramStage = async (
             case _l2RejectionReason:
             case _l2RevisionReason:
                 return (
-                    !isL2User ||
+                    !l2Member ||
                     values[_l2ApprovalStatus] === 'Approved' ||
                     values[_l2ApprovalStatus] === 'Rejected' ||
                     values[_l1ApprovalStatus] === 'Rejected'
                 )
             default:
                 if (newRecord) return false
-                else if (isL1User || isL2User) return true
+                else if (l1Member || l2Member) return true
                 else
                     return !(
                         (values[_l2ApprovalStatus] === 'Resend' &&
@@ -144,7 +141,10 @@ export const getProgramStage = async (
     }
 
     Object.keys(programStage.dataElements).forEach(id => {
-        programStage.dataElements[id].disabled = shouldDisable(id)
+        const dataElement = programStage.dataElements[id]
+        dataElement.disabled = shouldDisable(id)
+        if (dataElement.optionSet)
+            dataElement.optionSet = dataElement.optionSet.id
         if (!values[id]) values[id] = ''
     })
 
@@ -152,8 +152,8 @@ export const getProgramStage = async (
         s.hideWithValues =
             s.name === 'Results' ||
             (s.name === 'Approval' &&
-                !isL1User &&
-                !isL2User &&
+                !l1Member &&
+                !l2Member &&
                 !values[_l1ApprovalStatus] &&
                 !values[_l2ApprovalStatus])
     })
@@ -168,7 +168,7 @@ export const getProgramStage = async (
             [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes(
                 'Resend'
             ) ||
-            (isL2User && !values[_l2ApprovalStatus]),
+            (l2Member && !values[_l2ApprovalStatus]),
         finished:
             (values[_l1ApprovalStatus] === values[_l2ApprovalStatus]) ===
             'Approved',

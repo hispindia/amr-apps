@@ -1,5 +1,6 @@
 import { bool } from 'prop-types'
 import styled, { css } from 'styled-components'
+import { colors } from '@dhis2/ui-core'
 
 export const Title = styled.h1`
     display: block;
@@ -12,10 +13,11 @@ export const Title = styled.h1`
 `
 
 export const Heading = styled.h2`
-    margin: 40px 0 30px 32px;
     color: #0d0d0e;
     font-size: 1.25rem;
-    line-height: 1.6;
+    margin-block-start: 1.6rem;
+    margin-block-end: 1rem;
+    margin-inline-start: 1rem;
     font-weight: 500;
 `
 
@@ -25,18 +27,17 @@ export const Text = styled.div`
 `
 
 export const Label = styled.div`
-    color: var(--grey700);
+    color: ${colors.grey600};
     white-space: nowrap;
-    padding: 0px 12px 12px 16px;
+    padding-bottom: 12px;
     line-height: 24px;
     font-weight: 500;
-    ${({ required, disabled }) =>
+    ${({ required }) =>
         required &&
-        !disabled &&
         css`
             ::after {
                 content: '*';
-                color: var(--red600);
+                color: ${colors.red600};
                 padding-left: 4px;
             }
         `}

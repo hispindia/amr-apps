@@ -10,6 +10,17 @@ import {
     _l2ApprovalGroup,
 } from './constants'
 
+const sortChildren = ou => {
+    ou.children.forEach(c => sortChildren(c))
+    ou.children.sort((a, b) =>
+        a.displayName > b.displayName
+            ? 1
+            : b.displayName > a.displayName
+            ? -1
+            : 0
+    )
+}
+
 export const initMetadata = async () => {
     // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
     const programCondition = c => {
@@ -123,7 +134,11 @@ export const initMetadata = async () => {
             else {
                 const ancestors = o.path.split('/').slice(1, -1)
                 let ancestor = ancestors.shift()
-                let parent = orgUnits.find(o => ancestor === o.id)
+                let parent = orgUnits.find(o => o.path.endsWith(ancestor))
+                while (!parent) {
+                    ancestor = ancestors.shift()
+                    parent = orgUnits.find(o => o.path.endsWith(ancestor))
+                }
                 while (ancestors.length > 0) {
                     ancestor = ancestors.shift()
                     parent = parent.children.find(o => ancestor === o.id)
@@ -136,19 +151,7 @@ export const initMetadata = async () => {
         })
 
     // Sorting descendants of each of the user's OU's.
-    orgUnits.forEach(ou => {
-        const sortChildren = ou => {
-            ou.children.forEach(c => sortChildren(c))
-            ou.children.sort((a, b) =>
-                a.displayName > b.displayName
-                    ? 1
-                    : b.displayName > a.displayName
-                    ? -1
-                    : 0
-            )
-        }
-        sortChildren(ou)
-    })
+    orgUnits.forEach(ou => sortChildren(ou))
 
     const options = {}
     data.options.forEach(
@@ -255,7 +258,7 @@ export const initMetadata = async () => {
         stageLists[p.id] = stages
     })
 
-    programs.rules = []
+    let eventRules = []
     data.programRules
         .filter(r =>
             r.programRuleActions.find(
@@ -264,9 +267,9 @@ export const initMetadata = async () => {
         )
         .forEach(d => {
             d.condition = programCondition(d.condition)
-            programs.rules.push(d)
+            eventRules.push(d)
         })
-    programs.rules = programs.rules.sort((a, b) =>
+    eventRules = eventRules.sort((a, b) =>
         a.priority > b.priority || !a.priority ? 1 : -1
     )
 
@@ -292,5 +295,6 @@ export const initMetadata = async () => {
         dataElements,
         orgUnits,
         user,
+        eventRules,
     }
 }

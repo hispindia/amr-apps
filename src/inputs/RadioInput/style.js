@@ -1,10 +1,11 @@
 import styled from 'styled-components'
+import { Radio, colors } from '@dhis2/ui-core'
 
 /**
  * Green valid.
  */
-export const CustomRadio = styled.div`
-    .ui_radio_valid-icon_ixvar:not(.ui_radio_disabled_ixvar) {
-        color: var(--green600) !important;
+export const CustomRadio = styled(Radio)`
+    .valid {
+        fill: ${colors.green600} !important;
     }
 `

@@ -1,47 +1,40 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React from 'react'
 import { withRouter } from 'react-router-dom'
-import { Menu } from '@dhis2/ui/core'
-import { getCounts } from 'api'
-import { ConfigContext, MetadataContext } from 'contexts'
-import { CustomMenu } from './style'
+import { useSelector } from 'react-redux'
+import { Menu } from '@dhis2/ui-core'
+import { Icon } from 'components'
+import { StyledMenuItem, Title, Count } from './style'
+import { useCounts } from './useCounts'
 
 /**
  * Sidebar menu.
  */
-const SidebarMenu = ({ selected, location, history }) => {
-    const { categories, isApproval } = useContext(ConfigContext)
-    const { user } = useContext(MetadataContext)
-    const [menuItems, setMenuItems] = useState(null)
-    const [force, setForce] = useState(false)
-
-    useEffect(() => {
-        updateCounts(categories)
-    }, [selected, location])
-
-    /**
-     * Updates count number in menu.
-     */
-    const updateCounts = async items => {
-        items = await getCounts(items, selected, {
-            username: !isApproval ? user.username : false,
-            l2Member: user.l2Member,
-        })
-        items.forEach(
-            item =>
-                (item.label = item.label.replace(/\(\d*\)/, `(${item.count})`))
-        )
-        setMenuItems(items)
-        setForce(!force)
-    }
+const SidebarMenu = ({ location, history }) => {
+    const { categories } = useSelector(state => state.appConfig)
+    const [counts, error] = useCounts(location)
 
     return (
-        <CustomMenu>
-            <Menu
-                size="dense"
-                list={menuItems ? menuItems : categories}
-                onClick={path => history.push(path)}
-            />
-        </CustomMenu>
+        <nav>
+            <Menu>
+                {categories.map((c, i) => (
+                    <StyledMenuItem
+                        dense
+                        key={c.value}
+                        value={c.value}
+                        onClick={history.push}
+                        label={
+                            <>
+                                <Icon icon={c.icon} color={c.color} />
+                                <Title>{c.label}</Title>
+                                <Count>
+                                    {error ? '?' : counts ? counts[i] : 0}
+                                </Count>
+                            </>
+                        }
+                    />
+                ))}
+            </Menu>
+        </nav>
     )
 }
 

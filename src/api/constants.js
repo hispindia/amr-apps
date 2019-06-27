@@ -15,3 +15,5 @@ export const _l2RevisionReason = 'fEnFVvEFKVc'
 export const _deoGroup = 'mYdK5QT4ndl'
 export const _l1ApprovalGroup = 'jVK9RNKNLus'
 export const _l2ApprovalGroup = 'TFmNnLn06Rd'
+
+export const _organismSet = 'TUCsBvqwTUV'

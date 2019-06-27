@@ -1,16 +1,15 @@
 import styled, { css } from 'styled-components'
+import { theme } from '@dhis2/ui-core'
 
 export const Caret = styled.span`
     cursor: pointer;
     user-select: none;
+    line-height: 22px;
     &::before {
         content: '\\2023';
         color: black;
         display: inline-block;
         margin-right: 5px;
-    }
-    :hover::before {
-        color: var(--primary800);
     }
     ${props =>
         props.opened &&
@@ -33,13 +32,15 @@ export const NoCaret = styled.span`
 export const OrgUnitText = styled.span`
     cursor: pointer;
     user-select: none;
+    line-height: 22px;
+    white-space: nowrap;
     &:hover {
-        color: var(--primary800);
+        color: ${theme.secondary600};
     }
     ${props =>
         props.isSelected &&
         css`
-            color: var(--primary800);
+            color: ${theme.secondary600};
         `}
 `
 

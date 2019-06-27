@@ -1,5 +1,6 @@
 import { bool } from 'prop-types'
 import styled, { css } from 'styled-components'
+import { colors } from '@dhis2/ui-core'
 
 export const Row = styled.div`
     display: flex;
@@ -41,9 +42,4 @@ Col.propTypes = {
 
 export const Input = styled.div`
     min-width: 300px;
-    .ui_selectfield_label_1a3v8.ui_selectfield_required_1a3v8::after,
-    .ui_inputfield_label_kvrmz.ui_inputfield_required_kvrmz::after {
-        color: var(--red600);
-        padding-left: 4px;
-    }
 `
