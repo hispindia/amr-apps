@@ -159,7 +159,7 @@ export const existingRecord = async (
         .find(p => p.id === program)
         .programStages.find(ps => (ps.id = programStageId))
     const { programStage, eventValues, status } = await getProgramStage(
-        JSON.parse(JSON.stringify(pStage)),
+        pStage,
         initialValues,
         {
             completed,

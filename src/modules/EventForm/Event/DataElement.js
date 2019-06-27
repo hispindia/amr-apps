@@ -13,8 +13,7 @@ import {
 import { setEventValue } from 'actions'
 import * as DUPLICACY from 'constants/duplicacy'
 
-export const DataElement = props => {
-    const id = props.id
+export const DataElement = ({ id }) => {
     const dispatch = useDispatch()
     const optionSets = useSelector(state => state.metadata.optionSets)
     const completed = useSelector(state => state.data.event.status.completed)

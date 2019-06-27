@@ -95,7 +95,7 @@ export const generateAmrId = async (orgUnitId, orgUnitCode) => {
 }
 
 export const getProgramStage = async (
-    programStage,
+    pStage,
     values,
     { completed, newRecord, l1Member, l2Member }
 ) => {
@@ -139,6 +139,8 @@ export const getProgramStage = async (
                     )
         }
     }
+
+    const programStage = JSON.parse(JSON.stringify(pStage))
 
     Object.keys(programStage.dataElements).forEach(id => {
         const dataElement = programStage.dataElements[id]
