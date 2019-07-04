@@ -8,7 +8,7 @@ import { LoadingIcon } from './LoadingIcon'
 /**
  * Row of buttons.
  */
-export const ButtonRow = ({ buttons, className }) => (
+export const ButtonRow = ({ buttons, initialFocus, className }) => (
     <ButtonContainer className={className}>
         {buttons.map(button => (
             <ButtonPadding
@@ -32,6 +32,9 @@ export const ButtonRow = ({ buttons, className }) => (
                     }
                     small={button.small}
                     large={button.large}
+                    initialFocus={
+                        initialFocus && (button.primary || button.destructive)
+                    }
                 >
                     {button.label}
                 </Button>
@@ -58,4 +61,5 @@ ButtonRow.propTypes = {
         })
     ).isRequired,
     className: string,
+    initialFocus: bool,
 }
