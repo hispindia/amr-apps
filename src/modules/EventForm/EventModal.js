@@ -23,13 +23,12 @@ export const EventModal = ({ history }) => {
         <ModalPopup
             heading="Delete record"
             text="Are you sure you want to permanently delete this record?"
-            onClick={onDeleteConfirmation}
             label="Delete"
             icon="delete"
+            destructive
+            onClick={onDeleteConfirmation}
             loading={deleting}
             disabled={deleting}
-            destructive
-            deletion
         />
     )
 }

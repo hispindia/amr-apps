@@ -20,6 +20,7 @@ export const ModalPopup = ({
             <ModalTitle>{heading}</ModalTitle>
             <Text>{text}</Text>
             <ButtonRow
+                initialFocus
                 buttons={[
                     {
                         label: 'Cancel',
