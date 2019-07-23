@@ -14,19 +14,15 @@
         "build:approval": "node scripts/approval.js",
         "build:entry": "node scripts/entry.js",
         "build:shared": "BABEL_ENV=cjs babel src --out-dir build --copy-files --verbose",
-        "clean": "rm -rf ./build/*",
-        "clean:node": "rm -rf ./node_modules/*",
+        "clean": "rimraf build",
+        "clean:node": "rimraf node_modules",
         "format": "d2-style js apply",
         "launch": "./scripts/konsole/launch.sh",
-        "manifest:approval": "d2-manifest approval/manifest.json approval/public/manifest.webapp",
-        "manifest:entry": "d2-manifest entry/manifest.json entry/public/manifest.webapp",
-        "postbuild:approval": "yarn zip:approval",
-        "postbuild:entry": "yarn zip:entry",
-        "prebuild:approval": "yarn manifest:approval",
-        "prebuild:entry": "yarn manifest:entry",
-        "start": "node scripts/watch.js",
-        "zip:approval": "rm -f amr-approval.zip && cd build/approval && zip -r -X ../../amr-approval.zip .",
-        "zip:entry": "rm -f amr-entry.zip && cd build/entry && zip -r -X ../../amr-entry.zip ."
+        "postbuild:approval": "rimraf amr-approval.zip && cd build/approval && bestzip ../../amr-approval.zip *",
+        "postbuild:entry": "rimraf amr-entry.zip && cd build/entry && bestzip ../../amr-entry.zip *",
+        "prebuild:approval": "d2-manifest approval/manifest.json approval/public/manifest.webapp",
+        "prebuild:entry": "d2-manifest entry/manifest.json entry/public/manifest.webapp",
+        "start": "node scripts/watch.js"
     },
     "devDependencies": {
         "@babel/cli": "^7.2.3",
@@ -36,23 +32,24 @@
         "@babel/plugin-transform-react-constant-elements": "^7.2.0",
         "@babel/preset-env": "^7.4.2",
         "@babel/preset-react": "^7.0.0",
-        "@dhis2/cli-style": "^3.2.2",
+        "@dhis2/cli-style": "^4.1.1",
+        "bestzip": "^2.1.4",
         "chokidar": "^2.0.4",
         "d2-manifest": "^1.0.0",
         "fs-extra": "^7.0.0",
-        "husky": "^1.3.1",
         "moment": "^2.24.0",
         "react-dev-utils": "^8.0.0",
         "react-scripts": "^3.0.1",
         "redux-logger": "^3.0.6",
+        "rimraf": "^2.6.3",
         "source-map-explorer": "^1.8.0"
     },
     "dependencies": {
         "@babel/runtime": "^7.3.1",
         "@date-io/dayjs": "^1.3.5",
-        "@dhis2/app-runtime": "^1.2.0",
-        "@dhis2/ui-core": "^3.5.0",
-        "@dhis2/ui-widgets": "^1.0.6",
+        "@dhis2/app-runtime": "^1.3.0",
+        "@dhis2/ui-core": "3.6.3",
+        "@dhis2/ui-widgets": "^1.0.8",
         "@material-ui/core": "^3.9.3",
         "@material-ui/icons": "^3.0.2",
         "dayjs": "^1.8.14",
@@ -67,11 +64,5 @@
         "redux-thunk": "^2.3.0",
         "styled-components": "^5.0.0-beta.6",
         "typeface-roboto": "^0.0.54"
-    },
-    "husky": {
-        "hooks": {
-            "commit-msg": "d2-style commit check",
-            "pre-commit": "d2-style js apply"
-        }
     }
 }
