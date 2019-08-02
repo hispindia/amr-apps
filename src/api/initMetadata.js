@@ -43,7 +43,7 @@ export const initMetadata = async () => {
                     "values['" + id + "']"
                 )
             })
-        } catch {
+        } catch (e) {
             console.warn('Improper condition:', original)
         }
         return c
@@ -101,7 +101,7 @@ export const initMetadata = async () => {
                     optionGroup,content,trackedEntityAttribute,
                     programStageSection,data]`,
                 'programStage',
-                `programStages[id,displayName,programStageDataElements[
+                `programStages[id,displayName,access,programStageDataElements[
                     dataElement[id],compulsory],programStageSections[id,name,
                     displayName,renderType,dataElements[id,displayFormName,
                     code,valueType,optionSetValue,optionSet]]]`,
@@ -212,49 +212,53 @@ export const initMetadata = async () => {
             og => og.name === p.name
         ).id
         const remove = []
-        p.programStages.forEach(ps => {
-            stages.push({
-                value: ps.id,
-                label: ps.displayName,
-            })
-            ps.dataElements = {}
-            ps.programStageDataElements.forEach(
-                d =>
-                    (ps.dataElements[d.dataElement.id] = {
-                        required: d.compulsory,
-                        hide: false,
-                    })
-            )
-            if (ps.dataElements[_organismsDataElementId])
-                ps.dataElements[_organismsDataElementId].hideWithValues = true
-            ps.programStageSections.forEach(pss => {
-                pss.dataElements.forEach(
+        p.programStages
+            .filter(ps => ps.access.data.write)
+            .forEach(ps => {
+                stages.push({
+                    value: ps.id,
+                    label: ps.displayName,
+                })
+                ps.dataElements = {}
+                ps.programStageDataElements.forEach(
                     d =>
-                        (ps.dataElements[d.id] = {
-                            ...ps.dataElements[d.id],
-                            ...d,
+                        (ps.dataElements[d.dataElement.id] = {
+                            required: d.compulsory,
+                            hide: false,
                         })
                 )
-                pss.dataElements = pss.dataElements.map(d => d.id)
-                const childSections = []
-                ps.programStageSections
-                    .filter(cs =>
-                        cs.name.match(new RegExp('{' + pss.name + '}.*'))
+                if (ps.dataElements[_organismsDataElementId])
+                    ps.dataElements[
+                        _organismsDataElementId
+                    ].hideWithValues = true
+                ps.programStageSections.forEach(pss => {
+                    pss.dataElements.forEach(
+                        d =>
+                            (ps.dataElements[d.id] = {
+                                ...ps.dataElements[d.id],
+                                ...d,
+                            })
                     )
-                    .forEach(cs => {
-                        remove.push(cs.id)
-                        cs.name = cs.name.replace(
-                            new RegExp('{' + pss.name + '}'),
-                            ''
+                    pss.dataElements = pss.dataElements.map(d => d.id)
+                    const childSections = []
+                    ps.programStageSections
+                        .filter(cs =>
+                            cs.name.match(new RegExp('{' + pss.name + '}.*'))
                         )
-                        childSections.push(cs)
-                    })
-                pss.childSections = childSections
+                        .forEach(cs => {
+                            remove.push(cs.id)
+                            cs.name = cs.name.replace(
+                                new RegExp('{' + pss.name + '}'),
+                                ''
+                            )
+                            childSections.push(cs)
+                        })
+                    pss.childSections = childSections
+                })
+                ps.programStageSections = ps.programStageSections.filter(
+                    s => !remove.includes(s.id)
+                )
             })
-            ps.programStageSections = ps.programStageSections.filter(
-                s => !remove.includes(s.id)
-            )
-        })
         stageLists[p.id] = stages
     })
 
