@@ -12,8 +12,8 @@
     "scripts": {
         "analyze:approval": "source-map-explorer 'build/approval/static/js/*.js'",
         "analyze:entry": "source-map-explorer 'build/entry/static/js/*.js'",
+        "postinstall": "lerna bootstrap",
         "clean": "lerna clean -y",
-        "bootstrap": "lerna bootstrap",
         "build": "lerna run build",
         "bump": "node scripts/bump.js",
         "start": "lerna run start --parallel"

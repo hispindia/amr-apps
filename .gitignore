@@ -25,10 +25,4 @@ yarn-error.log*
 *.log
 *.zip
 
-/approval/node_modules
-/approval/build
-/entry/node_modules
-/entry/build
-/build
-
 manifest.webapp
