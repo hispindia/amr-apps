@@ -10,9 +10,8 @@
         "packages/*"
     ],
     "scripts": {
-        "analyze:approval": "source-map-explorer 'build/approval/static/js/*.js'",
-        "analyze:entry": "source-map-explorer 'build/entry/static/js/*.js'",
-        "postinstall": "lerna bootstrap",
+        "analyze": "lerna analyze",
+        "bootstrap": "lerna bootstrap",
         "clean": "lerna clean -y",
         "build": "lerna run build",
         "bump": "node scripts/bump.js",
@@ -24,6 +23,7 @@
         "d2-manifest": "^1.0.0",
         "lerna": "^3.16.4",
         "react-scripts": "^3.1.0",
-        "rimraf": "^2.6.3"
+        "rimraf": "^2.6.3",
+        "source-map-explorer": "^2.0.1"
     }
 }

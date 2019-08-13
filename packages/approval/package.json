@@ -28,7 +28,8 @@
         "test": "react-scripts test --env=jsdom",
         "eject": "react-scripts eject",
         "prebuild": "rimraf build && d2-manifest package.json public/manifest.webapp",
-        "postbuild": "rimraf ../../../amr-approval.zip && cd build && bestzip ../../../amr-approval.zip *"
+        "postbuild": "rimraf ../../../amr-approval.zip && cd build && bestzip ../../../amr-approval.zip *",
+        "analyze": "source-map-explorer build/static/js/*.js'"
     },
     "dependencies": {
         "@amr/app": "*",
