@@ -108,8 +108,7 @@ export const Panel = ({ showEdit }) => {
     if (!entityValid) return null
 
     return (
-        <CardSection heading="Panel">
-            {showEdit && <PanelButtons />}
+        <CardSection heading="Panel" buttons={showEdit && <PanelButtons />}>
             <Grid container spacing={0}>
                 <Grid item xs>
                     {getDataElement('program')}

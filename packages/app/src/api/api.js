@@ -3,7 +3,6 @@ import { get, post, del, put, setBaseUrl } from './crud'
 import { request } from './request'
 import {
     _organismsDataElementId,
-    _testResultDataElementId,
     _sampleIdElementId,
     _amrDataElement,
     _personTypeId,

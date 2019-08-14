@@ -10,9 +10,16 @@ export const StyledCard = styled(Card)`
     height: unset !important;
 `
 
-export const CardSection = ({ heading, children }) => (
+const SectionButtons = styled.div`
+    position: absolute;
+    top: 38px;
+    right: 32px;
+`
+
+export const CardSection = ({ heading, children, buttons }) => (
     <StyledCard>
         <Heading>{heading}</Heading>
+        {!!buttons && <SectionButtons>{buttons}</SectionButtons>}
         {children}
     </StyledCard>
 )
