@@ -4,7 +4,7 @@ export const config = {
     categories: [
         {
             label: 'My records',
-            value: '/approval/ALL',
+            value: '#/approval/ALL',
             icon: 'home',
             status: 'ALL',
             sqlViews: {
@@ -16,7 +16,7 @@ export const config = {
         },
         {
             label: 'Records for revision',
-            value: '/approval/Resend',
+            value: '#/approval/Resend',
             icon: 'error_outline',
             status: 'Resend',
             sqlViews: {
@@ -29,7 +29,7 @@ export const config = {
         },
         {
             label: 'Rejected records',
-            value: '/approval/Rejected',
+            value: '#/approval/Rejected',
             icon: 'highlight_off',
             status: 'Rejected',
             sqlViews: {
@@ -42,7 +42,7 @@ export const config = {
         },
         {
             label: 'Accepted records',
-            value: '/approval/Approved',
+            value: '#/approval/Approved',
             icon: 'check_circle_outline',
             status: 'Approved',
             sqlViews: {
@@ -55,7 +55,7 @@ export const config = {
         },
         {
             label: 'Records for validation',
-            value: '/approval/Validate',
+            value: '#/approval/Validate',
             icon: 'help_outline',
             status: 'Validate',
             sqlViews: {
@@ -67,7 +67,7 @@ export const config = {
         },
         {
             label: 'Incomplete records',
-            value: '/approval/Incomplete',
+            value: '#/approval/Incomplete',
             icon: 'pause_circle_outline',
             status: 'Incomplete',
             sqlViews: {

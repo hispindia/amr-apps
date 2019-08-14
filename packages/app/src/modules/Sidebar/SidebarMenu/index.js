@@ -1,5 +1,4 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { Menu } from '@dhis2/ui-core'
 import { Icon } from 'components'
@@ -9,7 +8,7 @@ import { useCounts } from './useCounts'
 /**
  * Sidebar menu.
  */
-const SidebarMenu = ({ location, history }) => {
+export const SidebarMenu = ({ location }) => {
     const { categories } = useSelector(state => state.appConfig)
     const [counts, error] = useCounts(location)
 
@@ -20,8 +19,7 @@ const SidebarMenu = ({ location, history }) => {
                     <StyledMenuItem
                         dense
                         key={c.value}
-                        value={c.value}
-                        onClick={history.push}
+                        href={c.value}
                         label={
                             <>
                                 <Icon icon={c.icon} color={c.color} />
@@ -37,5 +35,3 @@ const SidebarMenu = ({ location, history }) => {
         </nav>
     )
 }
-
-export default withRouter(SidebarMenu)
