@@ -2,7 +2,7 @@ import React from 'react'
 import { Route } from 'react-router-dom'
 import styled from 'styled-components'
 import { OrgUnitTree } from './OrgUnitTree'
-import { SidebarMenu } from './SidebarMenu'
+import SidebarMenu from './SidebarMenu'
 
 const SidebarContainer = styled.aside`
     display: flex;
