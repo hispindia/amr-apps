@@ -1,17 +1,51 @@
 const fs = require('fs')
 
 const paths = [
-    'package.json',
-    'approval/manifest.json',
-    'approval/package.json',
-    'entry/manifest.json',
-    'entry/package.json'
+    'packages/app/package.json',
+    'packages/approval/package.json',
+    'packages/entry/package.json',
 ]
 
-const version = process.argv[2]
+const getVersionType = arg => {
+    if (!arg) return 2
+    switch (arg.toLowerCase()) {
+        case 'major':
+            return 0
+        case 'minor':
+            return 1
+        default:
+            return 2
+    }
+}
 
-paths.forEach(path => {
+const getCurrentVersion = () => JSON.parse(fs.readFileSync(paths[0])).version
+
+const getNewVersion = (index, current) => {
+    const versions = current.split('.')
+    versions[index] = parseInt(versions[index]) + 1
+    return versions.join('.')
+}
+
+const setVersion = (path, version) => {
     const data = JSON.parse(fs.readFileSync(path))
     data.version = version
     fs.writeFileSync(path, JSON.stringify(data, null, 4))
-})
+}
+
+const main = () => {
+    const versionType = getVersionType(process.argv[2])
+    const oldVersion = getCurrentVersion()
+    const newVersion = getNewVersion(versionType, getCurrentVersion())
+
+    console.log(`${oldVersion} -> ${newVersion}`)
+
+    paths.forEach(path => {
+        try {
+            setVersion(path, newVersion)
+        } catch (error) {
+            console.error(`Failed to bump '${path}' to '${newVersion}'`, error)
+        }
+    })
+}
+
+main()

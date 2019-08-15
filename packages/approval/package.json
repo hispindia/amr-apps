@@ -1,0 +1,39 @@
+{
+    "name": "amr-approval",
+    "version": "0.2.3",
+    "description": "AMR data approval app for DHIS2",
+    "main": "index.js",
+    "license": "BSD-3-Clause",
+    "homepage": ".",
+    "developer": {
+        "name": "Terje Uglebakken",
+        "company": "HISP India"
+    },
+    "manifest.webapp": {
+        "name": "AMR Data Approval",
+        "description": "Approve AMR data.",
+        "appType": "APP",
+        "activities": {
+            "dhis": {
+                "href": "*"
+            }
+        }
+    },
+    "icons": {
+        "48": "icon.png"
+    },
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test --env=jsdom",
+        "eject": "react-scripts eject",
+        "prebuild": "rimraf build && d2-manifest package.json public/manifest.webapp",
+        "postbuild": "rimraf ../../../amr-approval.zip && cd build && bestzip ../../../amr-approval.zip *",
+        "analyze": "source-map-explorer build/static/js/*.js'"
+    },
+    "dependencies": {
+        "@amr/app": "*",
+        "react": "^16.9.0",
+        "react-dom": "^16.9.0"
+    }
+}
