@@ -2,10 +2,10 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { string } from 'prop-types'
 import { Padding } from 'styles'
-import { _sampleIdElementId } from 'api'
+import { SAMPLE_ID_ELEMENT } from 'constants/dhis2'
 import {
     TextInput,
-    RadioInput,
+    RadioInputs,
     SelectInput,
     SwitchInput,
     DateInput,
@@ -50,7 +50,7 @@ export const DataElement = ({ id }) => {
     )
 
     const duplicate =
-        id === _sampleIdElementId &&
+        id === SAMPLE_ID_ELEMENT &&
         useSelector(state => state.data.event.duplicate)
 
     const onChange = (key, value) => dispatch(setEventValue(key, value))
@@ -61,7 +61,7 @@ export const DataElement = ({ id }) => {
         <Padding>
             {optionSetValue ? (
                 optionSets[optionSet].length < 5 ? (
-                    <RadioInput
+                    <RadioInputs
                         objects={optionSets[optionSet]}
                         name={id}
                         label={displayFormName}
@@ -110,11 +110,11 @@ export const DataElement = ({ id }) => {
                     disabled={disabled || completed}
                     type={valueType === 'NUMBER' ? 'number' : 'text'}
                     color={color}
-                    unique={id === _sampleIdElementId}
+                    unique={id === SAMPLE_ID_ELEMENT}
                     error={
                         error
                             ? error
-                            : id === _sampleIdElementId &&
+                            : id === SAMPLE_ID_ELEMENT &&
                               duplicate === DUPLICACY.DUPLICATE_ERROR
                             ? duplicate
                             : ''
@@ -122,13 +122,13 @@ export const DataElement = ({ id }) => {
                     warning={
                         warning
                             ? warning
-                            : id === _sampleIdElementId &&
+                            : id === SAMPLE_ID_ELEMENT &&
                               duplicate === DUPLICACY.DUPLICATE_WARNING
                             ? duplicate
                             : ''
                     }
                     loading={
-                        id === _sampleIdElementId &&
+                        id === SAMPLE_ID_ELEMENT &&
                         duplicate === DUPLICACY.DUPLICATE_CHECKING
                             ? true
                             : false

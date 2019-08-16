@@ -1,16 +1,5 @@
 import { createMuiTheme } from '@material-ui/core'
-import { createGlobalStyle } from 'styled-components'
 import { theme } from '@dhis2/ui-core'
-import 'typeface-roboto'
-
-export const BodyStyle = createGlobalStyle`
-    body {
-        background-color: rgb(240, 240, 240);
-    }
-    .required span::after {
-        color: #c62828;
-    }
-`
 
 export const muiTheme = createMuiTheme({
     palette: {

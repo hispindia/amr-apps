@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Padding } from 'styles'
-import { TextInput, AgeInput, RadioInput, SelectInput } from 'inputs'
+import { TextInput, AgeInput, RadioInputs, SelectInput } from 'inputs'
 import { setEntityValue, validateUnique } from 'actions'
 
 /**
@@ -50,7 +50,7 @@ export const EntityInput = ({ attribute }) => {
             ) : attribute.trackedEntityAttribute.optionSetValue ? (
                 optionSets[attribute.trackedEntityAttribute.optionSet.id]
                     .length < 4 ? (
-                    <RadioInput
+                    <RadioInputs
                         required={attribute.mandatory}
                         objects={
                             optionSets[

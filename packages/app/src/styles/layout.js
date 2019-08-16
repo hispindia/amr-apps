@@ -1,6 +1,5 @@
 import { bool } from 'prop-types'
 import styled, { css } from 'styled-components'
-import { colors } from '@dhis2/ui-core'
 
 export const Row = styled.div`
     display: flex;

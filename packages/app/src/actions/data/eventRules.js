@@ -1,5 +1,5 @@
-import { _testResultDataElementId, _sampleIdElementId } from 'api'
-import * as INVALID_REASONS from '../../constants/invalidReasons'
+import { TEST_RESULT_ELEMENT } from 'constants/dhis2'
+import * as INVALID_REASONS from 'constants/invalidReasons'
 
 export const eventRules = (
     values,
@@ -51,7 +51,7 @@ export const eventRules = (
 
     const setColors = (condition, affected, testValue) => {
         if (!affected.optionSetValue) return
-        if (affected.optionSet !== _testResultDataElementId) return
+        if (affected.optionSet !== TEST_RESULT_ELEMENT) return
         const variables = getVariables(condition)
         variables.forEach(id => {
             const dataElement = stage.dataElements[id]

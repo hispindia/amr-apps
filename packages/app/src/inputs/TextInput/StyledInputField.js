@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components'
-import { Help, InputField } from '@dhis2/ui-core'
+import { InputField } from '@dhis2/ui-core'
 
 /**
  * Colored field background.

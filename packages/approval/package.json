@@ -27,13 +27,20 @@
         "build": "react-scripts build",
         "test": "react-scripts test --env=jsdom",
         "eject": "react-scripts eject",
-        "prebuild": "rimraf build && d2-manifest package.json public/manifest.webapp",
-        "postbuild": "rimraf ../../../amr-approval.zip && cd build && bestzip ../../../amr-approval.zip *",
+        "prebuild": "rimraf build ../../amr-approval.zip && d2-manifest package.json public/manifest.webapp",
+        "postbuild": "cd build && bestzip ../../../amr-approval.zip *",
         "analyze": "source-map-explorer build/static/js/*.js'"
     },
     "dependencies": {
         "@amr/app": "*",
         "react": "^16.9.0",
         "react-dom": "^16.9.0"
+    },
+    "devDependencies": {
+        "bestzip": "^2.1.4",
+        "d2-manifest": "^1.0.0",
+        "react-scripts": "^3.1.0",
+        "rimraf": "^2.6.3",
+        "source-map-explorer": "^2.0.1"
     }
 }

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { bool, func, object, objectOf, string } from 'prop-types'
-import { Checkbox } from '@dhis2/ui-core'
-import { Label, OptionSpacer, Row } from 'styles'
+import { Label, Row } from 'styles'
+import { CheckboxInput } from './CheckBoxInput'
 
 /**
  * Input consisting of a a group of checkboxes.
  */
-export const CheckboxInput = props => {
+export const CheckboxInputs = props => {
     const [values, setValues] = useState({})
 
     useEffect(() => {
@@ -24,14 +24,6 @@ export const CheckboxInput = props => {
         newValues[name] = checked
         setValues(newValues)
         props.onChange(name, checked)
-        console.log(target)
-    }
-
-    const onKeyDown = ({ key, target }) => {
-        if (key === 'Enter')
-            onChange({
-                target: { name: target.name, checked: !values[target.name] },
-            })
     }
 
     return (
@@ -39,23 +31,21 @@ export const CheckboxInput = props => {
             <Label required={props.required}>{props.label}</Label>
             <Row wrapped>
                 {Object.keys(props.objects).map(id => (
-                    <OptionSpacer key={id} onKeyDown={onKeyDown}>
-                        <Checkbox
-                            name={id}
-                            label={props.objects[id].label}
-                            checked={values[id] === 'true'}
-                            onChange={onChange}
-                            disabled={props.objects[id].disabled}
-                            value={id}
-                        />
-                    </OptionSpacer>
+                    <CheckboxInput
+                        key={id}
+                        id={id}
+                        label={props.objects[id].label}
+                        checked={values[id] === 'true'}
+                        onChange={onChange}
+                        disabled={props.objects[id].disabled}
+                    />
                 ))}
             </Row>
         </>
     )
 }
 
-CheckboxInput.propTypes = {
+CheckboxInputs.propTypes = {
     label: string.isRequired,
     onChange: func.isRequired,
     objects: object.isRequired,

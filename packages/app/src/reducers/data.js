@@ -1,6 +1,6 @@
-import { ERROR } from '../constants/statuses'
-import { REQUIRED_EMPTY } from '../constants/invalidReasons'
-import { _organismsDataElementId } from 'api'
+import { ERROR } from 'constants/statuses'
+import { REQUIRED_EMPTY } from 'constants/invalidReasons'
+import { ORGANISM_ELEMENT } from 'constants/dhis2'
 import {
     SET_ENTITY,
     SET_ENTITY_VALUE,
@@ -190,7 +190,7 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                 panel: {
                     program: payload.program,
                     programStage: payload.programStage.id,
-                    organism: payload.eventValues[_organismsDataElementId],
+                    organism: payload.eventValues[ORGANISM_ELEMENT],
                     sampleDate: payload.sampleDate,
                     programs: payload.programs,
                     organisms: payload.organisms,

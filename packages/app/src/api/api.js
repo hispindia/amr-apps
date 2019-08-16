@@ -2,15 +2,15 @@
 import { get, post, del, put, setBaseUrl } from './crud'
 import { request } from './request'
 import {
-    _organismsDataElementId,
-    _sampleIdElementId,
-    _amrDataElement,
-    _personTypeId,
-    _l1ApprovalStatus,
-    _l1RevisionReason,
-    _l2ApprovalStatus,
-    _l2RevisionReason,
-} from './constants'
+    ORGANISM_ELEMENT,
+    SAMPLE_ID_ELEMENT,
+    AMR_ELEMENT,
+    PERSON_TYPE,
+    L1_APPROVAL_STATUS,
+    L1_REVISION_REASON,
+    L2_APPROVAL_STATUS,
+    L2_REVISION_REASON,
+} from 'constants/dhis2'
 import {
     getProgramStage,
     getEventValues,
@@ -18,7 +18,7 @@ import {
     generateAmrId,
     getSqlView,
 } from './internal'
-import * as DUPLICACY from '../constants/duplicacy'
+import * as DUPLICACY from 'constants/duplicacy'
 
 /**
  * Sets the base URL, username, and user groups.
@@ -37,7 +37,7 @@ export const checkUnique = async (property, value, ou) => {
         request('trackedEntityInstances', {
             fields: 'trackedEntityInstance',
             filters: `${property}:eq:${value}`,
-            options: [`ou=${ou}`, `trackedEntityType=${_personTypeId}`],
+            options: [`ou=${ou}`, `trackedEntityType=${PERSON_TYPE}`],
         })
     )).trackedEntityInstances
     return !entities
@@ -75,7 +75,7 @@ export const getPersonValues = async entityId => {
  */
 export const addPerson = async (values, orgUnit) => {
     const data = {
-        trackedEntityType: _personTypeId,
+        trackedEntityType: PERSON_TYPE,
         orgUnit: orgUnit,
         attributes: [],
     }
@@ -114,8 +114,8 @@ export const newRecord = async (
     { orgaCode, ou, eId, eValues, sampleDate, orgUnitCode }
 ) => {
     const initialValues = {
-        [_organismsDataElementId]: orgaCode,
-        [_amrDataElement]: await generateAmrId(ou, orgUnitCode),
+        [ORGANISM_ELEMENT]: orgaCode,
+        [AMR_ELEMENT]: await generateAmrId(ou, orgUnitCode),
     }
     const { entityId, eventId } = eId
         ? await addEvent(initialValues, pId, {
@@ -199,7 +199,7 @@ export const addPersonWithEvent = async (
     )
 
     const data = {
-        trackedEntityType: _personTypeId,
+        trackedEntityType: PERSON_TYPE,
         orgUnit: event.orgUnit,
         attributes: Object.keys(entityValues).map(key => {
             return { attribute: key, value: entityValues[key] }
@@ -289,13 +289,13 @@ export const setEventStatus = async (eventId, completed, isApproval) => {
         event.dataValues.forEach(
             dataValue => (values[dataValue.dataElement] = dataValue.value)
         )
-        if (values[_l1ApprovalStatus] === 'Resend') {
-            values[_l1ApprovalStatus] = ''
-            values[_l1RevisionReason] = ''
+        if (values[L1_APPROVAL_STATUS] === 'Resend') {
+            values[L1_APPROVAL_STATUS] = ''
+            values[L1_REVISION_REASON] = ''
         }
-        if (values[_l2ApprovalStatus] === 'Resend') {
-            values[_l2ApprovalStatus] = ''
-            values[_l2RevisionReason] = ''
+        if (values[L2_APPROVAL_STATUS] === 'Resend') {
+            values[L2_APPROVAL_STATUS] = ''
+            values[L2_REVISION_REASON] = ''
         }
         event = await setEventValues(event, values)
     }
@@ -354,7 +354,7 @@ export const isDuplicateRecord = async ({
         request('events', {
             order: 'created:asc',
             fields: 'event,dataValues[dataElement,value]',
-            filters: `${_sampleIdElementId}:eq:${sampleId}`,
+            filters: `${SAMPLE_ID_ELEMENT}:eq:${sampleId}`,
             options: [`trackedEntityInstance=${entity}`],
         })
     )).events
@@ -366,9 +366,7 @@ export const isDuplicateRecord = async ({
     if (events.length < 1) return false
     return events.find(e =>
         e.dataValues.find(
-            dv =>
-                dv.dataElement === _organismsDataElementId &&
-                dv.value === organism
+            dv => dv.dataElement === ORGANISM_ELEMENT && dv.value === organism
         )
     )
         ? DUPLICACY.DUPLICATE_ERROR

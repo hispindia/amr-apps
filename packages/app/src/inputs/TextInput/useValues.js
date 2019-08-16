@@ -40,7 +40,7 @@ const reducer = (state, action) => {
     }
 }
 
-export const hook = () =>
+export const useValues = () =>
     useReducer(reducer, {
         value: '',
         hashedValue: '',
