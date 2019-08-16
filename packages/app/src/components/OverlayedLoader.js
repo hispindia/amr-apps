@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { CircularLoader } from '@dhis2/ui-core'
 
-export const Overlay = styled.div`
+const Overlay = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;

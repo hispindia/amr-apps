@@ -1,12 +1,12 @@
 # AMR Data Entry and Approval
 
-### Installation
+## Installation
 
 ```bash
 yarn install
 ```
 
-### Development
+## Development
 
 You need to log in to the test server: https://amrtest.icmr.org.in/amr
 
@@ -16,13 +16,13 @@ yarn start
 
 You may have to F5 once.
 
-### Building
+## Building
 
 ```bash
 yarn build
 ```
 
-### Versioning
+## Versioning
 
 ```bash
 yarn bump        # 1.1.1 -> 1.1.2

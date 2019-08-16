@@ -1,13 +1,12 @@
 import { get } from './crud'
 import { request } from './request'
 import {
-    _organismsDataElementId,
-    _sampleIdElementId,
-    _personTypeId,
-    _deoGroup,
-    _l1ApprovalGroup,
-    _l2ApprovalGroup,
-} from './constants'
+    ORGANISM_ELEMENT,
+    PERSON_TYPE,
+    DEO_GROUP,
+    L1_GROUP,
+    L2_GROUP,
+} from 'constants/dhis2'
 
 const sortChildren = ou => {
     ou.children.forEach(c => sortChildren(c))
@@ -73,9 +72,9 @@ export const initMetadata = async () => {
     const userGroups = userData.userGroups.map(userGroup => userGroup.id)
     const user = {
         username: userData.userCredentials.username,
-        deoMember: userGroups.includes(_deoGroup),
-        l1Member: userGroups.includes(_l1ApprovalGroup),
-        l2Member: userGroups.includes(_l2ApprovalGroup),
+        deoMember: userGroups.includes(DEO_GROUP),
+        l1Member: userGroups.includes(L1_GROUP),
+        l2Member: userGroups.includes(L2_GROUP),
     }
     const userOrgUnits = userData.organisationUnits.map(uo => uo.id)
 
@@ -169,9 +168,7 @@ export const initMetadata = async () => {
         os => (optionSets[os.id] = os.options.map(o => options[o.id]))
     )
 
-    const person = data.trackedEntityTypes.find(
-        type => (type.id = _personTypeId)
-    )
+    const person = data.trackedEntityTypes.find(type => (type.id = PERSON_TYPE))
 
     person.uniques = {}
     person.values = {}
@@ -226,10 +223,8 @@ export const initMetadata = async () => {
                             hide: false,
                         })
                 )
-                if (ps.dataElements[_organismsDataElementId])
-                    ps.dataElements[
-                        _organismsDataElementId
-                    ].hideWithValues = true
+                if (ps.dataElements[ORGANISM_ELEMENT])
+                    ps.dataElements[ORGANISM_ELEMENT].hideWithValues = true
                 ps.programStageSections.forEach(pss => {
                     pss.dataElements.forEach(
                         d =>

@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { object } from 'prop-types'
 import styled from 'styled-components'
 import { Label, Padding } from 'styles'
-import { CheckboxInput } from 'inputs'
+import { CheckboxInputs } from 'inputs'
 import { DataElement } from './DataElement'
 import { setEventValue } from 'actions'
 
@@ -53,7 +53,7 @@ export const ChildSection = ({ childSection }) => {
         return (
             <>
                 <Padding>
-                    <CheckboxInput
+                    <CheckboxInputs
                         objects={objects}
                         name={childSection.name}
                         label={childSection.name}

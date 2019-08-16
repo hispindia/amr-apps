@@ -1,14 +1,7 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import styled from 'styled-components'
 import { ButtonRow } from 'components'
 import { resetPanel } from 'actions'
-
-const StyledButtonRow = styled(ButtonRow)`
-    position: absolute;
-    top: 38px;
-    right: 32px;
-`
 
 /**
  * Contains event panel.
@@ -29,5 +22,5 @@ export const PanelButtons = () => {
         },
     ]
 
-    return <StyledButtonRow buttons={buttons} />
+    return <ButtonRow buttons={buttons} />
 }

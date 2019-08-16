@@ -1,15 +1,15 @@
 import { get } from './crud'
 import { request } from './request'
 import {
-    _organismsDataElementId,
-    _amrDataElement,
-    _l1ApprovalStatus,
-    _l1RejectionReason,
-    _l1RevisionReason,
-    _l2ApprovalStatus,
-    _l2RejectionReason,
-    _l2RevisionReason,
-} from './constants'
+    ORGANISM_ELEMENT,
+    AMR_ELEMENT,
+    L1_APPROVAL_STATUS,
+    L1_REJECTION_REASON,
+    L1_REVISION_REASON,
+    L2_APPROVAL_STATUS,
+    L2_REJECTION_REASON,
+    L2_REVISION_REASON,
+} from 'constants/dhis2'
 
 export const getSqlView = async (sqlView, orgUnit, { user, status }) =>
     (await get(
@@ -84,7 +84,7 @@ export const generateAmrId = async (orgUnitId, orgUnitCode) => {
         (await get(
             request('events', {
                 fields: 'event',
-                filters: `${_amrDataElement}:eq:${amrId}`,
+                filters: `${AMR_ELEMENT}:eq:${amrId}`,
                 options: [`orgUnit=${orgUnitId}`],
             })
         )).events.length !== 0
@@ -101,41 +101,40 @@ export const getProgramStage = async (
 ) => {
     const shouldDisable = id => {
         switch (id) {
-            case _amrDataElement:
-                return values[_amrDataElement] && values[_amrDataElement] !== ''
-            case _organismsDataElementId:
+            case AMR_ELEMENT:
+                return values[AMR_ELEMENT] && values[AMR_ELEMENT] !== ''
+            case ORGANISM_ELEMENT:
                 return (
-                    values[_organismsDataElementId] &&
-                    values[_organismsDataElementId] !== ''
+                    values[ORGANISM_ELEMENT] && values[ORGANISM_ELEMENT] !== ''
                 )
-            case _l1ApprovalStatus:
-            case _l1RejectionReason:
-            case _l1RevisionReason:
+            case L1_APPROVAL_STATUS:
+            case L1_REJECTION_REASON:
+            case L1_REVISION_REASON:
                 return (
                     !l1Member ||
-                    values[_l1ApprovalStatus] === 'Approved' ||
-                    values[_l1ApprovalStatus] === 'Rejected' ||
-                    values[_l2ApprovalStatus] === 'Rejected'
+                    values[L1_APPROVAL_STATUS] === 'Approved' ||
+                    values[L1_APPROVAL_STATUS] === 'Rejected' ||
+                    values[L2_APPROVAL_STATUS] === 'Rejected'
                 )
-            case _l2ApprovalStatus:
-            case _l2RejectionReason:
-            case _l2RevisionReason:
+            case L2_APPROVAL_STATUS:
+            case L2_REJECTION_REASON:
+            case L2_REVISION_REASON:
                 return (
                     !l2Member ||
-                    values[_l2ApprovalStatus] === 'Approved' ||
-                    values[_l2ApprovalStatus] === 'Rejected' ||
-                    values[_l1ApprovalStatus] === 'Rejected'
+                    values[L2_APPROVAL_STATUS] === 'Approved' ||
+                    values[L2_APPROVAL_STATUS] === 'Rejected' ||
+                    values[L1_APPROVAL_STATUS] === 'Rejected'
                 )
             default:
                 if (newRecord) return false
                 else if (l1Member || l2Member) return true
                 else
                     return !(
-                        (values[_l2ApprovalStatus] === 'Resend' &&
-                            values[_l1ApprovalStatus] !== 'Rejected') ||
-                        (values[_l1ApprovalStatus] === 'Resend' ||
-                            values[_l1ApprovalStatus] === '' ||
-                            !values[_l1ApprovalStatus])
+                        (values[L2_APPROVAL_STATUS] === 'Resend' &&
+                            values[L1_APPROVAL_STATUS] !== 'Rejected') ||
+                        (values[L1_APPROVAL_STATUS] === 'Resend' ||
+                            values[L1_APPROVAL_STATUS] === '' ||
+                            !values[L1_APPROVAL_STATUS])
                     )
         }
     }
@@ -156,23 +155,23 @@ export const getProgramStage = async (
             (s.name === 'Approval' &&
                 !l1Member &&
                 !l2Member &&
-                !values[_l1ApprovalStatus] &&
-                !values[_l2ApprovalStatus])
+                !values[L1_APPROVAL_STATUS] &&
+                !values[L2_APPROVAL_STATUS])
     })
 
     const status = {
         deletable:
             values === {} ||
-            (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus]),
+            (!values[L1_APPROVAL_STATUS] && !values[L2_APPROVAL_STATUS]),
         editable:
             values === {} ||
-            (!values[_l1ApprovalStatus] && !values[_l2ApprovalStatus]) ||
-            [values[_l1ApprovalStatus], values[_l2ApprovalStatus]].includes(
+            (!values[L1_APPROVAL_STATUS] && !values[L2_APPROVAL_STATUS]) ||
+            [values[L1_APPROVAL_STATUS], values[L2_APPROVAL_STATUS]].includes(
                 'Resend'
             ) ||
-            (l2Member && !values[_l2ApprovalStatus]),
+            (l2Member && !values[L2_APPROVAL_STATUS]),
         finished:
-            (values[_l1ApprovalStatus] === values[_l2ApprovalStatus]) ===
+            (values[L1_APPROVAL_STATUS] === values[L2_APPROVAL_STATUS]) ===
             'Approved',
         completed: completed,
     }
