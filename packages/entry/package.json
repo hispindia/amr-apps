@@ -1,6 +1,6 @@
 {
     "name": "amr-entry",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "description": "AMR data entry app for DHIS2",
     "main": "index.js",
     "license": "BSD-3-Clause",
@@ -20,7 +20,9 @@
         }
     },
     "icons": {
-        "48": "icon.png"
+        "16": "favicon-16x16.png",
+        "32": "favicon-32x32.png",
+        "48": "favicon-48x48.png"
     },
     "scripts": {
         "start": "PORT=3001 react-scripts start",

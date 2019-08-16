@@ -2,14 +2,12 @@
     "short_name": "AMR Data Entry",
     "name": "AMR Data Entry",
     "icons": [
-        {
-            "src": "favicon.ico",
-            "sizes": "64x64 32x32 24x24 16x16",
-            "type": "image/x-icon"
-        }
+        { "16": "favicon-16x16.png" },
+        { "32": "favicon-32x32.png" },
+        { "48": "favicon-48x48.png" }
     ],
     "start_url": ".",
     "display": "standalone",
-    "theme_color": "#000000",
+    "theme_color": "#235b8b",
     "background_color": "#ffffff"
 }

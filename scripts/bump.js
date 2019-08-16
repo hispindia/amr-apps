@@ -1,6 +1,7 @@
 const fs = require('fs')
 
 const paths = [
+    'packages.json',
     'packages/app/package.json',
     'packages/approval/package.json',
     'packages/entry/package.json',
