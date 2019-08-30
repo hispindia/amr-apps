@@ -24,13 +24,12 @@ import {
     updateEventValue,
     deleteEvent,
     isDuplicateRecord,
-    _organismSet,
-    _sampleIdElementId,
 } from 'api'
 import { entityRules } from './entityRules'
 import { eventRules } from './eventRules'
 import { DUPLICATE_CHECKING } from 'constants/duplicacy'
 import { LOADING, SUCCESS } from 'constants/statuses'
+import { SAMPLE_ID_ELEMENT, ORGANISM_SET } from 'constants/dhis2'
 import { showAlert } from '../alert'
 
 export const resetData = () => dispatch => dispatch(createAction(RESET_DATA))
@@ -134,7 +133,7 @@ export const getExistingEvent = (orgUnit, eventId) => async (
             code: getCode(orgUnit, state.metadata.orgUnits),
         }
         data.programs = state.metadata.programList
-        data.organisms = optionSets[_organismSet]
+        data.organisms = optionSets[ORGANISM_SET]
         data.invalid = invalid
         data.rules = getRules(
             state.metadata.eventRules,
@@ -287,7 +286,7 @@ export const setEventValue = (key, value) => (dispatch, getState) => {
 
     updateEventValue(event.id, key, value)
 
-    if (key === _sampleIdElementId) dispatch(checkDuplicacy(value))
+    if (key === SAMPLE_ID_ELEMENT) dispatch(checkDuplicacy(value))
 
     const [values, programStage, invalid] = eventRules(
         { ...event.values, [key]: value },
