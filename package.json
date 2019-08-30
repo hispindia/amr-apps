@@ -15,7 +15,8 @@
         "clean": "lerna clean -y",
         "build": "lerna run build",
         "bump": "node scripts/bump.js",
-        "start": "lerna run start --parallel"
+        "start": "lerna run start --parallel",
+        "test": "lerna run test"
     },
     "devDependencies": {
         "@dhis2/cli-style": "^4.1.1",

@@ -1,7 +1,7 @@
 import { initMetadata } from 'api'
-import { createAction } from '../createAction'
-import { METADATA_RECEIVED, METADATA_ERRORED } from '../types'
-import { showAlert } from '../alert'
+import { createAction } from './createAction'
+import { METADATA_RECEIVED, METADATA_ERRORED } from './types'
+import { showAlert } from './alert'
 
 export const setMetadata = () => async dispatch => {
     try {

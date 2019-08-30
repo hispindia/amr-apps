@@ -1,5 +1,5 @@
-import { createAction } from '../createAction'
-import { ADD_ALERT, REMOVE_ALERT } from '../types'
+import { createAction } from './createAction'
+import { ADD_ALERT, REMOVE_ALERT } from './types'
 
 export const showAlert = (
     content,

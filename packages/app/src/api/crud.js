@@ -11,7 +11,7 @@ export const setBaseUrl = url => (baseUrl = `${url}/`)
  * @returns Server response.
  */
 export const get = async endpoint =>
-    await (await fetch(baseUrl + endpoint, {
+    await (await fetch(`${baseUrl}${endpoint}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
