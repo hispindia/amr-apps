@@ -25,9 +25,9 @@
         "48": "favicon-48x48.png"
     },
     "scripts": {
-        "start": "react-scripts start",
-        "build": "react-scripts build",
-        "test": "react-scripts test --env=jsdom",
+        "xstart": "react-scripts start",
+        "xbuild": "react-scripts build",
+        "xtest": "react-scripts test --env=jsdom",
         "eject": "react-scripts eject",
         "prebuild": "rimraf build ../../amr-approval.zip && d2-manifest package.json public/manifest.webapp",
         "postbuild": "cd build && bestzip ../../../amr-approval.zip *",
