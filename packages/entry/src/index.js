@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { init } from '@amr/app'
 import * as serviceWorker from './serviceWorker'
-import { Entry } from './Entry'
+import { DataEntry } from './DataEntry'
 
 const developmentServer = 'https://amrtest.icmr.org.in/amr'
 const rootElement = document.getElementById('root')
@@ -19,7 +19,7 @@ const productionRender = async () => {
 
 const render = baseUrl => {
     init(`${baseUrl}/api`)
-    ReactDOM.render(<Entry baseUrl={baseUrl} />, rootElement)
+    ReactDOM.render(<DataEntry baseUrl={baseUrl} />, rootElement)
     serviceWorker.unregister()
 }
 

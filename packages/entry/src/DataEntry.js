@@ -3,7 +3,7 @@ import { string } from 'prop-types'
 import { App, Content, store } from '@amr/app'
 import { appName, categories } from './config'
 
-export const Entry = ({ baseUrl }) => (
+export const DataEntry = ({ baseUrl }) => (
     <App baseUrl={baseUrl} appName={appName} store={store(categories)}>
         <Content />
     </App>
