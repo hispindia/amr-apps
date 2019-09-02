@@ -1,0 +1,48 @@
+{
+    "name": "isolate-validation",
+    "version": "0.2.4",
+    "description": "AMR isolate validation app for DHIS2",
+    "main": "index.js",
+    "license": "BSD-3-Clause",
+    "homepage": ".",
+    "developer": {
+        "name": "Terje Uglebakken",
+        "company": "HISP India"
+    },
+    "manifest.webapp": {
+        "name": "AMR Isolate Validation",
+        "description": "Validate AMR isolates.",
+        "appType": "APP",
+        "activities": {
+            "dhis": {
+                "href": "*"
+            }
+        }
+    },
+    "icons": {
+        "16": "favicon-16x16.png",
+        "32": "favicon-32x32.png",
+        "48": "favicon-48x48.png"
+    },
+    "scripts": {
+        "start": "PORT=3002 react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject",
+        "prebuild": "rimraf build ../../isolate-validation.zip && d2-manifest package.json public/manifest.webapp",
+        "postbuild": "cd build && bestzip ../../../isolate-validation.zip *",
+        "analyze": "source-map-explorer build/static/js/*.js'"
+    },
+    "dependencies": {
+        "@amr/app": "*",
+        "react": "^16.9.0",
+        "react-dom": "^16.9.0"
+    },
+    "devDependencies": {
+        "bestzip": "^2.1.4",
+        "d2-manifest": "^1.0.0",
+        "react-scripts": "^3.1.0",
+        "rimraf": "^2.6.3",
+        "source-map-explorer": "^2.0.1"
+    }
+}
