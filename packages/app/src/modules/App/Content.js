@@ -10,7 +10,6 @@ import { Sidebar } from '../Sidebar'
 const ContentSection = styled.section`
     display: flex;
     flex-direction: row;
-    margin-top: 48px;
 `
 
 export const Content = () => {
