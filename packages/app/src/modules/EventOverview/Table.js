@@ -16,17 +16,15 @@ export const Table = ({
     rows,
     headers,
     onEventClick,
-    addButton,
     onAddClick,
     addButtonDisabled,
 }) => {
-    const toolbar = () =>
-        addButton && (
-            <TableToolbar
-                onAddClick={onAddClick}
-                addButtonDisabled={addButtonDisabled}
-            />
-        )
+    const toolbar = () => (
+        <TableToolbar
+            onAddClick={onAddClick}
+            addButtonDisabled={addButtonDisabled}
+        />
+    )
 
     return (
         <StyledCard>

@@ -87,17 +87,11 @@ export const getExistingEvent = (orgUnit, eventId) => async (
     getState
 ) => {
     const state = getState()
-    const isApproval = state.appConfig.isApproval
-    const { l1Member, l2Member } = state.metadata.user
     const programs = state.metadata.programs
     const optionSets = state.metadata.optionSets
     const { trackedEntityTypeAttributes, rules } = state.metadata.person
     try {
-        const data = await existingRecord(programs, eventId, {
-            isApproval,
-            l1Member,
-            l2Member,
-        })
+        const data = await existingRecord(programs, eventId)
 
         const [entityValues, attributes] = entityRules(
             { ...state.metadata.person.values, ...data.entityValues },
@@ -212,11 +206,10 @@ export const submitEvent = addMore => async (dispatch, getState) => {
             createAction(SET_BUTTON_LOADING, addMore ? 'submitAdd' : 'submit')
         )
     })
-    const isApproval = getState().appConfig.isApproval
     const eventId = getState().data.event.id
 
     try {
-        await setEventStatus(eventId, true, isApproval)
+        await setEventStatus(eventId, true)
         if (addMore) dispatch(createAction(RESET_PANEL_EVENT))
         else dispatch(createAction(EXIT))
         dispatch(showAlert('Record submitted successfully.', { success: true }))

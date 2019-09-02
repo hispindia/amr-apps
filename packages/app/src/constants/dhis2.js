@@ -13,7 +13,5 @@ export const L2_REJECTION_REASON = 'pz8SoHBO6RL'
 export const L2_REVISION_REASON = 'fEnFVvEFKVc'
 
 export const DEO_GROUP = 'mYdK5QT4ndl'
-export const L1_GROUP = 'jVK9RNKNLus'
-export const L2_GROUP = 'TFmNnLn06Rd'
 
 export const ORGANISM_SET = 'TUCsBvqwTUV'

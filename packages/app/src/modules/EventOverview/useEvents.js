@@ -52,7 +52,6 @@ const reducer = (state, action) => {
 export const useEvents = status => {
     const dispatch = useDispatch()
     const categories = useSelector(state => state.appConfig.categories)
-    const isApproval = useSelector(state => state.appConfig.isApproval)
     const programList = useSelector(state => state.metadata.programList)
     const user = useSelector(state => state.metadata.user)
     const selected = useSelector(state => state.selectedOrgUnit.id)
@@ -60,7 +59,6 @@ export const useEvents = status => {
     const [state, dispatcher] = useReducer(reducer, INITIAL_STATE)
 
     useEffect(() => {
-        if (isApproval) return
         const noProgram = !programList.find(p => p.orgUnits.includes(selected))
         if (noProgram !== state.addButtonDisabled)
             dispatcher({ type: NEW_PROGRAMS, disable: noProgram })
@@ -72,10 +70,7 @@ export const useEvents = status => {
                 const events = await getEvents(
                     categories.find(c => c.status === status),
                     selected,
-                    {
-                        username: !isApproval ? user.username : false,
-                        l2Member: user.l2Member,
-                    }
+                    user.username
                 )
                 dispatcher({
                     type: NEW_ROWS,

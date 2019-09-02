@@ -141,11 +141,7 @@ export const newRecord = async (
     return { programStage, eventValues, status, eventId, entityId }
 }
 
-export const existingRecord = async (
-    programs,
-    eventId,
-    { isApproval, l1Member, l2Member }
-) => {
+export const existingRecord = async (programs, eventId) => {
     const {
         eventValues: initialValues,
         programId: program,
@@ -163,8 +159,6 @@ export const existingRecord = async (
         {
             completed,
             newRecord: false,
-            l1Member: isApproval ? l1Member : false,
-            l2Member: isApproval ? l2Member : false,
         }
     )
     const entityValues = await getPersonValues(entityId)
@@ -279,26 +273,26 @@ export const addEvent = async (
     }
 }
 
-export const setEventStatus = async (eventId, completed, isApproval) => {
+export const setEventStatus = async (eventId, completed) => {
     const url = `events/${eventId}`
 
     let event = await get(url)
     event.status = completed ? 'COMPLETED' : 'ACTIVE'
-    if (!isApproval) {
-        const values = {}
-        event.dataValues.forEach(
-            dataValue => (values[dataValue.dataElement] = dataValue.value)
-        )
-        if (values[L1_APPROVAL_STATUS] === 'Resend') {
-            values[L1_APPROVAL_STATUS] = ''
-            values[L1_REVISION_REASON] = ''
-        }
-        if (values[L2_APPROVAL_STATUS] === 'Resend') {
-            values[L2_APPROVAL_STATUS] = ''
-            values[L2_REVISION_REASON] = ''
-        }
-        event = await setEventValues(event, values)
+
+    const values = {}
+    event.dataValues.forEach(
+        dataValue => (values[dataValue.dataElement] = dataValue.value)
+    )
+    if (values[L1_APPROVAL_STATUS] === 'Resend') {
+        values[L1_APPROVAL_STATUS] = ''
+        values[L1_REVISION_REASON] = ''
     }
+    if (values[L2_APPROVAL_STATUS] === 'Resend') {
+        values[L2_APPROVAL_STATUS] = ''
+        values[L2_REVISION_REASON] = ''
+    }
+    event = await setEventValues(event, values)
+
     await put(url, event)
 }
 
@@ -313,34 +307,18 @@ export const updateEventValue = (eventId, dataElementId, value) =>
  */
 export const deleteEvent = async eventId => await del(`events/${eventId}`)
 
-export const getEvents = async (config, orgUnit, { username, l2Member }) =>
-    await getSqlView(
-        config.sqlViews.table.length === 1
-            ? config.sqlViews.table[0]
-            : l2Member
-            ? config.sqlViews.table[1]
-            : config.sqlViews.table[0],
-        orgUnit,
-        {
-            user: username ? username : false,
-            status: config.param ? config.status : false,
-        }
-    )
+export const getEvents = async (config, orgUnit, username) =>
+    await getSqlView(config.sqlViews.table, orgUnit, {
+        user: username,
+        status: config.param ? config.status : false,
+    })
 
-export const getCounts = async (configs, orgUnit, { username, l2Member }) => {
+export const getCounts = async (configs, orgUnit, username) => {
     for (const config of configs)
-        config.count = (await getSqlView(
-            config.sqlViews.count.length === 1
-                ? config.sqlViews.count[0]
-                : l2Member
-                ? config.sqlViews.count[1]
-                : config.sqlViews.count[0],
-            orgUnit,
-            {
-                user: username ? username : false,
-                status: config.param ? config.status : false,
-            }
-        ))[0][0]
+        config.count = (await getSqlView(config.sqlViews.count, orgUnit, {
+            user: username,
+            status: config.param ? config.status : false,
+        }))[0][0]
     return configs.map(config => config.count)
 }
 

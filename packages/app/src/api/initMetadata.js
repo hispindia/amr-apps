@@ -1,12 +1,6 @@
 import { get } from './crud'
 import { request } from './request'
-import {
-    ORGANISM_ELEMENT,
-    PERSON_TYPE,
-    DEO_GROUP,
-    L1_GROUP,
-    L2_GROUP,
-} from 'constants/dhis2'
+import { ORGANISM_ELEMENT, PERSON_TYPE, DEO_GROUP } from 'constants/dhis2'
 
 const sortChildren = ou => {
     ou.children.forEach(c => sortChildren(c))
@@ -73,8 +67,6 @@ export const initMetadata = async () => {
     const user = {
         username: userData.userCredentials.username,
         deoMember: userGroups.includes(DEO_GROUP),
-        l1Member: userGroups.includes(L1_GROUP),
-        l2Member: userGroups.includes(L2_GROUP),
     }
     const userOrgUnits = userData.organisationUnits.map(uo => uo.id)
 

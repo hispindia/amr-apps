@@ -5,7 +5,7 @@ import { showAlert } from 'actions/alert'
 
 export const useCounts = location => {
     const dispatch = useDispatch()
-    const { categories, isApproval } = useSelector(state => state.appConfig)
+    const categories = useSelector(state => state.appConfig.categories)
     const user = useSelector(state => state.metadata.user)
     const selectedOrgUnit = useSelector(state => state.selectedOrgUnit.id)
 
@@ -15,10 +15,11 @@ export const useCounts = location => {
     useEffect(() => {
         const updateCounts = async () => {
             try {
-                const data = await getCounts(categories, selectedOrgUnit, {
-                    username: !isApproval ? user.username : false,
-                    l2Member: user.l2Member,
-                })
+                const data = await getCounts(
+                    categories,
+                    selectedOrgUnit,
+                    user.username
+                )
                 setCounts(data)
                 if (error) setError(false)
             } catch (e) {

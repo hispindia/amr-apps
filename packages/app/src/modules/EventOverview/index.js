@@ -11,7 +11,6 @@ import { titles, headers } from './config'
  */
 export const EventOverview = ({ match, history }) => {
     const status = match.params.status
-    const isApproval = useSelector(state => state.appConfig.isApproval)
     const selected = useSelector(state => state.selectedOrgUnit.id)
     const { rows, loading, addButtonDisabled, error } = useEvents(status)
 
@@ -38,7 +37,6 @@ export const EventOverview = ({ match, history }) => {
                         headers={headers}
                         onEventClick={onEventClick}
                         onAddClick={onAddClick}
-                        addButton={!isApproval}
                         addButtonDisabled={addButtonDisabled}
                     />
                 ))}

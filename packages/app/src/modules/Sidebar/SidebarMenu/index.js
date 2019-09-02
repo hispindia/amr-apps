@@ -10,7 +10,7 @@ import { useCounts } from './useCounts'
  * Sidebar menu.
  */
 const SidebarMenu = ({ location }) => {
-    const { categories } = useSelector(state => state.appConfig)
+    const categories = useSelector(state => state.appConfig.categories)
     const [counts, error] = useCounts(location)
 
     return (

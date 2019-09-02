@@ -10,13 +10,14 @@ import {
     L2_REJECTION_REASON,
     L2_REVISION_REASON,
 } from 'constants/dhis2'
+import { APPROVED, RESEND } from 'constants/approval'
 
 export const getSqlView = async (sqlView, orgUnit, { user, status }) =>
     (await get(
         request(`sqlViews/${sqlView}/data`, {
             options: [
                 `var=orgunit:${orgUnit}`,
-                ...(user ? [`var=username:${user}`] : []),
+                `var=username:${user}`,
                 ...(status ? [`var=status:${status}`] : []),
             ],
         })
@@ -97,7 +98,7 @@ export const generateAmrId = async (orgUnitId, orgUnitCode) => {
 export const getProgramStage = async (
     pStage,
     values,
-    { completed, newRecord, l1Member, l2Member }
+    { completed, newRecord }
 ) => {
     const shouldDisable = id => {
         switch (id) {
@@ -111,28 +112,25 @@ export const getProgramStage = async (
             case L1_REJECTION_REASON:
             case L1_REVISION_REASON:
                 return (
-                    !l1Member ||
-                    values[L1_APPROVAL_STATUS] === 'Approved' ||
-                    values[L1_APPROVAL_STATUS] === 'Rejected' ||
-                    values[L2_APPROVAL_STATUS] === 'Rejected'
+                    values[L1_APPROVAL_STATUS] === APPROVED ||
+                    values[L1_APPROVAL_STATUS] === REJECTED ||
+                    values[L2_APPROVAL_STATUS] === REJECTED
                 )
             case L2_APPROVAL_STATUS:
             case L2_REJECTION_REASON:
             case L2_REVISION_REASON:
                 return (
-                    !l2Member ||
-                    values[L2_APPROVAL_STATUS] === 'Approved' ||
-                    values[L2_APPROVAL_STATUS] === 'Rejected' ||
-                    values[L1_APPROVAL_STATUS] === 'Rejected'
+                    values[L2_APPROVAL_STATUS] === APPROVED ||
+                    values[L2_APPROVAL_STATUS] === REJECTED ||
+                    values[L1_APPROVAL_STATUS] === REJECTED
                 )
             default:
                 if (newRecord) return false
-                else if (l1Member || l2Member) return true
                 else
                     return !(
-                        (values[L2_APPROVAL_STATUS] === 'Resend' &&
-                            values[L1_APPROVAL_STATUS] !== 'Rejected') ||
-                        (values[L1_APPROVAL_STATUS] === 'Resend' ||
+                        (values[L2_APPROVAL_STATUS] === RESEND &&
+                            values[L1_APPROVAL_STATUS] !== REJECTED) ||
+                        (values[L1_APPROVAL_STATUS] === RESEND ||
                             values[L1_APPROVAL_STATUS] === '' ||
                             !values[L1_APPROVAL_STATUS])
                     )
@@ -153,8 +151,6 @@ export const getProgramStage = async (
         s.hideWithValues =
             s.name === 'Results' ||
             (s.name === 'Approval' &&
-                !l1Member &&
-                !l2Member &&
                 !values[L1_APPROVAL_STATUS] &&
                 !values[L2_APPROVAL_STATUS])
     })
@@ -167,12 +163,11 @@ export const getProgramStage = async (
             values === {} ||
             (!values[L1_APPROVAL_STATUS] && !values[L2_APPROVAL_STATUS]) ||
             [values[L1_APPROVAL_STATUS], values[L2_APPROVAL_STATUS]].includes(
-                'Resend'
-            ) ||
-            (l2Member && !values[L2_APPROVAL_STATUS]),
+                RESEND
+            ),
         finished:
             (values[L1_APPROVAL_STATUS] === values[L2_APPROVAL_STATUS]) ===
-            'Approved',
+            APPROVED,
         completed: completed,
     }
 

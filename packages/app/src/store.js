@@ -5,11 +5,7 @@ import { alert, appConfig, metadata, selectedOrgUnit, data } from 'reducers'
 
 const middlewares = [ReduxThunk]
 
-const shouldLog = true
-
-if (process.env.NODE_ENV === 'development' && shouldLog) {
-    middlewares.push(logger)
-}
+if (process.env.NODE_ENV === 'development') middlewares.push(logger)
 
 const rootReducer = combineReducers({
     alert,
@@ -19,9 +15,9 @@ const rootReducer = combineReducers({
     data,
 })
 
-export const store = (categories, isApproval = false) =>
+export const store = categories =>
     createStore(
         rootReducer,
-        { appConfig: { categories, isApproval } },
+        { appConfig: { categories } },
         applyMiddleware(...middlewares)
     )
