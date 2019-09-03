@@ -36,7 +36,8 @@
     "dependencies": {
         "@amr/app": "*",
         "react": "^16.9.0",
-        "react-dom": "^16.9.0"
+        "react-dom": "^16.9.0",
+        "react-router-dom": "^5.0.1"
     },
     "devDependencies": {
         "bestzip": "^2.1.4",

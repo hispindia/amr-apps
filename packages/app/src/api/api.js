@@ -1,6 +1,7 @@
-//import moment from 'moment'
 import { get, post, del, put, setBaseUrl } from './crud'
 import { request } from './request'
+import { getRecord } from './getRecord'
+import { postEvent } from './postEvent'
 import {
     ORGANISM_ELEMENT,
     SAMPLE_ID_ELEMENT,
@@ -13,7 +14,6 @@ import {
 } from 'constants/dhis2'
 import {
     getProgramStage,
-    getEventValues,
     setEventValues,
     generateAmrId,
     getSqlView,
@@ -142,35 +142,12 @@ export const newRecord = async (
 }
 
 export const existingRecord = async (programs, eventId) => {
-    const {
-        eventValues: initialValues,
-        programId: program,
-        programStageId,
-        completed,
-        entityId,
-        sampleDate,
-    } = await getEventValues(eventId)
-    const pStage = programs
-        .find(p => p.id === program)
-        .programStages.find(ps => (ps.id = programStageId))
-    const { programStage, eventValues, status } = await getProgramStage(
-        pStage,
-        initialValues,
-        {
-            completed,
-            newRecord: false,
-        }
-    )
-    const entityValues = await getPersonValues(entityId)
+    const record = await getRecord(programs, eventId)
+    console.log(record)
+    const entityValues = await getPersonValues(record.entityId)
 
     return {
-        program,
-        programStage,
-        eventValues,
-        status,
-        eventId,
-        entityId,
-        sampleDate,
+        ...record,
         entityValues,
     }
 }
@@ -265,11 +242,11 @@ export const addEvent = async (
         })
     }
 
-    const r = await post('events', event)
+    const eventId = await postEvent(event)
 
     return {
         entityId,
-        eventId: r.response.importSummaries[0].reference,
+        eventId,
     }
 }
 

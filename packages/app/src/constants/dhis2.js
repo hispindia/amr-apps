@@ -2,6 +2,7 @@ export const ORGANISM_ELEMENT = 'SaQe2REkGVw'
 export const TEST_RESULT_ELEMENT = 'bSgpKbkbVGL'
 export const SAMPLE_ID_ELEMENT = 'GpAu5HjWAEz'
 export const AMR_ELEMENT = 'lIkk661BLpG'
+export const IS_ISOLATE_ELEMENT = 'ugtQC30LNua'
 
 export const PERSON_TYPE = 'tOJvIFXsB5V'
 

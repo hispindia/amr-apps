@@ -1,14 +1,9 @@
 import React from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
-import styled from 'styled-components'
+import { MainSection } from 'components'
 import { EventForm, EventOverview } from 'modules'
 
 const paths = ['/orgUnit/:orgUnit/event', '/orgUnit/:orgUnit/event/:event']
-
-const MainSection = styled.main`
-    width: 100%;
-    padding: 16px;
-`
 
 export const Main = () => (
     <MainSection>

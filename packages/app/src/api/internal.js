@@ -1,5 +1,6 @@
 import { get } from './crud'
 import { request } from './request'
+import { getEvent } from './getEvent'
 import {
     ORGANISM_ELEMENT,
     AMR_ELEMENT,
@@ -10,7 +11,7 @@ import {
     L2_REJECTION_REASON,
     L2_REVISION_REASON,
 } from 'constants/dhis2'
-import { APPROVED, RESEND } from 'constants/approval'
+import { APPROVED, RESEND, REJECTED } from 'constants/approval'
 
 export const getSqlView = async (sqlView, orgUnit, { user, status }) =>
     (await get(
@@ -29,7 +30,7 @@ export const getSqlView = async (sqlView, orgUnit, { user, status }) =>
  * @returns {Object} Event values.
  */
 export const getEventValues = async eventId => {
-    const event = await get(`events/${eventId}`)
+    const event = await getEvent(eventId)
     const values = {}
 
     if (event.dataValues)

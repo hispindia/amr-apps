@@ -1,5 +1,6 @@
 export * from './actions'
 export * from './api'
+export * from './components'
 export * from './constants'
 export * from './inputs'
 export * from './modules'

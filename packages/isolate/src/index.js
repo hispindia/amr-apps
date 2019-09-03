@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { init } from '@amr/app'
 import * as serviceWorker from './serviceWorker'
-import { IsolateValidation } from './IsolateValidation'
+import { IsolateValidation } from './components/IsolateValidation'
 
 const developmentServer = 'https://amrtest.icmr.org.in/amr'
 const rootElement = document.getElementById('root')
