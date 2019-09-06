@@ -25,8 +25,7 @@ import {
     deleteEvent,
     isDuplicateRecord,
 } from 'api'
-import { entityRules } from './entityRules'
-import { eventRules } from './eventRules'
+import { entityRules, eventRules, getRules } from 'helpers'
 import { DUPLICATE_CHECKING } from 'constants/duplicacy'
 import { LOADING, SUCCESS } from 'constants/statuses'
 import { SAMPLE_ID_ELEMENT, ORGANISM_SET } from 'constants/dhis2'
@@ -314,11 +313,3 @@ export const checkDuplicacy = sampleId => async (dispatch, getState) => {
     })
     dispatch(createAction(DUPLICACY, duplicate))
 }
-
-const getRules = (rules, programId, programStageId) =>
-    rules.filter(
-        r =>
-            (r.programStage ? r.programStage.id === programStageId : false) ||
-            (r.program.id === programId &&
-                (r.programStage ? r.programStage.id === programStageId : true))
-    )

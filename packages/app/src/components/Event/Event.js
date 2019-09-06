@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { LoadingSection } from 'components'
+import { LoadingSection } from '../LoadingSection'
 import { Section } from './Section'
 
 export const Event = () => {

@@ -1015,10 +1015,10 @@
     classnames "^2.2.6"
     styled-jsx "^3.2.1"
 
-"@dhis2/ui-core@^3.7.1":
-  version "3.7.1"
-  resolved "https://registry.yarnpkg.com/@dhis2/ui-core/-/ui-core-3.7.1.tgz#fe01cb408eee73fe8167173cdc4ce825229f2d43"
-  integrity sha512-lO7ILCf33TC77G5xwpJAdDBtLzBVIu0D4crafVbGafQn5dXZKHoD3eLZYxfau9/jw8819NV0FmuNd5+13Zgabg==
+"@dhis2/ui-core@^3.9.0":
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/@dhis2/ui-core/-/ui-core-3.9.0.tgz#67711e7446e7045a9b90b094a616b11bb7a91514"
+  integrity sha512-xZ58Z6RSuLCe2t06wWIB6uq9W65CkPJOtf0IQGeFTeelsGL9GTQVICUTZohE78g185qR94WxIEUIID/o1HK/sA==
   dependencies:
     "@dhis2/prop-types" "^1.0.3"
     classnames "^2.2.6"

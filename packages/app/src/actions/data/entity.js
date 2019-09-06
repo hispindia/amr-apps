@@ -9,7 +9,7 @@ import {
 } from '../types'
 import { showAlert } from '../alert'
 import { getPersonValues, checkUnique } from 'api'
-import { entityRules } from './entityRules'
+import { entityRules } from 'helpers'
 
 export const getEntity = id => async (dispatch, getState) => {
     dispatch(createAction(SET_MODAL_LOADING, true))

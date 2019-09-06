@@ -99,7 +99,7 @@ export const generateAmrId = async (orgUnitId, orgUnitCode) => {
 export const getProgramStage = async (
     pStage,
     values,
-    { completed, newRecord }
+    { completed, newRecord, isIsolate }
 ) => {
     const shouldDisable = id => {
         switch (id) {
@@ -109,36 +109,29 @@ export const getProgramStage = async (
                 return (
                     values[ORGANISM_ELEMENT] && values[ORGANISM_ELEMENT] !== ''
                 )
-            case L1_APPROVAL_STATUS:
-            case L1_REJECTION_REASON:
-            case L1_REVISION_REASON:
-                return (
-                    values[L1_APPROVAL_STATUS] === APPROVED ||
-                    values[L1_APPROVAL_STATUS] === REJECTED ||
-                    values[L2_APPROVAL_STATUS] === REJECTED
-                )
-            case L2_APPROVAL_STATUS:
-            case L2_REJECTION_REASON:
-            case L2_REVISION_REASON:
-                return (
-                    values[L2_APPROVAL_STATUS] === APPROVED ||
-                    values[L2_APPROVAL_STATUS] === REJECTED ||
-                    values[L1_APPROVAL_STATUS] === REJECTED
-                )
             default:
-                if (newRecord) return false
-                else
-                    return !(
-                        (values[L2_APPROVAL_STATUS] === RESEND &&
-                            values[L1_APPROVAL_STATUS] !== REJECTED) ||
-                        (values[L1_APPROVAL_STATUS] === RESEND ||
-                            values[L1_APPROVAL_STATUS] === '' ||
-                            !values[L1_APPROVAL_STATUS])
-                    )
+                return isIsolate && !programStage.dataElements[id].editable
         }
     }
 
+    const setEditable = dataElements =>
+        dataElements.forEach(
+            id => (programStage.dataElements[id].editable = true)
+        )
+
     const programStage = JSON.parse(JSON.stringify(pStage))
+
+    programStage.programStageSections.forEach(s => {
+        s.hideWithValues =
+            s.name === 'Results' ||
+            (s.name === 'Approval' &&
+                !values[L1_APPROVAL_STATUS] &&
+                !values[L2_APPROVAL_STATUS])
+        if (s.editable) setEditable(s.dataElements)
+        s.childSections.forEach(cs => {
+            if (cs.editable) setEditable(cs.dataElements)
+        })
+    })
 
     Object.keys(programStage.dataElements).forEach(id => {
         const dataElement = programStage.dataElements[id]
@@ -148,27 +141,10 @@ export const getProgramStage = async (
         if (!values[id]) values[id] = ''
     })
 
-    programStage.programStageSections.forEach(s => {
-        s.hideWithValues =
-            s.name === 'Results' ||
-            (s.name === 'Approval' &&
-                !values[L1_APPROVAL_STATUS] &&
-                !values[L2_APPROVAL_STATUS])
-    })
-
     const status = {
-        deletable:
-            values === {} ||
-            (!values[L1_APPROVAL_STATUS] && !values[L2_APPROVAL_STATUS]),
-        editable:
-            values === {} ||
-            (!values[L1_APPROVAL_STATUS] && !values[L2_APPROVAL_STATUS]) ||
-            [values[L1_APPROVAL_STATUS], values[L2_APPROVAL_STATUS]].includes(
-                RESEND
-            ),
-        finished:
-            (values[L1_APPROVAL_STATUS] === values[L2_APPROVAL_STATUS]) ===
-            APPROVED,
+        deletable: !completed,
+        editable: !completed,
+        finished: completed,
         completed: completed,
     }
 

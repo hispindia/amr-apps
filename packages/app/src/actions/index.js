@@ -1,4 +1,5 @@
 export * from './alert'
+export { createAction } from './createAction'
 export * from './data'
 export * from './metadata'
 export * from './orgUnit'

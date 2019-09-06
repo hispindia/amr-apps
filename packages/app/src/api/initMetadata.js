@@ -2,6 +2,60 @@ import { get } from './crud'
 import { request } from './request'
 import { ORGANISM_ELEMENT, PERSON_TYPE, DEO_GROUP } from 'constants/dhis2'
 
+const getUserData = async () =>
+    await get(
+        request('me', {
+            fields: 'organisationUnits,userGroups,userCredentials[username]',
+        })
+    )
+
+const getMetadata = async () =>
+    await get(
+        request('metadata', {
+            order: 'level:asc',
+            fields: [
+                'children',
+                'condition',
+                'code',
+                'dataElement',
+                'displayName',
+                'formName',
+                'id',
+                'name',
+                'options',
+                'organisationUnits',
+                'path',
+                'priority',
+                'program',
+                `programRuleActions[programRuleActionType,dataElement,
+                optionGroup,content,trackedEntityAttribute,
+                programStageSection,data]`,
+                'programStage',
+                `programStages[id,displayName,access,programStageDataElements[
+                dataElement[id],compulsory],programStageSections[id,name,
+                displayName,renderType,dataElements[id,displayFormName,
+                code,valueType,optionSetValue,optionSet]]]`,
+                `trackedEntityTypeAttributes[name,id,displayName,valueType,
+                unique,optionSetValue,optionSet,mandatory,
+                trackedEntityAttribute[name,id,displayName,valueType,
+                unique,optionSetValue,optionSet]]`,
+                'value',
+            ],
+            options: [
+                'constants=true',
+                'dataElements=true',
+                'optionGroups=true',
+                'options=true',
+                'optionSets=true',
+                'organisationUnits=true',
+                'programRules=true',
+                'programRuleVariables=true',
+                'programs=true',
+                'trackedEntityTypes=true',
+            ],
+        })
+    )
+
 const sortChildren = ou => {
     ou.children.forEach(c => sortChildren(c))
     ou.children.sort((a, b) =>
@@ -13,7 +67,7 @@ const sortChildren = ou => {
     )
 }
 
-export const initMetadata = async () => {
+export const initMetadata = async isIsolate => {
     // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
     const programCondition = c => {
         const original = c
@@ -58,11 +112,8 @@ export const initMetadata = async () => {
         return c
     }
 
-    const userData = await get(
-        request('me', {
-            fields: 'organisationUnits,userGroups,userCredentials[username]',
-        })
-    )
+    const userData = await getUserData()
+
     const userGroups = userData.userGroups.map(userGroup => userGroup.id)
     const user = {
         username: userData.userCredentials.username,
@@ -70,51 +121,7 @@ export const initMetadata = async () => {
     }
     const userOrgUnits = userData.organisationUnits.map(uo => uo.id)
 
-    const data = await get(
-        request('metadata', {
-            order: 'level:asc',
-            fields: [
-                'children',
-                'condition',
-                'code',
-                'dataElement',
-                'displayName',
-                'formName',
-                'id',
-                'name',
-                'options',
-                'organisationUnits',
-                'path',
-                'priority',
-                'program',
-                `programRuleActions[programRuleActionType,dataElement,
-                    optionGroup,content,trackedEntityAttribute,
-                    programStageSection,data]`,
-                'programStage',
-                `programStages[id,displayName,access,programStageDataElements[
-                    dataElement[id],compulsory],programStageSections[id,name,
-                    displayName,renderType,dataElements[id,displayFormName,
-                    code,valueType,optionSetValue,optionSet]]]`,
-                `trackedEntityTypeAttributes[name,id,displayName,valueType,
-                    unique,optionSetValue,optionSet,mandatory,
-                    trackedEntityAttribute[name,id,displayName,valueType,
-                    unique,optionSetValue,optionSet]]`,
-                'value',
-            ],
-            options: [
-                'constants=true',
-                'dataElements=true',
-                'optionGroups=true',
-                'options=true',
-                'optionSets=true',
-                'organisationUnits=true',
-                'programRules=true',
-                'programRuleVariables=true',
-                'programs=true',
-                'trackedEntityTypes=true',
-            ],
-        })
-    )
+    const data = await getMetadata()
 
     const orgUnits = []
     data.organisationUnits
@@ -184,7 +191,7 @@ export const initMetadata = async () => {
             }
         })
 
-    const programs = data.programs.filter(p => p.name !== 'AMR (WHONET import)')
+    const programs = data.programs.filter(p => !p.name.includes('[IGNORE]'))
 
     const programList = []
     const stageLists = {}
@@ -218,6 +225,13 @@ export const initMetadata = async () => {
                 if (ps.dataElements[ORGANISM_ELEMENT])
                     ps.dataElements[ORGANISM_ELEMENT].hideWithValues = true
                 ps.programStageSections.forEach(pss => {
+                    if (pss.name.includes('[EDITABLE]')) {
+                        pss.displayName = pss.name = pss.name.replace(
+                            '[EDITABLE]',
+                            ''
+                        )
+                        if (isIsolate) pss.editable = true
+                    }
                     pss.dataElements.forEach(
                         d =>
                             (ps.dataElements[d.id] = {
@@ -237,6 +251,7 @@ export const initMetadata = async () => {
                                 new RegExp('{' + pss.name + '}'),
                                 ''
                             )
+                            cs.editable = !!pss.editable
                             childSections.push(cs)
                         })
                     pss.childSections = childSections
@@ -262,6 +277,8 @@ export const initMetadata = async () => {
     eventRules = eventRules.sort((a, b) =>
         a.priority > b.priority || !a.priority ? 1 : -1
     )
+
+    console.log(eventRules)
 
     const constants = {}
     if (data.constants)

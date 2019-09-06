@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { node } from 'prop-types'
+import { bool, node } from 'prop-types'
 import { OverlayedLoader } from './OverlayedLoader'
 import { setMetadata } from 'actions'
 import { ERROR, LOADING } from 'constants/statuses'
 
-export const MetadataLoader = ({ children }) => {
+export const MetadataLoader = ({ isIsolate, children }) => {
     const dispatch = useDispatch()
     const status = useSelector(state => state.metadata.status)
 
     useEffect(() => {
-        dispatch(setMetadata())
+        dispatch(setMetadata(isIsolate))
     }, [])
 
     if (status === ERROR) return null
@@ -20,4 +20,7 @@ export const MetadataLoader = ({ children }) => {
     return children
 }
 
-MetadataLoader.propTypes = { children: node.isRequired }
+MetadataLoader.propTypes = {
+    isIsolate: bool,
+    children: node.isRequired,
+}

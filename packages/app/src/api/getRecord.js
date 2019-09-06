@@ -1,6 +1,6 @@
 import { getProgramStage, getEventValues } from './internal'
 
-export const getRecord = async (programs, eventId) => {
+export const getRecord = async (programs, eventId, isIsolate) => {
     const {
         eventValues: initialValues,
         programId: program,
@@ -18,6 +18,7 @@ export const getRecord = async (programs, eventId) => {
         {
             completed,
             newRecord: false,
+            isIsolate,
         }
     )
 

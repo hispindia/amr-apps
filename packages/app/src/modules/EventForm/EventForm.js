@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { TitleRow } from 'components'
+import { TitleRow, Event, Panel } from 'components'
 import {
     getExistingEvent,
     initNewEvent,
@@ -10,8 +10,6 @@ import {
 } from 'actions'
 import { EventModal } from './EventModal'
 import { Entity } from './Entity'
-import { Panel } from './Panel'
-import { Event } from './Event'
 import { EventButtons } from './EventButtons'
 import { ERROR } from 'constants/statuses'
 
