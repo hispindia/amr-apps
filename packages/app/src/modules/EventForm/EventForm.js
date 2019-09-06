@@ -7,8 +7,8 @@ import {
     initNewEvent,
     createNewEvent,
     resetData,
+    EventModal,
 } from 'actions'
-import { EventModal } from './EventModal'
 import { Entity } from './Entity'
 import { EventButtons } from './EventButtons'
 import { ERROR } from 'constants/statuses'

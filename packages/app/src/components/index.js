@@ -1,6 +1,7 @@
 export { ButtonRow } from './ButtonRow'
 export { CardSection } from './CardSection'
 export { Event } from './Event'
+export { EventModal } from './EventModal'
 export { Icon } from './Icon'
 export { IconButton } from './IconButton'
 export { Header } from './Header'

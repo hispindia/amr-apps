@@ -1,6 +1,13 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { TitleRow, Panel, Event, LoadingSection, ERROR } from '@amr/app'
+import {
+    EventModal,
+    TitleRow,
+    Panel,
+    Event,
+    LoadingSection,
+    ERROR,
+} from '@amr/app'
 import { getIsolate } from '../actions/data'
 import { Buttons } from './Buttons'
 
@@ -20,15 +27,14 @@ export const IsolateForm = ({ history, match }) => {
 
     return (
         <>
+            <EventModal history={history} isIsolate />
             <TitleRow title="Isolate" />
+            {loading && !error && <LoadingSection />}
             <form autoComplete="off">
-                {loading && !error && <LoadingSection />}
                 <Panel />
                 <Event />
-                {!loading && !error && !completed && (
-                    <Buttons history={history} />
-                )}
             </form>
+            {!loading && !error && !completed && <Buttons history={history} />}
         </>
     )
 }

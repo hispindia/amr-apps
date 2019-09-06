@@ -4,11 +4,13 @@ import { ModalPopup } from 'components'
 import { SUCCESS, LOADING } from 'constants/statuses'
 import { onDeleteConfirmed } from 'actions'
 
-export const EventModal = ({ history }) => {
+export const EventModal = ({ history, isIsolate }) => {
     const dispatch = useDispatch()
     const deletePrompt = useSelector(state => state.data.deletePrompt)
     const deleteSuccess = deletePrompt === SUCCESS
     const deleting = deletePrompt === LOADING
+
+    const type = isIsolate ? 'isolate' : 'record'
 
     useEffect(() => {
         if (deleteSuccess) history.goBack()
@@ -21,8 +23,8 @@ export const EventModal = ({ history }) => {
 
     return (
         <ModalPopup
-            heading="Delete record"
-            text="Are you sure you want to permanently delete this record?"
+            heading={`Delete ${type}`}
+            text={`Are you sure you want to permanently delete this ${type}?`}
             label="Delete"
             icon="delete"
             destructive

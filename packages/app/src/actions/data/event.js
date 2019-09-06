@@ -211,10 +211,10 @@ export const submitEvent = addMore => async (dispatch, getState) => {
         await setEventStatus(eventId, true)
         if (addMore) dispatch(createAction(RESET_PANEL_EVENT))
         else dispatch(createAction(EXIT))
-        dispatch(showAlert('Record submitted successfully.', { success: true }))
+        dispatch(showAlert('Submitted successfully.', { success: true }))
     } catch (error) {
         console.error(error)
-        dispatch(showAlert('Failed to submit record.', { critical: true }))
+        dispatch(showAlert('Failed to submit.', { critical: true }))
         dispatch(createAction(ENABLE_BUTTONS))
     } finally {
         batch(() => {
@@ -262,11 +262,11 @@ export const onDeleteConfirmed = confirmed => async (dispatch, getState) => {
     try {
         const response = (await deleteEvent(eventId)).response
         if (response.importCount.deleted !== 1) throw response.description
-        dispatch(showAlert('Record deleted successfully.', {}))
+        dispatch(showAlert('Deleted successfully.', {}))
         dispatch(setDeletePrompt(SUCCESS))
     } catch (error) {
         console.error(error)
-        dispatch(showAlert('Failed to delete record.', { critical: true }))
+        dispatch(showAlert('Failed to delete.', { critical: true }))
         dispatch(setDeletePrompt(true))
     }
 }
