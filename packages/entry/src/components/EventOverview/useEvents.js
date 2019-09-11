@@ -1,7 +1,7 @@
 import { useEffect, useReducer } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { showAlert } from '@amr/app'
 import { getEvents } from 'api'
-import { showAlert } from 'actions/alert'
 
 const INITIAL_STATE = {
     rows: null,
@@ -62,7 +62,7 @@ export const useEvents = status => {
         const noProgram = !programList.find(p => p.orgUnits.includes(selected))
         if (noProgram !== state.addButtonDisabled)
             dispatcher({ type: NEW_PROGRAMS, disable: noProgram })
-    }, [selected])
+    }, [selected, programList, state.addButtonDisabled])
 
     useEffect(() => {
         const getData = async () => {
@@ -85,7 +85,8 @@ export const useEvents = status => {
 
         dispatcher({ type: LOADING })
         getData()
-    }, [selected, status])
+    }, [selected, status, categories, dispatch, user.username])
 
     return state
 }
+

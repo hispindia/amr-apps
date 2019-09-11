@@ -4,7 +4,7 @@ import { ModalPopup } from 'components'
 import { SUCCESS, LOADING } from 'constants/statuses'
 import { onDeleteConfirmed } from 'actions'
 
-export const EventModal = ({ history, isIsolate }) => {
+export const EventModal = ({ history, isIsolate, secondaryAction }) => {
     const dispatch = useDispatch()
     const deletePrompt = useSelector(state => state.data.deletePrompt)
     const deleteSuccess = deletePrompt === SUCCESS
@@ -17,7 +17,7 @@ export const EventModal = ({ history, isIsolate }) => {
     }, [deleteSuccess])
 
     const onDeleteConfirmation = async confirmed =>
-        dispatch(onDeleteConfirmed(confirmed))
+        dispatch(onDeleteConfirmed(confirmed, secondaryAction))
 
     if (!deletePrompt) return null
 
@@ -31,6 +31,7 @@ export const EventModal = ({ history, isIsolate }) => {
             onClick={onDeleteConfirmation}
             loading={deleting}
             disabled={deleting}
+            secondaryAction={secondaryAction}
         />
     )
 }

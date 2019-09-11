@@ -1,81 +1,10 @@
-import {
-    getRecord,
-    getEvent,
-    ACTIVE,
-    COMPLETED,
-    postEvent,
-    putEvent,
-    deleteEvent,
-    updateEventValue,
-    postDataElement,
-} from '@amr/app'
+import { getRecord, getEvent, ACTIVE, postEvent } from '@amr/app'
+import { setCorrespondingIsolate } from './setCorrespondingIsolate'
 import {
     CORRESPONDING_ISOLATE_ELEMENT,
     CORRESPONDING_EVENT_ELEMENT,
 } from '../constants/dhis2'
-
-const isolateDe = {
-    lastUpdated: '2019-09-05T13:54:00.546',
-    id: 'zXHKQkUKqzY',
-    href: 'https://amrtest.icmr.org.in/amr/api/dataElements/zXHKQkUKqzY',
-    created: '2019-09-05T13:54:00.546',
-    name: 'Corresponding isolate',
-    shortName: 'Corresponding isolate',
-    aggregationType: 'NONE',
-    domainType: 'TRACKER',
-    displayName: 'Corresponding isolate',
-    publicAccess: 'rw------',
-    description: 'Contains the event ID of the isolate',
-    displayShortName: 'Corresponding isolate',
-    externalAccess: false,
-    valueType: 'TEXT',
-    displayDescription: 'Contains the event ID of the isolate',
-    dimensionItem: 'zXHKQkUKqzY',
-    displayFormName: 'Corresponding isolate',
-    zeroIsSignificant: false,
-    favorite: false,
-    optionSetValue: false,
-    dimensionItemType: 'DATA_ELEMENT',
-    access: {
-        read: true,
-        update: true,
-        externalize: true,
-        delete: true,
-        write: true,
-        manage: true,
-    },
-    categoryCombo: {
-        id: 'bjDvmb4bfuf',
-    },
-    lastUpdatedBy: {
-        id: 'aWnm8btrL9A',
-    },
-    user: {
-        id: 'aWnm8btrL9A',
-    },
-    favorites: [],
-    dataSetElements: [],
-    translations: [],
-    userGroupAccesses: [],
-    dataElementGroups: [],
-    attributeValues: [],
-    userAccesses: [],
-    legendSets: [],
-    aggregationLevels: [],
-}
-
-const setCorrespondingIsolate = async (event, isolate) =>
-    await putEvent({
-        ...event,
-        status: COMPLETED,
-        dataValues: [
-            ...event.dataValues,
-            {
-                dataElement: CORRESPONDING_ISOLATE_ELEMENT,
-                value: isolate,
-            },
-        ],
-    })
+import { deleteEvent } from '@amr/app/dist/api/api'
 
 /**
  * Posts a new event with the same values,
@@ -110,6 +39,8 @@ const postIsolate = async event =>
  */
 export const fetchIsolate = async (programs, eventId) => {
     const event = await getEvent(eventId)
+    //await deleteEvent('cmOvii0m3S7')
+    //return
     console.log(event)
 
     const correspondingIsolate = event.dataValues.find(
@@ -118,8 +49,18 @@ export const fetchIsolate = async (programs, eventId) => {
 
     // Existing isolate
     if (correspondingIsolate) {
-        console.log('existing isolate')
-        return await getRecord(programs, correspondingIsolate.value, true)
+        console.log('Existing isolate')
+        try {
+            const isolate = await getRecord(
+                programs,
+                correspondingIsolate.value,
+                true
+            )
+            return isolate
+        } catch (error) {
+            if (error !== 404) throw error
+            else console.log('Existing isolate already removed.')
+        }
     }
 
     // Is isolate

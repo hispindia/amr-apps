@@ -8,10 +8,11 @@ import {
     LoadingSection,
     ERROR,
 } from '@amr/app'
-import { getIsolate } from '../actions/data'
+import { getIsolate } from '../actions'
 import { Buttons } from './Buttons'
+import { removeCorrespondingIsolate } from '../api'
 
-export const IsolateForm = ({ history, match }) => {
+export const Form = ({ history, match }) => {
     const dispatch = useDispatch()
 
     const programs = useSelector(state => state.metadata.programs)
@@ -25,9 +26,16 @@ export const IsolateForm = ({ history, match }) => {
         dispatch(getIsolate(eventId))
     }, [programs, eventId, dispatch])
 
+    const secondaryAction = async () =>
+        await removeCorrespondingIsolate(eventId)
+
     return (
         <>
-            <EventModal history={history} isIsolate />
+            <EventModal
+                history={history}
+                isIsolate
+                secondaryAction={secondaryAction}
+            />
             <TitleRow title="Isolate" />
             {loading && !error && <LoadingSection />}
             <form autoComplete="off">

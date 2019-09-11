@@ -1,7 +1,6 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { LoadingSection, TitleRow } from 'components'
+import { LoadingSection, TitleRow } from '@amr/app'
 import { Table } from './Table'
 import { useEvents } from './useEvents'
 import { titles, headers } from './config'
@@ -44,4 +43,3 @@ export const EventOverview = ({ match, history }) => {
     )
 }
 
-export default withRouter(EventOverview)

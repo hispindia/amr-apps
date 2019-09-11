@@ -42,6 +42,8 @@ export const getIsolate = eventId => async (dispatch, getState) => {
         data.invalid = invalid
 
         dispatch(createAction(EXISTING_DATA_RECEIVED, data))
+        if (data.status.completed)
+            dispatch(showAlert('Isolate has already been completed.'))
     } catch (error) {
         console.error(error)
         dispatch(showAlert('Failed to get isolate.', { critical: true }))

@@ -31,6 +31,7 @@ export const getSqlView = async (sqlView, orgUnit, { user, status }) =>
  */
 export const getEventValues = async eventId => {
     const event = await getEvent(eventId)
+    if (event.httpStatusCode === 404) throw 404
     const values = {}
 
     if (event.dataValues)

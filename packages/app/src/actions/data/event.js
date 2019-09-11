@@ -249,7 +249,10 @@ export const editEvent = () => async (dispatch, getState) => {
 export const setDeletePrompt = deletePrompt => dispatch =>
     dispatch(createAction(SET_DELETE_PROMPT, deletePrompt))
 
-export const onDeleteConfirmed = confirmed => async (dispatch, getState) => {
+export const onDeleteConfirmed = (confirmed, secondaryAction) => async (
+    dispatch,
+    getState
+) => {
     if (!confirmed) {
         dispatch(setDeletePrompt(false))
         return
@@ -260,6 +263,7 @@ export const onDeleteConfirmed = confirmed => async (dispatch, getState) => {
     const eventId = getState().data.event.id
 
     try {
+        if (secondaryAction) await secondaryAction()
         const response = (await deleteEvent(eventId)).response
         if (response.importCount.deleted !== 1) throw response.description
         dispatch(showAlert('Deleted successfully.', {}))

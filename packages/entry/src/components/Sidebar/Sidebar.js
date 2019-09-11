@@ -16,6 +16,6 @@ const SidebarContainer = styled.aside`
 export const Sidebar = () => (
     <SidebarContainer>
         <SidebarMenu />
-        <Route path="/approval" component={OrgUnitTree} />
+        <Route path="/events" component={OrgUnitTree} />
     </SidebarContainer>
 )

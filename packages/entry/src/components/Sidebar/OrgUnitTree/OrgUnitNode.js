@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { object } from 'prop-types'
-import { Row } from 'styles'
+import { Row } from '@amr/app'
 import { setOrgUnit } from 'actions'
 import { Caret, ChildTree, OrgUnitText, NoCaret } from './style'
 
@@ -15,7 +15,7 @@ export const OrgUnitNode = ({ orgUnit }) => {
 
     useEffect(() => {
         setOpened(selected.path.includes(orgUnit.id))
-    }, [])
+    }, [selected.path, orgUnit.id])
 
     const onCarretClick = () => setOpened(!opened)
 

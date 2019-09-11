@@ -278,8 +278,6 @@ export const initMetadata = async isIsolate => {
         a.priority > b.priority || !a.priority ? 1 : -1
     )
 
-    console.log(eventRules)
-
     const constants = {}
     if (data.constants)
         data.constants.forEach(c => {

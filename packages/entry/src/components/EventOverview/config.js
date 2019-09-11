@@ -1,5 +1,5 @@
 export const titles = {
-    ALL: 'My records',
+    All: 'My records',
     Resend: 'Records for revision',
     Rejected: 'Rejected records',
     Approved: 'Approved records',

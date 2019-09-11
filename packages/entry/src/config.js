@@ -5,9 +5,9 @@ export const appName = 'Data Entry'
 export const categories = [
     {
         label: 'My records',
-        value: '#/approval/ALL',
+        value: '#/events/All',
         icon: 'home',
-        status: 'ALL',
+        status: 'All',
         sqlViews: {
             count: 'odg5FpAc79x',
             table: 'gPZgVJOeHk4',
@@ -17,7 +17,7 @@ export const categories = [
     },
     {
         label: 'Records for revision',
-        value: '#/approval/Resend',
+        value: '#/events/Resend',
         icon: 'error_outline',
         status: 'Resend',
         sqlViews: {
@@ -30,7 +30,7 @@ export const categories = [
     },
     {
         label: 'Rejected records',
-        value: '#/approval/Rejected',
+        value: '#/events/Rejected',
         icon: 'highlight_off',
         status: 'Rejected',
         sqlViews: {
@@ -43,7 +43,7 @@ export const categories = [
     },
     {
         label: 'Accepted records',
-        value: '#/approval/Approved',
+        value: '#/events/Approved',
         icon: 'check_circle_outline',
         status: 'Approved',
         sqlViews: {
@@ -56,7 +56,7 @@ export const categories = [
     },
     {
         label: 'Records for validation',
-        value: '#/approval/Validate',
+        value: '#/events/Validate',
         icon: 'help_outline',
         status: 'Validate',
         sqlViews: {
@@ -68,7 +68,7 @@ export const categories = [
     },
     {
         label: 'Incomplete records',
-        value: '#/approval/Incomplete',
+        value: '#/events/Incomplete',
         icon: 'pause_circle_outline',
         status: 'Incomplete',
         sqlViews: {

@@ -278,27 +278,6 @@ export const updateEventValue = (eventId, dataElementId, value) =>
         dataValues: [{ dataElement: dataElementId, value: value }],
     })
 
-/**
- * Deletes event.
- * @param {string} eventId - Event ID.
- */
-export const deleteEvent = async eventId => await del(`events/${eventId}`)
-
-export const getEvents = async (config, orgUnit, username) =>
-    await getSqlView(config.sqlViews.table, orgUnit, {
-        user: username,
-        status: config.param ? config.status : false,
-    })
-
-export const getCounts = async (configs, orgUnit, username) => {
-    for (const config of configs)
-        config.count = (await getSqlView(config.sqlViews.count, orgUnit, {
-            user: username,
-            status: config.param ? config.status : false,
-        }))[0][0]
-    return configs.map(config => config.count)
-}
-
 export const isDuplicateRecord = async ({
     event,
     entity,

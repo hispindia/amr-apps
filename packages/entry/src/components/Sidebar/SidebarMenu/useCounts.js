@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { getCounts } from 'api'
-import { showAlert } from 'actions/alert'
+import { showAlert } from '@amr/app'
 
 export const useCounts = location => {
     const dispatch = useDispatch()
@@ -33,7 +33,7 @@ export const useCounts = location => {
             }
         }
         updateCounts()
-    }, [selectedOrgUnit, location])
+    }, [selectedOrgUnit, location, categories, dispatch, error, user.username])
 
     return [counts, error]
 }

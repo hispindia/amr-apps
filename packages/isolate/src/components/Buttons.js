@@ -2,8 +2,6 @@ import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
 import { ButtonRow, submitEvent, setDeletePrompt } from '@amr/app'
-//import { submitEvent, editEvent, setDeletePrompt } from 'actions'
-//import { DUPLICATE_ERROR } from '../../constants/duplicacy'
 
 const StyledButtonRow = styled(ButtonRow)`
     margin: 0px;
@@ -19,7 +17,7 @@ export const Buttons = ({ history }) => {
         if (exit) history.goBack()
     }, [exit, history])
 
-    const onSubmit = async () => await dispatch(submitEvent(true))
+    const onSubmit = async () => await dispatch(submitEvent())
 
     const onDelete = () => dispatch(setDeletePrompt(true))
 

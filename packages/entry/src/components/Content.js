@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
-import { OverlayedLoader } from 'components'
-import { setMetadata, setOrgUnit } from 'actions'
-import { READY, ERROR } from 'constants/statuses'
+import { READY, ERROR } from '@amr/app'
+import { setOrgUnit } from '../actions'
 import { Main } from './Main'
-import { Sidebar } from '../Sidebar'
+import { Sidebar } from './Sidebar'
 
 const ContentSection = styled.section`
     display: flex;
@@ -19,19 +18,13 @@ export const Content = () => {
     const error = useSelector(state => state.metadata.status) === ERROR
 
     useEffect(() => {
-        dispatch(setMetadata())
-    }, [])
+        const initOrgUnit = (id, path) => dispatch(setOrgUnit(id, path))
 
-    useEffect(() => {
         if (metadata.status === READY)
-            dispatch(
-                setOrgUnit(metadata.orgUnits[0].id, metadata.orgUnits[0].path)
-            )
-    }, [metadata.status])
+            initOrgUnit(metadata.orgUnits[0].id, metadata.orgUnits[0].path)
+    }, [metadata.status, metadata.orgUnits, dispatch])
 
-    if (error) return null
-
-    if (!selected) return <OverlayedLoader />
+    if (error || !selected) return null
 
     return (
         <ContentSection>

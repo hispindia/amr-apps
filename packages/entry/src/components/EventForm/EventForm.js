@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { TitleRow, Event, Panel } from 'components'
+import { TitleRow, Event, Panel, EventModal } from 'components'
 import {
     getExistingEvent,
     initNewEvent,
     createNewEvent,
-    resetData,
-    EventModal,
+    resetData
 } from 'actions'
 import { Entity } from './Entity'
 import { EventButtons } from './EventButtons'
