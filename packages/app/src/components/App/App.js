@@ -3,10 +3,11 @@ import { BrowserRouter, HashRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { string, object, node } from 'prop-types'
 import { MuiThemeProvider } from '@material-ui/core'
+import { HeaderBar } from '@dhis2/ui-widgets'
+import { DataProvider } from '@dhis2/app-runtime'
 import { MuiPickersUtilsProvider } from 'material-ui-pickers'
 import DayjsUtils from '@date-io/dayjs'
 import { CssReset } from '@dhis2/ui-core'
-import { Header } from 'components'
 import { muiTheme } from './muiTheme'
 import { BodyStyle } from './BodyStyle'
 import { Alerts } from './Alerts'
@@ -19,11 +20,13 @@ export const App = ({ appName, baseUrl, store, children }) => (
                     <>
                         <CssReset />
                         <BodyStyle />
-                        <Header appName={appName} baseUrl={baseUrl} />
-                        <Provider store={store}>
-                            {children}
-                            <Alerts />
-                        </Provider>
+                        <DataProvider baseUrl={baseUrl} apiVersion={30}>
+                            <HeaderBar appName={appName} />
+                            <Provider store={store}>
+                                {children}
+                                <Alerts />
+                            </Provider>
+                        </DataProvider>
                     </>
                 </MuiPickersUtilsProvider>
             </MuiThemeProvider>

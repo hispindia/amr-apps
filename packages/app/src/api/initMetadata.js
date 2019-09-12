@@ -1,6 +1,7 @@
 import { get } from './crud'
 import { request } from './request'
 import { ORGANISM_ELEMENT, PERSON_TYPE, DEO_GROUP } from 'constants/dhis2'
+import { HIDE, IGNORE, EDITABLE } from 'constants'
 
 const getUserData = async () =>
     await get(
@@ -66,6 +67,14 @@ const sortChildren = ou => {
             : 0
     )
 }
+
+const hasHide = name => name.includes(HIDE)
+
+const hasIgnore = name => name.includes(IGNORE)
+
+const hasEditable = name => name.includes(EDITABLE)
+
+const removeOption = (name, option) => name.replace(option, '')
 
 export const initMetadata = async isIsolate => {
     // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
@@ -191,7 +200,7 @@ export const initMetadata = async isIsolate => {
             }
         })
 
-    const programs = data.programs.filter(p => !p.name.includes('[IGNORE]'))
+    const programs = data.programs.filter(p => !hasIgnore(p.name))
 
     const programList = []
     const stageLists = {}
@@ -225,10 +234,17 @@ export const initMetadata = async isIsolate => {
                 if (ps.dataElements[ORGANISM_ELEMENT])
                     ps.dataElements[ORGANISM_ELEMENT].hideWithValues = true
                 ps.programStageSections.forEach(pss => {
-                    if (pss.name.includes('[EDITABLE]')) {
-                        pss.displayName = pss.name = pss.name.replace(
-                            '[EDITABLE]',
-                            ''
+                    if (hasHide(pss.name)) {
+                        pss.displayName = pss.name = removeOption(
+                            pss.name,
+                            HIDE
+                        )
+                        pss.hideWithValues = true
+                    }
+                    if (hasEditable(pss.name)) {
+                        pss.displayName = pss.name = removeOption(
+                            pss.name,
+                            EDITABLE
                         )
                         if (isIsolate) pss.editable = true
                     }

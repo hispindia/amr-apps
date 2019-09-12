@@ -1,10 +1,9 @@
-import { getRecord, getEvent, ACTIVE, postEvent } from '@amr/app'
+import { getRecord, getEvent, ACTIVE, postEvent, deleteEvent } from '@amr/app'
 import { setCorrespondingIsolate } from './setCorrespondingIsolate'
 import {
     CORRESPONDING_ISOLATE_ELEMENT,
     CORRESPONDING_EVENT_ELEMENT,
 } from '../constants/dhis2'
-import { deleteEvent } from '@amr/app/dist/api/api'
 
 /**
  * Posts a new event with the same values,
@@ -39,7 +38,7 @@ const postIsolate = async event =>
  */
 export const fetchIsolate = async (programs, eventId) => {
     const event = await getEvent(eventId)
-    //await deleteEvent('cmOvii0m3S7')
+    //await deleteEvent("J4QBsND9uI5")
     //return
     console.log(event)
 

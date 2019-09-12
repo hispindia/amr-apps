@@ -123,11 +123,6 @@ export const getProgramStage = async (
     const programStage = JSON.parse(JSON.stringify(pStage))
 
     programStage.programStageSections.forEach(s => {
-        s.hideWithValues =
-            s.name === 'Results' ||
-            (s.name === 'Approval' &&
-                !values[L1_APPROVAL_STATUS] &&
-                !values[L2_APPROVAL_STATUS])
         if (s.editable) setEditable(s.dataElements)
         s.childSections.forEach(cs => {
             if (cs.editable) setEditable(cs.dataElements)

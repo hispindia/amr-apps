@@ -13,8 +13,8 @@ export const EventModal = ({ history, isIsolate, secondaryAction }) => {
     const type = isIsolate ? 'isolate' : 'record'
 
     useEffect(() => {
-        if (deleteSuccess) history.goBack()
-    }, [deleteSuccess])
+        if (deleteSuccess && history) history.goBack()
+    }, [deleteSuccess, history])
 
     const onDeleteConfirmation = async confirmed =>
         dispatch(onDeleteConfirmed(confirmed, secondaryAction))

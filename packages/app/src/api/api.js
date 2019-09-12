@@ -12,12 +12,7 @@ import {
     L2_APPROVAL_STATUS,
     L2_REVISION_REASON,
 } from 'constants/dhis2'
-import {
-    getProgramStage,
-    setEventValues,
-    generateAmrId,
-    getSqlView,
-} from './internal'
+import { getProgramStage, setEventValues, generateAmrId } from './internal'
 import * as DUPLICACY from 'constants/duplicacy'
 
 /**

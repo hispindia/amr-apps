@@ -1,2 +1,2 @@
-export * from './data'
+export { getIsolate } from './getIsolate'
 export * from './types'

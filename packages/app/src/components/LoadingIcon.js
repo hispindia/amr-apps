@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import { theme } from '@dhis2/ui-core'
 
 const StyledSvg = styled.svg`
     fill: white;

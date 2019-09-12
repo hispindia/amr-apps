@@ -1,7 +1,7 @@
 {
-    "name": "isolate-validation",
+    "name": "isolate-transfer",
     "version": "0.2.4",
-    "description": "AMR isolate validation app for DHIS2",
+    "description": "AMR isolate transfer app for DHIS2",
     "main": "index.js",
     "license": "BSD-3-Clause",
     "homepage": ".",
@@ -10,8 +10,8 @@
         "company": "HISP India"
     },
     "manifest.webapp": {
-        "name": "AMR Isolate Validation",
-        "description": "Validate AMR isolates.",
+        "name": "Isolate Transfer",
+        "description": "Transfer AMR isolates.",
         "appType": "APP",
         "activities": {
             "dhis": {
@@ -29,8 +29,8 @@
         "build": "react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
-        "prebuild": "rimraf build ../../isolate-validation.zip && d2-manifest package.json public/manifest.webapp",
-        "postbuild": "cd build && bestzip ../../../isolate-validation.zip *",
+        "prebuild": "rimraf build ../../isolate-transfer.zip && d2-manifest package.json public/manifest.webapp",
+        "postbuild": "cd build && bestzip ../../../isolate-transfer.zip *",
         "analyze": "source-map-explorer build/static/js/*.js'"
     },
     "dependencies": {

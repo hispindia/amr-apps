@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
-    EventModal,
+    DeleteModal,
     TitleRow,
     Panel,
     Event,
@@ -29,12 +29,22 @@ export const Form = ({ history, match }) => {
     const secondaryAction = async () =>
         await removeCorrespondingIsolate(eventId)
 
+    const onDeleteSucccess = () =>
+        history.push(
+            window.location.href.replace(
+                `/api/apps/Isolate-Transfer/index.html${window.location.href}`,
+                ''
+            )
+        )
+
+    console.log(window.location)
+
     return (
         <>
-            <EventModal
-                history={history}
-                isIsolate
+            <DeleteModal
+                type="isolate"
                 secondaryAction={secondaryAction}
+                onDeleteSucccess={onDeleteSucccess}
             />
             <TitleRow title="Isolate" />
             {loading && !error && <LoadingSection />}

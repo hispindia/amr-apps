@@ -1,6 +1,6 @@
 {
-    "short_name": "AMR Isolate Validation",
-    "name": "AMR Isolate Validation",
+    "short_name": "Isolate Transfer",
+    "name": "Isolate Transfer",
     "icons": [
         { "16": "favicon-16x16.png" },
         { "32": "favicon-32x32.png" },
