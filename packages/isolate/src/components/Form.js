@@ -10,7 +10,7 @@ import {
 } from '@amr/app'
 import { getIsolate } from '../actions'
 import { Buttons } from './Buttons'
-import { removeCorrespondingIsolate } from '../api'
+import { removeCorrespondingEvent } from '../api'
 
 export const Form = ({ history, match }) => {
     const dispatch = useDispatch()
@@ -26,8 +26,7 @@ export const Form = ({ history, match }) => {
         dispatch(getIsolate(eventId))
     }, [programs, eventId, dispatch])
 
-    const secondaryAction = async () =>
-        await removeCorrespondingIsolate(eventId)
+    const secondaryAction = async () => await removeCorrespondingEvent(eventId)
 
     const onDeleteSucccess = () =>
         window.location.assign(
