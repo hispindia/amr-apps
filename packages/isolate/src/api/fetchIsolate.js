@@ -1,9 +1,15 @@
-import { getRecord, getEvent, ACTIVE, postEvent, deleteEvent } from '@amr/app'
+import { getRecord, getEvent, ACTIVE, postEvent } from '@amr/app'
 import { setCorrespondingIsolate } from './setCorrespondingIsolate'
 import {
     CORRESPONDING_ISOLATE_ELEMENT,
     CORRESPONDING_EVENT_ELEMENT,
 } from '../constants/dhis2'
+
+const findIsolate = dataValues =>
+    dataValues.find(dv => dv.dataElement === CORRESPONDING_ISOLATE_ELEMENT)
+
+const isIsolate = dataValues =>
+    !!dataValues.find(dv => dv.dataElement === CORRESPONDING_EVENT_ELEMENT)
 
 /**
  * Posts a new event with the same values,
@@ -38,17 +44,11 @@ const postIsolate = async event =>
  */
 export const fetchIsolate = async (programs, eventId) => {
     const event = await getEvent(eventId)
-    //await deleteEvent("J4QBsND9uI5")
-    //return
-    console.log(event)
 
-    const correspondingIsolate = event.dataValues.find(
-        dv => dv.dataElement === CORRESPONDING_ISOLATE_ELEMENT
-    )
+    const correspondingIsolate = findIsolate(event.dataValues)
 
     // Existing isolate
     if (correspondingIsolate) {
-        console.log('Existing isolate')
         try {
             const isolate = await getRecord(
                 programs,
@@ -58,22 +58,14 @@ export const fetchIsolate = async (programs, eventId) => {
             return isolate
         } catch (error) {
             if (error !== 404) throw error
-            else console.log('Existing isolate already removed.')
         }
     }
 
     // Is isolate
-    if (
-        event.dataValues.find(
-            dv => dv.dataElement === CORRESPONDING_EVENT_ELEMENT
-        )
-    ) {
-        console.log('is isolate')
+    if (isIsolate(event.dataValues))
         return await getRecord(programs, eventId, true)
-    }
 
     // Create isolate
-    console.log('creating isolate')
     const isolateId = await postIsolate(event)
     setCorrespondingIsolate(event, isolateId)
     return await getRecord(programs, isolateId, true)

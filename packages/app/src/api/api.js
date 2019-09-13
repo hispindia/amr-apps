@@ -138,7 +138,6 @@ export const newRecord = async (
 
 export const existingRecord = async (programs, eventId) => {
     const record = await getRecord(programs, eventId)
-    console.log(record)
     const entityValues = await getPersonValues(record.entityId)
 
     return {

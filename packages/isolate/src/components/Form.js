@@ -30,14 +30,12 @@ export const Form = ({ history, match }) => {
         await removeCorrespondingIsolate(eventId)
 
     const onDeleteSucccess = () =>
-        history.push(
+        window.location.assign(
             window.location.href.replace(
-                `/api/apps/Isolate-Transfer/index.html${window.location.href}`,
+                `/api/apps/Isolate-Transfer/index.html${window.location.hash}`,
                 ''
             )
         )
-
-    console.log(window.location)
 
     return (
         <>

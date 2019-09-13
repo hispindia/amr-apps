@@ -15,7 +15,6 @@ export const getIsolate = eventId => async (dispatch, getState) => {
 
     try {
         const data = await fetchIsolate(metadata.programs, eventId)
-        console.log(data)
 
         data.rules = getRules(
             metadata.eventRules,
