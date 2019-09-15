@@ -19,8 +19,8 @@ const SidebarMenu = ({ location }) => {
                 {categories.map((c, i) => (
                     <StyledMenuItem
                         dense
-                        key={c.value}
-                        href={c.value}
+                        key={c.status}
+                        href={`#/events/${c.status}`}
                         label={
                             <>
                                 <Icon icon={c.icon} color={c.color} />

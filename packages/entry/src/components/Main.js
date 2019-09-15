@@ -1,32 +1,25 @@
 import React from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
-import { MainSection } from '@amr/app'
 import { EventOverview } from './EventOverview'
-//import { EventForm } from 'modules'
+import { EventForm } from './EventForm'
 
 const paths = ['/orgUnit/:orgUnit/event', '/orgUnit/:orgUnit/event/:event']
 
 export const Main = () => (
-    <MainSection>
-        <Switch>
+    <Switch>
+        <Route
+            exact
+            path={'/events/:status'}
+            render={componentProps => <EventOverview {...componentProps} />}
+        />
+        {paths.map(path => (
             <Route
+                key={path}
                 exact
-                path={'/events/:status'}
-                render={componentProps => <EventOverview {...componentProps} />}
+                path={path}
+                render={componentProps => <EventForm {...componentProps} />}
             />
-            {paths.map(path => (
-                <Route
-                    key={path}
-                    exact
-                    path={path}
-                    render={componentProps => (
-                        <Hello {...componentProps} />
-                    )}
-                />
-            ))}
-            <Route render={() => <Redirect from="/" to={'/events/All'} />} />
-        </Switch>
-    </MainSection>
+        ))}
+        <Route render={() => <Redirect from="/" to={'/events/complete'} />} />
+    </Switch>
 )
-
-const Hello = () => <h1>Hello</h1>

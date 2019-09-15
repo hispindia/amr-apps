@@ -12,7 +12,8 @@ import {
     L2_APPROVAL_STATUS,
     L2_REVISION_REASON,
 } from 'constants/dhis2'
-import { getProgramStage, setEventValues, generateAmrId } from './internal'
+import { getProgramStage, generateAmrId } from './helpers'
+import { setEventValues } from './setEventValues'
 import * as DUPLICACY from 'constants/duplicacy'
 
 /**
@@ -130,7 +131,7 @@ export const newRecord = async (
     const { programStage, eventValues, status } = await getProgramStage(
         pStage,
         initialValues,
-        { completed: false, newRecord: true }
+        { completed: false }
     )
 
     return { programStage, eventValues, status, eventId, entityId }

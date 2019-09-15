@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { LoadingSection, TitleRow } from '@amr/app'
+import { MainSection, LoadingSection, TitleRow } from '@amr/app'
 import { Table } from './Table'
 import { useEvents } from './useEvents'
 import { titles, headers } from './config'
@@ -25,7 +25,7 @@ export const EventOverview = ({ match, history }) => {
     const onAddClick = () => history.push(`/orgUnit/${selected}/event/`)
 
     return (
-        <>
+        <MainSection>
             <TitleRow title={titles[status]} />
             {!error &&
                 (loading ? (
@@ -39,7 +39,6 @@ export const EventOverview = ({ match, history }) => {
                         addButtonDisabled={addButtonDisabled}
                     />
                 ))}
-        </>
+        </MainSection>
     )
 }
-

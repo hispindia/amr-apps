@@ -1,10 +1,6 @@
 export const titles = {
-    All: 'My records',
-    Resend: 'Records for revision',
-    Rejected: 'Rejected records',
-    Approved: 'Approved records',
-    Validate: 'Records for validation',
-    Incomplete: 'Incomplete records',
+    complete: 'Complete records',
+    incomplete: 'Incomplete records',
 }
 
 export const headers = [

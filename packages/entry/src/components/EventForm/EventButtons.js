@@ -1,9 +1,13 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
-import { ButtonRow } from 'components'
-import { submitEvent, editEvent, setDeletePrompt } from 'actions'
-import { DUPLICATE_ERROR } from '../../constants/duplicacy'
+import {
+    ButtonRow,
+    submitEvent,
+    editEvent,
+    setDeletePrompt,
+    DUPLICATE_ERROR,
+} from '@amr/app'
 
 const StyledButtonRow = styled(ButtonRow)`
     margin: 0px;
@@ -61,7 +65,12 @@ export const EventButtons = ({ history, existingEvent }) => {
         icon: 'add',
         primary: true,
         tooltip: 'Submit record and add new record for the same person',
-        disabledTooltip: duplicate === DUPLICATE_ERROR ? DUPLICATE_ERROR : invalid ? invalid : '',
+        disabledTooltip:
+            duplicate === DUPLICATE_ERROR
+                ? DUPLICATE_ERROR
+                : invalid
+                ? invalid
+                : '',
         loading: buttonLoading === 'submitAdd',
     }
 
@@ -72,7 +81,12 @@ export const EventButtons = ({ history, existingEvent }) => {
         icon: 'done',
         primary: true,
         tooltip: 'Submit record',
-        disabledTooltip: duplicate === DUPLICATE_ERROR ? DUPLICATE_ERROR : invalid ? invalid : '',
+        disabledTooltip:
+            duplicate === DUPLICATE_ERROR
+                ? DUPLICATE_ERROR
+                : invalid
+                ? invalid
+                : '',
         loading: buttonLoading === 'submit',
     }
 

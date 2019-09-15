@@ -1,5 +1,5 @@
 export * from './api'
-export * from './initMetadata'
+export { initMetadata } from './initMetadata'
 export { get } from './crud'
 export { request } from './request'
 export { getRecord } from './getRecord'

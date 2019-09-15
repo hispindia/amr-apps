@@ -6,7 +6,4 @@ export const BodyStyle = createGlobalStyle`
         background-color: rgb(240, 240, 240);
         min-width: 400px;
     }
-    .required span::after {
-        color: #c62828;
-    }
 `

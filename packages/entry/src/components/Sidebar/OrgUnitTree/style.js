@@ -41,6 +41,7 @@ export const OrgUnitText = styled.span`
         props.isSelected &&
         css`
             color: ${theme.secondary600};
+            cursor: unset;
         `}
 `
 

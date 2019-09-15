@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { TitleRow, Event, Panel, EventModal } from 'components'
 import {
+    DeleteModal,
+    MainSection,
+    TitleRow,
+    Event,
+    Panel,
     getExistingEvent,
     initNewEvent,
     createNewEvent,
-    resetData
-} from 'actions'
+    resetData,
+    ERROR,
+} from '@amr/app'
 import { Entity } from './Entity'
 import { EventButtons } from './EventButtons'
-import { ERROR } from 'constants/statuses'
 
 export const EventForm = ({ history, match }) => {
     const [isFirstRender, setIsFirstRender] = useState(true)
@@ -35,11 +39,13 @@ export const EventForm = ({ history, match }) => {
         if (!isFirstRender && panelValid && !event) dispatch(createNewEvent())
     }, [panelValid])
 
+    const onDeleteSucccess = () => history.goBack()
+
     if (isFirstRender) return <TitleRow title="Record" history={history} />
 
     return (
-        <>
-            <EventModal history={history} />
+        <MainSection padded>
+            <DeleteModal type="record" onDeleteSucccess={onDeleteSucccess} />
             <TitleRow title="Record" history={history} />
             <form autoComplete="off">
                 <Entity showEdit={!event && !panelValid} />
@@ -47,7 +53,7 @@ export const EventForm = ({ history, match }) => {
                 <Event />
             </form>
             <EventButtons history={history} existingEvent={event} />
-        </>
+        </MainSection>
     )
 }
 

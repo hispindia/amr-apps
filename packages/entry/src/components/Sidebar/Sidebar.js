@@ -10,12 +10,14 @@ const SidebarContainer = styled.aside`
     padding: 16px;
 `
 
-/**
- * Sidebar with menu and possibly OU tree.
- */
-export const Sidebar = () => (
+const SidebarContent = () => (
     <SidebarContainer>
         <SidebarMenu />
-        <Route path="/events" component={OrgUnitTree} />
+        <OrgUnitTree />
     </SidebarContainer>
 )
+
+/**
+ * Sidebar with menu and OU tree.
+ */
+export const Sidebar = () => <Route path="/events" component={SidebarContent} />

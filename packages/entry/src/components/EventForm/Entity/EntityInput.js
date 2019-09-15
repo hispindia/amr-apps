@@ -1,8 +1,14 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Padding } from 'styles'
-import { TextInput, AgeInput, RadioInputs, SelectInput } from 'inputs'
-import { setEntityValue, validateUnique } from 'actions'
+import {
+    TextInput,
+    AgeInput,
+    RadioInputs,
+    SelectInput,
+    Padding,
+    setEntityValue,
+    validateUnique,
+} from '@amr/app'
 
 /**
  * Entity information section.

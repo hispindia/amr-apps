@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { ModalPopup } from 'components'
-import { removeModal } from 'actions'
+import { Modal, ButtonStrip } from '@dhis2/ui-core'
+import { RichButton, Text, removeModal } from '@amr/app'
 
 export const EntityModal = () => {
     const dispatch = useDispatch()
@@ -12,19 +12,33 @@ export const EntityModal = () => {
     if (!modal) return null
 
     return (
-        <ModalPopup
-            heading="Person found"
-            text={
-                <span>
+        <Modal open small>
+            <Modal.Title>Person found</Modal.Title>
+            <Modal.Content>
+                <Text>
                     A person with the same <em>{modal.label}</em> is already
                     registered. Do you want to get this person?
-                </span>
-            }
-            label="Import"
-            icon="person"
-            primary
-            onClick={onModalClick}
-            loading={modal.loading}
-        />
+                </Text>
+            </Modal.Content>
+            <Modal.Actions>
+                <ButtonStrip end>
+                    <RichButton
+                        secondary
+                        onClick={() => onModalClick(false)}
+                        icon="clear"
+                        label="Cancel"
+                        disabled={modal.loading}
+                    />
+                    <RichButton
+                        primary
+                        onClick={() => onModalClick(true)}
+                        loading={modal.loading}
+                        icon="person"
+                        label="Import"
+                        initialFocus
+                    />
+                </ButtonStrip>
+            </Modal.Actions>
+        </Modal>
     )
 }
