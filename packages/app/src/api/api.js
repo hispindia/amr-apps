@@ -12,8 +12,7 @@ import {
     L2_APPROVAL_STATUS,
     L2_REVISION_REASON,
 } from 'constants/dhis2'
-import { getProgramStage, generateAmrId } from './helpers'
-import { setEventValues } from './setEventValues'
+import { getProgramStage, generateAmrId, setEventValues } from './helpers'
 import * as DUPLICACY from 'constants/duplicacy'
 
 /**
