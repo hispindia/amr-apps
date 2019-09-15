@@ -3,7 +3,7 @@ import { arrayOf, bool, func, shape, string } from 'prop-types'
 import { Button } from '@dhis2/ui-core'
 import { Icon } from 'components'
 import { ButtonPadding, ButtonContainer } from './style'
-import { LoadingIcon } from './LoadingIcon'
+import { LoadingIcon } from 'components/LoadingIcon'
 
 /**
  * Row of buttons.

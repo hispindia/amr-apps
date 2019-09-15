@@ -1,12 +1,61 @@
 import { get } from './crud'
 import { request } from './request'
-import {
-    ORGANISM_ELEMENT,
-    PERSON_TYPE,
-    DEO_GROUP,
-    L1_GROUP,
-    L2_GROUP,
-} from 'constants/dhis2'
+import { ORGANISM_ELEMENT, PERSON_TYPE, DEO_GROUP } from 'constants/dhis2'
+import { HIDE, IGNORE, EDITABLE } from 'constants'
+
+const getUserData = async () =>
+    await get(
+        request('me', {
+            fields: 'organisationUnits,userGroups,userCredentials[username]',
+        })
+    )
+
+const getMetadata = async () =>
+    await get(
+        request('metadata', {
+            order: 'level:asc',
+            fields: [
+                'children',
+                'condition',
+                'code',
+                'dataElement',
+                'displayName',
+                'formName',
+                'id',
+                'name',
+                'options',
+                'organisationUnits',
+                'path',
+                'priority',
+                'program',
+                `programRuleActions[programRuleActionType,dataElement,
+                optionGroup,content,trackedEntityAttribute,
+                programStageSection,data]`,
+                'programStage',
+                `programStages[id,displayName,access,programStageDataElements[
+                dataElement[id],compulsory],programStageSections[id,name,
+                displayName,renderType,dataElements[id,displayFormName,
+                code,valueType,optionSetValue,optionSet]]]`,
+                `trackedEntityTypeAttributes[name,id,displayName,valueType,
+                unique,optionSetValue,optionSet,mandatory,
+                trackedEntityAttribute[name,id,displayName,valueType,
+                unique,optionSetValue,optionSet]]`,
+                'value',
+            ],
+            options: [
+                'constants=true',
+                'dataElements=true',
+                'optionGroups=true',
+                'options=true',
+                'optionSets=true',
+                'organisationUnits=true',
+                'programRules=true',
+                'programRuleVariables=true',
+                'programs=true',
+                'trackedEntityTypes=true',
+            ],
+        })
+    )
 
 const sortChildren = ou => {
     ou.children.forEach(c => sortChildren(c))
@@ -19,7 +68,15 @@ const sortChildren = ou => {
     )
 }
 
-export const initMetadata = async () => {
+const hasHide = name => name.includes(HIDE)
+
+const hasIgnore = name => name.includes(IGNORE)
+
+const hasEditable = name => name.includes(EDITABLE)
+
+const removeOption = (name, option) => name.replace(option, '')
+
+export const initMetadata = async isIsolate => {
     // Replaces '#{xxx}' with 'this.state.values['id of xxx']'
     const programCondition = c => {
         const original = c
@@ -64,65 +121,16 @@ export const initMetadata = async () => {
         return c
     }
 
-    const userData = await get(
-        request('me', {
-            fields: 'organisationUnits,userGroups,userCredentials[username]',
-        })
-    )
+    const userData = await getUserData()
+
     const userGroups = userData.userGroups.map(userGroup => userGroup.id)
     const user = {
         username: userData.userCredentials.username,
         deoMember: userGroups.includes(DEO_GROUP),
-        l1Member: userGroups.includes(L1_GROUP),
-        l2Member: userGroups.includes(L2_GROUP),
     }
     const userOrgUnits = userData.organisationUnits.map(uo => uo.id)
 
-    const data = await get(
-        request('metadata', {
-            order: 'level:asc',
-            fields: [
-                'children',
-                'condition',
-                'code',
-                'dataElement',
-                'displayName',
-                'formName',
-                'id',
-                'name',
-                'options',
-                'organisationUnits',
-                'path',
-                'priority',
-                'program',
-                `programRuleActions[programRuleActionType,dataElement,
-                    optionGroup,content,trackedEntityAttribute,
-                    programStageSection,data]`,
-                'programStage',
-                `programStages[id,displayName,access,programStageDataElements[
-                    dataElement[id],compulsory],programStageSections[id,name,
-                    displayName,renderType,dataElements[id,displayFormName,
-                    code,valueType,optionSetValue,optionSet]]]`,
-                `trackedEntityTypeAttributes[name,id,displayName,valueType,
-                    unique,optionSetValue,optionSet,mandatory,
-                    trackedEntityAttribute[name,id,displayName,valueType,
-                    unique,optionSetValue,optionSet]]`,
-                'value',
-            ],
-            options: [
-                'constants=true',
-                'dataElements=true',
-                'optionGroups=true',
-                'options=true',
-                'optionSets=true',
-                'organisationUnits=true',
-                'programRules=true',
-                'programRuleVariables=true',
-                'programs=true',
-                'trackedEntityTypes=true',
-            ],
-        })
-    )
+    const data = await getMetadata()
 
     const orgUnits = []
     data.organisationUnits
@@ -192,7 +200,7 @@ export const initMetadata = async () => {
             }
         })
 
-    const programs = data.programs.filter(p => p.name !== 'AMR (WHONET import)')
+    const programs = data.programs.filter(p => !hasIgnore(p.name))
 
     const programList = []
     const stageLists = {}
@@ -226,6 +234,20 @@ export const initMetadata = async () => {
                 if (ps.dataElements[ORGANISM_ELEMENT])
                     ps.dataElements[ORGANISM_ELEMENT].hideWithValues = true
                 ps.programStageSections.forEach(pss => {
+                    if (hasHide(pss.name)) {
+                        pss.displayName = pss.name = removeOption(
+                            pss.name,
+                            HIDE
+                        )
+                        pss.hideWithValues = true
+                    }
+                    if (hasEditable(pss.name)) {
+                        pss.displayName = pss.name = removeOption(
+                            pss.name,
+                            EDITABLE
+                        )
+                        if (isIsolate) pss.editable = true
+                    }
                     pss.dataElements.forEach(
                         d =>
                             (ps.dataElements[d.id] = {
@@ -245,6 +267,7 @@ export const initMetadata = async () => {
                                 new RegExp('{' + pss.name + '}'),
                                 ''
                             )
+                            cs.editable = !!pss.editable
                             childSections.push(cs)
                         })
                     pss.childSections = childSections

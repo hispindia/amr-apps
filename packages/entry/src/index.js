@@ -1,12 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { init, App } from '@amr/app'
-import { config } from './config'
+import { init } from '@amr/app'
 import * as serviceWorker from './serviceWorker'
+import { DataEntry } from './components/DataEntry'
 
 const developmentServer = 'https://amrtest.icmr.org.in/amr'
 const rootElement = document.getElementById('root')
-const { appName, isApproval, categories } = config
 
 const productionRender = async () => {
     try {
@@ -20,15 +19,7 @@ const productionRender = async () => {
 
 const render = baseUrl => {
     init(`${baseUrl}/api`)
-    ReactDOM.render(
-        <App
-            appName={appName}
-            categories={categories}
-            isApproval={isApproval}
-            baseUrl={baseUrl}
-        />,
-        rootElement
-    )
+    ReactDOM.render(<DataEntry baseUrl={baseUrl} />, rootElement)
     serviceWorker.unregister()
 }
 

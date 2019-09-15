@@ -1,10 +1,10 @@
 const fs = require('fs')
 
 const paths = [
-    'packages.json',
+    'package.json',
     'packages/app/package.json',
-    'packages/approval/package.json',
     'packages/entry/package.json',
+    'packages/isolate/package.json',
 ]
 
 const getVersionType = arg => {

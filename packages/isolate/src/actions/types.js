@@ -1,0 +1,1 @@
+export const ISOLATE_RECEIVED = 'ISOLATE_RECEIVED'

@@ -25,8 +25,7 @@ import {
     deleteEvent,
     isDuplicateRecord,
 } from 'api'
-import { entityRules } from './entityRules'
-import { eventRules } from './eventRules'
+import { entityRules, eventRules, getRules } from 'helpers'
 import { DUPLICATE_CHECKING } from 'constants/duplicacy'
 import { LOADING, SUCCESS } from 'constants/statuses'
 import { SAMPLE_ID_ELEMENT, ORGANISM_SET } from 'constants/dhis2'
@@ -87,17 +86,11 @@ export const getExistingEvent = (orgUnit, eventId) => async (
     getState
 ) => {
     const state = getState()
-    const isApproval = state.appConfig.isApproval
-    const { l1Member, l2Member } = state.metadata.user
     const programs = state.metadata.programs
     const optionSets = state.metadata.optionSets
     const { trackedEntityTypeAttributes, rules } = state.metadata.person
     try {
-        const data = await existingRecord(programs, eventId, {
-            isApproval,
-            l1Member,
-            l2Member,
-        })
+        const data = await existingRecord(programs, eventId)
 
         const [entityValues, attributes] = entityRules(
             { ...state.metadata.person.values, ...data.entityValues },
@@ -212,17 +205,16 @@ export const submitEvent = addMore => async (dispatch, getState) => {
             createAction(SET_BUTTON_LOADING, addMore ? 'submitAdd' : 'submit')
         )
     })
-    const isApproval = getState().appConfig.isApproval
     const eventId = getState().data.event.id
 
     try {
-        await setEventStatus(eventId, true, isApproval)
+        await setEventStatus(eventId, true)
         if (addMore) dispatch(createAction(RESET_PANEL_EVENT))
         else dispatch(createAction(EXIT))
-        dispatch(showAlert('Record submitted successfully.', { success: true }))
+        dispatch(showAlert('Submitted successfully.', { success: true }))
     } catch (error) {
         console.error(error)
-        dispatch(showAlert('Failed to submit record.', { critical: true }))
+        dispatch(showAlert('Failed to submit.', { critical: true }))
         dispatch(createAction(ENABLE_BUTTONS))
     } finally {
         batch(() => {
@@ -257,7 +249,10 @@ export const editEvent = () => async (dispatch, getState) => {
 export const setDeletePrompt = deletePrompt => dispatch =>
     dispatch(createAction(SET_DELETE_PROMPT, deletePrompt))
 
-export const onDeleteConfirmed = confirmed => async (dispatch, getState) => {
+export const onDeleteConfirmed = (confirmed, secondaryAction) => async (
+    dispatch,
+    getState
+) => {
     if (!confirmed) {
         dispatch(setDeletePrompt(false))
         return
@@ -268,13 +263,14 @@ export const onDeleteConfirmed = confirmed => async (dispatch, getState) => {
     const eventId = getState().data.event.id
 
     try {
+        if (secondaryAction) await secondaryAction()
         const response = (await deleteEvent(eventId)).response
         if (response.importCount.deleted !== 1) throw response.description
-        dispatch(showAlert('Record deleted successfully.', {}))
+        dispatch(showAlert('Deleted successfully.', {}))
         dispatch(setDeletePrompt(SUCCESS))
     } catch (error) {
         console.error(error)
-        dispatch(showAlert('Failed to delete record.', { critical: true }))
+        dispatch(showAlert('Failed to delete.', { critical: true }))
         dispatch(setDeletePrompt(true))
     }
 }
@@ -321,11 +317,3 @@ export const checkDuplicacy = sampleId => async (dispatch, getState) => {
     })
     dispatch(createAction(DUPLICACY, duplicate))
 }
-
-const getRules = (rules, programId, programStageId) =>
-    rules.filter(
-        r =>
-            (r.programStage ? r.programStage.id === programStageId : false) ||
-            (r.program.id === programId &&
-                (r.programStage ? r.programStage.id === programStageId : true))
-    )

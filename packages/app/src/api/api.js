@@ -1,6 +1,7 @@
-//import moment from 'moment'
 import { get, post, del, put, setBaseUrl } from './crud'
 import { request } from './request'
+import { getRecord } from './getRecord'
+import { postEvent } from './postEvent'
 import {
     ORGANISM_ELEMENT,
     SAMPLE_ID_ELEMENT,
@@ -11,13 +12,7 @@ import {
     L2_APPROVAL_STATUS,
     L2_REVISION_REASON,
 } from 'constants/dhis2'
-import {
-    getProgramStage,
-    getEventValues,
-    setEventValues,
-    generateAmrId,
-    getSqlView,
-} from './internal'
+import { getProgramStage, generateAmrId, setEventValues } from './helpers'
 import * as DUPLICACY from 'constants/duplicacy'
 
 /**
@@ -135,48 +130,18 @@ export const newRecord = async (
     const { programStage, eventValues, status } = await getProgramStage(
         pStage,
         initialValues,
-        { completed: false, newRecord: true }
+        { completed: false }
     )
 
     return { programStage, eventValues, status, eventId, entityId }
 }
 
-export const existingRecord = async (
-    programs,
-    eventId,
-    { isApproval, l1Member, l2Member }
-) => {
-    const {
-        eventValues: initialValues,
-        programId: program,
-        programStageId,
-        completed,
-        entityId,
-        sampleDate,
-    } = await getEventValues(eventId)
-    const pStage = programs
-        .find(p => p.id === program)
-        .programStages.find(ps => (ps.id = programStageId))
-    const { programStage, eventValues, status } = await getProgramStage(
-        pStage,
-        initialValues,
-        {
-            completed,
-            newRecord: false,
-            l1Member: isApproval ? l1Member : false,
-            l2Member: isApproval ? l2Member : false,
-        }
-    )
-    const entityValues = await getPersonValues(entityId)
+export const existingRecord = async (programs, eventId) => {
+    const record = await getRecord(programs, eventId)
+    const entityValues = await getPersonValues(record.entityId)
 
     return {
-        program,
-        programStage,
-        eventValues,
-        status,
-        eventId,
-        entityId,
-        sampleDate,
+        ...record,
         entityValues,
     }
 }
@@ -271,34 +236,34 @@ export const addEvent = async (
         })
     }
 
-    const r = await post('events', event)
+    const eventId = await postEvent(event)
 
     return {
         entityId,
-        eventId: r.response.importSummaries[0].reference,
+        eventId,
     }
 }
 
-export const setEventStatus = async (eventId, completed, isApproval) => {
+export const setEventStatus = async (eventId, completed) => {
     const url = `events/${eventId}`
 
     let event = await get(url)
     event.status = completed ? 'COMPLETED' : 'ACTIVE'
-    if (!isApproval) {
-        const values = {}
-        event.dataValues.forEach(
-            dataValue => (values[dataValue.dataElement] = dataValue.value)
-        )
-        if (values[L1_APPROVAL_STATUS] === 'Resend') {
-            values[L1_APPROVAL_STATUS] = ''
-            values[L1_REVISION_REASON] = ''
-        }
-        if (values[L2_APPROVAL_STATUS] === 'Resend') {
-            values[L2_APPROVAL_STATUS] = ''
-            values[L2_REVISION_REASON] = ''
-        }
-        event = await setEventValues(event, values)
+
+    const values = {}
+    event.dataValues.forEach(
+        dataValue => (values[dataValue.dataElement] = dataValue.value)
+    )
+    if (values[L1_APPROVAL_STATUS] === 'Resend') {
+        values[L1_APPROVAL_STATUS] = ''
+        values[L1_REVISION_REASON] = ''
     }
+    if (values[L2_APPROVAL_STATUS] === 'Resend') {
+        values[L2_APPROVAL_STATUS] = ''
+        values[L2_REVISION_REASON] = ''
+    }
+    event = await setEventValues(event, values)
+
     await put(url, event)
 }
 
@@ -306,43 +271,6 @@ export const updateEventValue = (eventId, dataElementId, value) =>
     put(`events/${eventId}/${dataElementId}`, {
         dataValues: [{ dataElement: dataElementId, value: value }],
     })
-
-/**
- * Deletes event.
- * @param {string} eventId - Event ID.
- */
-export const deleteEvent = async eventId => await del(`events/${eventId}`)
-
-export const getEvents = async (config, orgUnit, { username, l2Member }) =>
-    await getSqlView(
-        config.sqlViews.table.length === 1
-            ? config.sqlViews.table[0]
-            : l2Member
-            ? config.sqlViews.table[1]
-            : config.sqlViews.table[0],
-        orgUnit,
-        {
-            user: username ? username : false,
-            status: config.param ? config.status : false,
-        }
-    )
-
-export const getCounts = async (configs, orgUnit, { username, l2Member }) => {
-    for (const config of configs)
-        config.count = (await getSqlView(
-            config.sqlViews.count.length === 1
-                ? config.sqlViews.count[0]
-                : l2Member
-                ? config.sqlViews.count[1]
-                : config.sqlViews.count[0],
-            orgUnit,
-            {
-                user: username ? username : false,
-                status: config.param ? config.status : false,
-            }
-        ))[0][0]
-    return configs.map(config => config.count)
-}
 
 export const isDuplicateRecord = async ({
     event,

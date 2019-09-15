@@ -1,5 +1,7 @@
 export * from './approval'
 export * from './dhis2'
 export * from './duplicacy'
+export * from './eventStatus'
 export * from './invalidReasons'
+export * from './options'
 export * from './statuses'
