@@ -14,7 +14,15 @@ export const Alerts = () => {
     return (
         <AlertStack>
             {alerts.map(
-                ({ content, id, success, warning, critical, permanent }) => (
+                ({
+                    content,
+                    id,
+                    success,
+                    warning,
+                    critical,
+                    permanent,
+                    actions,
+                }) => (
                     <AlertBar
                         key={id}
                         success={success}
@@ -22,6 +30,7 @@ export const Alerts = () => {
                         critical={critical}
                         permanent={permanent}
                         onHidden={() => onHidden(id)}
+                        actions={actions}
                     >
                         {content}
                     </AlertBar>

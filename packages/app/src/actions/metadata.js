@@ -3,6 +3,10 @@ import { createAction } from './createAction'
 import { METADATA_RECEIVED, METADATA_ERRORED } from './types'
 import { showAlert } from './alert'
 
+const reload = () => window.location.reload()
+
+const actions = [{ label: 'Reload', onClick: reload }]
+
 export const setMetadata = isIsolate => async dispatch => {
     try {
         const metadata = await initMetadata(isIsolate)
@@ -10,6 +14,8 @@ export const setMetadata = isIsolate => async dispatch => {
     } catch (error) {
         console.error(error)
         dispatch(createAction(METADATA_ERRORED))
-        dispatch(showAlert('Failed to initiate app.', { critical: true }))
+        dispatch(
+            showAlert('Failed to initiate app.', { critical: true, actions })
+        )
     }
 }
