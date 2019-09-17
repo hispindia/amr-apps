@@ -35,7 +35,7 @@
     },
     "dependencies": {
         "@hisp-amr/app": "*",
-        "@hisp-amr/org-unit-tree": "^0.0.1",
+        "@hisp-amr/org-unit-tree": "*",
         "@dhis2/ui-core": "^3.9.0",
         "react": "^16.9.0",
         "react-dom": "^16.9.0",
