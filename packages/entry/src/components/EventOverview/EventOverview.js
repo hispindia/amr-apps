@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { MainSection, LoadingSection, TitleRow } from '@amr/app'
+import { MainSection, LoadingSection, TitleRow } from '@hisp-amr/app'
 import { Table } from './Table'
 import { useEvents } from './useEvents'
 import { titles, headers } from './config'

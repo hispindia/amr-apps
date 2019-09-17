@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { showAlert } from '@amr/app'
+import { showAlert } from '@hisp-amr/app'
 import { getEvents } from 'api'
 
 const INITIAL_STATE = {

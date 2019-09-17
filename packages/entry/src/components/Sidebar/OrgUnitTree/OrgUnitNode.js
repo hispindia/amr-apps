@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { object } from 'prop-types'
-import { Row } from '@amr/app'
+import { Row } from '@hisp-amr/app'
 import { setOrgUnit } from 'actions'
 import { Caret, ChildTree, OrgUnitText, NoCaret } from './style'
 

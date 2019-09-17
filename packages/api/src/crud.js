@@ -1,10 +1,9 @@
-let baseUrl = ''
+if (!process.env.REACT_APP_DHIS2_BASE_URL)
+    throw new Error(
+        'The environment variable REACT_APP_DHIS2_BASE_URL must be set'
+    )
 
-/**
- * Sets the base URL.
- * @param {String} url
- */
-export const setBaseUrl = url => (baseUrl = `${url}/`)
+const baseUrl = `${process.env.REACT_APP_DHIS2_BASE_URL}/api/`
 
 /**
  * @param {String} endpoint

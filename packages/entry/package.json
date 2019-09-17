@@ -34,15 +34,9 @@
         "analyze": "source-map-explorer build/static/js/*.js'"
     },
     "dependencies": {
-        "@amr/app": "*",
+        "@hisp-amr/api": "*",
+        "@hisp-amr/app": "*",
         "react": "^16.9.0",
         "react-dom": "^16.9.0"
-    },
-    "devDependencies": {
-        "bestzip": "^2.1.4",
-        "d2-manifest": "^1.0.0",
-        "react-scripts": "^3.1.0",
-        "rimraf": "^2.6.3",
-        "source-map-explorer": "^2.0.1"
     }
 }

@@ -12,7 +12,7 @@ import {
     createNewEvent,
     resetData,
     ERROR,
-} from '@amr/app'
+} from '@hisp-amr/app'
 import { Entity } from './Entity'
 import { EventButtons } from './EventButtons'
 

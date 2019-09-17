@@ -2,7 +2,7 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { Menu } from '@dhis2/ui-core'
-import { Icon } from '@amr/app'
+import { Icon } from '@hisp-amr/app'
 import { StyledMenuItem, Title, Count } from './style'
 import { useCounts } from './useCounts'
 

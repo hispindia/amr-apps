@@ -1,5 +1,4 @@
-import { get } from './crud'
-import { request } from './request'
+import { get, request } from '@hisp-amr/api'
 import { ORGANISM_ELEMENT, PERSON_TYPE, DEO_GROUP } from 'constants/dhis2'
 import { HIDE, IGNORE, EDITABLE } from 'constants'
 

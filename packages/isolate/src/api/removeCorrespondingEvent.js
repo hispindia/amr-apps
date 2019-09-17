@@ -1,4 +1,4 @@
-import { getEvent } from '@amr/app'
+import { getEvent } from '@hisp-amr/api'
 import { setCorrespondingEvent } from './helpers'
 
 /**

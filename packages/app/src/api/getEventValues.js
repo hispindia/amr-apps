@@ -1,4 +1,4 @@
-import { getEvent } from './getEvent'
+import { getEvent } from '@hisp-amr/api'
 
 /**
  * Gets values for a single event.

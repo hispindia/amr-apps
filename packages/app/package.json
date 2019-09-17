@@ -1,5 +1,5 @@
 {
-    "name": "@amr/app",
+    "name": "@hisp-amr/app",
     "version": "0.2.5",
     "description": "AMR apps for DHIS2",
     "developer": {
@@ -22,6 +22,7 @@
         "@dhis2/app-runtime": "1.5.1",
         "@dhis2/ui-core": "^3.9.0",
         "@dhis2/ui-widgets": "^1.0.8",
+        "@hisp-amr/api": "*",
         "@material-ui/core": "3.9.3",
         "@material-ui/icons": "3.0.2",
         "dayjs": "^1.8.15",
@@ -36,19 +37,5 @@
         "redux-thunk": "^2.3.0",
         "styled-components": "^5.0.0-beta.8",
         "typeface-roboto": "^0.0.75"
-    },
-    "devDependencies": {
-        "@babel/cli": "^7.5.5",
-        "@babel/core": "^7.5.5",
-        "@babel/plugin-proposal-class-properties": "^7.5.5",
-        "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
-        "@babel/plugin-transform-react-constant-elements": "^7.5.0",
-        "@babel/preset-env": "^7.5.5",
-        "@babel/preset-react": "^7.0.0",
-        "@babel/runtime": "^7.5.5",
-        "babel-plugin-module-resolver": "^3.2.0",
-        "prop-types": "^15.7.2",
-        "react-scripts": "^3.1.0",
-        "rimraf": "^2.6.3"
     }
 }

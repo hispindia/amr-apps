@@ -12,7 +12,10 @@ import { muiTheme } from './muiTheme'
 import { BodyStyle } from './BodyStyle'
 import { Alerts } from './Alerts'
 
-export const App = ({ appName, baseUrl, store, children }) => (
+const baseUrl = process.env.REACT_APP_DHIS2_BASE_URL
+const apiVersion = process.env.REACT_APP_DHIS2_API_VERSION
+
+export const App = ({ appName, store, children }) => (
     <BrowserRouter>
         <HashRouter>
             <MuiThemeProvider theme={muiTheme}>
@@ -20,7 +23,7 @@ export const App = ({ appName, baseUrl, store, children }) => (
                     <>
                         <CssReset />
                         <BodyStyle />
-                        <DataProvider baseUrl={baseUrl} apiVersion={30}>
+                        <DataProvider baseUrl={baseUrl} apiVersion={apiVersion}>
                             <HeaderBar appName={appName} />
                             <Provider store={store}>
                                 {children}
@@ -36,7 +39,6 @@ export const App = ({ appName, baseUrl, store, children }) => (
 
 App.propTypes = {
     appName: string.isRequired,
-    baseUrl: string.isRequired,
     store: object.isRequired,
     children: node.isRequired,
 }

@@ -19,11 +19,26 @@
         "test": "lerna run test"
     },
     "devDependencies": {
+        "@babel/cli": "^7.5.5",
+        "@babel/core": "^7.5.5",
+        "@babel/plugin-proposal-class-properties": "^7.5.5",
+        "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
+        "@babel/plugin-transform-react-constant-elements": "^7.5.0",
+        "@babel/preset-env": "^7.5.5",
+        "@babel/preset-react": "^7.0.0",
+        "@babel/runtime": "^7.5.5",
         "@dhis2/cli-style": "^4.1.1",
+        "babel-plugin-module-resolver": "^3.2.0",
+        "bestzip": "^2.1.4",
+        "d2-manifest": "^1.0.0",
         "enzyme": "^3.10.0",
         "enzyme-adapter-react-16": "^1.14.0",
         "jest-enzyme": "^7.1.0",
         "lerna": "^3.16.4",
-        "redux-mock-store": "^1.5.3"
+        "prop-types": "^15.7.2",
+        "redux-mock-store": "^1.5.3",
+        "react-scripts": "^3.1.0",
+        "rimraf": "^2.6.3",
+        "source-map-explorer": "^2.0.1"
     }
 }
