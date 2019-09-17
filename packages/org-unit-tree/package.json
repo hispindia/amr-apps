@@ -1,7 +1,7 @@
 {
     "name": "@hisp-amr/org-unit-tree",
-    "version": "0.0.3",
-    "description": "",
+    "version": "0.0.12",
+    "description": "DHIS2 single select organisation unit tree",
     "license": "BSD-3-Clause",
     "main": "dist/index.js",
     "repository": {

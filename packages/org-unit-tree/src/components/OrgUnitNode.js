@@ -18,7 +18,10 @@ export const OrgUnitNode = ({ orgUnit, selected, onSelect }) => {
 
     const onCarretClick = () => setOpened(!opened)
 
-    const onOrgUnitClick = () => onSelect(orgUnit.id, orgUnit.path, orgUnit.displayName)
+    const onOrgUnitClick = () => {
+        if (selected.id !== orgUnit.id)
+            onSelect(orgUnit.id, orgUnit.path, orgUnit.displayName)
+    }
 
     return (
         <li key={orgUnit.id}>

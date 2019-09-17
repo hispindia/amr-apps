@@ -18,12 +18,7 @@ export const OrgUnitTree = ({ onSelect, onError }) => {
     const [selected, setSelected] = useState(null)
 
     useEffect(() => {
-        if (data)
-            setSelected({
-                id: data[0].id,
-                path: data[0].path,
-                displayName: data[0].displayName,
-            })
+        if (data) select(data[0].id, data[0].path, data[0].displayName)
     }, [data])
 
     useEffect(() => {

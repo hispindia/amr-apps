@@ -8,26 +8,19 @@ yarn add @hisp-amr/org-unit-tree
 npm i @hisp-amr/org-unit-tree
 ```
 
-## Environment variables
-`REACT_APP_DHIS2_BASE_URL` and `REACT_APP_DHIS2_API_VERSION` needs to be set.
+## Usage
+`REACT_APP_DHIS2_BASE_URL` needs to be set.
 
-### Example
-```dotenv
-# [root_dir]/.env
-REACT_APP_DHIS2_API_VERSION=30
-```
-
-```dotenv
+```bash
 # [root_dir]/.env.development
 REACT_APP_DHIS2_BASE_URL=https://amrtest.icmr.org.in/amr
 ```
 
-```dotenv
+```bash
 # [root_dir]/.env.production
 REACT_APP_DHIS2_BASE_URL=../../..
 ```
 
-## Usage
 ```jsx
 import React from 'react'
 import { OrgUnitTree } from '@hisp-amr/org-unit-tree'
@@ -40,7 +33,7 @@ const App = () => (
         {/* Other components */}
         <OrgUnitTree
             onSelect={onSelect}
-            onError{onError}
+            onError={onError}
         />
     </>
 )
