@@ -1,5 +1,3 @@
-export const developmentServer = 'https://amrtest.icmr.org.in/amr'
-
 export const appName = 'Data Entry'
 
 export const categories = [
