@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { ButtonRow, setEditing, resetEntity } from '@amr/app'
+import { ButtonRow, setEditing, resetEntity } from '@hisp-amr/app'
 
 export const EntityButtons = () => {
     const dispatch = useDispatch()

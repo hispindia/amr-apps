@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
-import { READY, ERROR } from '@amr/app'
+import { READY, ERROR } from '@hisp-amr/app'
 import { setOrgUnit } from '../actions'
 import { Main } from './Main'
 import { Sidebar } from './Sidebar'

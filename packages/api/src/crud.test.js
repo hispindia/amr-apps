@@ -1,15 +1,6 @@
-import { setBaseUrl, get, put, post, del } from './crud'
-
-const baseUrl = 'https://amrtest.icmr.org.in/amr/api'
+import { get, put, post, del } from './crud'
 
 window.fetch = jest.fn()
-
-describe('crud', () => {
-    it('sets base url', () => {
-        const expected = `${baseUrl}/`
-        return expect(setBaseUrl(baseUrl)).toEqual(expected)
-    })
-})
 
 describe('get', () => {
     it('calls fetch get and receive json', () => {

@@ -1,4 +1,5 @@
-import { getRecord, getEvent, ACTIVE, postEvent } from '@amr/app'
+import { getEvent, postEvent } from '@hisp-amr/api'
+import { getRecord, ACTIVE } from '@hisp-amr/app'
 import { assignDataValues, setCorrespondingEvent } from './helpers'
 import {
     CORRESPONDING_EVENT_ELEMENT,

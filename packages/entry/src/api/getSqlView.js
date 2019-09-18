@@ -1,4 +1,4 @@
-import { get, request } from '@amr/app'
+import { get, request } from '@hisp-amr/api'
 
 export const getSqlView = async (sqlView, orgUnit, { user, status }) =>
     (await get(

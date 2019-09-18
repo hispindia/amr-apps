@@ -1,6 +1,6 @@
 import React from 'react'
 import { Route, Switch } from 'react-router-dom'
-import { MainSection } from '@amr/app'
+import { MainSection } from '@hisp-amr/app'
 import { Form } from './Form'
 import { NotFound } from './NotFound'
 

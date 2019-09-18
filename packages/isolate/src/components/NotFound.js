@@ -1,5 +1,5 @@
 import React from 'react'
-import { CardSection, TitleRow } from '@amr/app'
+import { CardSection, TitleRow } from '@hisp-amr/app'
 
 export const NotFound = () => (
     <>

@@ -1,4 +1,5 @@
-import { COMPLETED, putEvent } from '@amr/app'
+import { putEvent } from '@hisp-amr/api'
+import { COMPLETED } from '@hisp-amr/app'
 import { assignDataValues } from './assignDataValues'
 
 /**

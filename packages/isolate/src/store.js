@@ -1,4 +1,4 @@
-import { store, reducers } from '@amr/app'
+import { store, reducers } from '@hisp-amr/app'
 
 const isolateReducers = {
     alert: reducers.alert,

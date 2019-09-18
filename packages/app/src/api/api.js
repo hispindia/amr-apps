@@ -1,7 +1,5 @@
-import { get, post, del, put, setBaseUrl } from './crud'
-import { request } from './request'
+import { get, post, del, put, request, postEvent } from '@hisp-amr/api'
 import { getRecord } from './getRecord'
-import { postEvent } from './postEvent'
 import {
     ORGANISM_ELEMENT,
     SAMPLE_ID_ELEMENT,
@@ -14,12 +12,6 @@ import {
 } from 'constants/dhis2'
 import { getProgramStage, generateAmrId, setEventValues } from './helpers'
 import * as DUPLICACY from 'constants/duplicacy'
-
-/**
- * Sets the base URL, username, and user groups.
- * @param {String} baseUrl - Base URL.
- */
-export const init = baseUrl => setBaseUrl(baseUrl)
 
 /**
  * Checks if any tracked entity instance has property with value.

@@ -7,7 +7,7 @@ import {
     editEvent,
     setDeletePrompt,
     DUPLICATE_ERROR,
-} from '@amr/app'
+} from '@hisp-amr/app'
 
 const StyledButtonRow = styled(ButtonRow)`
     margin: 0px;
@@ -25,7 +25,7 @@ export const EventButtons = ({ history, existingEvent }) => {
 
     useEffect(() => {
         if (exit) history.goBack()
-    }, [exit])
+    }, [exit, history])
 
     const onSubmit = async addMore => await dispatch(submitEvent(addMore))
 

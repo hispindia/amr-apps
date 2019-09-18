@@ -37,6 +37,7 @@ export const Table = ({
                     elevation: 0,
                     onRowClick: onEventClick,
                     customToolbar: toolbar,
+                    responsive: 'stacked',
                 }}
             />
         </StyledCard>

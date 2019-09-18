@@ -8,6 +8,7 @@ export const showAlert = (
         warning = false,
         critical = false,
         permanent = false,
+        actions = null,
     } = {}
 ) => dispatch =>
     dispatch(
@@ -17,6 +18,7 @@ export const showAlert = (
             warning,
             critical,
             permanent,
+            actions,
         })
     )
 

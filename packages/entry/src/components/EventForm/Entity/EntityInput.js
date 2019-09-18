@@ -8,7 +8,7 @@ import {
     Padding,
     setEntityValue,
     validateUnique,
-} from '@amr/app'
+} from '@hisp-amr/app'
 
 /**
  * Entity information section.

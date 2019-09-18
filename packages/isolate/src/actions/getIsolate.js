@@ -8,7 +8,7 @@ import {
     ORGANISM_SET,
     showAlert,
     EXISTING_DATA_ERRORED,
-} from '@amr/app'
+} from '@hisp-amr/app'
 
 export const getIsolate = eventId => async (dispatch, getState) => {
     const metadata = getState().metadata

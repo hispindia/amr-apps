@@ -1,4 +1,4 @@
-import { createAction } from '@amr/app'
+import { createAction } from '@hisp-amr/app'
 import { ORG_UNIT_SELECTED } from './types'
 
 export const setOrgUnit = (id, path) => dispatch =>

@@ -1,5 +1,4 @@
-import { get } from '../crud'
-import { request } from '../request'
+import { get, request } from '@hisp-amr/api'
 import { AMR_ELEMENT } from 'constants/dhis2'
 
 /**

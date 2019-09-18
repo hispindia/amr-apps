@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { getCounts } from 'api'
-import { showAlert } from '@amr/app'
+import { showAlert } from '@hisp-amr/app'
 
 export const useCounts = location => {
     const dispatch = useDispatch()

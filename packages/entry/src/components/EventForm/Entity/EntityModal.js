@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Modal, ButtonStrip } from '@dhis2/ui-core'
-import { RichButton, Text, removeModal } from '@amr/app'
+import { RichButton, Text, removeModal } from '@hisp-amr/app'
 
 export const EntityModal = () => {
     const dispatch = useDispatch()

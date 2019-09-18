@@ -7,7 +7,7 @@ import {
     Event,
     LoadingSection,
     ERROR,
-} from '@amr/app'
+} from '@hisp-amr/app'
 import { getIsolate } from '../actions'
 import { Buttons } from './Buttons'
 import { removeCorrespondingEvent } from '../api'
