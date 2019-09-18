@@ -37,7 +37,6 @@ export const Label = styled.div`
         css`
             ::after {
                 content: '*';
-                color: ${colors.red600};
                 padding-left: 4px;
             }
         `}
