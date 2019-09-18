@@ -1,6 +1,6 @@
 {
     "name": "amr-entry",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "description": "AMR data entry app for DHIS2",
     "main": "index.js",
     "license": "BSD-3-Clause",

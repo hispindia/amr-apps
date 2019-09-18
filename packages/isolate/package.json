@@ -1,6 +1,6 @@
 {
     "name": "isolate-transfer",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "description": "AMR isolate transfer app for DHIS2",
     "main": "index.js",
     "license": "BSD-3-Clause",
