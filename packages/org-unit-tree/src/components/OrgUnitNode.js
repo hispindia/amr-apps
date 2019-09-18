@@ -20,7 +20,12 @@ export const OrgUnitNode = ({ orgUnit, selected, onSelect }) => {
 
     const onOrgUnitClick = () => {
         if (selected.id !== orgUnit.id)
-            onSelect(orgUnit.id, orgUnit.path, orgUnit.displayName)
+            onSelect({
+                id: orgUnit.id,
+                path: orgUnit.path,
+                displayName: orgUnit.displayName,
+                code: orgUnit.code,
+            })
     }
 
     return (

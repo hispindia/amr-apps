@@ -4,7 +4,7 @@ export const getOrgUnits = async ({ root }) =>
     await get(
         request('organisationUnits', {
             order: 'level:asc',
-            fields: ['children', 'displayName', 'id', 'path'],
-            filter: `path:like:${root}`
+            fields: ['children', 'displayName', 'id', 'path, code'],
+            filter: `path:like:${root}`,
         })
     )
