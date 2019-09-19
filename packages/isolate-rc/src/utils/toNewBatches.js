@@ -5,7 +5,7 @@ export const toNewBatches = batches =>
         .filter(b => b.status === CREATE)
         .map(b => [
             b.BatchNo,
-            b.rows.selectedArray.map(event => event.amrid).join(),
+            b.rows.selectedArray.map(event => event.amrid).join(', '),
             b.program.displayName,
             b.createdDate,
         ])

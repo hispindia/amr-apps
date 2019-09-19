@@ -42,6 +42,8 @@ export const DateInput = props => {
             onChange={setDate}
             ref={setPicker}
             TextFieldComponent={renderField}
+            minDate={props.minDate}
+            maxDate={props.maxDate}
             disableFuture
         />
     )

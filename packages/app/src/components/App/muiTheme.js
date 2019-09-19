@@ -25,5 +25,10 @@ export const muiTheme = createMuiTheme({
                 cursor: 'pointer',
             },
         },
+        MuiModal: {
+            root: {
+                zIndex: 10000,
+            },
+        },
     },
 })

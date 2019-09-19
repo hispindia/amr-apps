@@ -29,6 +29,7 @@ export const SelectInput = props => {
                 onChange={onChange}
                 disabled={props.disabled}
                 required={props.required}
+                initialFocus={props.initialFocus}
                 dense
             >
                 {props.objects.map(o => (

@@ -43,8 +43,10 @@ export const EventButtons = ({ history, existingEvent }) => {
         disabled: buttonsDisabled || !status.deletable,
         icon: 'delete',
         destructive: true,
-        tooltip: 'Permanently delete record',
-        disabledTooltip: 'You cannot delete records with an approval status',
+        tooltip:
+            buttonsDisabled || !status.deletable
+                ? 'You cannot delete records with an approval status'
+                : 'Permanently delete record',
     }
 
     const editButton = {
@@ -53,8 +55,10 @@ export const EventButtons = ({ history, existingEvent }) => {
         disabled: buttonsDisabled || !status.editable,
         icon: 'edit',
         primary: true,
-        tooltip: 'Edit record',
-        disabledTooltip: 'Records with this approval status cannot be edited',
+        tooltip:
+            buttonsDisabled || !status.editable
+                ? 'Records with this approval status cannot be edited'
+                : 'Edit record',
         loading: buttonLoading === 'edit',
     }
 
@@ -64,13 +68,12 @@ export const EventButtons = ({ history, existingEvent }) => {
         disabled: buttonsDisabled || !!invalid,
         icon: 'add',
         primary: true,
-        tooltip: 'Submit record and add new record for the same person',
-        disabledTooltip:
+        tooltip:
             duplicate === DUPLICATE_ERROR
                 ? DUPLICATE_ERROR
                 : invalid
                 ? invalid
-                : '',
+                : 'Submit record and add new record for the same person',
         loading: buttonLoading === 'submitAdd',
     }
 
@@ -80,13 +83,12 @@ export const EventButtons = ({ history, existingEvent }) => {
         disabled: buttonsDisabled || !!invalid,
         icon: 'done',
         primary: true,
-        tooltip: 'Submit record',
-        disabledTooltip:
+        tooltip:
             duplicate === DUPLICATE_ERROR
                 ? DUPLICATE_ERROR
                 : invalid
                 ? invalid
-                : '',
+                : 'Submit record',
         loading: buttonLoading === 'submit',
     }
 

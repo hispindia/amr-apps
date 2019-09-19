@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { LoadingSection, Table, TitleRow, showAlert } from '@hisp-amr/app'
-import { getBatches } from '../api'
-import { toNewBatches } from '../utils/toNewBatches'
+import React, { useState } from 'react'
+import { RichButton } from '@hisp-amr/app'
+import { BatchForm } from './BatchForm'
+import { BatchTable } from './BatchTable'
+import { toNewBatches, useHasPrograms } from '../utils'
 
 const headers = [
     { name: 'Batch' },
@@ -12,54 +12,41 @@ const headers = [
 ]
 
 export const NewBatches = () => {
-    const dispatch = useDispatch()
+    const hasPrograms = useHasPrograms()
 
-    const selected = useSelector(state => state.selectedOrgUnit)
+    const [showForm, setShowForm] = useState(false)
 
-    const [data, setData] = useState(null)
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(false)
+    const onFormCancel = () => setShowForm(false)
 
-    useEffect(() => {
-        const getData = async () => {
-            setLoading(true)
-            try {
-                const response = await getBatches(selected.code)
-                if (response.httpStatusCode === 404) throw 404
-                setData(toNewBatches(response[selected.code]))
-                setError(false)
-            } catch (e) {
-                if (e === 404) {
-                    setData([])
-                    setError(false)
-                } else {
-                    console.error(e)
-                    dispatch(
-                        showAlert('Failed to get sample batches', {
-                            critical: true,
-                        })
-                    )
-                    setError(true)
-                }
-            } finally {
-                setLoading(false)
-            }
-        }
+    const onRowClick = () => console.log('Row clicked')
 
-        if (selected && selected.code) getData()
-    }, [selected])
+    const onAddClick = () => setShowForm(true)
 
-    const onClick = param => console.log(param)
+    const tooltip = hasPrograms
+        ? 'Add a new batch'
+        : 'You cannot add batches from the selected organisation unit'
 
     return (
         <>
-            <TitleRow title="New sample batches" />
-            {!error &&
-                (loading ? (
-                    <LoadingSection />
-                ) : (
-                    <Table headers={headers} rows={data} onRowClick={onClick} />
-                ))}
+            {showForm && <BatchForm onCancel={onFormCancel} />}
+            <BatchTable
+                title="New sample batches"
+                headers={headers}
+                onClick={onRowClick}
+                filterBatches={toNewBatches}
+                button={
+                    <div title={tooltip}>
+                        <RichButton
+                            primary
+                            large
+                            icon="add"
+                            label="Add batch"
+                            disabled={!hasPrograms}
+                            onClick={onAddClick}
+                        />
+                    </div>
+                }
+            />
         </>
     )
 }

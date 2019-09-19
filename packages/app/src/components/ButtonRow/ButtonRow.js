@@ -11,12 +11,7 @@ import { LoadingIcon } from 'components/LoadingIcon'
 export const ButtonRow = ({ buttons, initialFocus, className }) => (
     <ButtonContainer className={className}>
         {buttons.map(button => (
-            <ButtonPadding
-                key={button.label}
-                title={
-                    button.disabled ? button.disabledTooltip : button.tooltip
-                }
-            >
+            <ButtonPadding key={button.label} title={button.tooltip}>
                 <Button
                     primary={button.primary}
                     secondary={button.secondary}
@@ -50,7 +45,6 @@ ButtonRow.propTypes = {
             onClick: func.isRequired,
             icon: string.isRequired,
             tooltip: string,
-            disabledTooltip: string,
             disabled: bool,
             loading: bool,
             small: bool,
