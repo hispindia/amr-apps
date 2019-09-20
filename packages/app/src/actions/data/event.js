@@ -9,6 +9,7 @@ import {
     DISABLE_BUTTONS,
     RESET_PANEL_EVENT,
     SET_INCOMPLETED,
+    SET_COMPLETED,
     SET_DELETE_PROMPT,
     SET_EVENT_AND_ENTITY,
     SET_EVENT_VALUES_AND_PROGRAMSTAGE,
@@ -211,6 +212,7 @@ export const submitEvent = addMore => async (dispatch, getState) => {
         await setEventStatus(eventId, true)
         if (addMore) dispatch(createAction(RESET_PANEL_EVENT))
         else dispatch(createAction(EXIT))
+        dispatch(createAction(SET_COMPLETED))
         dispatch(showAlert('Submitted successfully.', { success: true }))
     } catch (error) {
         console.error(error)

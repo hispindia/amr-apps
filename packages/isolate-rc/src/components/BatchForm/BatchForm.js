@@ -3,69 +3,42 @@ import { useSelector } from 'react-redux'
 import { func } from 'prop-types'
 import styled from 'styled-components'
 import { Modal } from '@dhis2/ui-core'
-import { DateInput } from '@hisp-amr/app'
+import { TextInput, DateInput } from '@hisp-amr/app'
 import { OrganismGroupSelect } from './OrganismGroupSelect'
 import { BatchButtons } from './BatchButtons'
+import { EventLoader } from './EventsLoader'
 import { TransferList } from '../TransferList'
-import { getEvents } from '../../api'
-
-const items = [
-    {
-        label: 'AMR1',
-        value: '1',
-    },
-    {
-        label: 'AMR2',
-        value: '2',
-    },
-    {
-        label: 'AMR3',
-        value: '3',
-    },
-    {
-        label: 'AMR4',
-        value: '4',
-    },
-    {
-        label: 'AMR5',
-        value: '5',
-    },
-    {
-        label: 'AMR6',
-        value: '6',
-    },
-    {
-        label: 'AMR7',
-        value: '7',
-    },
-    {
-        label: 'AMR8',
-        value: '8',
-    },
-    {
-        label: 'AMR9',
-        value: '9',
-    },
-]
+import { useEvents } from './useEvents'
 
 const Form = styled.form`
     padding: 2px 0;
 `
 
-const Padding = styled.div`
-    padding: 8px 0;
+const Row = styled.div`
+    display: flex;
+    justify-content: space-between;
+`
+
+const Col = styled.div`
+    display: flex;
+    flex-direction: column;
+    div:first-child {
+        margin-bottom: 3px;
+    }
 `
 
 export const BatchForm = ({ onCancel }) => {
-    const orgUnit = useSelector(state => state.selectedOrgUnit.id)
+    const orgUnit = useSelector(state => state.selectedOrgUnit)
 
     const [program, setProgram] = useState('')
     const [from, setFrom] = useState('')
     const [to, setTo] = useState('')
+    const [selectedEvents, setSelectedEvents] = useState([])
 
-    const [loading, setLoading] = useState(false)
+    const { events, loading, error } = useEvents(program, from, to)
 
-    const disabled = [program, from, to].includes('')
+    const disabled =
+        [program, from, to, events].includes('') || !selectedEvents.length
 
     const onOrganismChange = (name, value) => setProgram(value)
 
@@ -73,57 +46,62 @@ export const BatchForm = ({ onCancel }) => {
 
     const onToChange = (name, value) => setTo(value)
 
-    const onSubmit = async () => {
-        setLoading(true)
-        try {
-            const response = await getEvents({ program, orgUnit, from, to })
-            console.log(response)
-        } catch (error) {
-            console.error(error)
-        }
-    }
+    const onSubmit = async () => {}
 
     return (
         <Modal open medium>
             <Modal.Title>Add new batch</Modal.Title>
             <Modal.Content>
-                <Form>
-                    <Padding>
-                        <OrganismGroupSelect
-                            value={program}
-                            onChange={onOrganismChange}
-                            disabled={loading}
+                <Form autoComplete="off">
+                    <Row>
+                        <Col>
+                            <TextInput
+                                name="location"
+                                label="Location"
+                                value={orgUnit.displayName}
+                                onChange={() => {}}
+                                disabled
+                            />
+                            <OrganismGroupSelect
+                                value={program}
+                                onChange={onOrganismChange}
+                                disabled={loading}
+                            />
+                        </Col>
+                        <Col>
+                            <DateInput
+                                name="from"
+                                label="From"
+                                value={from}
+                                onChange={onFromChange}
+                                disabled={loading}
+                                maxDate={to}
+                                required
+                            />
+                            <DateInput
+                                name="to"
+                                label="To"
+                                value={to}
+                                onChange={onToChange}
+                                disabled={loading}
+                                minDate={from}
+                                required
+                            />
+                        </Col>
+                    </Row>
+                    {loading && <EventLoader />}
+                    {events && (
+                        <TransferList
+                            options={events}
+                            onChange={setSelectedEvents}
                         />
-                    </Padding>
-                    <Padding>
-                        <DateInput
-                            name="from"
-                            label="From"
-                            value={from}
-                            onChange={onFromChange}
-                            disabled={loading}
-                            maxDate={to}
-                            required
-                        />
-                    </Padding>
-                    <Padding>
-                        <DateInput
-                            name="to"
-                            label="To"
-                            value={to}
-                            onChange={onToChange}
-                            disabled={loading}
-                            minDate={from}
-                            required
-                        />
-                    </Padding>
-                    <TransferList items={items} />
+                    )}
                 </Form>
             </Modal.Content>
             <Modal.Actions>
                 <BatchButtons
                     disabled={disabled}
-                    loading={loading}
+                    loading={false}
                     onCancel={onCancel}
                     onSubmit={onSubmit}
                 />

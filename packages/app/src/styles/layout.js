@@ -40,5 +40,5 @@ Col.propTypes = {
 }
 
 export const Input = styled.div`
-    min-width: 300px;
+    min-width: 268px;
 `
