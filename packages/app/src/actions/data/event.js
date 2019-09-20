@@ -18,12 +18,12 @@ import {
     EXIT,
     SET_BUTTON_LOADING,
 } from '../types'
+import { deleteEvent } from '@hisp-amr/api'
 import {
     existingRecord,
     newRecord,
     setEventStatus,
     updateEventValue,
-    deleteEvent,
     isDuplicateRecord,
 } from 'api'
 import { entityRules, eventRules, getRules } from 'helpers'
