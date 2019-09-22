@@ -2,7 +2,7 @@ import React from 'react'
 import { func } from 'prop-types'
 import styled from 'styled-components'
 import { Button } from '@dhis2/ui-core'
-import { Icon } from '@hisp-amr/app'
+import { Icon } from '../Icon'
 
 const MiniButton = styled(Button)`
     padding: 0 !important;

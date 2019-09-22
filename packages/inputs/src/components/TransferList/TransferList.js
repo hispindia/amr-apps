@@ -64,15 +64,37 @@ export const TransferList = ({ options, onChange }) => {
     const onChangeRight = ({ target }) =>
         setSelectedRight(getSelected(target.selectedOptions))
 
+    const onDoubleClick = target => {
+        if (left.map(o => o.value).includes(target.value)) {
+            const newRight = [...right, target]
+            setLeft([...left.filter(o => o.value !== target.value)])
+            setRight(newRight)
+            onChange(newRight)
+        } else {
+            const newRight = [...right.filter(o => o.value !== target.value)]
+            setLeft([...left, target])
+            setRight(newRight)
+            onChange(newRight)
+        }
+    }
+
     return (
         <Section>
-            <MultiSelect options={left} onChange={onChangeLeft} />
+            <MultiSelect
+                options={left}
+                onChange={onChangeLeft}
+                onDoubleClick={onDoubleClick}
+            />
             <TransferButtons
                 onLeft={onLeft}
                 onRight={onRight}
                 onSwitch={onSwitch}
             />
-            <MultiSelect options={right} onChange={onChangeRight} />
+            <MultiSelect
+                options={right}
+                onChange={onChangeRight}
+                onDoubleClick={onDoubleClick}
+            />
         </Section>
     )
 }

@@ -9,6 +9,7 @@ export const useEvents = (program, from, to) => {
     const orgUnit = useSelector(state => state.selectedOrgUnit.id)
 
     const [events, setEvents] = useState(null)
+    const [eventData, setEventData] = useState(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(false)
 
@@ -18,10 +19,21 @@ export const useEvents = (program, from, to) => {
             setEvents(null)
             try {
                 const response = await getEvents({ program, orgUnit, from, to })
+                const newEventData = response.listGrid.rows.map(r => ({
+                    amrid: r[0],
+                    enrollmentuid: r[1],
+                    eventuid: r[2],
+                    eventdate: r[3],
+                    programuid: r[4],
+                    teiuid: r[5],
+                    orguid: r[6],
+                }))
+
+                setEventData(newEventData)
                 setEvents(
-                    response.listGrid.rows.map(r => ({
-                        label: r[0],
-                        value: r[2],
+                    newEventData.map(({ amrid, eventuid }) => ({
+                        label: amrid,
+                        value: eventuid,
                     }))
                 )
             } catch (e) {
@@ -40,5 +52,5 @@ export const useEvents = (program, from, to) => {
         if (![program, from, to].includes('')) fetchEvents()
     }, [program, from, to])
 
-    return { events, loading, error }
+    return { events, eventData, loading, error }
 }

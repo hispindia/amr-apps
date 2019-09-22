@@ -1,14 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { func } from 'prop-types'
 import styled from 'styled-components'
 import { Modal } from '@dhis2/ui-core'
-import { TextInput, DateInput } from '@hisp-amr/app'
+import { TextInput, DateInput, TransferList } from '@hisp-amr/inputs'
 import { OrganismGroupSelect } from './OrganismGroupSelect'
 import { BatchButtons } from './BatchButtons'
 import { EventLoader } from './EventsLoader'
-import { TransferList } from '../TransferList'
 import { useEvents } from './useEvents'
+import { useAddBatch } from './useAddBatch'
 
 const Form = styled.form`
     padding: 2px 0;
@@ -34,8 +34,22 @@ export const BatchForm = ({ onCancel }) => {
     const [from, setFrom] = useState('')
     const [to, setTo] = useState('')
     const [selectedEvents, setSelectedEvents] = useState([])
+    const [add, setAdd] = useState(false)
 
-    const { events, loading, error } = useEvents(program, from, to)
+    const { events, eventData, loading, error } = useEvents(program, from, to)
+
+    const addBatchResult = useAddBatch({
+        add,
+        program,
+        from,
+        to,
+        selectedEvents,
+        eventData,
+    })
+
+    useEffect(() => {
+        if (addBatchResult.success) onCancel()
+    }, [addBatchResult.success])
 
     const disabled =
         [program, from, to, events].includes('') || !selectedEvents.length
@@ -46,7 +60,10 @@ export const BatchForm = ({ onCancel }) => {
 
     const onToChange = (name, value) => setTo(value)
 
-    const onSubmit = async () => {}
+    const onEventsChange = newSelected =>
+        setSelectedEvents(newSelected.map(s => s.value))
+
+    const onSubmit = () => setAdd(true)
 
     return (
         <Modal open medium>
@@ -93,7 +110,7 @@ export const BatchForm = ({ onCancel }) => {
                     {events && (
                         <TransferList
                             options={events}
-                            onChange={setSelectedEvents}
+                            onChange={onEventsChange}
                         />
                     )}
                 </Form>
@@ -101,7 +118,7 @@ export const BatchForm = ({ onCancel }) => {
             <Modal.Actions>
                 <BatchButtons
                     disabled={disabled}
-                    loading={false}
+                    loading={addBatchResult.loading}
                     onCancel={onCancel}
                     onSubmit={onSubmit}
                 />

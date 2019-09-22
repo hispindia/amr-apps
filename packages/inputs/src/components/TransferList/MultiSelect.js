@@ -24,10 +24,16 @@ const StyledSelect = styled.select`
     }
 `
 
-export const MultiSelect = ({ onChange, options }) => (
+const onDoubleClick = (n, m) => console.log(n, m)
+
+export const MultiSelect = ({ onChange, onDoubleClick, options }) => (
     <StyledSelect onChange={onChange} multiple>
         {options.map(({ label, value }) => (
-            <Option key={value} value={value}>
+            <Option
+                key={value}
+                value={value}
+                onDoubleClick={() => onDoubleClick({ label, value })}
+            >
                 {label}
             </Option>
         ))}

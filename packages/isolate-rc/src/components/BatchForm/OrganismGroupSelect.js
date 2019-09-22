@@ -1,6 +1,6 @@
 import React from 'react'
 import { bool, func, string } from 'prop-types'
-import { SelectInput } from '@hisp-amr/app'
+import { SelectInput } from '@hisp-amr/inputs'
 import { useGetPrograms } from '../../utils'
 
 export const OrganismGroupSelect = ({ value, onChange, disabled }) => {
