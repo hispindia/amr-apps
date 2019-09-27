@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import dayjs from 'dayjs'
 import { showAlert } from '@hisp-amr/app'
-import { getBatches } from '../../api'
+import { getBatches, putBatches, postBatches } from '../../api'
 import { generateAmrId } from '../../utils'
 import { CREATE } from '../../constants/statuses'
 
@@ -30,7 +30,12 @@ export const useAddBatch = ({
         const addBatch = async () => {
             setLoading(true)
             try {
-                const batches = (await getBatches(orgUnit.code))[orgUnit.code]
+                const response = await getBatches(orgUnit.code)
+
+                const batches =
+                    response.httpStatusCode === 404
+                        ? []
+                        : response[orgUnit.code]
 
                 const amrIds = batches.map(b => b.BatchNo)
                 let amrId = newAmrId
@@ -62,9 +67,20 @@ export const useAddBatch = ({
                         receivedDate: '',
                     },
                 }
-                console.log({ [orgUnit.code]: [...batches, newBatch] })
-                setSuccess(true)
+
+                const putResponse =
+                    batches === []
+                        ? await postBatches(orgUnit.code, {
+                              [orgUnit.code]: [newBatch],
+                          })
+                        : await putBatches(orgUnit.code, {
+                              [orgUnit.code]: [...batches, newBatch],
+                          })
+
+                if (putResponse.httpStatusCode !== 200) throw putResponse
+
                 dispatch(showAlert(`Batch ${amrId} created`))
+                setSuccess(true)
             } catch (e) {
                 console.error(e)
                 setError(e)

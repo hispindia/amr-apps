@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { showAlert } from '@hisp-amr/app'
-import { getBatches } from '../api'
+import { getBatches } from '../../api'
 
-export const useBatches = filterBatches => {
+export const useBatches = (filterBatches, refetch) => {
     const dispatch = useDispatch()
 
     const selected = useSelector(state => state.selectedOrgUnit)
@@ -42,7 +42,7 @@ export const useBatches = filterBatches => {
             if (selected.code) getData()
             else setData([])
         }
-    }, [selected])
+    }, [selected, refetch])
 
     return { data, loading, error }
 }

@@ -36,6 +36,7 @@
     "dependencies": {
         "@hisp-amr/api": "*",
         "@hisp-amr/app": "*",
+        "@hisp-amr/icons": "*",
         "react": "^16.9.0",
         "react-dom": "^16.9.0"
     }

@@ -1,14 +1,16 @@
 {
-    "name": "@hisp-amr/inputs",
-    "version": "0.2.8",
-    "description": "Inputs for DHIS2",
-    "developer": {
-        "name": "Terje Uglebakken",
-        "company": "HISP India"
-    },
+    "name": "@hisp-amr/icons",
+    "version": "0.0.8",
+    "description": "Material UI icons",
     "license": "BSD-3-Clause",
-    "private": true,
     "main": "dist/index.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/hispindia/amr-apps.git"
+    },
+    "bugs": {
+        "url": "https://github.com/hispindia/amr-apps/issues"
+    },
     "scripts": {
         "transpile": "babel src -d dist",
         "start": "babel src -d dist -w",
@@ -18,13 +20,7 @@
         "test": "react-scripts test"
     },
     "dependencies": {
-        "@hisp-amr/icons": "*",
-        "@date-io/dayjs": "^1.3.9",
         "@dhis2/ui-core": "^3.9.0",
-        "@material-ui/core": "3.9.3",
-        "dayjs": "^1.8.15",
-        "material-ui-pickers": "^2.1.2",
-        "react": "^16.9.0",
         "styled-components": "^5.0.0-beta.8"
     }
 }

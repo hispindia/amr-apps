@@ -6,7 +6,7 @@ import { Modal } from '@dhis2/ui-core'
 import { TextInput, DateInput, TransferList } from '@hisp-amr/inputs'
 import { OrganismGroupSelect } from './OrganismGroupSelect'
 import { BatchButtons } from './BatchButtons'
-import { EventLoader } from './EventsLoader'
+import { Loader } from '../Loader'
 import { useEvents } from './useEvents'
 import { useAddBatch } from './useAddBatch'
 
@@ -27,7 +27,7 @@ const Col = styled.div`
     }
 `
 
-export const BatchForm = ({ onCancel }) => {
+export const BatchForm = ({ close }) => {
     const orgUnit = useSelector(state => state.selectedOrgUnit)
 
     const [program, setProgram] = useState('')
@@ -48,7 +48,7 @@ export const BatchForm = ({ onCancel }) => {
     })
 
     useEffect(() => {
-        if (addBatchResult.success) onCancel()
+        if (addBatchResult.success) close(true)
     }, [addBatchResult.success])
 
     const disabled =
@@ -106,7 +106,7 @@ export const BatchForm = ({ onCancel }) => {
                             />
                         </Col>
                     </Row>
-                    {loading && <EventLoader />}
+                    {loading && <Loader />}
                     {events && (
                         <TransferList
                             options={events}
@@ -119,7 +119,7 @@ export const BatchForm = ({ onCancel }) => {
                 <BatchButtons
                     disabled={disabled}
                     loading={addBatchResult.loading}
-                    onCancel={onCancel}
+                    onCancel={close}
                     onSubmit={onSubmit}
                 />
             </Modal.Actions>
@@ -128,5 +128,5 @@ export const BatchForm = ({ onCancel }) => {
 }
 
 BatchForm.propTypes = {
-    onCancel: func.isRequired,
+    close: func.isRequired,
 }

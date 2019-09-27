@@ -1,7 +1,7 @@
 import React from 'react'
 import { string, func, arrayOf, shape, object, node } from 'prop-types'
 import { LoadingSection, Table, TitleRow } from '@hisp-amr/app'
-import { useBatches } from '../utils'
+import { useBatches } from './useBatches'
 
 export const BatchTable = ({
     title,
@@ -9,8 +9,10 @@ export const BatchTable = ({
     onClick,
     filterBatches,
     button,
+    orgUnit,
+    refetch,
 }) => {
-    const { data, loading, error } = useBatches(filterBatches)
+    const { data, loading, error } = useBatches(filterBatches, refetch)
 
     return (
         <>
@@ -19,7 +21,12 @@ export const BatchTable = ({
                 (loading ? (
                     <LoadingSection />
                 ) : (
-                    <Table headers={headers} rows={data} onRowClick={onClick} />
+                    <Table
+                        headers={headers}
+                        rows={data}
+                        onRowClick={onClick}
+                        title={orgUnit}
+                    />
                 ))}
         </>
     )
@@ -32,4 +39,5 @@ BatchTable.propTypes = {
     onClick: func.isRequired,
     filterBatches: func.isRequired,
     button: node,
+    orgUnit: string,
 }

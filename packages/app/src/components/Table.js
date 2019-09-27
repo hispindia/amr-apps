@@ -11,10 +11,10 @@ const StyledCard = styled(Card)`
 /**
  * Table containg the persons events.
  */
-export const Table = ({ rows, headers, onRowClick }) => (
+export const Table = ({ rows, headers, onRowClick, title }) => (
     <StyledCard>
         <MUIDataTable
-            title=""
+            title={title}
             data={rows}
             columns={headers}
             options={{
@@ -36,4 +36,5 @@ Table.propTypes = {
             options: object,
         })
     ).isRequired,
+    title: string,
 }

@@ -35,6 +35,7 @@
     },
     "dependencies": {
         "@hisp-amr/app": "*",
+        "@hisp-amr/icons": "*",
         "@hisp-amr/inputs": "*",
         "@hisp-amr/org-unit-tree": "*",
         "@date-io/dayjs": "^1.3.9",

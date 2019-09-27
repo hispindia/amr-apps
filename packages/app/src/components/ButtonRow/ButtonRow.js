@@ -1,7 +1,7 @@
 import React from 'react'
 import { arrayOf, bool, func, shape, string } from 'prop-types'
 import { Button } from '@dhis2/ui-core'
-import { Icon } from 'components'
+import { Icon, icons } from '@hisp-amr/icons'
 import { ButtonPadding, ButtonContainer } from './style'
 import { LoadingIcon } from 'components/LoadingIcon'
 
@@ -22,7 +22,7 @@ export const ButtonRow = ({ buttons, initialFocus, className }) => (
                         button.loading ? (
                             <LoadingIcon />
                         ) : (
-                            button.icon && <Icon icon={button.icon} />
+                            button.icon && <Icon icon={icons[button.icon]} />
                         )
                     }
                     small={button.small}

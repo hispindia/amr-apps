@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 import { RichButton } from '@hisp-amr/app'
 import { BatchForm } from './BatchForm'
 import { BatchTable } from './BatchTable'
@@ -12,11 +13,16 @@ const headers = [
 ]
 
 export const NewBatches = () => {
+    const orgUnit = useSelector(state => state.selectedOrgUnit)
     const hasPrograms = useHasPrograms()
 
     const [showForm, setShowForm] = useState(false)
+    const [refetch, setRefetch] = useState(false)
 
-    const onFormCancel = () => setShowForm(false)
+    const onFormClose = success => {
+        setShowForm(false)
+        if (success) setRefetch(!refetch)
+    }
 
     const onRowClick = () => console.log('Row clicked')
 
@@ -28,12 +34,14 @@ export const NewBatches = () => {
 
     return (
         <>
-            {showForm && <BatchForm onCancel={onFormCancel} />}
+            {showForm && <BatchForm close={onFormClose} />}
             <BatchTable
                 title="New sample batches"
                 headers={headers}
                 onClick={onRowClick}
                 filterBatches={toNewBatches}
+                orgUnit={orgUnit ? orgUnit.displayName : ''}
+                refetch={refetch}
                 button={
                     <div title={tooltip}>
                         <RichButton

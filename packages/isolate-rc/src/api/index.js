@@ -1,4 +1,7 @@
 export { getBatches } from './getBatches'
+export { getDataStore } from './getDataStore'
+export { getDataStoreKeys } from './getDataStoreKeys'
 export { getEvents } from './getEvents'
 export { getMetadata } from './getMetadata'
+export { postBatches } from './postBatches'
 export { putBatches } from './putBatches'

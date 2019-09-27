@@ -9,7 +9,7 @@ const Section = styled.section`
     justify-content: center;
 `
 
-export const EventLoader = () => (
+export const Loader = () => (
     <Section>
         <CircularLoader />
     </Section>

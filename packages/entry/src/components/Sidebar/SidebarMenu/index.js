@@ -2,7 +2,7 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { Menu } from '@dhis2/ui-core'
-import { Icon } from '@hisp-amr/app'
+import { Icon, icons } from '@hisp-amr/icons'
 import { StyledMenuItem, Title, Count } from './style'
 import { useCounts } from './useCounts'
 
@@ -23,7 +23,10 @@ const SidebarMenu = ({ location }) => {
                         href={`#/events/${c.status}`}
                         label={
                             <>
-                                <Icon icon={c.icon} color={c.color} />
+                                <Icon
+                                    icon={icons[c.icon]}
+                                    color={colors[c.color]}
+                                />
                                 <Title>{c.label}</Title>
                                 <Count>
                                     {error ? '?' : counts ? counts[i] : 0}

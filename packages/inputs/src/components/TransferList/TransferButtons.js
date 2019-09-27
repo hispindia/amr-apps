@@ -2,7 +2,7 @@ import React from 'react'
 import { func } from 'prop-types'
 import styled from 'styled-components'
 import { Button } from '@dhis2/ui-core'
-import { Icon } from '../Icon'
+import { Icon, icons } from '@hisp-amr/icons'
 
 const MiniButton = styled(Button)`
     padding: 0 !important;
@@ -19,13 +19,13 @@ const ButtonCol = styled.div`
 export const TransferButtons = ({ onLeft, onRight, onSwitch }) => (
     <ButtonCol>
         <MiniButton onClick={onLeft}>
-            <Icon icon="chevron_left" />
+            <Icon icon={icons.chevron_left} />
         </MiniButton>
         <MiniButton onClick={onRight}>
-            <Icon icon="chevron_right" />
+            <Icon icon={icons.chevron_right} />
         </MiniButton>
         <MiniButton onClick={onSwitch}>
-            <Icon icon="code" />
+            <Icon icon={icons.code} />
         </MiniButton>
     </ButtonCol>
 )

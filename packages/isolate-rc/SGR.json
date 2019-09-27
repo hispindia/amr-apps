@@ -1,0 +1,102 @@
+{
+    "SGR": [
+        {
+            "key": "mKmB0wcw7Gf",
+            "BatchNo": "SGR67240",
+            "startDate": "2019-01-01",
+            "endDate": "2019-09-11",
+            "status": "DISPATCH",
+            "program": {
+                "id": "rMiBliR4FGr",
+                "displayName": "Enterococci"
+            },
+            "rows": {
+                "availableArray": [],
+                "selectedArray": [
+                    {
+                        "amrid": "SGR31757",
+                        "enrollmentuid": "bvan5Ykan0g",
+                        "eventuid": "EZOrOk0IXhV",
+                        "eventdate": "2019-04-23",
+                        "programuid": "rMiBliR4FGr",
+                        "teiuid": "ZCCxvo4j8GB",
+                        "orguid": "mKmB0wcw7Gf"
+                    },
+                    {
+                        "amrid": "SGR93963",
+                        "enrollmentuid": "dpnZA3kHV9Q",
+                        "eventuid": "vkg7CUhfbTM",
+                        "eventdate": "2019-06-11",
+                        "programuid": "rMiBliR4FGr",
+                        "teiuid": "Knvqd2qjZnC",
+                        "orguid": "mKmB0wcw7Gf"
+                    },
+                    {
+                        "amrid": "SGR47504",
+                        "enrollmentuid": "WLF0d2SEWv6",
+                        "eventuid": "gAXVkV5hatl",
+                        "eventdate": "2019-06-01",
+                        "programuid": "rMiBliR4FGr",
+                        "teiuid": "VahdgnbQfuo",
+                        "orguid": "mKmB0wcw7Gf"
+                    },
+                    {
+                        "amrid": "SGR41271",
+                        "enrollmentuid": "TobdRJRSfGW",
+                        "eventuid": "QyhnC49pIlL",
+                        "eventdate": "2019-06-13",
+                        "programuid": "rMiBliR4FGr",
+                        "teiuid": "SFBrE8TPoRs",
+                        "orguid": "mKmB0wcw7Gf"
+                    },
+                    {
+                        "amrid": "SGR29990",
+                        "enrollmentuid": "fs4KXtoysjY",
+                        "eventuid": "VPKCNDGXNpb",
+                        "eventdate": "2019-08-02",
+                        "programuid": "rMiBliR4FGr",
+                        "teiuid": "cGPsONPJ9I7",
+                        "orguid": "mKmB0wcw7Gf"
+                    }
+                ]
+            },
+            "createdDate": "2019-09-12",
+            "dispatchDate": "2019-09-11",
+            "disptachStatus": {
+                "received": "Received",
+                "receivedDate": "2019-09-03"
+            }
+        },
+        {
+            "key": "mKmB0wcw7Gf",
+            "BatchNo": "SGR66191",
+            "startDate": "2019-08-01",
+            "endDate": "2019-09-12",
+            "status": "DISPATCH",
+            "program": {
+                "id": "rMiBliR4FGr",
+                "displayName": "Enterococci"
+            },
+            "rows": {
+                "availableArray": [],
+                "selectedArray": [
+                    {
+                        "amrid": "SGR29990",
+                        "enrollmentuid": "fs4KXtoysjY",
+                        "eventuid": "VPKCNDGXNpb",
+                        "eventdate": "2019-08-02",
+                        "programuid": "rMiBliR4FGr",
+                        "teiuid": "cGPsONPJ9I7",
+                        "orguid": "mKmB0wcw7Gf"
+                    }
+                ]
+            },
+            "createdDate": "2019-09-12",
+            "dispatchDate": "2019-09-11",
+            "disptachStatus": {
+                "received": "Received",
+                "receivedDate": "2019-09-11"
+            }
+        }
+    ]
+}
