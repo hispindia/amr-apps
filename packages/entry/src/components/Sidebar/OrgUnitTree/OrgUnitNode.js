@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { object } from 'prop-types'
-import { Row } from '@hisp-amr/app'
+import styled from 'styled-components'
 import { setOrgUnit } from 'actions'
 import { Caret, ChildTree, OrgUnitText, NoCaret } from './style'
+
+const Row = styled.div`
+    display: flex;
+`
 
 /**
  * Organisation unit node.
@@ -11,6 +15,7 @@ import { Caret, ChildTree, OrgUnitText, NoCaret } from './style'
 export const OrgUnitNode = ({ orgUnit }) => {
     const dispatch = useDispatch()
     const selected = useSelector(state => state.selectedOrgUnit)
+
     const [opened, setOpened] = useState(false)
 
     useEffect(() => {

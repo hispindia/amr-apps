@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components'
 import { number } from 'prop-types'
 import { colorsPropType } from '../propTypes'
+import { colors } from '../colors'
 
 export const StyledSvg = styled.svg`
     margin: auto;
@@ -15,7 +16,7 @@ export const StyledSvg = styled.svg`
             `
         if (color)
             return css`
-                fill: ${themeColors[color]};
+                fill: ${colors[color]};
             `
     }}
 `

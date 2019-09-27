@@ -18,10 +18,13 @@ export const Content = () => {
     const error = useSelector(state => state.metadata.status) === ERROR
 
     useEffect(() => {
-        const initOrgUnit = (id, path) => dispatch(setOrgUnit(id, path))
-
         if (metadata.status === READY)
-            initOrgUnit(metadata.orgUnits[0].id, metadata.orgUnits[0].path)
+            dispatch(
+                setOrgUnit({
+                    id: metadata.orgUnits[0].id,
+                    path: metadata.orgUnits[0].path,
+                })
+            )
     }, [metadata.status, metadata.orgUnits, dispatch])
 
     if (error || !selected) return null
