@@ -2,10 +2,11 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { object } from 'prop-types'
 import styled from 'styled-components'
-import { Label, Padding } from 'styles'
-import { CheckboxInputs } from 'inputs'
+import { CheckboxInputs } from '@hisp-amr/inputs'
+import { Label } from 'styles'
 import { DataElement } from './DataElement'
 import { setEventValue } from 'actions'
+import { Padding } from '../Padding'
 
 const StyledLabel = styled(Label)`
     margin: 16px 16px -16px;

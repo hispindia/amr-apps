@@ -1,8 +1,12 @@
 import React from 'react'
 import { string, object, node } from 'prop-types'
 import styled from 'styled-components'
-import { Row, Title } from 'styles'
+import { Title } from 'styles'
 import { IconButton } from 'components'
+
+const Row = styled.div`
+    display: flex;
+`
 
 const Wrapper = styled.div`
     display: flex;

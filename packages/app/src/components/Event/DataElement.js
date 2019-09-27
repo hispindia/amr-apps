@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { string } from 'prop-types'
-import { Padding } from 'styles'
+import { Padding } from '../Padding'
 import { SAMPLE_ID_ELEMENT } from 'constants/dhis2'
 import {
     TextInput,
@@ -9,7 +9,7 @@ import {
     SelectInput,
     SwitchInput,
     DateInput,
-} from 'inputs'
+} from '@hisp-amr/inputs'
 import { setEventValue } from 'actions'
 import * as DUPLICACY from 'constants/duplicacy'
 

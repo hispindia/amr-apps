@@ -1,9 +1,9 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Grid } from '@material-ui/core'
-import { Padding } from 'styles'
+import { Padding } from '../Padding'
 import { CardSection } from 'components'
-import { SelectInput, RadioInputs, DateInput } from 'inputs'
+import { SelectInput, RadioInputs, DateInput } from '@hisp-amr/inputs'
 import { setProgram, setPanelValue } from 'actions'
 import { PanelButtons } from './PanelButtons'
 
