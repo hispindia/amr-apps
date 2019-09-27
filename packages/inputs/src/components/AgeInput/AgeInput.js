@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
 import dayjs from 'dayjs'
-import { Input, Label } from 'styles'
 import { AgeFields } from './AgeFields'
 import { DateOfBirth } from './DateOfBirth'
+import { MinWidth } from '../MinWidth'
+import { Label } from '../Label'
 
 /**
  * Age input consisting of date picker and year/month/date input fields.
@@ -64,7 +65,7 @@ export const AgeInput = props => {
     }
 
     return (
-        <Input>
+        <MinWidth>
             <Label required={props.required}>{props.label}</Label>
             <AgeFields
                 years={years}
@@ -79,7 +80,7 @@ export const AgeInput = props => {
                 disabled={props.disabled}
                 onChange={setValues}
             />
-        </Input>
+        </MinWidth>
     )
 }
 

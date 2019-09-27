@@ -1,7 +1,7 @@
 import React from 'react'
 import { bool, func, string } from 'prop-types'
 import { Radio } from '@dhis2/ui-core'
-import { OptionSpacer } from 'styles'
+import { OptionSpacer } from '../OptionSpacer'
 
 /**
  * Input consisting of a group of radios.

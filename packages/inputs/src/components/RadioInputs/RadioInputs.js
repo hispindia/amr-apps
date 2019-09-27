@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { arrayOf, bool, func, shape, string } from 'prop-types'
-import { Input, Label, Row } from 'styles'
+import { Label } from '../Label'
+import { Row } from '../Row'
+import { MinWidth } from '../MinWidth'
 import { RadioInput } from './RadioInput'
 
 /**
@@ -22,9 +24,9 @@ export const RadioInputs = props => {
     }
 
     return (
-        <Input>
+        <MinWidth>
             <Label required={props.required}>{props.label}</Label>
-            <Row wrapped>
+            <Row>
                 {props.objects.map(object => (
                     <RadioInput
                         key={object.value}
@@ -37,7 +39,7 @@ export const RadioInputs = props => {
                     />
                 ))}
             </Row>
-        </Input>
+        </MinWidth>
     )
 }
 

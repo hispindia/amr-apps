@@ -2,7 +2,7 @@ import React from 'react'
 import { bool, func, string } from 'prop-types'
 import styled from 'styled-components'
 import { InputField } from '@dhis2/ui-core'
-import { Row } from 'styles'
+import { Row } from '../Row'
 
 const StyledInputField = styled(InputField)`
     margin-right: 16px;
@@ -16,7 +16,7 @@ const StyledInputField = styled(InputField)`
  * Age input consisting of date picker and year/month/date input fields.
  */
 export const AgeFields = ({ days, months, years, disabled, onChange }) => (
-    <Row wrapped>
+    <Row>
         <StyledInputField
             name="years"
             label="Years"

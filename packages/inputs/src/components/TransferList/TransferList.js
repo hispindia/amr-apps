@@ -17,9 +17,11 @@ const getSelected = selected =>
 
 export const TransferList = ({ options, onChange, selected }) => {
     const [left, setLeft] = useState(
-        selected ? options.filter(o => o) : selected
+        selected ? options.filter(o => !selected.includes(o.value)) : options
     )
-    //const [right, setRight] = useState(selected ? selected : [])
+    const [right, setRight] = useState(
+        selected ? options.filter(o => selected.includes(o.value)) : []
+    )
     const [selectedLeft, setSelectedLeft] = useState([])
     const [selectedRight, setSelectedRight] = useState([])
 

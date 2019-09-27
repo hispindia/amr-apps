@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { arrayOf, bool, func, shape, string } from 'prop-types'
 import { SelectField } from '@dhis2/ui-core'
-import { Input } from 'styles'
+import { MinWidth } from './MinWidth'
 
 /**
  * Single select field.
@@ -20,7 +20,7 @@ export const SelectInput = props => {
     }
 
     return (
-        <Input>
+        <MinWidth>
             <SelectField
                 name={props.name}
                 value={value}
@@ -38,7 +38,7 @@ export const SelectInput = props => {
                     </option>
                 ))}
             </SelectField>
-        </Input>
+        </MinWidth>
     )
 }
 

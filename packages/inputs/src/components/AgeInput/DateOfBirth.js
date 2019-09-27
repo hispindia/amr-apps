@@ -1,9 +1,13 @@
 import React, { useState } from 'react'
 import { bool, func, string } from 'prop-types'
+import styled from 'styled-components'
 import { InputField } from '@dhis2/ui-core'
 import { DatePicker } from 'material-ui-pickers'
 import dayjs from 'dayjs'
-import { MarginTop } from 'styles'
+
+const Wrapper = styled.div`
+    margin-top: 16px;
+`
 
 export const DateOfBirth = ({ name, value, disabled, onChange }) => {
     const [picker, setPicker] = useState(null)
@@ -27,7 +31,7 @@ export const DateOfBirth = ({ name, value, disabled, onChange }) => {
      * @returns {Component} Input field.
      */
     const getField = () => (
-        <MarginTop
+        <Wrapper
             onClick={disabled ? null : openPicker}
             onKeyPress={disabled ? null : onKeyPress}
         >
@@ -39,7 +43,7 @@ export const DateOfBirth = ({ name, value, disabled, onChange }) => {
                 disabled={disabled}
                 dense
             />
-        </MarginTop>
+        </Wrapper>
     )
 
     return (

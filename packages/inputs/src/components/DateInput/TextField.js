@@ -2,7 +2,7 @@ import React from 'react'
 import { bool, string, object, oneOfType } from 'prop-types'
 import { InputField, Help } from '@dhis2/ui-core'
 import dayjs from 'dayjs'
-import { Input } from 'styles'
+import { MinWidth } from '../MinWidth'
 
 /**
  * Date picker.
@@ -32,7 +32,7 @@ export const TextField = ({
     }
 
     return (
-        <Input
+        <MinWidth
             onClick={disabled ? null : openPicker}
             onKeyPress={disabled ? null : onKeyPress}
         >
@@ -52,7 +52,7 @@ export const TextField = ({
                     {error ? error : warning}
                 </Help>
             )}
-        </Input>
+        </MinWidth>
     )
 }
 

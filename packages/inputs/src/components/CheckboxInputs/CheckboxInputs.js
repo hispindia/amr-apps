@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { bool, func, object, objectOf, string } from 'prop-types'
-import { Label, Row } from 'styles'
+import { Label } from '../Label'
+import { Row } from '../Row'
 import { CheckboxInput } from './CheckBoxInput'
 
 /**
@@ -29,7 +30,7 @@ export const CheckboxInputs = props => {
     return (
         <>
             <Label required={props.required}>{props.label}</Label>
-            <Row wrapped>
+            <Row>
                 {Object.keys(props.objects).map(id => (
                     <CheckboxInput
                         key={id}

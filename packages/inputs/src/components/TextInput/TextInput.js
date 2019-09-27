@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
 import { Help } from '@dhis2/ui-core'
-import { Input } from 'styles'
 import { hash } from 'utils'
+import { MinWidth } from '../MinWidth'
 import { types, texts } from './constants'
 import { useValues } from './useValues'
 import { useDebounce } from './useDebounce'
@@ -70,7 +70,7 @@ export const TextInput = props => {
     const onBlur = () => setDebouncedValue(value)
 
     return (
-        <Input onKeyDown={onKeyDown}>
+        <MinWidth onKeyDown={onKeyDown}>
             <StyledInputField
                 required={props.required}
                 name={props.name}
@@ -115,7 +115,7 @@ export const TextInput = props => {
                         : props.warning}
                 </Help>
             )}
-        </Input>
+        </MinWidth>
     )
 }
 

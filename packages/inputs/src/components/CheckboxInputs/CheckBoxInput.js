@@ -1,7 +1,7 @@
 import React from 'react'
 import { bool, func, string } from 'prop-types'
 import { Checkbox } from '@dhis2/ui-core'
-import { OptionSpacer } from 'styles'
+import { OptionSpacer } from '../OptionSpacer'
 
 export const CheckboxInput = ({ id, label, checked, disabled, onChange }) => {
     const onKeyDown = ({ key, target }) => {
