@@ -1,8 +1,13 @@
 import React from 'react'
 import { func, string, bool } from 'prop-types'
+import styled from 'styled-components'
 import { ButtonRow } from 'components'
-import { Text } from 'styles'
 import { Background, CustomCard, ModalTitle } from './style'
+
+const Text = styled.div`
+    margin: 8px 0;
+    line-height: 24px;
+`
 
 export const ModalPopup = ({
     heading,

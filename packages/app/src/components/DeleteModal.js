@@ -1,11 +1,16 @@
 import React, { useEffect } from 'react'
 import { func, oneOf } from 'prop-types'
 import { useSelector, useDispatch } from 'react-redux'
+import styled from 'styled-components'
 import { Modal, ButtonStrip } from '@dhis2/ui-core'
-import { Text } from 'styles'
 import { onDeleteConfirmed } from 'actions'
 import { RichButton } from './RichButton'
 import { LOADING, SUCCESS } from 'constants'
+
+const Text = styled.div`
+    margin: 8px 0;
+    line-height: 24px;
+`
 
 export const DeleteModal = ({ secondaryAction, onDeleteSucccess, type }) => {
     const dispatch = useDispatch()

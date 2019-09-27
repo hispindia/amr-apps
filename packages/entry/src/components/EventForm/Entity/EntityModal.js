@@ -1,7 +1,13 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import styled from 'styled-components'
 import { Modal, ButtonStrip } from '@dhis2/ui-core'
-import { RichButton, Text, removeModal } from '@hisp-amr/app'
+import { RichButton, removeModal } from '@hisp-amr/app'
+
+const Text = styled.div`
+    margin: 8px 0;
+    line-height: 24px;
+`
 
 export const EntityModal = () => {
     const dispatch = useDispatch()

@@ -1,8 +1,17 @@
 import React from 'react'
 import { string, object, node } from 'prop-types'
 import styled from 'styled-components'
-import { Title } from 'styles'
 import { IconButton } from 'components'
+
+const Title = styled.h1`
+    display: block;
+    font-size: 2em;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: 500;
+`
 
 const Row = styled.div`
     display: flex;
