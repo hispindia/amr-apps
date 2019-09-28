@@ -1,5 +1,5 @@
 import React from 'react'
-import { App, Row, store, reducers } from '@hisp-amr/app'
+import { App, store, reducers } from '@hisp-amr/app'
 import { Content } from './Content'
 import 'typeface-roboto'
 
@@ -13,8 +13,6 @@ const isolateTransferStore = store({
 
 export const IsolateTransfer = () => (
     <App appName={appName} store={isolateTransferStore}>
-        <Row>
-            <Content />
-        </Row>
+        <Content />
     </App>
 )

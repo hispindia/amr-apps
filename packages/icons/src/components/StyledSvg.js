@@ -4,7 +4,6 @@ import { colorsPropType } from '../propTypes'
 import { colors } from '../colors'
 
 export const StyledSvg = styled.svg`
-    margin: auto;
     width: 24px;
     height: 24px;
     ${({ size, color }) => {
