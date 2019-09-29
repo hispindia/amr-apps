@@ -6,7 +6,8 @@ import { TransferButtons } from './TransferButtons'
 
 const Section = styled.section`
     display: flex;
-    padding-top: 14px;
+    height: 264px;
+    margin-top: 10px;
 `
 
 const getSelected = selected =>
@@ -34,6 +35,7 @@ export const TransferList = ({ options, onChange, selected }) => {
         setRight(newRight)
         setLeft([...left, ...selectedRight])
         setSelectedRight([])
+        setSelectedLeft([])
         onChange(newRight)
     }
 
@@ -45,6 +47,7 @@ export const TransferList = ({ options, onChange, selected }) => {
             ),
         ])
         setRight(newRight)
+        setSelectedRight([])
         setSelectedLeft([])
         onChange(newRight)
     }
@@ -54,10 +57,14 @@ export const TransferList = ({ options, onChange, selected }) => {
             const newRight = [...right, ...left]
             setRight(newRight)
             setLeft([])
+            setSelectedRight([])
+            setSelectedLeft([])
             onChange(newRight)
         } else {
             setLeft([...right])
             setRight([])
+            setSelectedRight([])
+            setSelectedLeft([])
             onChange([])
         }
     }
@@ -80,6 +87,8 @@ export const TransferList = ({ options, onChange, selected }) => {
             setRight(newRight)
             onChange(newRight)
         }
+        setSelectedRight([])
+        setSelectedLeft([])
     }
 
     return (
@@ -91,7 +100,9 @@ export const TransferList = ({ options, onChange, selected }) => {
             />
             <TransferButtons
                 onLeft={onLeft}
+                disableLeft={!selectedRight.length}
                 onRight={onRight}
+                disableRight={!selectedLeft.length}
                 onSwitch={onSwitch}
             />
             <MultiSelect

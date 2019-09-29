@@ -1,5 +1,5 @@
 import React from 'react'
-import { func } from 'prop-types'
+import { func, bool } from 'prop-types'
 import styled from 'styled-components'
 import { Button } from '@dhis2/ui-core'
 import { Icon, icons } from '@hisp-amr/icons'
@@ -16,12 +16,18 @@ const ButtonCol = styled.div`
     justify-content: center;
 `
 
-export const TransferButtons = ({ onLeft, onRight, onSwitch }) => (
+export const TransferButtons = ({
+    onLeft,
+    onRight,
+    disableLeft,
+    disableRight,
+    onSwitch,
+}) => (
     <ButtonCol>
-        <MiniButton onClick={onLeft}>
+        <MiniButton onClick={onLeft} disabled={disableLeft}>
             <Icon icon={icons.chevron_left} />
         </MiniButton>
-        <MiniButton onClick={onRight}>
+        <MiniButton onClick={onRight} disabled={disableRight}>
             <Icon icon={icons.chevron_right} />
         </MiniButton>
         <MiniButton onClick={onSwitch}>
@@ -33,5 +39,7 @@ export const TransferButtons = ({ onLeft, onRight, onSwitch }) => (
 TransferButtons.propTypes = {
     onLeft: func.isRequired,
     onRight: func.isRequired,
+    disableLeft: bool,
+    disableRight: bool,
     onSwitch: func.isRequired,
 }

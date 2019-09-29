@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '@hisp-amr/app'
-import { getBatches } from '../../api'
+import { getBatches } from '../api'
 
 export const useGetBatch = batchNo => {
     const dispatch = useDispatch()
@@ -9,7 +9,7 @@ export const useGetBatch = batchNo => {
     const orgUnit = useSelector(state => state.selectedOrgUnit)
 
     const [data, setData] = useState(false)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
 
     useEffect(() => {
@@ -37,7 +37,7 @@ export const useGetBatch = batchNo => {
         }
 
         getBatch()
-    }, [getBatch])
+    }, [batchNo])
 
     return { data, loading, error }
 }

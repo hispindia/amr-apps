@@ -10,7 +10,6 @@ const Option = styled.option`
 `
 
 const StyledSelect = styled.select`
-    height: 240px;
     flex: 1;
     border-width: 1px;
     border-style: solid;

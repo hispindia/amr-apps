@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BatchTable } from './BatchTable'
+import { BatchDispatch } from './BatchDispatch'
 import { toDispatchedBatches } from '../utils/toDispatchedBatches'
 
 const headers = [
@@ -11,14 +12,21 @@ const headers = [
 ]
 
 export const DispatchedBatches = () => {
-    const onClick = param => console.log(param)
+    const [batch, setBatch] = useState()
+
+    const onClick = id => {} //setBatch(id[0])
+
+    const onClose = () => {} //setBatch()
 
     return (
-        <BatchTable
-            title="Dispatched sample batches"
-            headers={headers}
-            onClick={onClick}
-            filterBatches={toDispatchedBatches}
-        />
+        <>
+            {batch && <BatchDispatch batchNo={batch} close={onClose} />}
+            <BatchTable
+                title="Dispatched sample batches"
+                headers={headers}
+                onClick={onClick}
+                filterBatches={toDispatchedBatches}
+            />
+        </>
     )
 }

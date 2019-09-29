@@ -63,6 +63,8 @@ export const BatchForm = ({ close }) => {
     const onEventsChange = newSelected =>
         setSelectedEvents(newSelected.map(s => s.value))
 
+    const onCancel = () => close(false)
+
     const onSubmit = () => setAdd(true)
 
     return (
@@ -119,7 +121,7 @@ export const BatchForm = ({ close }) => {
                 <BatchButtons
                     disabled={disabled}
                     loading={addBatchResult.loading}
-                    onCancel={close}
+                    onCancel={onCancel}
                     onSubmit={onSubmit}
                 />
             </Modal.Actions>

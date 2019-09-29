@@ -14,7 +14,10 @@ export const setMetadata = () => async dispatch => {
     try {
         const metadata = await getMetadata()
         dispatch(
-            createAction(METADATA_RECEIVED, { programs: metadata.programs })
+            createAction(METADATA_RECEIVED, {
+                programs: metadata.programs,
+                optionSets: metadata.optionSets,
+            })
         )
     } catch (error) {
         console.error(error)

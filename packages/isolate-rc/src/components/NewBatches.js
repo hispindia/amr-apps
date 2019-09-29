@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
 import { RichButton } from '@hisp-amr/app'
 import { BatchForm } from './BatchForm'
+import { BatchDispatch } from './BatchDispatch'
 import { BatchTable } from './BatchTable'
 import { toNewBatches, useHasPrograms } from '../utils'
 
@@ -13,20 +13,25 @@ const headers = [
 ]
 
 export const NewBatches = () => {
-    const orgUnit = useSelector(state => state.selectedOrgUnit)
     const hasPrograms = useHasPrograms()
 
-    const [showForm, setShowForm] = useState(false)
+    const [newBatch, setNewBatch] = useState(false)
+    const [dispatchBatch, setDispatchBatch] = useState()
     const [refetch, setRefetch] = useState(false)
 
     const onFormClose = success => {
-        setShowForm(false)
+        setNewBatch(false)
         if (success) setRefetch(!refetch)
     }
 
-    const onRowClick = () => console.log('Row clicked')
+    const onDispatchClose = success => {
+        setDispatchBatch()
+        if (success) setRefetch(!refetch)
+    }
 
-    const onAddClick = () => setShowForm(true)
+    const onRowClick = id => setDispatchBatch(id[0])
+
+    const onAddClick = () => setNewBatch(true)
 
     const tooltip = hasPrograms
         ? 'Add a new batch'
@@ -34,13 +39,18 @@ export const NewBatches = () => {
 
     return (
         <>
-            {showForm && <BatchForm close={onFormClose} />}
+            {newBatch && <BatchForm close={onFormClose} />}
+            {dispatchBatch && (
+                <BatchDispatch
+                    batchNo={dispatchBatch}
+                    close={onDispatchClose}
+                />
+            )}
             <BatchTable
                 title="New sample batches"
                 headers={headers}
                 onClick={onRowClick}
                 filterBatches={toNewBatches}
-                orgUnit={orgUnit ? orgUnit.displayName : ''}
                 refetch={refetch}
                 button={
                     <div title={tooltip}>

@@ -48,8 +48,8 @@ export const useAddBatch = ({
                     endDate: to,
                     status: CREATE,
                     program: {
-                        id: programData.find(p => p.id == program).id,
-                        displayName: programData.find(p => p.id == program)
+                        id: programData.find(p => p.id === program).id,
+                        displayName: programData.find(p => p.id === program)
                             .displayName,
                     },
                     rows: {
@@ -85,7 +85,7 @@ export const useAddBatch = ({
                 console.error(e)
                 setError(e)
                 dispatch(
-                    showAlert('Failed to get events', {
+                    showAlert('Failed to create dispatch', {
                         critical: true,
                     })
                 )
