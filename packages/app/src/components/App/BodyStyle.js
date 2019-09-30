@@ -8,4 +8,8 @@ export const BodyStyle = createGlobalStyle`
         overflow-y: auto !important;
         padding-right: 0 !important;
     }
+    .no-hover tr {
+            user-select: unset !important;
+            cursor: unset !important;
+    }
 `

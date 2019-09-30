@@ -24,7 +24,6 @@ export const DispatchedBatches = () => {
             <BatchTable
                 title="Dispatched sample batches"
                 headers={headers}
-                onClick={onClick}
                 filterBatches={toDispatchedBatches}
             />
         </>

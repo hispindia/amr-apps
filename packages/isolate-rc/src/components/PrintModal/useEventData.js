@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { showAlert } from '@hisp-amr/app'
 import { getEventData } from '../../api'
 import { ORGANISM_OPTION_SET } from '../../constants/ids'
+import { ORGANISM, SAMPLE_TYPE } from '../../constants/dataElements'
 
 export const useEventData = batch => {
     const dispatch = useDispatch()
@@ -30,19 +31,27 @@ export const useEventData = batch => {
                     ...batch,
                     rows: {
                         ...batch.rows,
-                        selectedArray: batch.rows.selectedArray.map(s => ({
-                            ...s,
-                            sampletype: eventData.find(
-                                e => e[0][0] === s.eventuid
-                            )[0][2],
-                            organism: organisms.find(
-                                o =>
-                                    o.code ===
-                                    eventData.find(
-                                        e => e[1][0] === s.eventuid
-                                    )[1][2]
-                            ).name,
-                        })),
+                        selectedArray: batch.rows.selectedArray.map(s => {
+                            const array = eventData
+                                .filter(e => e.length)
+                                .find(e => e[0][0] === s.eventuid)
+
+                            const sampleType =
+                                !!array && array.find(e => e[1] === SAMPLE_TYPE)
+
+                            const organism =
+                                !!array && array.find(e => e[1] === ORGANISM)
+
+                            return {
+                                ...s,
+                                sampletype: sampleType ? sampleType[2] : '',
+                                organism: organism
+                                    ? organisms.find(
+                                          o => o.code === organism[2]
+                                      ).name
+                                    : '',
+                            }
+                        }),
                     },
                 })
             } catch (e) {

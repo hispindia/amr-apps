@@ -5,7 +5,6 @@ import { Button } from '@dhis2/ui-core'
 import { LoadingSection, Table, TitleRow } from '@hisp-amr/app'
 import { useBatches } from './useBatches'
 import { PrintModal } from '../PrintModal'
-//import './style.css'
 
 export const BatchTable = ({
     title,
@@ -68,7 +67,7 @@ BatchTable.propTypes = {
     title: string.isRequired,
     headers: arrayOf(shape({ name: string.isRequired, options: object }))
         .isRequired,
-    onClick: func.isRequired,
+    onClick: func,
     filterBatches: func.isRequired,
     button: node,
 }

@@ -45,16 +45,11 @@ export const useDispatchBatch = ({
                     orgUnit.code
                 ].filter(b => b.BatchNo !== data.BatchNo)
 
-                console.log(newBatch)
-                console.log({
+                const putResponse = await putBatches(orgUnit.code, {
                     [orgUnit.code]: [...batches, newBatch],
                 })
 
-                /*const putResponse = await putBatches(orgUnit.code, {
-                    [orgUnit.code]: [...batches, newBatch],
-                })
-
-                if (putResponse.httpStatusCode !== 200) throw putResponse*/
+                if (putResponse.httpStatusCode !== 200) throw putResponse
 
                 dispatch(showAlert(`Batch ${data.BatchNo} dispatched`))
                 setSuccess(true)
