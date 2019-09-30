@@ -13,10 +13,13 @@ export const useEventData = batch => {
     const [data, setData] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(false)
+    const [retry, setRetry] = useState(false)
 
     useEffect(() => {
         const getData = async eventIds => {
+            setError(false)
             setLoading(true)
+            setRetry(false)
             try {
                 const response = await Promise.all(
                     eventIds.map(async e => await getEventData(e))
@@ -60,6 +63,12 @@ export const useEventData = batch => {
                 dispatch(
                     showAlert('Failed to get batch data', {
                         critical: true,
+                        actions: [
+                            {
+                                label: 'Retry',
+                                onClick: () => setRetry(true),
+                            },
+                        ],
                     })
                 )
             } finally {
@@ -67,9 +76,9 @@ export const useEventData = batch => {
             }
         }
 
-        if (batch)
+        if (batch && !!error === retry)
             getData(batch.rows.selectedArray.map(({ eventuid }) => eventuid))
-    }, [batch])
+    }, [batch, retry])
 
     return { data, loading, error }
 }

@@ -22,6 +22,7 @@ export const TransferButtons = ({
     disableLeft,
     disableRight,
     onSwitch,
+    disableSwitch,
 }) => (
     <ButtonCol>
         <MiniButton onClick={onLeft} disabled={disableLeft}>
@@ -30,7 +31,7 @@ export const TransferButtons = ({
         <MiniButton onClick={onRight} disabled={disableRight}>
             <Icon icon={icons.chevron_right} />
         </MiniButton>
-        <MiniButton onClick={onSwitch}>
+        <MiniButton onClick={onSwitch} disabled={disableSwitch}>
             <Icon icon={icons.code} />
         </MiniButton>
     </ButtonCol>

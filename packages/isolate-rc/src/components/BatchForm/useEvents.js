@@ -12,10 +12,13 @@ export const useEvents = (program, from, to) => {
     const [eventData, setEventData] = useState(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(false)
+    const [retry, setRetry] = useState(false)
 
     useEffect(() => {
         const fetchEvents = async () => {
+            setError(false)
             setLoading(true)
+            setRetry(false)
             setEvents(null)
             try {
                 const response = await getEvents({ program, orgUnit, from, to })
@@ -42,6 +45,12 @@ export const useEvents = (program, from, to) => {
                 dispatch(
                     showAlert('Failed to get events', {
                         critical: true,
+                        actions: [
+                            {
+                                label: 'Retry',
+                                onClick: () => setRetry(true),
+                            },
+                        ],
                     })
                 )
             } finally {
@@ -49,8 +58,9 @@ export const useEvents = (program, from, to) => {
             }
         }
 
-        if (![program, from, to].includes('')) fetchEvents()
-    }, [program, from, to])
+        if (![program, from, to].includes('') && !!error === retry)
+            fetchEvents()
+    }, [program, from, to, retry])
 
     return { events, eventData, loading, error }
 }

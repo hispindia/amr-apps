@@ -104,6 +104,7 @@ export const TransferList = ({ options, onChange, selected }) => {
                 onRight={onRight}
                 disableRight={!selectedLeft.length}
                 onSwitch={onSwitch}
+                disableSwitch={!options.length}
             />
             <MultiSelect
                 options={right}

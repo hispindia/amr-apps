@@ -10,7 +10,7 @@
         "company": "HISP India"
     },
     "manifest.webapp": {
-        "name": "RC - Isolate Transfer",
+        "name": "RC - Isolate Transfer (TEST)",
         "description": "Transfer AMR isolates.",
         "appType": "APP",
         "activities": {

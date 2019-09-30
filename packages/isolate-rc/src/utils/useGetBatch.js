@@ -11,10 +11,13 @@ export const useGetBatch = batchNo => {
     const [data, setData] = useState(false)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
+    const [retry, setRetry] = useState(false)
 
     useEffect(() => {
         const getBatch = async () => {
+            setError(false)
             setLoading(true)
+            setRetry(false)
             try {
                 const response = await getBatches(orgUnit.code)
 
@@ -29,6 +32,12 @@ export const useGetBatch = batchNo => {
                 dispatch(
                     showAlert('Failed to get batch', {
                         critical: true,
+                        actions: [
+                            {
+                                label: 'Retry',
+                                onClick: () => setRetry(true),
+                            },
+                        ],
                     })
                 )
             } finally {
@@ -36,8 +45,8 @@ export const useGetBatch = batchNo => {
             }
         }
 
-        getBatch()
-    }, [batchNo])
+        if (!!error === retry) getBatch()
+    }, [batchNo, retry])
 
     return { data, loading, error }
 }

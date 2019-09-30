@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import { IGNORE } from '../constants/options'
 
 export const useGetPrograms = () => {
     const selected = useSelector(state => state.selectedOrgUnit)
@@ -11,14 +12,16 @@ export const useGetPrograms = () => {
         if (programs && selected)
             setOrgUnitPrograms(
                 programs
-                    .filter(p =>
-                        p.organisationUnits
-                            .map(ou => ou.id)
-                            .includes(selected.id)
+                    .filter(
+                        ({ displayName, organisationUnits }) =>
+                            !displayName.includes(IGNORE) &&
+                            organisationUnits
+                                .map(ou => ou.id)
+                                .includes(selected.id)
                     )
-                    .map(p => ({
-                        label: p.displayName,
-                        value: p.id,
+                    .map(({ displayName, id }) => ({
+                        label: displayName,
+                        value: id,
                     }))
             )
     }, [programs, selected])

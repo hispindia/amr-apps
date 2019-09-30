@@ -3,7 +3,7 @@ import { App, store, reducers } from '@hisp-amr/app'
 import { Content } from './Content'
 import 'typeface-roboto'
 
-const appName = 'RC - Isolate Transfer'
+const appName = 'RC - Isolate Transfer (TEST)'
 
 const isolateTransferStore = store({
     alert: reducers.alert,
