@@ -25,7 +25,13 @@ export const OrgUnitNode = ({ orgUnit }) => {
     const onCarretClick = () => setOpened(!opened)
 
     const onOrgUnitClick = () =>
-        dispatch(setOrgUnit({ id: orgUnit.id, path: orgUnit.path }))
+        dispatch(
+            setOrgUnit({
+                id: orgUnit.id,
+                path: orgUnit.path,
+                displayName: orgUnit.displayName,
+            })
+        )
 
     return (
         <li key={orgUnit.id}>

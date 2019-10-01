@@ -1,5 +1,5 @@
 export const titles = {
-    complete: 'Complete records',
+    complete: 'Completed records',
     incomplete: 'Incomplete records',
 }
 

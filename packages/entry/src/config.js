@@ -2,7 +2,7 @@ export const appName = 'Data Entry'
 
 export const categories = [
     {
-        label: 'Complete records',
+        label: 'Completed records',
         icon: 'check_circle_outline',
         status: 'complete',
         sqlViews: {

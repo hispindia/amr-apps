@@ -23,6 +23,7 @@ export const Content = () => {
                 setOrgUnit({
                     id: metadata.orgUnits[0].id,
                     path: metadata.orgUnits[0].path,
+                    displayName: metadata.orgUnits[0].displayName,
                 })
             )
     }, [metadata.status, metadata.orgUnits, dispatch])
