@@ -1,4 +1,4 @@
-# AMR Data Entry and Approval
+# Apps and libs for the AMR Surveillance System
 
 ## Installation
 
