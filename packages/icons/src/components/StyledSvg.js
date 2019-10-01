@@ -6,6 +6,7 @@ import { colors } from '../colors'
 export const StyledSvg = styled.svg`
     width: 24px;
     height: 24px;
+    flex-shrink: 0;
     ${({ size, color }) => {
         if (size)
             return css`
