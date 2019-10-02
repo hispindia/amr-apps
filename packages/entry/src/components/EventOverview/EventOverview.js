@@ -11,7 +11,7 @@ import { useEvents } from './useEvents'
 import { titles, headers } from './config'
 
 const title = {
-    true: 'You cannot add records for the selected organisation unit',
+    true: 'You cannot add records for the selected location',
     false: 'Add new record',
 }
 

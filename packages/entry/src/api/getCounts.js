@@ -1,4 +1,4 @@
-import { getSqlView } from './getSqlView'
+import { getSqlView } from './helpers'
 
 export const getCounts = async (configs, orgUnit, username) => {
     for (const config of configs)
