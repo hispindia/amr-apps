@@ -24,6 +24,7 @@ const getCurrentVersion = () => JSON.parse(fs.readFileSync(paths[0])).version
 const getNewVersion = (index, current) => {
     const versions = current.split('.')
     versions[index] = parseInt(versions[index]) + 1
+    for (i = index + 1; i < versions.length; i++) versions[i] = 0
     return versions.join('.')
 }
 

@@ -1,6 +1,6 @@
 {
     "name": "@hisp-amr/org-unit-tree",
-    "version": "0.0.15",
+    "version": "0.0.16",
     "description": "DHIS2 single select organisation unit tree",
     "license": "BSD-3-Clause",
     "main": "dist/index.js",
@@ -20,7 +20,7 @@
         "test": "react-scripts test"
     },
     "dependencies": {
-        "@hisp-amr/api": "*",
+        "@hisp-amr/api": "0.0.8",
         "@dhis2/ui-core": "^3.9.1",
         "styled-components": "^5.0.0-beta.8"
     },
