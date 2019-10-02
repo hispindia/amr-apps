@@ -2,12 +2,18 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { object } from 'prop-types'
 import styled from 'styled-components'
-import { Label, Padding } from 'styles'
-import { CheckboxInputs } from 'inputs'
+import { colors } from '@dhis2/ui-core'
+import { CheckboxInputs } from '@hisp-amr/inputs'
 import { DataElement } from './DataElement'
 import { setEventValue } from 'actions'
+import { Padding } from '../Padding'
 
-const StyledLabel = styled(Label)`
+const Label = styled.div`
+    color: ${colors.grey600};
+    white-space: nowrap;
+    padding-bottom: 12px;
+    line-height: 24px;
+    font-weight: 500;
     margin: 16px 16px -16px;
 `
 
@@ -72,7 +78,7 @@ export const ChildSection = ({ childSection }) => {
 
     return (
         <>
-            <StyledLabel>{childSection.name}</StyledLabel>
+            <Label>{childSection.name}</Label>
             {childSection.dataElements.map(id => (
                 <DataElement key={id} id={id} />
             ))}

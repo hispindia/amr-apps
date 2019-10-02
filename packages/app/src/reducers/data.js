@@ -19,6 +19,7 @@ import {
     ENABLE_BUTTONS,
     RESET_PANEL_EVENT,
     SET_INCOMPLETED,
+    SET_COMPLETED,
     SET_DELETE_PROMPT,
     SET_ENTITY_AND_ORG_UNIT,
     SET_EVENT_VALUE,
@@ -248,6 +249,17 @@ export const data = (state = INITIAL_STATE, { type, payload }) => {
                     },
                 },
                 buttonsDisabled: false,
+            }
+        case SET_COMPLETED:
+            return {
+                ...state,
+                event: {
+                    ...state.event,
+                    status: {
+                        ...state.event.status,
+                        completed: true,
+                    },
+                },
             }
         case SET_DELETE_PROMPT:
             return {

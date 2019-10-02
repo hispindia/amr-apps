@@ -1,16 +1,26 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { MainSection, LoadingSection, TitleRow } from '@hisp-amr/app'
+import {
+    MainSection,
+    LoadingSection,
+    TitleRow,
+    RichButton,
+} from '@hisp-amr/app'
 import { Table } from './Table'
 import { useEvents } from './useEvents'
 import { titles, headers } from './config'
+
+const title = {
+    true: 'You cannot add records for the selected organisation unit',
+    false: 'Add new record',
+}
 
 /**
  * Shows events by status.
  */
 export const EventOverview = ({ match, history }) => {
     const status = match.params.status
-    const selected = useSelector(state => state.selectedOrgUnit.id)
+    const selected = useSelector(state => state.selectedOrgUnit)
     const { rows, loading, addButtonDisabled, error } = useEvents(status)
 
     /**
@@ -22,11 +32,25 @@ export const EventOverview = ({ match, history }) => {
     /**
      * On table add click.
      */
-    const onAddClick = () => history.push(`/orgUnit/${selected}/event/`)
+    const onAddClick = () => history.push(`/orgUnit/${selected.id}/event/`)
 
     return (
         <MainSection>
-            <TitleRow title={titles[status]} />
+            <TitleRow
+                title={titles[status]}
+                button={
+                    <div title={title[addButtonDisabled]}>
+                        <RichButton
+                            primary
+                            large
+                            icon="add"
+                            label="Add record"
+                            disabled={addButtonDisabled}
+                            onClick={onAddClick}
+                        />
+                    </div>
+                }
+            />
             {!error &&
                 (loading ? (
                     <LoadingSection />
@@ -35,8 +59,7 @@ export const EventOverview = ({ match, history }) => {
                         rows={rows}
                         headers={headers}
                         onEventClick={onEventClick}
-                        onAddClick={onAddClick}
-                        addButtonDisabled={addButtonDisabled}
+                        title={selected.displayName}
                     />
                 ))}
         </MainSection>

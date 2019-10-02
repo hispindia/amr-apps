@@ -1,0 +1,26 @@
+{
+    "name": "@hisp-amr/icons",
+    "version": "0.0.8",
+    "description": "Material UI icons",
+    "license": "BSD-3-Clause",
+    "main": "dist/index.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/hispindia/amr-apps.git"
+    },
+    "bugs": {
+        "url": "https://github.com/hispindia/amr-apps/issues"
+    },
+    "scripts": {
+        "transpile": "babel src -d dist",
+        "start": "babel src -d dist -w",
+        "build": "NODE_ENV=production BABEL_ENV=production babel src -d dist",
+        "prebuild": "rimraf dist",
+        "prestart": "rimraf dist",
+        "test": "react-scripts test"
+    },
+    "dependencies": {
+        "@dhis2/ui-core": "^3.9.0",
+        "styled-components": "^5.0.0-beta.8"
+    }
+}

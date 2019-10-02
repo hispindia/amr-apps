@@ -1,14 +1,12 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-    TextInput,
-    AgeInput,
-    RadioInputs,
-    SelectInput,
-    Padding,
-    setEntityValue,
-    validateUnique,
-} from '@hisp-amr/app'
+import styled from 'styled-components'
+import { setEntityValue, validateUnique } from '@hisp-amr/app'
+import { TextInput, AgeInput, RadioInputs, SelectInput } from '@hisp-amr/inputs'
+
+const Padding = styled.div`
+    padding: 16px;
+`
 
 /**
  * Entity information section.

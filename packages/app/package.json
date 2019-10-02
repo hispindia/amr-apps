@@ -1,6 +1,6 @@
 {
     "name": "@hisp-amr/app",
-    "version": "0.2.6",
+    "version": "0.3.8",
     "description": "AMR apps for DHIS2",
     "developer": {
         "name": "Terje Uglebakken",
@@ -23,6 +23,8 @@
         "@dhis2/ui-core": "^3.9.0",
         "@dhis2/ui-widgets": "^1.0.8",
         "@hisp-amr/api": "*",
+        "@hisp-amr/icons": "*",
+        "@hisp-amr/inputs": "*",
         "@material-ui/core": "3.9.3",
         "@material-ui/icons": "3.0.2",
         "dayjs": "^1.8.15",

@@ -2,7 +2,7 @@ import React from 'react'
 import { func, string } from 'prop-types'
 import styled from 'styled-components'
 import { theme } from '@dhis2/ui-core'
-import { Icon } from 'components'
+import { Icon, icons } from '@hisp-amr/icons'
 
 export const IconContainer = styled.div`
     display: flex;
@@ -24,7 +24,7 @@ export const IconContainer = styled.div`
  */
 export const IconButton = ({ tooltip, onClick, icon }) => (
     <IconContainer title={tooltip} onClick={onClick}>
-        <Icon icon={icon} large />
+        <Icon icon={icons[icon]} size={40} />
     </IconContainer>
 )
 

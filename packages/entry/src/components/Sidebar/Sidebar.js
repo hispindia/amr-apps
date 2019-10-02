@@ -2,19 +2,19 @@ import React from 'react'
 import { Route } from 'react-router-dom'
 import styled from 'styled-components'
 import { OrgUnitTree } from './OrgUnitTree'
-import SidebarMenu from './SidebarMenu'
+import { SidebarMenu } from './SidebarMenu'
 
-const SidebarContainer = styled.aside`
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
+const Aside = styled.aside`
+    background-color: #fff;
+    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    min-height: calc(100vh - 48px);
 `
 
-const SidebarContent = () => (
-    <SidebarContainer>
-        <SidebarMenu />
+const SidebarContent = ({ location }) => (
+    <Aside>
+        <SidebarMenu location={location} />
         <OrgUnitTree />
-    </SidebarContainer>
+    </Aside>
 )
 
 /**

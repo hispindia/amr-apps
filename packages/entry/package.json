@@ -1,6 +1,6 @@
 {
     "name": "amr-entry",
-    "version": "0.2.6",
+    "version": "0.3.8",
     "description": "AMR data entry app for DHIS2",
     "main": "index.js",
     "license": "BSD-3-Clause",
@@ -36,6 +36,9 @@
     "dependencies": {
         "@hisp-amr/api": "*",
         "@hisp-amr/app": "*",
+        "@hisp-amr/icons": "*",
+        "@hisp-amr/inputs": "*",
+        "@dhis2/ui-core": "^3.9.0",
         "react": "^16.9.0",
         "react-dom": "^16.9.0"
     }

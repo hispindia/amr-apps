@@ -1,7 +1,7 @@
 import React from 'react'
 import { bool, func, string } from 'prop-types'
 import { Button } from '@dhis2/ui-core'
-import { Icon } from 'components'
+import { Icon, icons } from '@hisp-amr/icons'
 import { LoadingIcon } from 'components/LoadingIcon'
 
 /**
@@ -28,7 +28,9 @@ export const RichButton = ({
             destructive={destructive}
             onClick={onClick}
             disabled={disabled || loading}
-            icon={loading ? <LoadingIcon /> : icon && <Icon icon={icon} />}
+            icon={
+                loading ? <LoadingIcon /> : icon && <Icon icon={icons[icon]} />
+            }
             small={small}
             large={large}
             initialFocus={initialFocus}
