@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react'
 import { getOrgUnits, getUserOrgUnits } from '../api'
 import { toOrgUnitTree } from '../utils/toOrgUnitTree'
 
-export const useOrgUnits = () => {
+export const useOrgUnits = roots => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
-    const [data, setData] = useState(null)
+    const [data, setData] = useState()
 
     useEffect(() => {
         const getData = async () => {
@@ -20,14 +20,14 @@ export const useOrgUnits = () => {
 
                 setData(orgUnits)
                 setLoading(false)
-
             } catch (error) {
                 console.error(error)
                 setError(error)
             }
         }
 
-        getData()
+        if (roots) setData(roots)
+        else getData()
     }, [])
 
     return { data, loading, error }

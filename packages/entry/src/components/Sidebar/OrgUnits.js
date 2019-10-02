@@ -1,13 +1,13 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { setOrgUnit } from '@hisp-amr/app'
 import { OrgUnitTree } from '@hisp-amr/org-unit-tree'
-import 'typeface-roboto'
 
 export const OrgUnits = () => {
     const dispatch = useDispatch()
+    const roots = useSelector(state => state.metadata.orgUnits)
 
     const onSelect = orgUnit => dispatch(setOrgUnit(orgUnit))
 
-    return <OrgUnitTree onSelect={onSelect} />
+    return <OrgUnitTree onSelect={onSelect} roots={roots} />
 }

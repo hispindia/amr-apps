@@ -1,7 +1,7 @@
 import React from 'react'
 import { Route } from 'react-router-dom'
 import styled from 'styled-components'
-import { OrgUnitTree } from './OrgUnitTree'
+import { OrgUnits } from './OrgUnits'
 import { SidebarMenu } from './SidebarMenu'
 
 const Aside = styled.aside`
@@ -13,7 +13,7 @@ const Aside = styled.aside`
 const SidebarContent = ({ location }) => (
     <Aside>
         <SidebarMenu location={location} />
-        <OrgUnitTree />
+        <OrgUnits />
     </Aside>
 )
 

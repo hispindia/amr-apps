@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { func } from 'prop-types'
+import { array, func, shape, string, arrayOf } from 'prop-types'
 import styled from 'styled-components'
 import { useOrgUnits } from './useOrgUnits'
 import { OrgUnitNode } from './OrgUnitNode'
@@ -7,14 +7,14 @@ import { OrgUnitNode } from './OrgUnitNode'
 export const StyledList = styled.ul`
     list-style-type: none;
     margin: 0;
-    padding: 0;
+    padding: 16px;
 `
 
 /**
  * Organisation unit tree.
  */
-export const OrgUnitTree = ({ onSelect, onError }) => {
-    const { data, error, loading } = useOrgUnits()
+export const OrgUnitTree = ({ onSelect, onError, roots }) => {
+    const { data, error } = useOrgUnits(roots)
     const [selected, setSelected] = useState(null)
 
     useEffect(() => {
@@ -58,4 +58,13 @@ export const OrgUnitTree = ({ onSelect, onError }) => {
 OrgUnitTree.propTypes = {
     onSelect: func.isRequired,
     onError: func,
+    roots: arrayOf(
+        shape({
+            children: array.isRequired,
+            displayName: string.isRequired,
+            id: string.isRequired,
+            path: string.isRequired,
+            code: string.isRequired,
+        })
+    ),
 }
