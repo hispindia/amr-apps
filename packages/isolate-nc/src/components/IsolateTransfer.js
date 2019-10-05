@@ -2,7 +2,7 @@ import React from 'react'
 import { App, store, reducers } from '@hisp-amr/app'
 import { Content } from './Content'
 
-const appName = 'RC - Isolate Transfer (TEST)'
+const appName = 'NC - Isolate Transfer (TEST)'
 
 const isolateTransferStore = store({
     alert: reducers.alert,

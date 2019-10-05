@@ -35,7 +35,7 @@
     },
     "dependencies": {
         "@date-io/dayjs": "^1.3.9",
-        "@dhis2/ui-core": "^3.9.0",
+        "@dhis2/ui-core": "^3.11.2",
         "@hisp-amr/app": "*",
         "@hisp-amr/icons": "*",
         "@hisp-amr/inputs": "*",
@@ -43,7 +43,6 @@
         "react": "^16.9.0",
         "react-dom": "^16.9.0",
         "react-to-print": "^2.4.0",
-        "styled-components": "^5.0.0-beta.8",
-        "typeface-roboto": "^0.0.75"
+        "styled-components": "^5.0.0-beta.8"
     }
 }

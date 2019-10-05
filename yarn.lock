@@ -1107,6 +1107,13 @@
   resolved "https://registry.yarnpkg.com/@dhis2/prop-types/-/prop-types-1.1.0.tgz#6144470f336fbcf0fd9142c5ea402d03dfb92c2a"
   integrity sha512-hHbkoqEbi7vcWcJG1VdBkjKBUFZGWj7VRkwr2GvRU3g1j7AXW5WzsrGGgd/4ejK4nQMardlkZmCrzw7+mkTcRg==
 
+"@dhis2/prop-types@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@dhis2/prop-types/-/prop-types-1.1.1.tgz#a70dd59e56cff13f6e49470677a4def0ac78ff6f"
+  integrity sha512-ILyRcpPjFVtfxuZhyZ2yBp5NkIiTKBF/KfTtr6cSGqXnBIeV9XqHR+IT+C9jwcB96hxhuxBKmvfiaFQFT8uU6g==
+  dependencies:
+    prop-types "^15"
+
 "@dhis2/ui-core@3.5.0":
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/@dhis2/ui-core/-/ui-core-3.5.0.tgz#439a2e18faf540c3b80156d19cf4c236abccecd5"
@@ -1115,7 +1122,16 @@
     classnames "^2.2.6"
     styled-jsx "^3.2.1"
 
-"@dhis2/ui-core@^3.9.0", "@dhis2/ui-core@^3.9.1":
+"@dhis2/ui-core@^3.11.2":
+  version "3.11.2"
+  resolved "https://registry.yarnpkg.com/@dhis2/ui-core/-/ui-core-3.11.2.tgz#b795fefb73d7c4f386ce4b76f847e43b062eb061"
+  integrity sha512-Q2MzZFfwmangJnOPV7LTgXNb9w7FcH943uWwwYwIfQG6rGn1mxK/XnxXFH2I7OiIxM2d+2m4TsrS7CpW1qsv1A==
+  dependencies:
+    "@dhis2/prop-types" "^1.1.1"
+    classnames "^2.2.6"
+    styled-jsx "^3.2.2"
+
+"@dhis2/ui-core@^3.9.1":
   version "3.9.1"
   resolved "https://registry.yarnpkg.com/@dhis2/ui-core/-/ui-core-3.9.1.tgz#a5ce88537347a016edb453b9ae5039ec63300681"
   integrity sha512-derVmZZHrRAbAVlf029V0Pjlr3y7aBwj4Uyd/MqhlUfz3xkeS8X3dMiFpGLk0+4p2Y7q0/r/vPhK5l1zI5OFHA==
@@ -11440,7 +11456,7 @@ prop-types-exact@^1.2.0:
     object.assign "^4.1.0"
     reflect.ownkeys "^0.2.0"
 
-prop-types@^15.5.6, prop-types@^15.6.0, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15, prop-types@^15.5.6, prop-types@^15.6.0, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
