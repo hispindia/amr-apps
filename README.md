@@ -41,7 +41,6 @@ yarn build
 
 ```bash
 yarn bump        # 1.1.1 -> 1.1.2
-yarn bump        # 1.1.1 -> 1.1.2
 yarn bump minor  # 1.1.1 -> 1.2.0
 yarn bump major  # 1.1.1 -> 2.0.0
 ```
