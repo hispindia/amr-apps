@@ -34,7 +34,6 @@ yarn build
 ## Versioning
 ```bash
 yarn bump        # 1.1.1 -> 1.1.2
-yarn bump patch  # 1.1.1 -> 1.1.2
-yarn bump minor  # 1.1.1 -> 1.2.1
-yarn bump major  # 1.1.1 -> 2.1.1
+yarn bump minor  # 1.1.1 -> 1.2.0
+yarn bump major  # 1.1.1 -> 2.0.0
 ```
