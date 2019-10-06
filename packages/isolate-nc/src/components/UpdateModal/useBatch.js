@@ -3,6 +3,19 @@ import { useDispatch } from 'react-redux'
 import { showAlert } from '@hisp-amr/app'
 import { getEvent, putEvent } from '@hisp-amr/api'
 import { setValues } from './setValues'
+import {
+    ISOLATE_STATUS_ELEMENT,
+    ISOLATE_CONDITION_ELEMENT,
+    QUALITY_CHECK_ELEMENT,
+    MOLECULAR_TEST_ELEMENT,
+} from '../../constants/dataElements'
+
+const dataElementIds = [
+    ISOLATE_STATUS_ELEMENT,
+    ISOLATE_CONDITION_ELEMENT,
+    QUALITY_CHECK_ELEMENT,
+    MOLECULAR_TEST_ELEMENT,
+]
 
 export const useBatch = (
     eventIds,
@@ -71,6 +84,19 @@ export const useBatch = (
         if (!dataValue) event.dataValues.push({ dataElement, value })
         else dataValue.value = value
 
+        if (
+            dataElementIds.find(
+                id =>
+                    !event.dataValues.find(
+                        ({ dataElement }) => dataElement === id
+                    )
+            )
+        ) {
+            setData(newData)
+            return
+        }
+
+        putEvent(event)
         setData(newData)
     }
 

@@ -1,8 +1,7 @@
 import React from 'react'
 import { bool, func, string } from 'prop-types'
 import { Button } from '@dhis2/ui-core'
-import { Icon, icons } from '@hisp-amr/icons'
-import { LoadingIcon } from 'components/LoadingIcon'
+import { Icon, LoadingIcon, icons } from '@hisp-amr/icons'
 
 /**
  * Button with icon and loading spinner.

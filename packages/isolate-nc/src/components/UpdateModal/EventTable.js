@@ -1,6 +1,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { arrayOf, string, shape, func, bool } from 'prop-types'
+import styled from 'styled-components'
 import {
     Table,
     TableHead,
@@ -10,8 +11,10 @@ import {
     TableRow,
     TableCell,
     RadioGroup,
+    colors,
 } from '@dhis2/ui-core'
 import { DateInput } from '@hisp-amr/inputs'
+import { LoadingIcon } from '@hisp-amr/icons'
 import {
     AMR_ID_ELEMENT,
     ISOLATE_STATUS_ELEMENT,
@@ -51,11 +54,18 @@ const getOptions = (optionSets, id) =>
         label: name,
     }))
 
-const AmrId = ({ eventId, amrId, disabled }) => {
+const SavingIncicator = styled(LoadingIcon)`
+    color: ${colors.blue600} !important;
+    margin-left: 20px;
+`
+
+const AmrId = ({ eventId, amrId, disabled, loading }) => {
+    if (loading) return <SavingIncicator />
+
     if (disabled) return amrId
 
     return (
-        <a href={`${PATH}${eventId}`} target="_blank">
+        <a href={`${PATH}${eventId}`} target="_blank" rel="noopener noreferrer">
             {amrId}
         </a>
     )
@@ -94,6 +104,7 @@ export const EventTable = ({ data, onChange }) => {
             <TableBody>
                 {data.map(({ event, dataValues }) => {
                     const values = getValues(dataValues)
+                    console.log(values[1])
 
                     return (
                         <TableRow key={event}>
@@ -130,6 +141,7 @@ export const EventTable = ({ data, onChange }) => {
                                         )
                                     }
                                     options={conditionOptions}
+                                    disabled={values[1] !== 'Alive'}
                                 />
                             </TableCell>
                             <TableCell dense>
@@ -140,6 +152,7 @@ export const EventTable = ({ data, onChange }) => {
                                     onChange={(name, value) =>
                                         onChange(event, name, value)
                                     }
+                                    disabled={values[2] !== 'Pure'}
                                     small
                                 />
                             </TableCell>
@@ -151,6 +164,7 @@ export const EventTable = ({ data, onChange }) => {
                                     onChange={(name, value) =>
                                         onChange(event, name, value)
                                     }
+                                    disabled={values[2] !== 'Pure'}
                                     small
                                 />
                             </TableCell>

@@ -1,9 +1,8 @@
 import React from 'react'
 import { arrayOf, bool, func, shape, string } from 'prop-types'
 import { Button } from '@dhis2/ui-core'
-import { Icon, icons } from '@hisp-amr/icons'
+import { Icon, LoadingIcon, icons } from '@hisp-amr/icons'
 import { ButtonPadding, ButtonContainer } from './style'
-import { LoadingIcon } from 'components/LoadingIcon'
 
 /**
  * Row of buttons.
