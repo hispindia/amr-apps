@@ -3,7 +3,7 @@ import {
     DISPATCH_DATE_ELEMENT,
     DISPATCH_STATUS_ELEMENT,
     RECEIVED_DATE_ELEMENT,
-} from '../../constants/ids'
+} from '../../constants/dataElements'
 
 const findValue = (dataValues, id) =>
     dataValues.find(ev => ev.dataElement === id)

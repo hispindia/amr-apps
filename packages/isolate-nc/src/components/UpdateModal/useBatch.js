@@ -18,8 +18,6 @@ export const useBatch = (
         const getData = async () => {
             setLoading(true)
 
-            console.log(eventIds, batchId, received, dispatched, dispatchStatus)
-
             try {
                 const events = (await Promise.all(
                     eventIds.map(async e => await getEvent(e))
@@ -32,17 +30,11 @@ export const useBatch = (
                     })
                 )
 
-                console.log(events)
-
-                console.log(events.filter(e => e.updateNeeded))
-
-                /*const response = await Promise.all(
+                await Promise.all(
                     events
                         .filter(e => e.updateNeeded)
-                        .forEach(async e => await putEvent(e))
-                )*/
-
-                //console.log(response)
+                        .map(async e => await putEvent(e))
+                )
 
                 setData(events)
                 setError(false)

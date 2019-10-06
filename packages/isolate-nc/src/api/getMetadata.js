@@ -11,10 +11,12 @@ export const getMetadata = async () =>
                 'options[code,name]',
                 'access',
                 'code',
+                'formName',
             ],
             options: [
                 'programs=true',
                 'optionSets=true',
+                'dataElements=true',
                 'organisationUnits=true',
             ],
         })

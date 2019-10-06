@@ -8,6 +8,3 @@ export const ISOLATE_CONDITION_ELEMENT = 'H4s7FuoY3Hm'
 export const ISOLATE_STATUS_ELEMENT = 'KHHHMoiUsWZ'
 export const QUALITY_CHECK_ELEMENT = 'hQmS69HXStI'
 export const MOLECULAR_TEST_ELEMENT = 'qNmtxrjYccb'
-
-export const ISOLATE_CONDITION_SET = 'WaVwSkK76zO'
-export const ISOLATE_STATUS_SET = 'OeZFu9N3ihh'
