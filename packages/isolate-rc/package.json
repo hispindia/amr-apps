@@ -35,7 +35,7 @@
     },
     "dependencies": {
         "@date-io/dayjs": "^1.3.9",
-        "@dhis2/ui-core": "^3.11.2",
+        "@dhis2/ui-core": "^3.12.0",
         "@hisp-amr/app": "*",
         "@hisp-amr/icons": "*",
         "@hisp-amr/inputs": "*",

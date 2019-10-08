@@ -39,7 +39,7 @@
         "@hisp-amr/icons": "*",
         "@hisp-amr/inputs": "*",
         "@hisp-amr/org-unit-tree": "*",
-        "@dhis2/ui-core": "^3.11.2",
+        "@dhis2/ui-core": "^3.12.0",
         "react": "^16.9.0",
         "react-dom": "^16.9.0"
     }
