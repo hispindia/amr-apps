@@ -25,6 +25,11 @@ export const muiTheme = createMuiTheme({
                 cursor: 'pointer',
             },
         },
+        MuiTableCell: {
+            root: {
+                padding: '4px 46px 4px 18px',
+            },
+        },
         MuiModal: {
             root: {
                 zIndex: 10000,
