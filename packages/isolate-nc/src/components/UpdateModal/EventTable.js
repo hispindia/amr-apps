@@ -26,6 +26,10 @@ import {
     ISOLATE_CONDITION_SET,
     ISOLATE_STATUS_SET,
 } from '../../constants/optionSets'
+import {
+    ISOLATE_STATUS_ALIVE,
+    ISOLATE_CONDITION_PURE,
+} from '../../constants/options'
 
 const PATH = '../Isolate-Transfer/index.html#/event/'
 
@@ -104,11 +108,10 @@ export const EventTable = ({ data, onChange }) => {
             <TableBody>
                 {data.map(({ event, dataValues }) => {
                     const values = getValues(dataValues)
-                    console.log(values[1])
 
                     return (
                         <TableRow key={event}>
-                            <TableCell dense>
+                            <TableCell>
                                 <AmrId
                                     eventId={event}
                                     amrId={values[0]}
@@ -141,10 +144,12 @@ export const EventTable = ({ data, onChange }) => {
                                         )
                                     }
                                     options={conditionOptions}
-                                    disabled={values[1] !== 'Alive'}
+                                    disabled={
+                                        values[1] !== ISOLATE_STATUS_ALIVE
+                                    }
                                 />
                             </TableCell>
-                            <TableCell dense>
+                            <TableCell>
                                 <DateInput
                                     name={QUALITY_CHECK_ELEMENT}
                                     label=""
@@ -152,11 +157,13 @@ export const EventTable = ({ data, onChange }) => {
                                     onChange={(name, value) =>
                                         onChange(event, name, value)
                                     }
-                                    disabled={values[2] !== 'Pure'}
+                                    disabled={
+                                        values[2] !== ISOLATE_CONDITION_PURE
+                                    }
                                     small
                                 />
                             </TableCell>
-                            <TableCell dense>
+                            <TableCell>
                                 <DateInput
                                     name={MOLECULAR_TEST_ELEMENT}
                                     label=""

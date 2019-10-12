@@ -9,8 +9,11 @@ const Width = styled(MinWidth)`
     ${({ small }) => {
         if (small)
             return css`
-                width: 106px;
+                width: 100px;
                 min-width: unset;
+                input {
+                    padding-left: 14px !important;
+                }
             `
     }}
 `

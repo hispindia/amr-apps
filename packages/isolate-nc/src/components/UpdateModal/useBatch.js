@@ -9,6 +9,10 @@ import {
     QUALITY_CHECK_ELEMENT,
     MOLECULAR_TEST_ELEMENT,
 } from '../../constants/dataElements'
+import {
+    ISOLATE_STATUS_ALIVE,
+    ISOLATE_CONDITION_PURE,
+} from '../../constants/options'
 
 const dataElementIds = [
     ISOLATE_STATUS_ELEMENT,
@@ -16,6 +20,12 @@ const dataElementIds = [
     QUALITY_CHECK_ELEMENT,
     MOLECULAR_TEST_ELEMENT,
 ]
+
+const findDataValue = (dataValues, id) =>
+    dataValues.find(dv => dv.dataElement === id)
+
+const removeDataValues = (dataValues, ids) =>
+    dataValues.filter(dv => !ids.includes(dv.dataElement))
 
 export const useBatch = (
     eventIds,
@@ -77,12 +87,27 @@ export const useBatch = (
 
         const event = newData.find(e => e.event === eventId)
 
-        const dataValue = event.dataValues.find(
-            dv => dv.dataElement === dataElement
-        )
+        const dataValue = findDataValue(event.dataValues, dataElement)
 
         if (!dataValue) event.dataValues.push({ dataElement, value })
         else dataValue.value = value
+
+        if (
+            dataElement === ISOLATE_STATUS_ELEMENT &&
+            value !== ISOLATE_STATUS_ALIVE
+        )
+            event.dataValues = removeDataValues(
+                event.dataValues,
+                dataElementIds.slice(1)
+            )
+        else if (
+            dataElement === ISOLATE_CONDITION_ELEMENT &&
+            value !== ISOLATE_CONDITION_PURE
+        )
+            event.dataValues = removeDataValues(
+                event.dataValues,
+                dataElementIds.slice(2)
+            )
 
         if (
             dataElementIds.find(
