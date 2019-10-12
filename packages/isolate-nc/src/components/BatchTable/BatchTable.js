@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { bool, func } from 'prop-types'
-import { LoadingSection, Table } from '@hisp-amr/app'
+import { LoadingSection, Table, TitleRow } from '@hisp-amr/app'
 import { useBatches } from './useBatches'
 import { UpdateModal } from '../UpdateModal'
 import { UpdateButton } from './UpdateButton'
 import { ReceivedDate } from './ReceivedDate'
+
+const title = 'Dispatched batches'
 
 export const BatchTable = ({ onClick, refetch }) => {
     const orgUnit = useSelector(state => state.selectedOrgUnit)
@@ -64,6 +66,7 @@ export const BatchTable = ({ onClick, refetch }) => {
                     close={closeUpdate}
                 />
             )}
+            <TitleRow title={title} />
             {!error &&
                 (loading ? (
                     <LoadingSection />
