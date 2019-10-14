@@ -3,23 +3,48 @@ import { get, put, post, del } from './crud'
 window.fetch = jest.fn()
 
 describe('get', () => {
-    it('calls fetch get and receive json', () => {
-        const actual = { data: 'data' }
-        const expected = {
-            json: () => actual,
+    it('returns the data when everything is ok', () => {
+        const expected = 'data'
+        const response = {
+            ok: true,
+            json: () => expected,
         }
-        window.fetch.mockImplementationOnce(path => Promise.resolve(expected))
-        return expect(get('path')).resolves.toEqual(actual)
+        window.fetch.mockImplementationOnce(() => Promise.resolve(response))
+        return expect(get('path')).resolves.toEqual(expected)
     })
 })
 
 describe('put', () => {
-    it('calls fetch put with the expected data', () => {
-        const actual = 'config'
-        const expected = { ok: true, config: actual }
-        window.fetch.mockImplementationOnce((path, config) =>
-            Promise.resolve({ ok: true, config })
-        )
-        return expect(put('path', actual)).resolves.toEqual(expected)
+    it('returns the data when everything is ok', () => {
+        const expected = 'data'
+        const response = {
+            ok: true,
+            json: () => expected,
+        }
+        window.fetch.mockImplementationOnce(() => Promise.resolve(response))
+        return expect(put('path', expected)).resolves.toEqual(expected)
+    })
+})
+describe('post', () => {
+    it('returns the data when everything is ok', () => {
+        const expected = 'data'
+        const response = {
+            ok: true,
+            json: () => expected,
+        }
+        window.fetch.mockImplementationOnce(() => Promise.resolve(response))
+        return expect(post('path', expected)).resolves.toEqual(expected)
+    })
+})
+
+describe('del', () => {
+    it('returns the data when everything is ok', () => {
+        const expected = 'data'
+        const response = {
+            ok: true,
+            json: () => expected,
+        }
+        window.fetch.mockImplementationOnce(() => Promise.resolve(response))
+        return expect(del('path')).resolves.toEqual(expected)
     })
 })
