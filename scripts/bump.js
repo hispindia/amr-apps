@@ -5,6 +5,7 @@ const paths = [
     'packages/app/package.json',
     'packages/entry/package.json',
     'packages/isolate/package.json',
+    'packages/isolate-nc/package.json',
     'packages/isolate-rc/package.json',
 ]
 
