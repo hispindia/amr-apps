@@ -33,6 +33,7 @@ export const DateInput = props => {
             warning={!props.error && props.warning}
             error={props.error}
             picker={picker}
+            small={props.small}
         />
     )
 
@@ -56,4 +57,5 @@ DateInput.propTypes = {
     required: bool,
     disabled: bool,
     value: string,
+    small: bool,
 }

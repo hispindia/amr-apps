@@ -1,14 +1,12 @@
 import React from 'react'
 import { bool, func, string } from 'prop-types'
 import { Button } from '@dhis2/ui-core'
-import { Icon, icons } from '@hisp-amr/icons'
-import { LoadingIcon } from 'components/LoadingIcon'
+import { Icon, LoadingIcon, icons } from '@hisp-amr/icons'
 
 /**
- * Button with supporting tooltip and loading spinner.
+ * Button with icon and loading spinner.
  */
 export const RichButton = ({
-    tooltip,
     primary,
     secondary,
     destructive,
@@ -34,7 +32,6 @@ export const RichButton = ({
             small={small}
             large={large}
             initialFocus={initialFocus}
-            title="hello"
         >
             {label}
         </Button>
@@ -42,7 +39,6 @@ export const RichButton = ({
 }
 
 RichButton.propTypes = {
-    tooltip: string,
     primary: bool,
     secondary: bool,
     destructive: bool,

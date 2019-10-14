@@ -1,18 +1,24 @@
 import React from 'react'
-import { arrayOf, func, object, shape, string } from 'prop-types'
-import styled from 'styled-components'
+import { arrayOf, func, object, shape, string, bool } from 'prop-types'
+import styled, { css } from 'styled-components'
 import { Card } from '@dhis2/ui-core'
 import MUIDataTable from 'mui-datatables'
 
 const StyledCard = styled(Card)`
     height: unset !important;
+    ${({ noShadow }) => {
+        if (noShadow)
+            return css`
+                box-shadow: none !important;
+            `
+    }}
 `
 
 /**
  * Table containg the persons events.
  */
-export const Table = ({ rows, headers, onRowClick, title }) => (
-    <StyledCard>
+export const Table = ({ rows, headers, onRowClick, title, noShadow }) => (
+    <StyledCard noShadow={noShadow}>
         <MUIDataTable
             title={title}
             data={rows}
@@ -39,4 +45,5 @@ Table.propTypes = {
         })
     ).isRequired,
     title: string,
+    boxShadow: bool,
 }

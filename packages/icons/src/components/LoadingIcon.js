@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 const StyledSvg = styled.svg`
     fill: white;
@@ -34,12 +34,13 @@ const StyledSvg = styled.svg`
     }
 `
 
-export const LoadingIcon = () => (
+export const LoadingIcon = ({ className }) => (
     <StyledSvg
         xmlns="http://www.w3.org/2000/svg"
         width="48"
         height="48"
         viewBox="22 22 44 44"
+        className={className}
     >
         <circle cx="44" cy="44" r="20.2" fill="none" strokeWidth="3.6" />
     </StyledSvg>
