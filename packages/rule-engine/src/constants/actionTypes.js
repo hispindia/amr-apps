@@ -1,0 +1,6 @@
+export const SHOW_OPTION_GROUP = 'SHOWOPTIONGROUP'
+export const HIDE_FIELD = 'HIDEFIELD'
+export const HIDE_SECTION = 'HIDESECTION'
+export const ASSIGN = 'ASSIGN'
+export const SHOW_WARNING = 'SHOWWARNING'
+export const SHOW_ERROR = 'SHOWERROR'
