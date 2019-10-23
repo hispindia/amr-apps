@@ -1,5 +1,5 @@
 import { getError } from './getError'
-import { runRuleAction } from './runRuleAction'
+import { runEventAction } from './runEventAction'
 
 export const runEventRules = (
     values,
@@ -9,7 +9,7 @@ export const runEventRules = (
     rules.forEach(rule => {
         rule.programRuleActions.forEach(action => {
             try {
-                runRuleAction(
+                runEventAction(
                     values,
                     {
                         ...action,

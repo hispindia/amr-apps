@@ -8,7 +8,7 @@ import {
     SHOW_ERROR,
 } from '../constants/actionTypes'
 
-export const runRuleAction = (
+export const runEventAction = (
     values,
     {
         condition,
