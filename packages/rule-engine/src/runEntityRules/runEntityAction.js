@@ -1,4 +1,4 @@
-import { SHOW_OPTION_GROUP, HIDE_FIELD } from './constants/actionTypes'
+import { SHOW_OPTION_GROUP, HIDE_FIELD } from '../constants/actionTypes'
 
 const findAttribute = (id, attributes) =>
     attributes.find(a => a.trackedEntityAttribute.id == id)
@@ -22,7 +22,7 @@ export const runEntityAction = (
                     optionGroup.id
                 ) {
                     affectedAttr.trackedEntityAttribute.optionSet = {
-                        id: r.optionGroup.id,
+                        id: optionGroup.id,
                     }
                     // Only reset selected value if the options do not include current value.
                     if (

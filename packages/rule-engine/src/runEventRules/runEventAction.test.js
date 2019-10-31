@@ -1,5 +1,5 @@
 import { runEventAction } from './runEventAction'
-import { dataElements, programStageSections, values } from '../__test__'
+import { dataElementsOutput, programStageSections, values } from '../__test__'
 import {
     SHOW_OPTION_GROUP,
     HIDE_FIELD,
@@ -8,13 +8,10 @@ import {
     SHOW_ERROR,
 } from '../constants/actionTypes'
 
-const programStage = {
-    dataElements,
-    programStageSections,
-}
+const programStage = programsOutput[1].programStage[0]
 
 describe('runEventAction', () => {
-    it('sets the option set and calls updateValue', () => {
+    it('sets the option set', () => {
         const expected = 'id'
         const id = 'dRKIjwIDab4'
         const dataElement = programStage.dataElements[id]

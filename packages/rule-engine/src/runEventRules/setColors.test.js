@@ -1,10 +1,12 @@
 import { setColors } from './setColors'
-import { dataElements, values } from '../__test__'
+import { values, programsOutput } from '../__test__'
 
 const result = 'KmgWX65h0iM'
 const mic = 'GYNpOJWcNx2'
 const dd = 'VGdJnkTlNyK'
 const condition = `values['${mic}'] || values['${dd}']`
+
+const dataElements = programsOutput[1].programStages[0].dataElements
 
 describe('setColors', () => {
     it('does not set any colors when the affected data element is not a test value', () => {

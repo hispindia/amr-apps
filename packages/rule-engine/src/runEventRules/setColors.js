@@ -34,8 +34,8 @@ export const setColors = (
     values,
     { condition, affected, value }
 ) => {
-    if (!affected.optionSetValue) return
-    if (affected.optionSet !== TEST_RESULT_ELEMENT) return
+    if (!affected.optionSetValue || affected.optionSet !== TEST_RESULT_ELEMENT)
+        return
     const variables = getVariables(condition)
     variables.forEach(id => {
         const dataElement = dataElements[id]
