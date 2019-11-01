@@ -1,5 +1,5 @@
 import { runEventAction } from './runEventAction'
-import { dataElementsOutput, programStageSections, values } from '../__test__'
+import { values, programsOutput } from '../__test__'
 import {
     SHOW_OPTION_GROUP,
     HIDE_FIELD,
@@ -8,7 +8,7 @@ import {
     SHOW_ERROR,
 } from '../constants/actionTypes'
 
-const programStage = programsOutput[1].programStage[0]
+const programStage = programsOutput[1].programStages[0]
 
 describe('runEventAction', () => {
     it('sets the option set', () => {

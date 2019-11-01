@@ -9,7 +9,7 @@ const programStage = {
 describe('runEventRules', () => {
     it('does not crash when there is a problem with a rule', () => {
         runEventRules(values, programStage, {
-            rules: [
+            programRules: [
                 {
                     programRuleActions: [
                         {

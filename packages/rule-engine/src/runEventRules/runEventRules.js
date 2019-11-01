@@ -1,12 +1,23 @@
 import { getError } from './getError'
 import { runEventAction } from './runEventAction'
 
+/**
+ *
+ * @param {Object} values
+ * @param {Object} programStage
+ * @param {{
+ *     programRules: Object[],
+ *     optionSets: Object,
+ *     pushChanges: Boolean,
+ *     updateValue: Function
+ * }} params
+ */
 export const runEventRules = (
     values,
-    stage,
-    { rules, optionSets, pushChanges, updateValue }
+    programStage,
+    { programRules, optionSets, pushChanges, updateValue }
 ) => {
-    rules.forEach(rule => {
+    programRules.forEach(rule => {
         rule.programRuleActions.forEach(action => {
             try {
                 runEventAction(
@@ -16,7 +27,7 @@ export const runEventRules = (
                         condition: rule.condition,
                     },
                     {
-                        stage,
+                        stage: programStage,
                         optionSets,
                         pushChanges,
                         updateValue,
@@ -29,10 +40,10 @@ export const runEventRules = (
     })
 
     const error = getError(
-        stage.dataElements,
+        programStage.dataElements,
         values,
-        stage.programStageSections
+        programStage.programStageSections
     )
 
-    return [values, stage, error]
+    return [values, programStage, error]
 }

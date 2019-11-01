@@ -1,0 +1,1 @@
+export { trackedEntityAttributes } from './trackedEntityAttributes'

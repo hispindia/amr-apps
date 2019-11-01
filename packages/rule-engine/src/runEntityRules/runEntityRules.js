@@ -1,39 +1,33 @@
 import { runEntityAction } from './runEntityAction'
 
-const validate = (values, attributes, uniques) => {
-    if (
-        attributes.find(
-            a => a.mandatory && values[a.trackedEntityAttribute.id] === ''
-        )
+const validate = trackedEntityAttributes =>
+    !Object.keys(trackedEntityAttributes).find(
+        id =>
+            trackedEntityAttributes[id].mandatory &&
+            trackedEntityAttributes[id].value === ''
     )
-        return false
-    for (const key in uniques) if (!uniques[key]) return false
-    return true
-}
 
 export const runEntityRules = (
-    values,
-    attributes,
-    { rules, optionSets, uniques }
+    trackedEntityAttributes,
+    programRules,
+    optionSets
 ) => {
-    rules.forEach(rule => {
+    programRules.forEach(rule => {
         rule.programRuleActions.forEach(action => {
             try {
                 runEntityAction(
-                    values,
                     {
                         ...action,
                         condition: rule.condition,
                     },
-                    {
-                        attributes,
-                        optionSets,
-                    }
+
+                    trackedEntityAttributes,
+                    optionSets
                 )
             } catch (error) {
                 console.warn('Failed to evaluate rule:', rule, error)
             }
         })
     })
-    return [values, attributes, validate(values, attributes, uniques)]
+    return [trackedEntityAttributes, validate(trackedEntityAttributes)]
 }

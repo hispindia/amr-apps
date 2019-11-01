@@ -1,50 +1,41 @@
 import { runEntityAction } from './runEntityAction'
 import { attributeValues, attributes } from '../__test__'
+import { trackedEntityAttributes } from '../__test__/output'
 import { SHOW_OPTION_GROUP, HIDE_FIELD } from '../constants/actionTypes'
+
+const ID = 'SOVNMvY8TOf'
 
 describe('runEntityAction', () => {
     it('sets the option set', () => {
         const expected = 'optionSet2'
-        const id = 'tea5'
-        const trackedEntityAttribute = attributes.find(
-            a => a.trackedEntityAttribute.id === id
-        ).trackedEntityAttribute
+        const trackedEntityAttribute = trackedEntityAttributes[ID]
 
         runEntityAction(
-            attributeValues,
             {
                 condition: 'true',
                 trackedEntityAttribute,
                 programRuleActionType: SHOW_OPTION_GROUP,
                 optionGroup: { id: expected },
             },
-            {
-                attributes,
-                optionSets: { [trackedEntityAttribute]: [], [expected]: [] },
-            }
+            trackedEntityAttributes,
+            { [trackedEntityAttribute]: [], [expected]: [] }
         )
 
         return expect(trackedEntityAttribute.optionSet.id).toEqual(expected)
     })
 
     it('hides the field', () => {
-        const id = 'tea5'
-        const attribute = attributes.find(
-            a => a.trackedEntityAttribute.id === id
-        )
+        const trackedEntityAttribute = trackedEntityAttributes[ID]
 
         runEntityAction(
-            attributeValues,
             {
                 condition: 'true',
-                trackedEntityAttribute: attribute.trackedEntityAttribute,
+                trackedEntityAttribute,
                 programRuleActionType: HIDE_FIELD,
             },
-            {
-                attributes,
-            }
+            trackedEntityAttributes
         )
 
-        return expect(attribute.hide).toEqual(true)
+        return expect(trackedEntityAttribute.hide).toEqual(true)
     })
 })

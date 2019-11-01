@@ -1,3 +1,5 @@
+import { initOptions } from './initOptions'
+
 /**
  * @typedef {Object} Option
  * @property {string} label - Display name
@@ -20,12 +22,15 @@
  * @param {Object[]} optionGroups
  * @returns {CompinedOptions}
  */
-export const setOptionSets = (options, optionSets, optionGroups) =>
-    Object.assign(
+export const initOptionSets = (options, optionSets, optionGroups) => {
+    const optionsObjectified = initOptions(options)
+
+    return Object.assign(
         ...optionGroups.map(os => ({
-            [os.id]: os.options.map(o => options[o.id]),
+            [os.id]: os.options.map(o => optionsObjectified[o.id]),
         })),
         ...optionSets.map(os => ({
-            [os.id]: os.options.map(o => options[o.id]),
+            [os.id]: os.options.map(o => optionsObjectified[o.id]),
         }))
     )
+}

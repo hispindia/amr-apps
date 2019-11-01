@@ -14,7 +14,7 @@
  * @param {Object[]} options
  * @returns {Options}
  */
-export const setOptions = options =>
+export const initOptions = options =>
     Object.assign(
         {},
         ...options.map(o => ({
