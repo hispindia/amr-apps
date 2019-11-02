@@ -89,4 +89,3 @@ export const useEvents = status => {
 
     return state
 }
-

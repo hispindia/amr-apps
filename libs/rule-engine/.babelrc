@@ -4,6 +4,7 @@
         "@babel/plugin-proposal-class-properties",
         "@babel/plugin-proposal-object-rest-spread",
         "@babel/plugin-transform-react-constant-elements",
-        "@babel/plugin-transform-runtime",
-    ]
+        "@babel/plugin-transform-runtime"
+    ],
+    "ignore": ["*/__test__"]
 }
