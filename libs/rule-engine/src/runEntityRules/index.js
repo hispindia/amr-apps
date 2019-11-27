@@ -1,1 +1,0 @@
-export { runEntityRules } from './runEntityRules'

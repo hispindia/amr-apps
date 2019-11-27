@@ -1,1 +1,0 @@
-export { initData } from './initData'
