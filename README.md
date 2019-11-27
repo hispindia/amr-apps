@@ -2,18 +2,19 @@
 
 ## Apps
 
--   [Data Entry](./packages/entry)
--   [Isolate Transfer](./packages/isolate)
--   [RC - Isolate Transfer](./packages/isolate-rc)
--   [NC - Isolate Transfer](./packages/isolate-nc)
+-   [Data Entry](./apps/entry)
+-   [Isolate Transfer](./apps/isolate)
+-   [RC - Isolate Transfer](./apps/isolate-rc)
+-   [NC - Isolate Transfer](./apps/isolate-nc)
 
 ## Libs
 
--   [@hisp-amr/api](./packages/api) ([npm](https://www.npmjs.com/package/@hisp-amr/api))
--   [@hisp-amr/app](./packages/app)
--   [@hisp-amr/icons](./packages/icons)
--   [@hisp-amr/inputs](./packages/inputs)
--   [@hisp-amr/org-unit-tree](./packages/org-unit-tree) ([npm](https://www.npmjs.com/package/@hisp-amr/org-unit-tree))
+-   [@hisp-amr/api](./libs/api) ([npm](https://www.npmjs.com/package/@hisp-amr/api))
+-   [@hisp-amr/app](./libs/app)
+-   [@hisp-amr/icons](./libs/icons)
+-   [@hisp-amr/inputs](./libs/inputs)
+-   [@hisp-amr/org-unit-tree](./libs/org-unit-tree) ([npm](https://www.npmjs.com/package/@hisp-amr/org-unit-tree))
+-   [@hisp-amr/rule-engine](./libs/rule-engine)
 
 ## Installation
 
