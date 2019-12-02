@@ -2,11 +2,11 @@ const fs = require('fs')
 
 const paths = [
     'package.json',
-    'packages/app/package.json',
-    'packages/entry/package.json',
-    'packages/isolate/package.json',
-    'packages/isolate-nc/package.json',
-    'packages/isolate-rc/package.json',
+    'libs/app/package.json',
+    'apps/entry/package.json',
+    'apps/isolate/package.json',
+    'apps/isolate-nc/package.json',
+    'apps/isolate-rc/package.json',
 ]
 
 const getVersionType = arg => {
