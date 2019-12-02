@@ -1,0 +1,13 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="24" cy="24" r="23.5" fill="#449B00" stroke="black"/>
+<ellipse cx="35.52" cy="29.5199" rx="8.16" ry="7.92" fill="white" fill-opacity="0.38"/>
+<ellipse cx="23.7601" cy="38.8801" rx="4.56" ry="4.32" fill="white" fill-opacity="0.38"/>
+<ellipse cx="12.2399" cy="25.4398" rx="9.36" ry="9.12" fill="white" fill-opacity="0.38"/>
+<circle cx="20.16" cy="9.11988" r="6.24" fill="white" fill-opacity="0.38"/>
+<circle cx="35.28" cy="14.64" r="6" fill="white" fill-opacity="0.38"/>
+<circle cx="23.76" cy="38.6398" r="1.68" transform="rotate(-90 23.76 38.6398)" fill="white"/>
+<path d="M37.44 29.5201C37.44 30.4479 36.6878 31.2001 35.76 31.2001C34.8321 31.2001 34.08 30.4479 34.08 29.5201C34.08 28.5922 34.8321 27.8401 35.76 27.8401C36.6878 27.8401 37.44 28.5922 37.44 29.5201Z" fill="white"/>
+<circle cx="12.2401" cy="25.68" r="1.68" fill="white"/>
+<path d="M36.96 14.8801C36.96 15.8079 36.2079 16.5601 35.28 16.5601C34.3522 16.5601 33.6 15.8079 33.6 14.8801C33.6 13.9522 34.3522 13.2001 35.28 13.2001C36.2079 13.2001 36.96 13.9522 36.96 14.8801Z" fill="white"/>
+<circle cx="20.4" cy="9.36018" r="1.68" fill="white"/>
+</svg>
