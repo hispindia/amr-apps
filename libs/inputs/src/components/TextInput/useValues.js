@@ -16,12 +16,6 @@ const reducer = (state, action) => {
                 value: action.value,
             }
         }
-        case types.SET_HASHED_VALUE: {
-            return {
-                ...state,
-                hashedValue: action.value,
-            }
-        }
         case types.SET_ERROR: {
             return {
                 ...state,
@@ -43,7 +37,6 @@ const reducer = (state, action) => {
 export const useValues = () =>
     useReducer(reducer, {
         value: '',
-        hashedValue: '',
         validating: false,
         error: null,
     })

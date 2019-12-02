@@ -1,7 +1,6 @@
 export const types = {
     VALUE_PROP: 0,
     SET_VALUE: 1,
-    SET_HASHED_VALUE: 2,
     SET_ERROR: 3,
     SET_VALIDATING: 4,
 }
