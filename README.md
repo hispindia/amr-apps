@@ -45,3 +45,6 @@ yarn bump        # 1.1.1 -> 1.1.2
 yarn bump minor  # 1.1.1 -> 1.2.0
 yarn bump major  # 1.1.1 -> 2.0.0
 ```
+
+## App icons
+App icons are in [/app-icons](./app-icons).
