@@ -21,6 +21,8 @@ export const useBatches = (filterBatches, refetch) => {
                 setData(filterBatches(response[selected.code]))
                 setError(false)
             } catch (e) {
+                console.log('false loading')
+                setLoading(false)
                 if (e === 404) {
                     setData([])
                     setError(false)
@@ -40,7 +42,10 @@ export const useBatches = (filterBatches, refetch) => {
 
         if (selected) {
             if (selected.code) getData()
-            else setData([])
+            else {
+                setData([])
+                setLoading(false)
+            }
         }
     }, [selected, refetch])
 
