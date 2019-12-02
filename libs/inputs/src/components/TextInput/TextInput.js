@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import { bool, func, string } from 'prop-types'
 import { Help } from '@dhis2/ui-core'
-import { hash } from 'utils'
 import { MinWidth } from '../MinWidth'
 import { types, texts } from './constants'
 import { useValues } from './useValues'
@@ -12,11 +11,11 @@ import { StyledInputField } from './StyledInputField'
  * Textfield input.
  */
 export const TextInput = props => {
-    const [{ value, hashedValue, validating, error }, dispatch] = useValues()
+    const [{ value, validating, error }, dispatch] = useValues()
     const [debouncedValue, setDebouncedValue] = useDebounce(value, 2000)
 
     useEffect(() => {
-        if (props.value !== value && props.value !== hashedValue)
+        if (props.value !== value)
             dispatch({ type: types.VALUE_PROP, value: props.value })
     }, [props.value])
 
@@ -33,10 +32,6 @@ export const TextInput = props => {
      * Passes the value to parent component after 1 sec.
      */
     const passValue = async value => {
-        if (props.unique && value !== '') {
-            value = hash(value)
-            dispatch({ type: types.SET_HASHED_VALUE, value: value })
-        }
         await validate(value)
         props.onChange(props.name, value, props.unique)
     }
@@ -59,8 +54,7 @@ export const TextInput = props => {
 
     const onInput = ({ target }) => {
         const value = target.value
-        if (!validating && value.length < 128)
-            dispatch({ type: types.SET_VALUE, value: value })
+        if (!validating) dispatch({ type: types.SET_VALUE, value: value })
     }
 
     const onKeyDown = ({ key }) => {
@@ -75,7 +69,7 @@ export const TextInput = props => {
                 required={props.required}
                 name={props.name}
                 label={props.label}
-                value={value && value.length > 127 ? '' : value}
+                value={value}
                 onChange={onInput}
                 onBlur={onBlur}
                 loading={props.loading || validating}
@@ -87,9 +81,6 @@ export const TextInput = props => {
                 disabled={props.disabled}
                 type={props.type}
                 dense
-                placeholder={
-                    value && value.length > 127 ? '<Confidential>' : ''
-                }
                 color={props.color}
             />
             {(validating ||
