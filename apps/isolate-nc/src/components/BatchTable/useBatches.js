@@ -73,7 +73,10 @@ export const useBatches = refetch => {
 
         if (selected) {
             if (selected.code) getData()
-            else setData([])
+            else {
+                setData([])
+                setLoading(false)
+            }
         }
     }, [selected, refetch])
 
