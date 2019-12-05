@@ -8,7 +8,16 @@ import {
 } from '@hisp-amr/app'
 import { Table } from './Table'
 import { useEvents } from './useEvents'
-import { titles, headers } from './config'
+import { icmr, tanda } from 'config'
+
+if (!process.env.REACT_APP_DHIS2_TABLE_CONFIG)
+    throw new Error(
+        'The environment variable REACT_APP_DHIS2_TABLE_CONFIG must be set'
+    )
+
+const { titles, headers } = { icmr, tanda }[
+    process.env.REACT_APP_DHIS2_TABLE_CONFIG
+]
 
 const title = {
     true: 'You cannot add records for the selected location',

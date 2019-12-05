@@ -25,12 +25,16 @@
         "48": "appicon-48x48.svg"
     },
     "scripts": {
-        "start": "PORT=3001 react-scripts start",
-        "build": "react-scripts build",
+        "start": "REACT_APP_DHIS2_TABLE_CONFIG=tanda PORT=3001 react-scripts start",
+        "build": "yarn build:icmr && yarn build:tanda",
+        "build:icmr": "REACT_APP_DHIS2_TABLE_CONFIG=icmr react-scripts build",
+        "build:tanda": "REACT_APP_DHIS2_TABLE_CONFIG=tanda react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
-        "prebuild": "rimraf build ../../amr-entry.zip && d2-manifest package.json public/manifest.webapp",
-        "postbuild": "cd build && bestzip ../../../amr-entry.zip *",
+        "prebuild:icmr": "rimraf build ../../amr-entry-icmr.zip && d2-manifest package.json public/manifest.webapp",
+        "postbuild:icmr": "cd build && bestzip ../../../amr-entry-icmr.zip *",
+        "prebuild:tanda": "rimraf build ../../amr-entry-tanda.zip && d2-manifest package.json public/manifest.webapp",
+        "postbuild:tanda": "cd build && bestzip ../../../amr-entry-tanda.zip *",
         "analyze": "source-map-explorer build/static/js/*.js'"
     },
     "dependencies": {
